@@ -1,0 +1,62 @@
+---
+version: 2
+plan:
+  project-key: CL
+  key: FLMCP
+  name: Filter List Manager - Cargo publish
+
+stages:
+  - Publish:
+      manual: false
+      final: true
+      jobs:
+        - Test and Publish
+
+Test and Publish:
+  key: TAP
+  docker:
+    image: rust:1.75
+    volumes:
+      ${bamboo.working.directory}: ${bamboo.working.directory}
+      ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
+      ${bamboo.git.cache.directory}: ${bamboo.git.cache.directory}
+      ${system.HOME}/.ssh: /root/.ssh
+      ${system.HOME}/.cargo/registry: /root/.cargo/registry
+  tasks:
+    - !include 'docker-clean.yaml'
+    - checkout:
+        force-clean-build: 'true'
+        description: Checkout Default Repository
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            git status
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            ./bamboo-specs/scripts/run_tests.sh
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            ./bamboo-specs/scripts/cargo_publish.sh
+        description: Cargo publish
+  artifact-subscriptions: [ ]
+
+repositories:
+  - core-libs/filter-list-manager:
+      scope: global
+
+branches:
+  create: manually
+  delete: never
+  link-to-jira: true
+
+notifications: [ ]
+labels: [ ]
+triggers: [ ]
+
+other:
+  concurrent-build-plugin: system-default

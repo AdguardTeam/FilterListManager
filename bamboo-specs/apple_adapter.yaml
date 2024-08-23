@@ -1,0 +1,58 @@
+---
+version: 2
+plan:
+  project-key: CL
+  key: FLMBFM
+  name: Filter List Manager - build for macOS
+
+stages:
+  - Default Stage:
+      manual: false
+      final: false
+      jobs:
+        - Default Job
+
+Default Job:
+  key: JOB1
+  tasks:
+    - checkout:
+        repository: core-libs/filter-list-manager
+        force-clean-build: 'true'
+    - checkout:
+        repository: podspecs
+        path: podspecs
+        force-clean-build: 'true'
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            ./bamboo-specs/scripts/xcframework_build.sh
+        description: Build XCFramework
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            ./bamboo-specs/scripts/deploy_swift.sh
+        description: Deploy Swift package and CocoaPod
+  requirements:
+    - ARM
+    - Rust
+  artifact-subscriptions: [ ]
+
+repositories:
+  - core-libs/filter-list-manager:
+      scope: global
+  - podspecs:
+      scope: global
+
+notifications: [ ]
+labels: [ ]
+triggers: [ ]
+
+branches:
+  create: manually
+  delete: never
+  link-to-jira: true
+
+other:
+  concurrent-build-plugin: system-default

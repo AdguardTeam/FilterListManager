@@ -1,0 +1,101 @@
+---
+version: 2
+branches:
+  create: manually
+plan:
+  project-key: WIN
+  key: BFLMW
+  name: Build Filter List Manager Windows
+stages:
+- Default Stage:
+    manual: false
+    final: false
+    jobs:
+    - Default Job
+Default Job:
+  key: JOB1
+  tasks:
+  - checkout:
+      force-clean-build: 'true'
+      description: Checkout main repository
+  - checkout:
+      description: Checkout private repository
+      repository: adguard-windows-private
+      path: ${bamboo.private_repo_path}
+      force-clean-build: 'true'
+  - script:
+      interpreter: WINDOWS_POWER_SHELL
+      description: Set first project to update
+      scripts:
+      - |-
+        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        SetRootFolder "${bamboo.root_folder}"
+        InitializeProjects
+        SetFirstProjectToUpdate   
+  - inject-variables:
+      file: project_to_update.txt
+      scope: LOCAL
+      namespace: common     
+  - script:
+      interpreter: WINDOWS_POWER_SHELL
+      description: Main build
+      scripts:
+      - |-
+        
+        . "${bamboo.root_folder}\build.ps1"
+        RustBuild
+      
+        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        VersionIncrement "${Env:bamboo_planRepository_repositoryUrl}";
+        MainBuild "${bamboo.build_configuration}" "${bamboo.define_constants}" "${bamboo.build_folder}";
+      environment: channel="${bamboo.channel}" "use_force_master="${bamboo.use_force_master}"
+  - script:
+      interpreter: WINDOWS_POWER_SHELL
+      description: Run unit tests
+      scripts:
+      - |-
+        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        RunUnitTests "${bamboo.build_platform}" "${bamboo.build_configuration}" "${bamboo.build_folder}"
+  - any-task:
+      plugin-key: com.atlassian.bamboo.plugin.dotnet:mstest
+      configuration:
+        mstestTestResultsDirectory: TestResults\TestResults.trx
+        pickupOutdatedFiles: 'true'
+  - script:
+      interpreter: WINDOWS_POWER_SHELL
+      description: Main deploy
+      scripts:
+      - |-
+        . "${bamboo.deploy_folder}\main_deploy.ps1";
+        MainDeploy "${bamboo.build_folder}" "$Env:bamboo_windowsCertStoragePassword" ${bamboo.skip_signing_libs};
+      environment: use_force_master="${bamboo.use_force_master}"   
+  artifacts:
+  - name: dll
+    pattern: '*.dll'
+    shared: true
+    required: true
+  - name: nupkg
+    pattern: '*.nupkg'
+    shared: true
+    required: true
+  requirements:
+  - system.builder.msbuild.MSBuild v15.0 (32bit)
+variables:
+  build_configuration: Release
+  build_folder: platform\windows\build\bin\Release
+  build_platform: AnyCPU
+  channel: release
+  code_coverage_threshold_percent: '1'
+  define_constants: BUILD=Release
+  deploy_folder: platform\windows\adguard-windows-private\bamboo-specs
+  use_force_master: 'false'
+  private_repo_path: platform/windows/adguard-windows-private
+  deploy_script: "main_deploy.ps1"
+  # opencover: opencover.xml
+  root_folder: platform/windows
+  skip_signing_libs: $False
+  private_repo_hash: latest
+notifications: []
+labels: []
+other:
+  concurrent-build-plugin: system-default

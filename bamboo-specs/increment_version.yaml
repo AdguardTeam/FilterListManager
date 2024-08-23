@@ -1,0 +1,53 @@
+---
+version: 2
+
+plan:
+  project-key: CL
+  key: FLMIV
+  name: Filter List Manager - Increment version
+
+stages:
+  - Default Stage:
+      manual: false
+      final: false
+      jobs:
+        - Increment
+
+Increment:
+  key: JOB1
+  docker:
+    image: adguard/core-libs:2.1
+    volumes:
+      ${bamboo.working.directory}: ${bamboo.working.directory}
+      ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
+      ${bamboo.git.cache.directory}: ${bamboo.git.cache.directory}
+      ${system.HOME}/.ssh: /root/.ssh
+      ${system.HOME}/.cargo/registry: /root/.cargo/registry
+    docker-run-arguments: []
+  tasks:
+    - !include 'docker-clean.yaml'
+    - checkout:
+        force-clean-build: 'true'
+        description: Checkout Default Repository
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            ./bamboo-specs/scripts/increment_version.sh
+        description: Increment version
+  artifact-subscriptions: [ ]
+
+repositories:
+  - core-libs/filter-list-manager:
+      scope: global
+
+branches:
+  create: manually
+  delete: never
+  link-to-jira: true
+
+notifications: [ ]
+labels: [ ]
+
+other:
+  concurrent-build-plugin: system-default

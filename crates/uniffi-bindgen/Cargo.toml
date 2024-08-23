@@ -1,0 +1,12 @@
+[package]
+name = "uniffi-bindgen"
+version = "0.2.0"
+edition = "2021"
+
+[[bin]]
+# This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+
+[dependencies]
+uniffi.workspace = true

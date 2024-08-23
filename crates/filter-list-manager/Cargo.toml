@@ -1,0 +1,35 @@
+[package]
+name = "adguard-flm"
+version = "0.5.0"
+edition = "2021"
+homepage.workspace = true
+license-file.workspace = true
+repository.workspace = true
+description = "This crate represents a library for managing AdGuard filter lists"
+
+[dependencies]
+tokio = { version = "1.34.0", features = ["full"] }
+reqwest = { version = "0.11", features = ["json", "blocking"] }
+serde = { version = "1.0.193", features = ["derive"] }
+chrono = { version = "0.4.31", features = ["serde"] }
+chrono-tz = "0.8.4"
+nom = "7.1.3"
+url = "2.5.0"
+sha1 = "0.10.6"
+md5 = "0.7.0"
+base64 = "0.22.1"
+regex.workspace = true
+rusqlite.workspace = true
+uniffi.workspace = true
+thiserror.workspace = true
+
+[features]
+default = ["rusqlite-bundled"]
+rusqlite-bundled = ["rusqlite/bundled"]
+
+[dev-dependencies]
+libc = "0.2.153"
+once_cell = "1.19.0"
+serde_json = "1.0.115"
+rand = "0.8.5"
+rusty-hook = "^0.11.2"

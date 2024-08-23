@@ -1,0 +1,7 @@
+[bindings.swift]
+ffi_module_name = "AdguardFLMFFI"
+module_name = "FilterListManager"
+
+[bindings.csharp]
+cdylib_name = "adguard-flm"
+namespace = "com.adguard.flm"

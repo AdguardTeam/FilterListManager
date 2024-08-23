@@ -1,0 +1,5 @@
+framework module AdGuardFLM {
+    umbrella header "AdGuardFLM.h"
+    export *
+    module * { export * }
+}

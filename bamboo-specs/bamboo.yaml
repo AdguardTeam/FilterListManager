@@ -1,0 +1,10 @@
+---
+!include 'windows_adapter.yaml'
+---
+!include 'apple_adapter.yaml'
+---
+!include 'increment_version.yaml'
+---
+!include 'cargo_publish.yaml'
+---
+!include 'tests.yaml'

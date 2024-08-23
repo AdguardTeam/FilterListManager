@@ -1,0 +1,56 @@
+---
+version: 2
+plan:
+  project-key: CL
+  key: FLMRT
+  name: Filter List Manager - Run tests
+
+stages:
+  - Tests:
+      manual: false
+      final: false
+      jobs:
+        - Run tests
+
+Run tests:
+  key: JOB1
+  docker:
+    image: rust:1.75
+    volumes:
+      ${bamboo.working.directory}: ${bamboo.working.directory}
+      ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
+      ${bamboo.git.cache.directory}: ${bamboo.git.cache.directory}
+      ${system.HOME}/.ssh: /root/.ssh
+      ${system.HOME}/.cargo/registry: /root/.cargo/registry
+  tasks:
+    - !include 'docker-clean.yaml'
+    - checkout:
+        force-clean-build: 'true'
+        description: Checkout Default Repository
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            ./bamboo-specs/scripts/run_tests.sh
+        description: Run tests
+  artifact-subscriptions: [ ]
+
+repositories:
+  - core-libs/filter-list-manager:
+      scope: global
+
+branches:
+  create: for-pull-request
+  delete:
+    after-deleted-days: 7
+    after-inactive-days: 30
+  integration:
+    push-on-success: false
+    merge-from: CoreLibs - Run instrumented tests
+  link-to-jira: true
+
+notifications: [ ]
+labels: [ ]
+
+other:
+  concurrent-build-plugin: system-default

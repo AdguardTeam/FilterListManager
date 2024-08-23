@@ -1,0 +1,18 @@
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+[workspace.package]
+homepage = "https://adguard.com"
+license-file = "LICENSE"
+repository = "https://github.com/AdguardTeam/FilterListManager"
+
+[workspace.dependencies]
+uniffi = { version = "0.25.0", features = ["build", "cli"] }
+rusqlite = { version = "0.30.0", features = ["chrono"] }
+regex = "1.10.2"
+thiserror = "1.0.61"
+
+[profile.release]
+lto = "thin"
+debug = true

@@ -1,0 +1,360 @@
+mod recognize_rcs;
+
+use self::recognize_rcs::{recognize_rcs, RCSOperations};
+use crate::FilterParserError;
+
+/// Applies `diff` to `base_filter`
+///
+/// Returns just an empty string if error encountered
+pub(crate) fn apply_patch(
+    base_filter: &str,
+    diff_lines: Vec<&str>,
+) -> Result<String, FilterParserError> {
+    let mut diff_iter = diff_lines.iter().enumerate();
+    let base_filter_lines: Vec<&str> = base_filter.lines().collect();
+
+    let mut slices: Vec<&[&str]> = vec![];
+    let mut base_filter_cursor = 0usize;
+
+    while let Some((index, line)) = diff_iter.next() {
+        if line.is_empty() {
+            continue;
+        }
+
+        match recognize_rcs(line) {
+            Ok((_, None)) => {
+                // Just a regular line. Do nothing
+            }
+            Ok((_, Some((operation, line, count)))) => {
+                // Recognized rcs
+                match operation {
+                    RCSOperations::Add => {
+                        // If we have a gap between current base_filter_cursor and current diff line
+                        // we should write all lines in this gap first
+                        if base_filter_cursor + 1 < line {
+                            // Wrong diff encountered
+                            if base_filter_lines.len() < line {
+                                return make_line_out_of_bounds_error(
+                                    line,
+                                    base_filter_lines.as_slice(),
+                                    diff_lines.as_slice(),
+                                );
+                            }
+
+                            slices.push(
+                                base_filter_lines[base_filter_cursor..line]
+                                    .iter()
+                                    .as_slice(),
+                            );
+                            base_filter_cursor = line;
+                        }
+
+                        // Here we add lines from diff in specified range (next_line..count_next_lines)
+                        slices.push(
+                            diff_lines[(index + 1)..(index + count + 1)]
+                                .iter()
+                                .as_slice(),
+                        );
+                    }
+                    RCSOperations::Delete => {
+                        // Delete is first in diff, in that case we don't need to save something here,
+                        // just move the cursor
+                        if line != 1 {
+                            // Wrong diff encountered
+                            if base_filter_lines.len() < line {
+                                return make_line_out_of_bounds_error(
+                                    line,
+                                    base_filter_lines.as_slice(),
+                                    diff_lines.as_slice(),
+                                );
+                            }
+
+                            // Delete means: Save all lines from cursor to the line "to be deleted"
+                            // Subtracts 1 here, cuz we do not need to count current line
+                            slices.push(
+                                base_filter_lines[base_filter_cursor..line - 1]
+                                    .iter()
+                                    .as_slice(),
+                            );
+                        }
+
+                        // Then move cursor onto position after deleted range
+                        base_filter_cursor = line - 1 + count;
+                    }
+                }
+            }
+            Err(e) => return FilterParserError::other_err_from_to_string(e),
+        }
+    }
+
+    let slices_last_index = slices.len() - 1;
+    let mut slices_index = 0usize;
+
+    // I think, base_filter.len() initial capacity will be better than nothing
+    let patch_result = slices.into_iter().fold(
+        String::with_capacity(base_filter.len()),
+        |mut acc, sub_slice| {
+            let subs_slice_last_index = sub_slice.len() - 1;
+            let mut subslice_index = 0;
+
+            sub_slice.into_iter().for_each(|line| {
+                acc.push_str(line);
+                if !(slices_last_index == slices_index && subs_slice_last_index == subslice_index) {
+                    acc.push_str("\n");
+                }
+
+                subslice_index += 1;
+            });
+
+            slices_index += 1;
+
+            acc
+        },
+    );
+
+    return Ok(patch_result);
+}
+
+/// Make special case error: when rcs diff `line` index is out of bounds for current file
+fn make_line_out_of_bounds_error<R>(
+    requested_line: usize,
+    base_filter_lines: &[&str],
+    diff_lines: &[&str],
+) -> Result<R, FilterParserError> {
+    let default_str = "";
+
+    FilterParserError::other_err_from_to_string(
+        format!(
+            "Wrong diff. Request base file line {}, but it only has {} lines. \nFirst line of base filter: \"{}\".\n First diff line: \"{}\".",
+            requested_line,
+            base_filter_lines.len(),
+            base_filter_lines.first().unwrap_or(&default_str),
+            diff_lines.first().unwrap_or(&default_str)
+        )
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::apply_patch;
+
+    #[test]
+    fn test_apply_patch() {
+        const LAO: &str = "The Way that can be told of is not the eternal Way;
+The name that can be named is not the eternal name.
+The Nameless is the origin of Heaven and Earth;
+The Named is the mother of all things.
+Therefore let there always be non-being,
+  so we may see their subtlety,
+And let there always be being,
+  so we may see their outcome.
+The two are the same,
+But after they are produced,
+  they have different names.";
+
+        const TZU: &str = "The Nameless is the origin of Heaven and Earth;
+The named is the mother of all things.
+
+Therefore let there always be non-being,
+  so we may see their subtlety,
+And let there always be being,
+  so we may see their outcome.
+The two are the same,
+But after they are produced,
+  they have different names.
+They both may be called deep and profound.
+Deeper and more profound,
+The door of all subtleties!";
+
+        const PATCH: &str = "d1 2
+d4 1
+a4 2
+The named is the mother of all things.
+
+a11 3
+They both may be called deep and profound.
+Deeper and more profound,
+The door of all subtleties!";
+
+        let patched = apply_patch(LAO, PATCH.lines().collect()).unwrap();
+
+        assert_eq!(patched, TZU);
+    }
+
+    #[test]
+    fn test_apply_patch_with_sequential_addition_and_deletion_on_last_line() {
+        const LAO: &str = "The Way that can be told of is not the eternal Way;
+The name that can be named is not the eternal name.
+The Nameless is the origin of Heaven and Earth;
+The Named is the mother of all things.
+Therefore let there always be non-being,
+  so we may see their subtlety,
+And let there always be being,
+  so we may see their outcome.
+The two are the same,
+But after they are produced,
+  they have different names.";
+
+        const TZU: &str = "The Nameless is the origin of Heaven and Earth;
+The named is the mother of all things.
+
+Therefore let there always be non-being,
+  so we may see their subtlety,
+And let there always be being,
+  so we may see their outcome.
+The two are the same,
+They both may be called deep and profound.
+Deeper and more profound,
+The door of all subtleties!
+But after they are produced,";
+
+        const PATCH: &str = "d1 2
+d4 1
+a4 2
+The named is the mother of all things.
+
+a9 3
+They both may be called deep and profound.
+Deeper and more profound,
+The door of all subtleties!
+d11 1";
+
+        let patched = apply_patch(LAO, PATCH.lines().collect()).unwrap();
+
+        assert_eq!(patched, TZU);
+    }
+
+    #[test]
+    fn test_addition_first_and_emojis() {
+        const LAO: &str = "The Way that can be told of is not the eternal Way;
+The name that can be named is not the eternal name.
+The Nameless is the origin of Heaven and Earth;
+The Named is the mother of all things.
+Therefore let there always be non-being,
+  so we may see their subtlety,
+And let there always be being,
+  so we may see their outcome.
+The two are the same,
+But after they are produced,
+  they have different names.";
+
+        const TZU: &str = "FirstLine
+😀😎
+The Way that can be told of is not the eternal Way;
+The name that can be named is not the eternal name.
+The Nameless is the origin of Heaven and Earth;
+The named is the mother of all things.
+
+Therefore let there always be non-being,
+  so we may see their subtlety,
+And let there always be being,
+  so we may see their outcome.
+The two are the same,
+But after they are produced,
+  they have different names.
+They both may be called deep and profound.
+Deeper and more profound,
+The door of all subtleties!";
+
+        const PATCH: &str = "a1 2
+FirstLine
+😀😎
+d4 1
+a4 2
+The named is the mother of all things.
+
+a11 3
+They both may be called deep and profound.
+Deeper and more profound,
+The door of all subtleties!";
+
+        let patched = apply_patch(LAO, PATCH.lines().collect()).unwrap();
+
+        assert_eq!(patched, TZU);
+    }
+
+    #[test]
+    fn test_checksum_should_be_ignored() {
+        const LAO: &str = "The Way that can be told of is not the eternal Way;
+The name that can be named is not the eternal name.
+The Nameless is the origin of Heaven and Earth;
+The Named is the mother of all things.
+Therefore let there always be non-being,
+  so we may see their subtlety,
+And let there always be being,
+  so we may see their outcome.
+The two are the same,
+But after they are produced,
+  they have different names.";
+
+        const TZU: &str = "The Nameless is the origin of Heaven and Earth;
+The named is the mother of all things.
+
+Therefore let there always be non-being,
+  so we may see their subtlety,
+And let there always be being,
+  so we may see their outcome.
+The two are the same,
+But after they are produced,
+  they have different names.
+They both may be called deep and profound.
+Deeper and more profound,
+The door of all subtleties!";
+
+        const PATCH: &str = "d1 2
+d4 1
+a4 2
+The named is the mother of all things.
+
+a11 3
+They both may be called deep and profound.
+Deeper and more profound,
+The door of all subtleties!";
+
+        let patched = apply_patch(LAO, PATCH.lines().collect()).unwrap();
+
+        assert_eq!(patched, TZU);
+    }
+
+    #[test]
+    fn test_with_diff_directive() {
+        const ORIGINAL: &str = "! Title: Diff Updates Simple Example List
+! Version: v1.0.0
+! Diff-Path: patches/v1.0.0-m-28334060-60.patch
+||example.org^";
+
+        const PATCH: &str = "diff checksum:1ce52b527d56a245f32138e014b1571c19cfb659 lines:4
+d2 3
+a4 3
+! Version: v1.0.1
+! Diff-Path: patches/v1.0.1-m-28334120-60.patch
+||example.com^";
+
+        const CHANGED: &str = "! Title: Diff Updates Simple Example List
+! Version: v1.0.1
+! Diff-Path: patches/v1.0.1-m-28334120-60.patch
+||example.com^";
+
+        let result = apply_patch(ORIGINAL, PATCH.lines().collect()).unwrap();
+
+        assert_eq!(result, CHANGED);
+    }
+
+    #[test]
+    fn test_wrong_diff() {
+        const ORIGINAL: &str = "! Title: Diff Updates Simple Example List
+! Version: v1.0.0
+! Diff-Path: patches/v1.0.0-m-28334060-60.patch
+||example.org^";
+
+        const PATCH: &str = "d2 3
+a400 350
+! Version: v1.0.1
+! Diff-Path: patches/v1.0.1-m-28334120-60.patch
+||example.com^";
+
+        apply_patch(ORIGINAL, PATCH.lines().collect())
+            .err()
+            .unwrap();
+    }
+}

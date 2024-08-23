@@ -1,0 +1,181 @@
+namespace flm_ffi {
+    Configuration make_default_configuration();
+    FilterListManagerConstants make_constants_structure();
+};
+
+dictionary FilterListManagerConstants {
+    i64 user_rules_id;
+    i32 custom_group_id;
+    i32 special_group_id;
+    i64 smallest_filter_id;
+};
+
+dictionary FilterGroup {
+    i32 id;
+    string name;
+    i32 display_number;
+};
+
+dictionary FilterListMetadata {
+    string title;
+    string description;
+    string time_updated;
+    string version;
+    string homepage;
+    string license;
+    string checksum;
+    string url;
+    i32 rules_count;
+};
+
+dictionary FilterListRules {
+    i64 filter_id;
+    sequence<string> rules;
+    sequence<string> disabled_rules;
+};
+
+dictionary FilterTag {
+    i32 id;
+    string keyword;
+};
+
+dictionary FullFilterList {
+    i64 id;
+    i32 group_id;
+    i64 time_updated;
+    i64 last_download_time;
+    string title;
+    string description;
+    string version;
+    i32 display_number;
+    string download_url;
+    string subscription_url;
+    sequence<FilterTag> tags;
+    i32 expires;
+    boolean is_trusted;
+    boolean is_custom;
+    boolean is_enabled;
+    boolean is_installed;
+    string homepage;
+    string license;
+    string checksum;
+    sequence<string> languages;
+    FilterListRules? rules;
+};
+
+dictionary ActiveRulesInfo {
+    i64 filter_id;
+    i32 group_id;
+    boolean is_trusted;
+    sequence<string> rules;
+};
+
+dictionary UpdateFilterError {
+    i64 filter_id;
+    string message;
+};
+
+dictionary UpdateResult {
+    sequence<FullFilterList> updated_list;
+    i32 remaining_filters_count;
+    sequence<UpdateFilterError> filters_errors;
+};
+
+enum FilterListType {
+    "STANDARD",
+    "DNS"
+};
+
+dictionary Configuration {
+    FilterListType filter_list_type;
+    string? working_directory;
+    string locale;
+    i32 default_filter_list_expires_period_sec;
+    sequence<string>? compiler_conditional_constants;
+    string metadata_url;
+    string metadata_locales_url;
+    string? encryption_key;
+    i32 request_timeout_ms;
+};
+
+[Error]
+enum AGOuterError {
+    "CannotOpenDatabase",
+    "NotADatabase",
+    "DiskFull",
+    "EntityNotFound",
+    "PathNotFound",
+    "PathHasDeniedPermission",
+    "PathAlreadyExists",
+    "TimedOut",
+    "HttpClientNetworkError",
+    "HttpClientBodyRecoveryFailed",
+    "FilterParserError",
+    "FieldIsEmpty",
+    "Mutex",
+    "Other"
+};
+
+interface FilterListManager {
+    constructor(Configuration configuration);
+
+    [Throws=AGOuterError]
+    FullFilterList install_custom_filter_list(string download_url, boolean is_trusted, string? title, string? description);
+
+    [Throws=AGOuterError]
+    i64 enable_filter_lists(sequence<i64> ids, boolean is_enabled);
+
+    [Throws=AGOuterError]
+    i64 install_filter_lists(sequence<i64> ids, boolean is_installed);
+
+    [Throws=AGOuterError]
+    i64 delete_custom_filter_lists(sequence<i64> ids);
+
+    [Throws=AGOuterError]
+    sequence<FullFilterList> get_full_filter_lists();
+
+    [Throws=AGOuterError]
+    FullFilterList? get_full_filter_list_by_id(i64 id);
+
+    [Throws=AGOuterError]
+    void save_custom_filter_rules(FilterListRules rules);
+
+    [Throws=AGOuterError]
+    void save_disabled_rules(i64 filter_id, sequence<string> disabled_rules);
+
+    [Throws=AGOuterError]
+    UpdateResult? update_filters(boolean ignore_filters_expiration, i32 loose_timeout, boolean ignore_filters_status);
+
+    [Throws=AGOuterError]
+    UpdateResult? force_update_filters_by_ids(sequence<i64> ids, i32 loose_timeout);
+
+    [Throws=AGOuterError]
+    FilterListMetadata fetch_filter_list_metadata(string url);
+
+    [Throws=AGOuterError]
+    sequence<FilterTag> get_all_tags();
+
+    [Throws=AGOuterError]
+    sequence<FilterGroup> get_all_groups();
+
+    [Throws=AGOuterError]
+    boolean change_locale(string suggested_locale);
+
+    [Throws=AGOuterError]
+    void pull_metadata();
+
+    [Throws=AGOuterError]
+    boolean update_custom_filter_metadata(i64 filter_id, string title, boolean is_trusted);
+
+    [Throws=AGOuterError]
+    string get_database_path();
+
+    [Throws=AGOuterError]
+    i32? get_database_version();
+
+    [Throws=AGOuterError]
+    FullFilterList install_custom_filter_from_string(string download_url, i64 last_download_time, boolean is_enabled, boolean is_trusted, string filter_body, string? custom_title, string? custom_description);
+
+    [Throws=AGOuterError]
+    sequence<ActiveRulesInfo> get_active_rules();
+};
