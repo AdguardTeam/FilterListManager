@@ -43,17 +43,17 @@ The library supports:
     - `!` - NOT operator
     - Literal compiler constant from [configuration](./src/manager/models/configuration). For example, `windows`,`mac`, etc... It works like this: if the constant encountered is in the `configuration.compiler_conditional_constants` list, then the condition becomes **true**, **false** otherwise
 
-**See the tests for more information:**\
-`for all directives` - [here](./src/filters/parser.rs)\
-and\
-`for include` - [here](./src/filters/parser/include_processor.rs)\
-`for if/endif/else` - [here](./src/filters/parser/boolean_expression_parser.rs)
+**See the tests for more information:**
+* [All directives](./src/filters/parser.rs)
+* [!#include](./src/filters/parser/include_processor.rs)
+* [!#if / !#endif / !#else ](./src/filters/parser/boolean_expression_parser.rs)
 
 ## Usage
 
 ### Create and setup configuration for library facade
 
 ```rust
+// Every instance of FilterListManager must have its own configuration
 let mut configuration = Configuration::default();
 
 // Sets urls for filters indices.
@@ -64,9 +64,18 @@ configuration.metadata_locales_url = "https://filters.adtidy.org/extension/safar
 // groups, and tags, where applicable.
 configuration.locale = "pt_PT".to_string();
 
+// Sets type of filters lists.
+// By default, FilterListType::STANDARD will be selected.
+configuration.filter_list_type = FilterListType::DNS;
+
 // Creates facade instance
 let flm = FilterListManagerImpl::new(configuration);
 ```
+#### Example references
+[Configuration reference](./src/manager/models/configuration/mod.rs)\
+[FilterListManager reference](./src/manager/mod.rs)
+
+---
 
 ### How to create and fill up standard filters database
 
@@ -85,6 +94,8 @@ flm.update_filters(true, 0, true);
 > working directory (**cwd**), and the database file name is generated based on
 > the format `agflm_{configuration.filter_list_type.to_string()}`. For standard
 > filters, the file path will be `$CWD/agflm_standard.db`.
+
+---
 
 ### Operations with custom filters
 
@@ -121,7 +132,7 @@ flm.enable_filter_lists(vec![custom_filter.id], true);
 flm.delete_custom_filter_lists(vec![custom_filter.id]);
 ```
 
-Installing a custom filter from a string instead of downloading it.
+#### Installing a custom filter from a string instead of downloading it.
 
 ```rust
 let string_contents = String::from(r"
@@ -135,23 +146,27 @@ flm.install_custom_filter_from_string(
     1719505304i64, // last_download_time value. Explanation: Can we update filter? Answer: (filter.last_download_time + filter.expires < now()) 
     true, // Enabled
     true, // Trusted
-    string_contents,
-    None,
-    None
+    string_contents, // Filter body
+    None, // Filter title - Option<String>
+    None  // Filter description - Option<String>
 );
 ```
 
 [constants]: ./crates/filter-list-manager/src/storage/constants.rs
 
-Operations with custom filters rules
+#### Operations with custom filters rules
 
 ```rust
 // Saves the structure containing the filter rules.
-flm.save_custom_filter_rules(rules_for_new_local_custom_filter);
+flm.save_custom_filter_rules(/* FilterListRules */ rules_for_new_local_custom_filter);
 
 // You can save only disabled rules for the filter list 
-flm.save_disabled_rules(filter.id, disabled_rules_list);
+flm.save_disabled_rules(filter.id, /* Vec<String> */ disabled_rules_list);
 ```
+#### Example references
+[FilterListRules reference](./src/manager/models/filter_list_rules.rs)
+
+---
 
 ### Get operations
 
@@ -163,9 +178,13 @@ flm.get_full_filter_lists();
 // Retrieves a filter by its ID from the database.
 // Returns Optional<FullFilterList>.
 flm.get_full_filter_list_by_id(id);
-```
 
-[FullFilterList reference](./src/manager/models/full_filter_list.rs)
+// Retrieves all enabled filters as ActiveRulesInfo.
+flm.get_active_filters();
+```
+#### Example references
+[FullFilterList reference](./src/manager/models/full_filter_list.rs)\
+[ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)
 
 ### Other (All) operations
 

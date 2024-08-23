@@ -1,18 +1,5 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+Each crate has its own changelog file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [0.5.0] - 2024-08-19
-
-[0.5.0]: https://github.com/AdguardTeam/FilterListManager.git/releases/tag/0.5.0
-
-### Fixed
-
-- Documentation of the filter-list-manager crate was cleaned up
-
-### Added
-
-- Add changelog
+- [`filter-list-manager`](./crates/filter-list-manager/CHANGELOG.md)
