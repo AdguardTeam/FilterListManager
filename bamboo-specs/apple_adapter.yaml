@@ -35,7 +35,7 @@ Default Job:
             ./bamboo-specs/scripts/deploy_swift.sh
         description: Deploy Swift package and CocoaPod
   requirements:
-    - ARM
+    - macOS 11.0 or later
     - Rust
   artifact-subscriptions: [ ]
 
