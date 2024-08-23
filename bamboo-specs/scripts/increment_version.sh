@@ -47,6 +47,14 @@ if [ "${bamboo_repository_branch_name}" != "master" ]; then
   exit 0
 fi
 
+if [ ${bamboo_adguard_flm_custom_version} = "none" ]; then
+  bamboo_adguard_flm_custom_version=
+fi
+
+if [ ${bamboo_ffi_custom_version} = "none" ]; then
+  bamboo_ffi_custom_version=
+fi
+
 # Check if there are any changes in the `filter-list-manager` crate
 HASH_FILE="platform/flm_version_hash.hash"
 OBSERVED_DIR="crates/filter-list-manager"
