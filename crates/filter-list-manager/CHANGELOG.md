@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.1] - 2024-08-23
 
-[0.5.1]: https://github.com/AdguardTeam/FilterListManager/compare/0.5.0...0.5.1
+[0.5.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.5.0...flm-0.5.1
 
 ### Fixed
 
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0] - 2024-08-19
 
-[0.5.0]: https://github.com/AdguardTeam/FilterListManager/releases/tag/0.5.0
+[0.5.0]: https://github.com/AdguardTeam/FilterListManager/releases/tag/flm-0.5.0
 
 ### Fixed
 
