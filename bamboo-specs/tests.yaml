@@ -33,6 +33,8 @@ Run tests:
           - |-
             ./bamboo-specs/scripts/run_tests.sh
         description: Run tests
+  requirements:
+    - adg-privileged-docker
   artifact-subscriptions: [ ]
 
 repositories:

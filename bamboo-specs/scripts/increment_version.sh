@@ -10,20 +10,32 @@ increment_version() {
 }
 
 increment_flm_version() {
-  # Increment the version of the `filter-list-manager` crate
-  CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/filter-list-manager/Cargo.toml)
-  NEW_VERSION=$(increment_version $CURRENT_VERSION)
-  echo "Current version: $CURRENT_VERSION"
+  if [ -z "$1" ]; then
+    # Increment the version of the `filter-list-manager` crate
+    echo "No custom version provided. Incrementing revision..."
+    CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/filter-list-manager/Cargo.toml)
+    NEW_VERSION=$(increment_version $CURRENT_VERSION)
+    echo "Current version: $CURRENT_VERSION"
+  else
+    echo "Custom version provided: $1. Using it..."
+    NEW_VERSION=$1
+  fi
   echo "New version: $NEW_VERSION"
   sed -i "s/^ *version = \".*\"/version = \"$NEW_VERSION\"/" crates/filter-list-manager/Cargo.toml
   echo "Version incremented successfully!"
 }
 
 increment_flm_ffi_version() {
-  # Increment the version of the `ffi` crate
-  CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)
-  NEW_VERSION=$(increment_version $CURRENT_VERSION)
-  echo "Current version: $CURRENT_VERSION"
+  if [ -z "$1" ]; then
+    # Increment the version of the `ffi` crate
+    echo "No custom version provided. Incrementing revision..."
+    CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)
+    NEW_VERSION=$(increment_version $CURRENT_VERSION)
+    echo "Current version: $CURRENT_VERSION"
+  else
+    echo "Custom version provided: $1. Using it..."
+    NEW_VERSION=$1
+  fi
   echo "New version: $NEW_VERSION"
   sed -i "s/^ *version = \".*\"/version = \"$NEW_VERSION\"/" crates/ffi/Cargo.toml
   echo "Version incremented successfully!"
@@ -48,7 +60,7 @@ PREVIOUS_HASH=$(cat $HASH_FILE)
 # If the hash has changed, increment the version
 if [ "$CURRENT_HASH" != "$PREVIOUS_HASH" ]; then
   echo "The hash has changed. Incrementing the 'filter-list-manager' version..."
-  increment_flm_version
+  increment_flm_version ${bamboo_adguard_flm_custom_version}
   # Update the hash file after the version increment
   CURRENT_HASH=$(find $OBSERVED_DIR -type f -exec md5sum {} \; | md5sum | awk '{print $1}')
   echo $CURRENT_HASH > $HASH_FILE
@@ -58,7 +70,7 @@ fi
 
 # Increment the version of the `ffi` crate
 echo "Incrementing the 'ffi' version..."
-increment_flm_ffi_version
+increment_flm_ffi_version ${bamboo_ffi_custom_version}
 
 # Configure git
 git config user.name "Bamboo"

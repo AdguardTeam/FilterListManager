@@ -6,6 +6,10 @@ plan:
   key: FLMIV
   name: Filter List Manager - Increment version
 
+variables:
+  ffi.custom.version: 'none'
+  adguard.flm.custom.version: 'none'
+
 stages:
   - Default Stage:
       manual: false
@@ -35,6 +39,8 @@ Increment:
           - |-
             ./bamboo-specs/scripts/increment_version.sh
         description: Increment version
+  requirements:
+    - adg-privileged-docker
   artifact-subscriptions: [ ]
 
 repositories:

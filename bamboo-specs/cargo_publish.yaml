@@ -43,6 +43,8 @@ Test and Publish:
           - |-
             ./bamboo-specs/scripts/cargo_publish.sh
         description: Cargo publish
+  requirements:
+    - adg-privileged-docker
   artifact-subscriptions: [ ]
 
 repositories:
