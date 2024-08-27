@@ -31,11 +31,6 @@ Test and Publish:
         interpreter: SHELL
         scripts:
           - |-
-            git status
-    - script:
-        interpreter: SHELL
-        scripts:
-          - |-
             ./bamboo-specs/scripts/run_tests.sh
     - script:
         interpreter: SHELL
