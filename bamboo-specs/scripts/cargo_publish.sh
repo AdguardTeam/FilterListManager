@@ -13,6 +13,7 @@ set -e
 # Step 8: Logout from the registry
 
 # Check that we are on the master branch
+# shellcheck disable=SC2154
 if [ "${bamboo_repository_branch_name}" != "master" ]; then
   echo "Not on the master branch. Exiting..."
   exit 0
@@ -24,6 +25,7 @@ FFI_VERSION=$(sed -ne 's/^ *version *= *\"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)
 
 # Login to the registry
 echo "Logging in to the registry..."
+# shellcheck disable=SC2154
 cargo login ${bamboo_cargoPassword}
 
 # Check if the 'adguard-flm' version is already published
@@ -82,8 +84,7 @@ if [ -z "$FFI_FOUND" ]; then
   echo "Publishing 'ffi' crate..."
   pushd crates/ffi
     cargo publish --dry-run
-  #  todo: uncomment the line below
-  #  cargo publish
+    cargo publish
   popd
 fi
 

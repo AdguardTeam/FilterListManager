@@ -12,6 +12,6 @@ name = "adguard-flm-cli"
 [dependencies]
 clap = "4.4.8"
 adguard-flm = { path = "../filter-list-manager" }
-rusqlite.workspace = true
+rusqlite = { version = "0.30.0", features = ["chrono", "bundled"] }
 uniffi.workspace = true
 regex.workspace = true
