@@ -167,13 +167,12 @@ impl FilterParser {
                 let trimmed_url = trimmed.to_string();
                 match self.filter_downloader.get_filter_contents(&trimmed_url) {
                     Ok(contents) => {
-                        validate_checksum(contents.as_str()).map_err(|error| {
-                            FilterParserErrorContext {
-                                file: absolute_url.to_string(),
-                                line: 0,
-                                error,
-                            }
-                        })?;
+                        self.filter_downloader
+                            .pre_check_filter_contents(contents.as_str())
+                            .or_else(|why| self.build_error_with_context(why))?;
+
+                        validate_checksum(contents.as_str())
+                            .or_else(|why| self.build_error_with_context(why))?;
 
                         cursor = FilterCursor::new(trimmed_url, contents);
                     }
@@ -197,11 +196,12 @@ impl FilterParser {
                     .get_included_filter_contents(&absolute_url, current_scheme.into())
                     .or_else(|why| self.build_error_with_context(why))?;
 
-                validate_checksum(contents.as_str()).map_err(|error| FilterParserErrorContext {
-                    file: absolute_url.to_string(),
-                    line: 0,
-                    error,
-                })?;
+                self.filter_downloader
+                    .pre_check_filter_contents(contents.as_str())
+                    .or_else(|why| self.build_error_with_context(why))?;
+
+                validate_checksum(contents.as_str())
+                    .or_else(|why| self.build_error_with_context(why))?;
 
                 cursor = FilterCursor::new(absolute_url.to_owned(), contents);
             } else {

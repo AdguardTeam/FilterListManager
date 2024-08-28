@@ -57,6 +57,10 @@ pub enum FilterParserError {
     #[error("NoContent")]
     NoContent,
 
+    /// When filter's body is not valid filters body by parser's heuristics
+    #[error("Filter content is likely not a filter")]
+    FilterContentIsLikelyNotAFilter,
+
     /// Other errors
     #[error("{0}")]
     Other(String),
@@ -69,6 +73,14 @@ impl FilterParserError {
         S: ToString,
     {
         Err(FilterParserError::Other(error_source.to_string()))
+    }
+
+    #[inline]
+    pub(crate) fn other_from_to_string<S>(error_source: S) -> FilterParserError
+    where
+        S: ToString,
+    {
+        FilterParserError::Other(error_source.to_string())
     }
 
     #[inline]

@@ -44,9 +44,10 @@ The library supports:
     - Literal compiler constant from [configuration](./src/manager/models/configuration). For example, `windows`,`mac`, etc... It works like this: if the constant encountered is in the `configuration.compiler_conditional_constants` list, then the condition becomes **true**, **false** otherwise
 
 **See the tests for more information:**
-* [All directives](./src/filters/parser.rs)
-* [!#include](./src/filters/parser/include_processor.rs)
-* [!#if / !#endif / !#else ](./src/filters/parser/boolean_expression_parser.rs)
+
+- [All directives](./src/filters/parser.rs)
+- [!#include](./src/filters/parser/include_processor.rs)
+- [!#if / !#endif / !#else](./src/filters/parser/boolean_expression_parser.rs)
 
 ## Usage
 
@@ -71,7 +72,9 @@ configuration.filter_list_type = FilterListType::DNS;
 // Creates facade instance
 let flm = FilterListManagerImpl::new(configuration);
 ```
+
 #### Example references
+
 [Configuration reference](./src/manager/models/configuration/mod.rs)\
 [FilterListManager reference](./src/manager/mod.rs)
 
@@ -132,7 +135,7 @@ flm.enable_filter_lists(vec![custom_filter.id], true);
 flm.delete_custom_filter_lists(vec![custom_filter.id]);
 ```
 
-#### Installing a custom filter from a string instead of downloading it.
+#### Installing a custom filter from a string instead of downloading it
 
 ```rust
 let string_contents = String::from(r"
@@ -163,7 +166,9 @@ flm.save_custom_filter_rules(/* FilterListRules */ rules_for_new_local_custom_fi
 // You can save only disabled rules for the filter list 
 flm.save_disabled_rules(filter.id, /* Vec<String> */ disabled_rules_list);
 ```
+
 #### Example references
+
 [FilterListRules reference](./src/manager/models/filter_list_rules.rs)
 
 ---
@@ -182,7 +187,9 @@ flm.get_full_filter_list_by_id(id);
 // Retrieves all enabled filters as ActiveRulesInfo.
 flm.get_active_filters();
 ```
+
 #### Example references
+
 [FullFilterList reference](./src/manager/models/full_filter_list.rs)\
 [ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)
 

@@ -1,5 +1,5 @@
 use adguard_flm::storage::error::DatabaseError;
-use adguard_flm::{FLMError, HttpClientError, IOError};
+use adguard_flm::{FLMError, FilterParserError, HttpClientError, IOError};
 
 #[derive(Debug, thiserror::Error, PartialEq)]
 pub enum AGOuterError {
@@ -39,9 +39,17 @@ pub enum AGOuterError {
     #[error("HttpClientNetworkError: {0}")]
     HttpClientNetworkError(String),
 
+    /// For a few requests we strictly check response code 200. 204, for example, considered erroneous
+    #[error("Expected strictly 200 status code, but {0} given for url: {1}")]
+    HttpStrict200Response(u16, String),
+
     /// Http client deserialization/body reading filed
     #[error("HttpClientBodyError: {0}")]
     HttpClientBodyRecoveryFailed(String),
+
+    /// Downloaded filter body likely is not a filter. This might be a html page, for example
+    #[error("{0}")]
+    FilterContentIsLikelyNotAFilter(String),
 
     /// Filter parser/compiler error
     #[error("ParserError: {0}")]
@@ -83,9 +91,17 @@ impl From<FLMError> for AGOuterError {
             FLMError::Network(variant) => match variant {
                 HttpClientError::NetworkError(err) => Self::HttpClientNetworkError(err),
                 HttpClientError::BodyRecoveryFailed(err) => Self::HttpClientBodyRecoveryFailed(err),
+                HttpClientError::Strict200Response(code, url) => {
+                    Self::HttpStrict200Response(code, url)
+                }
                 _ => Self::Other(String::from("Unknown network error")),
             },
-            FLMError::ParseFilterError(error) => Self::FilterParserError(error.to_string()),
+            FLMError::ParseFilterError(error) => match error.error {
+                FilterParserError::FilterContentIsLikelyNotAFilter => {
+                    Self::FilterContentIsLikelyNotAFilter(error.to_string())
+                }
+                _ => Self::FilterParserError(error.to_string()),
+            },
             _ => Self::Other(String::from("Unknown error")),
         }
     }

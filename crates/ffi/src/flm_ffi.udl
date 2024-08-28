@@ -110,6 +110,8 @@ enum AGOuterError {
     "TimedOut",
     "HttpClientNetworkError",
     "HttpClientBodyRecoveryFailed",
+    "HttpStrict200Response",
+    "FilterContentIsLikelyNotAFilter",
     "FilterParserError",
     "FieldIsEmpty",
     "Mutex",
