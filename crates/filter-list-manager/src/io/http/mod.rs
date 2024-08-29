@@ -16,11 +16,15 @@ impl HttpClient {
         let async_client =
             Self::build_async_client(timeout_ms).map_err(HttpClientError::make_network)?;
 
-        async_client
+        let response = async_client
             .get(url)
             .send()
             .await
             .map_err(HttpClientError::make_network)?
+            .error_for_status()
+            .map_err(HttpClientError::make_network)?;
+
+        response
             .json::<T>()
             .await
             .map_err(HttpClientError::make_body_recovery)
@@ -39,6 +43,8 @@ impl HttpClient {
         let response = client_builder
             .get(url)
             .send()
+            .map_err(HttpClientError::make_network)?
+            .error_for_status()
             .map_err(HttpClientError::make_network)?;
 
         let status = response.status();
