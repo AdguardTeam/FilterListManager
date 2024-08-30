@@ -74,20 +74,13 @@ if [ -z "$FFI_FOUND" ]; then
   echo "The 'ffi' crate is not published yet!"
   # Replace the 'adguard-flm' version in the 'ffi' crate
   echo "Replacing the 'adguard-flm' version in the 'ffi' crate..."
-  sed -i "s/^adguard-flm = .*/adguard-flm = \"$ADGUARD_FLM_VERSION\"/" crates/ffi/Cargo.toml
+  sed -i "s/^adguard-flm = .*/adguard-flm = { version = \"$ADGUARD_FLM_VERSION\", default-features = false }/" crates/ffi/Cargo.toml
 
-  # Configure git
-  git config user.name "Bamboo"
-  git config user.email "Bamboo"
-
-  git add crates/ffi/Cargo.toml
-  git commit -m "Update adguard-flm version in ffi crate"
-
-  # Publish the 'ffi' crate
+  # Publish the 'ffi' crate, add --allow-dirty because we modified the Cargo.toml file
   echo "Publishing 'ffi' crate..."
   pushd crates/ffi
-    cargo publish --dry-run
-    cargo publish
+    cargo publish --dry-run --allow-dirty
+    cargo publish --allow-dirty
   popd
 fi
 

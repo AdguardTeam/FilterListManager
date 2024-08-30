@@ -6,14 +6,19 @@ plan:
   name: Filter List Manager - Cargo publish
 
 stages:
+  - Test:
+      manual: false
+      final: true
+      jobs:
+        - Test
   - Publish:
       manual: false
       final: true
       jobs:
-        - Test and Publish
+        - Publish
 
-Test and Publish:
-  key: TAP
+Test:
+  key: TST
   docker:
     image: rust:1.75
     volumes:
@@ -22,6 +27,7 @@ Test and Publish:
       ${bamboo.git.cache.directory}: ${bamboo.git.cache.directory}
       ${system.HOME}/.ssh: /root/.ssh
       ${system.HOME}/.cargo/registry: /root/.cargo/registry
+    docker-run-arguments: [ ]
   tasks:
     - !include 'docker-clean.yaml'
     - checkout:
@@ -32,6 +38,26 @@ Test and Publish:
         scripts:
           - |-
             ./bamboo-specs/scripts/run_tests.sh
+  requirements:
+    - adg-privileged-docker
+  artifact-subscriptions: [ ]
+
+Publish:
+  key: PUB
+  docker:
+    image: rust:1.75
+    volumes:
+      ${bamboo.working.directory}: ${bamboo.working.directory}
+      ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
+      ${bamboo.git.cache.directory}: ${bamboo.git.cache.directory}
+      ${system.HOME}/.ssh: /root/.ssh
+      ${system.HOME}/.cargo/registry: /root/.cargo/registry
+    docker-run-arguments: [ ]
+  tasks:
+    - !include 'docker-clean.yaml'
+    - checkout:
+        force-clean-build: 'true'
+        description: Checkout Default Repository
     - script:
         interpreter: SHELL
         scripts:
