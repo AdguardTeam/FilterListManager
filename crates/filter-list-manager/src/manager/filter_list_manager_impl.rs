@@ -619,10 +619,11 @@ impl FilterListManager for FilterListManagerImpl {
                                 let filtered_rules = rule_entity
                                     .text
                                     .lines()
-                                    .flat_map(|line| {
+                                    .filter(|line| {
                                         disabled_lines
                                             .iter()
-                                            .find(|line_from_disabled| line_from_disabled != &&line)
+                                            .find(|line_from_disabled| line_from_disabled == &line)
+                                            .is_none()
                                     })
                                     .map(|line| line.to_string())
                                     .collect::<Vec<String>>();
@@ -651,7 +652,7 @@ mod tests {
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::sql_generators::operator::SQLOperator;
     use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
-    use crate::{Configuration, FilterListManager, FilterListManagerImpl};
+    use crate::{Configuration, FilterId, FilterListManager, FilterListManagerImpl};
     use chrono::{Duration, Utc};
     use std::fs;
     use std::ops::Sub;
@@ -941,7 +942,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_active_rules() {
+    fn test_get_active_rules_with_disabled_rules() {
         let filter = include_str!("../../tests/fixtures/small_pseudo_custom_filter_rules_test.txt");
         do_with_tests_helper(|mut helper| {
             helper.increment_postfix();
@@ -984,5 +985,36 @@ mod tests {
 
         assert_eq!(actual_filter.rules.len(), 32);
         assert_eq!(new_filter_rules.rules.len(), 38);
+    }
+
+    #[test]
+    fn test_get_active_rules() {
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let _ = spawn_test_db_with_metadata();
+
+        let flm = FilterListManagerImpl::new(Configuration::default());
+        let list_ids = flm
+            .get_full_filter_lists()
+            .unwrap()
+            .into_iter()
+            .map(|f| f.id)
+            .collect::<Vec<FilterId>>();
+
+        flm.enable_filter_lists(list_ids, true).unwrap();
+
+        let iter = flm
+            .get_active_rules()
+            .unwrap()
+            .into_iter()
+            // Take filters with rules
+            .filter(|info| info.filter_id != crate::USER_RULES_FILTER_LIST_ID)
+            .take(4);
+
+        for filter in iter {
+            assert!(filter.rules.len() > 0);
+        }
     }
 }
