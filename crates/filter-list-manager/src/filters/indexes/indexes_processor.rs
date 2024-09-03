@@ -97,6 +97,10 @@ impl IndexesProcessor {
         let index = self.exchange_index()?;
 
         for filter in index.filters {
+            if filter.deprecated {
+                continue;
+            }
+
             let filter_id = filter.filterId;
             let storage_entities = filter.to_storage_entities();
 
@@ -215,6 +219,10 @@ impl IndexesProcessor {
             let mut tags = Vec::new();
 
             for filter_index_entity in index.filters {
+                if filter_index_entity.deprecated {
+                    continue;
+                }
+
                 let storage_entities = filter_index_entity.to_storage_entities();
 
                 filters.push(storage_entities.filter);
@@ -377,6 +385,7 @@ mod tests {
     use crate::storage::{connect, with_transaction};
     use crate::test_utils::do_with_tests_helper;
     use crate::test_utils::indexes_fixtures::build_filters_indices_fixtures;
+    use crate::utils::memory::heap;
     use crate::{
         FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID, MINIMUM_CUSTOM_FILTER_ID,
     };
@@ -385,11 +394,26 @@ mod tests {
     use std::cell::RefCell;
     use std::rc::Rc;
 
+    const DEPRECATED_FILTER_ID: FilterId = 1;
+
     #[test]
     fn test_save_indices_in_empty_db() {
         do_with_tests_helper(|mut helper| helper.increment_postfix());
 
-        let (index, index_localisation) = build_filters_indices_fixtures().unwrap();
+        let (mut index, index_localisation) = build_filters_indices_fixtures().unwrap();
+
+        {
+            let deprecated_filter_index_entity = index
+                .filters
+                .iter_mut()
+                .find(|f| f.filterId == DEPRECATED_FILTER_ID)
+                .unwrap();
+            deprecated_filter_index_entity.deprecated = true;
+            assert_eq!(
+                deprecated_filter_index_entity.filterId,
+                DEPRECATED_FILTER_ID
+            );
+        }
 
         let mut indexes = IndexesProcessor::factory_test(
             DatabasePathHolder::factory_test().unwrap(),
@@ -424,9 +448,21 @@ mod tests {
             assert!(found_by_download_url.is_some());
         }
 
+        // Deprecated filter must not be saved
+        let deprecated_filter = filters_list
+            .iter()
+            .find(|filter| filter.filter_id == Some(DEPRECATED_FILTER_ID));
+        assert!(deprecated_filter.is_none());
+
         let conn = indexes.connection_factory().unwrap();
         let filter_filter_tag_entities = FilterFilterTagRepository::new()
-            .select(&conn, None)
+            .select(
+                &conn,
+                Some(Not(heap(FieldEqualValue(
+                    "filter_id",
+                    DEPRECATED_FILTER_ID.into(),
+                )))),
+            )
             .unwrap();
 
         {
@@ -455,7 +491,20 @@ mod tests {
         let mut indexes = IndexesProcessor::factory(DatabasePathHolder::factory_test().unwrap(), 0);
 
         let mut rng = thread_rng();
-        let (index, index_localisation) = build_filters_indices_fixtures().unwrap();
+        let (mut index, index_localisation) = build_filters_indices_fixtures().unwrap();
+
+        {
+            let deprecated_filter_index_entity = index
+                .filters
+                .iter_mut()
+                .find(|f| f.filterId == DEPRECATED_FILTER_ID)
+                .unwrap();
+            deprecated_filter_index_entity.deprecated = true;
+            assert_eq!(
+                deprecated_filter_index_entity.filterId,
+                DEPRECATED_FILTER_ID
+            );
+        }
 
         lift_up_database(&indexes.connection_source).unwrap();
 
@@ -594,5 +643,19 @@ mod tests {
             assert!(!second_groups_mapped.contains_key(&chosen_group_id));
         }
         // endregion
+
+        // region test deprecated filter
+        {
+            let list = filter_repository
+                .select_filters_except_bootstrapped(&conn)
+                .unwrap()
+                .unwrap();
+
+            let found = list
+                .iter()
+                .find(|f| f.filter_id.unwrap() == DEPRECATED_FILTER_ID);
+
+            assert!(found.is_none())
+        }
     }
 }

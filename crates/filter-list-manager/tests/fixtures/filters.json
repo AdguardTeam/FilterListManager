@@ -332,6 +332,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/1_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.91.90",
@@ -356,6 +357,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 1,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/2_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.3.41.61",
@@ -378,6 +380,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 2,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/3_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.71.44",
@@ -398,6 +401,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 3,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/4_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.1.2.61",
@@ -418,6 +422,7 @@
 			"expires": 432000,
 			"displayNumber": 4,
 			"groupId": 6,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/5_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.1.58",
@@ -437,6 +442,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/6_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.42.62",
@@ -461,6 +467,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/7_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.53.27",
@@ -484,6 +491,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/8_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.7.7",
@@ -509,6 +517,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/9_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.25.60",
@@ -534,6 +543,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 6,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/10_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.3.40",
@@ -551,6 +561,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 1,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/11_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.52.44",
@@ -574,6 +585,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/13_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.52.22",
@@ -598,6 +610,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/14_optimized.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -621,6 +634,7 @@
 			"expires": 432000,
 			"displayNumber": 3,
 			"groupId": 6,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/15_optimized.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -654,6 +668,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/16_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.45.37",
@@ -679,6 +694,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/18_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.42.17",
@@ -700,6 +716,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/19_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.38.85",
@@ -721,6 +738,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/20_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.14.85",
@@ -742,6 +760,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/21_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.23.75",
@@ -763,6 +782,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/22_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.8.64",
@@ -784,6 +804,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/23_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.0.4.91",
@@ -808,6 +829,7 @@
 			"expires": 432000,
 			"displayNumber": 3,
 			"groupId": 1,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylist.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -830,6 +852,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -854,6 +877,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://stanev.org/abp/adblock_bg.txt",
 			"trustLevel": "high",
 			"version": "2.0.0.38",
@@ -878,6 +902,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/easylist/easylistchina/master/easylistchina.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -902,6 +927,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt",
 			"trustLevel": "high",
 			"version": "2.0.2.66",
@@ -928,6 +954,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylistdutch.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -952,6 +979,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist.to/easylistgermany/easylistgermany.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -976,6 +1004,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/easylist/EasyListHebrew/master/EasyListHebrew.txt",
 			"trustLevel": "high",
 			"version": "2.0.4.84",
@@ -1000,6 +1029,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylistitaly.txt",
 			"trustLevel": "high",
 			"version": "2.1.51.41",
@@ -1024,6 +1054,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/EasyList-Lithuania/easylist_lithuania/master/easylistlithuania.txt",
 			"trustLevel": "high",
 			"version": "2.0.2.83",
@@ -1048,6 +1079,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/Latvian-List/adblock-latvian/master/lists/latvian-list.txt",
 			"trustLevel": "high",
 			"version": "2.0.0.59",
@@ -1072,6 +1104,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/Liste_AR.txt",
 			"trustLevel": "high",
 			"version": "2.1.51.40",
@@ -1096,6 +1129,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/liste_fr.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1120,6 +1154,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://www.zoso.ro/pages/rolist.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1144,6 +1179,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 2,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist.to/easylist/easyprivacy.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1166,6 +1202,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://adblock.gardar.net/is.abp.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1190,6 +1227,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/realodix/AdBlockID/main/dist/adblockid.adfl.txt",
 			"trustLevel": "high",
 			"version": "2.0.20.81",
@@ -1213,6 +1251,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://www.void.gr/kargig/void-gr-filters.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1237,6 +1276,7 @@
 			"expires": 432000,
 			"displayNumber": 100,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://secure.fanboy.co.nz/fanboy-annoyance_ubo.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1260,6 +1300,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 3,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/fanboy-social.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1283,6 +1324,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylistportuguese.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1308,6 +1350,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/easylist-thailand/easylist-thailand/master/subscription/easylist-thailand.txt",
 			"trustLevel": "high",
 			"version": "2.0.0.17",
@@ -1331,6 +1374,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://cdn.jsdelivr.net/gh/hufilter/hufilter@gh-pages/hufilter-adguard.txt",
 			"trustLevel": "high",
 			"version": "2.0.2.98",
@@ -1355,6 +1399,7 @@
 			"expires": 432000,
 			"displayNumber": 4,
 			"groupId": 2,
+			"deprecated": false,
 			"subscriptionUrl": "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&mimetype=plaintext",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1377,6 +1422,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/gioxx/xfiles/master/filtri.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1400,6 +1446,7 @@
 			"expires": 432000,
 			"displayNumber": 3,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/antiadblockfilters.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1422,6 +1469,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 5,
+			"deprecated": false,
 			"subscriptionUrl": "https://urlhaus-filter.pages.dev/urlhaus-filter-ag-online.txt",
 			"trustLevel": "low",
 			"version": "2.0.96.63",
@@ -1441,6 +1489,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/cntblock.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1464,6 +1513,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_adguard.txt",
 			"trustLevel": "high",
 			"version": "2.0.30.5",
@@ -1487,6 +1537,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-adblock-filters/adblock.txt",
 			"trustLevel": "high",
 			"version": "2.0.15.53",
@@ -1510,6 +1561,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/cookies_filters/adblock_cookies.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1533,6 +1585,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://adblock.ee/list.php",
 			"trustLevel": "low",
 			"version": "2.0.3.60",
@@ -1556,6 +1609,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/cjx82630/cjxlist/master/cjx-annoyance.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1579,6 +1633,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/adblock_social_filters/adblock_social_list.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1602,6 +1657,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://filters.adtidy.org/extension/safari/filters/224_optimized.txt",
 			"trustLevel": "full",
 			"version": "2.1.18.13",
@@ -1626,6 +1682,7 @@
 			"expires": 432000,
 			"displayNumber": 4,
 			"groupId": 2,
+			"deprecated": false,
 			"subscriptionUrl": "https://www.fanboy.co.nz/fanboy-antifacebook.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1649,6 +1706,7 @@
 			"expires": 86400,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/List-KR/List-KR/master/filter-AdGuard.txt",
 			"trustLevel": "high",
 			"version": "2.0.18.69",
@@ -1673,6 +1731,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/xinggsf/Adblock-Plus-Rule/master/rule.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1696,6 +1755,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylistspanish.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1720,6 +1780,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/FiltersHeroes/KAD/master/KAD.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1743,6 +1804,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/finnish-easylist-addition/finnish-easylist-addition/gh-pages/Finland_adb.txt",
 			"trustLevel": "high",
 			"version": "2.0.11.6",
@@ -1766,6 +1828,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://www.zoso.ro/pages/rolist2.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1791,6 +1854,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlocker.txt",
 			"trustLevel": "high",
 			"version": "2.0.4.50",
@@ -1818,6 +1882,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/tcptomato/ROad-Block/master/road-block-filters-light.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1841,6 +1906,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/PolishFiltersTeam/PolishAnnoyanceFilters/master/PPB.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1864,6 +1930,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/olegwukr/polish-privacy-filters/master/anti-adblock.txt",
 			"trustLevel": "high",
 			"version": "2.0.3.54",
@@ -1887,6 +1954,7 @@
 			"expires": 432000,
 			"displayNumber": 5,
 			"groupId": 6,
+			"deprecated": false,
 			"subscriptionUrl": "https://fanboy.co.nz/fanboy-antifonts.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1910,6 +1978,7 @@
 			"expires": 432000,
 			"displayNumber": 100,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://www.fanboy.co.nz/fanboy-cookiemonster.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1932,6 +2001,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/master/Frellwits-Swedish-Filter.txt",
 			"trustLevel": "high",
 			"version": "2.0.18.82",
@@ -1958,6 +2028,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/yous/YousList/master/youslist.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -1981,6 +2052,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/easylistpolish.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -2005,6 +2077,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/PolishFiltersTeam/PolishAntiAnnoyingSpecialSupplement/master/polish_rss_filters.txt",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -2029,6 +2102,7 @@
 			"expires": 432000,
 			"displayNumber": 249,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianExperimentalList%20alternate%20versions/NordicFiltersAdGuard.txt",
 			"trustLevel": "high",
 			"version": "2.0.7.55",
@@ -2059,6 +2133,7 @@
 			"expires": 432000,
 			"displayNumber": 100,
 			"groupId": 4,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/AnnoyancesList",
 			"platformsExcluded": [
 				"ext_chromium_mv3"
@@ -2082,6 +2157,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/SerboCroatianList.txt",
 			"trustLevel": "high",
 			"version": "2.0.0.49",
@@ -2107,6 +2183,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://easylist-downloads.adblockplus.org/indianlist.txt",
 			"trustLevel": "low",
 			"version": "2.0.44.72",
@@ -2130,6 +2207,7 @@
 			"expires": 432000,
 			"displayNumber": 2,
 			"groupId": 7,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/RandomAdversary/Macedonian-adBlock-Filters/master/Filters",
 			"trustLevel": "low",
 			"version": "2.0.0.9",
@@ -2153,6 +2231,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 5,
+			"deprecated": false,
 			"subscriptionUrl": "https://malware-filter.gitlab.io/malware-filter/phishing-filter-ag.txt",
 			"trustLevel": "low",
 			"version": "2.0.1.65",
@@ -2172,6 +2251,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 5,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/durablenapkin/scamblocklist/master/adguard.txt",
 			"trustLevel": "low",
 			"version": "2.0.0.86",
@@ -2191,6 +2271,7 @@
 			"expires": 432000,
 			"displayNumber": 1,
 			"groupId": 5,
+			"deprecated": false,
 			"subscriptionUrl": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt",
 			"trustLevel": "low",
 			"version": "2.0.1.61",

@@ -22,6 +22,7 @@ pub(crate) struct FilterIndexEntity {
     pub(crate) groupId: i32,
     pub(crate) downloadUrl: String,
     pub(crate) subscriptionUrl: String,
+    pub(crate) deprecated: bool,
     pub(crate) version: String,
     pub(crate) timeUpdated: chrono::DateTime<Utc>,
     pub(crate) languages: Vec<String>,
