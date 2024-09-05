@@ -19,6 +19,7 @@ uniffi.workspace = true
 [features]
 default = ["rusqlite-bundled"]
 rusqlite-bundled = ["adguard-flm/rusqlite-bundled"]
+rustls-tls = ["adguard-flm/rustls-tls"]
 
 [build-dependencies]
 uniffi.workspace = true
