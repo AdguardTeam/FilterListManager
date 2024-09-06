@@ -151,6 +151,24 @@ namespace AdGuard.FilterListManager.MarshalLogic
             public HttpClientBodyRecoveryFailedException(string message)
                 : base(message) { }
         }
+        
+        /// <summary>
+        /// For a few requests we strictly check response code 200. 204
+        /// </summary>
+        /// <seealso cref="AgOuterException" />
+        public class HttpStrict200Response : AgOuterException
+        {
+            public HttpStrict200Response(string message) : base(message) { }
+        }
+
+        /// <summary>
+        /// Downloaded filter body likely is not a filter. This might be a html page, for example
+        /// </summary>
+        /// <seealso cref="AgOuterException" />
+        public class FilterContentIsLikelyNotAFilter : AgOuterException
+        {
+            public FilterContentIsLikelyNotAFilter(string message) : base(message) { }
+        }
 
         /// <summary>
         /// Occurs when the library is unable to parse the filter given.

@@ -68,7 +68,9 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 new KeyValuePair<ushort, Func<ushort>>(2861,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_filters),
                 new KeyValuePair<ushort, Func<ushort>>(14366,
-                    uniffi_filter_list_manager_ffi_checksum_constructor_filterlistmanager_new)
+                    uniffi_filter_list_manager_ffi_checksum_constructor_filterlistmanager_new),
+                new KeyValuePair<ushort, Func<ushort>>(57711,
+                    uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_active_rules)
             };
 
         static void UniffiCheckApiChecksums()
@@ -91,511 +93,426 @@ namespace AdGuard.FilterListManager.MarshalLogic
         #endregion
 
         #region Imports
-
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern void uniffi_filter_list_manager_ffi_fn_free_filterlistmanager(
-            IntPtr ptr,
-            ref RustCallStatus uniffiOutErr
+        IntPtr ptr, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern FilterListManagerSafeHandle uniffi_filter_list_manager_ffi_fn_constructor_filterlistmanager_new(
-            RustBuffer configuration,
-            ref RustCallStatus uniffiOutErr
+        public static extern FilterListManagerSafeHandle uniffi_filter_list_manager_ffi_fn_constructor_filterlistmanager_new(RustBuffer configuration, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern sbyte uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_change_locale(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer suggestedLocale,
-            ref RustCallStatus uniffiOutErr
+        public static extern sbyte uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_change_locale(FilterListManagerSafeHandle ptr, RustBuffer suggestedLocale, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern sbyte uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_delete_custom_filter_lists(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer ids,
-            ref RustCallStatus uniffiOutErr
+        public static extern long uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_delete_custom_filter_lists(FilterListManagerSafeHandle ptr, RustBuffer ids, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern long uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_enable_filter_lists(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer ids,
-            sbyte isEnabled,
-            ref RustCallStatus uniffiOutErr
+        public static extern long uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_enable_filter_lists(FilterListManagerSafeHandle ptr, RustBuffer ids, sbyte isEnabled, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer url,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata(FilterListManagerSafeHandle ptr, RustBuffer url, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_force_update_filters_by_ids(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer ids,
-            int looseTimeout,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_force_update_filters_by_ids(FilterListManagerSafeHandle ptr, RustBuffer ids, int looseTimeout, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_all_groups(
-            FilterListManagerSafeHandle ptr,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_active_rules(FilterListManagerSafeHandle ptr, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_all_tags(
-            FilterListManagerSafeHandle ptr,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_all_groups(FilterListManagerSafeHandle ptr, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_database_path(
-            FilterListManagerSafeHandle ptr,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_all_tags(FilterListManagerSafeHandle ptr, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_database_version(
-            FilterListManagerSafeHandle ptr,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_database_path(FilterListManagerSafeHandle ptr, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_list_by_id(
-            FilterListManagerSafeHandle ptr,
-            long id,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_database_version(FilterListManagerSafeHandle ptr, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_lists(
-            FilterListManagerSafeHandle ptr,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_list_by_id(FilterListManagerSafeHandle ptr, long id, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_custom_filter_from_string(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer downloadUrl,
-            long lastDownloadTime,
-            sbyte isEnabled,
-            sbyte isTrusted,
-            RustBuffer filterBody,
-            RustBuffer customTitle,
-            RustBuffer customDescription,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_lists(FilterListManagerSafeHandle ptr, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_custom_filter_list(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer downloadUrl,
-            sbyte isTrusted,
-            RustBuffer title,
-            RustBuffer description,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_custom_filter_from_string(FilterListManagerSafeHandle ptr, RustBuffer downloadUrl, long lastDownloadTime, sbyte isEnabled, sbyte isTrusted, RustBuffer filterBody, RustBuffer customTitle, RustBuffer customDescription, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern long uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_filter_lists(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer ids,
-            sbyte isInstalled,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_custom_filter_list(FilterListManagerSafeHandle ptr, RustBuffer downloadUrl, sbyte isTrusted, RustBuffer title, RustBuffer description, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_pull_metadata(
-            FilterListManagerSafeHandle ptr,
-            ref RustCallStatus uniffiOutErr
+        public static extern long uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_filter_lists(FilterListManagerSafeHandle ptr, RustBuffer ids, sbyte isInstalled, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_custom_filter_rules(
-            FilterListManagerSafeHandle ptr,
-            RustBuffer rules,
-            ref RustCallStatus uniffiOutErr
+        public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_pull_metadata(FilterListManagerSafeHandle ptr, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_disabled_rules(
-            FilterListManagerSafeHandle ptr,
-            long filterId,
-            RustBuffer disabledRules,
-            ref RustCallStatus uniffiOutErr
+        public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_custom_filter_rules(FilterListManagerSafeHandle ptr, RustBuffer rules, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern sbyte uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_custom_filter_metadata(
-            FilterListManagerSafeHandle ptr,
-            long filterId,
-            RustBuffer title,
-            sbyte isTrusted,
-            ref RustCallStatus uniffiOutErr
+        public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_disabled_rules(FilterListManagerSafeHandle ptr, long filterId, RustBuffer disabledRules, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_filters(
-            FilterListManagerSafeHandle ptr,
-            sbyte ignoreFiltersExpiration,
-            int looseTimeout,
-            sbyte ignoreFiltersStatus,
-            ref RustCallStatus uniffiOutErr
+        public static extern sbyte uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_custom_filter_metadata(FilterListManagerSafeHandle ptr, long filterId, RustBuffer title, sbyte isTrusted, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_func_make_constants_structure(
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_filters(FilterListManagerSafeHandle ptr, sbyte ignoreFiltersExpiration, int looseTimeout, sbyte ignoreFiltersStatus, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_func_make_default_configuration(
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_func_make_constants_structure(ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer ffi_filter_list_manager_ffi_rustbuffer_alloc(
-            int size,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_func_make_default_configuration(ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer ffi_filter_list_manager_ffi_rustbuffer_from_bytes(
-            ForeignBytes bytes,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer ffi_filter_list_manager_ffi_rustbuffer_alloc(int size, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rustbuffer_free(
-            RustBuffer buf,
-            ref RustCallStatus uniffiOutErr
+        public static extern RustBuffer ffi_filter_list_manager_ffi_rustbuffer_from_bytes(ForeignBytes bytes, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer ffi_filter_list_manager_ffi_rustbuffer_reserve(
-            RustBuffer buf,
-            int additional,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rustbuffer_free(RustBuffer buf, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_continuation_callback_set(
-            IntPtr callback
+        public static extern RustBuffer ffi_filter_list_manager_ffi_rustbuffer_reserve(RustBuffer buf, int additional, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_u8(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern void ffi_filter_list_manager_ffi_rust_future_continuation_callback_set(IntPtr callback
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_u8(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_u8(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern byte ffi_filter_list_manager_ffi_rust_future_complete_u8(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_u8(IntPtr handle, IntPtr uniffiCallback
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_i8(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_u8(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_i8(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_i8(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern sbyte ffi_filter_list_manager_ffi_rust_future_complete_i8(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_u8(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_u16(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern byte ffi_filter_list_manager_ffi_rust_future_complete_u8(IntPtr handle, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_u16(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_u16(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort ffi_filter_list_manager_ffi_rust_future_complete_u16(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_i8(IntPtr handle, IntPtr uniffiCallback
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_i16(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_i8(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_i16(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_i16(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern short ffi_filter_list_manager_ffi_rust_future_complete_i16(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_i8(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_u32(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern sbyte ffi_filter_list_manager_ffi_rust_future_complete_i8(IntPtr handle, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_u32(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_u32(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern uint ffi_filter_list_manager_ffi_rust_future_complete_u32(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_u16(IntPtr handle, IntPtr uniffiCallback
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_i32(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_u16(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_i32(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_i32(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern int ffi_filter_list_manager_ffi_rust_future_complete_i32(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_u16(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_u64(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern ushort ffi_filter_list_manager_ffi_rust_future_complete_u16(IntPtr handle, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_u64(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_u64(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ulong ffi_filter_list_manager_ffi_rust_future_complete_u64(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_i16(IntPtr handle, IntPtr uniffiCallback
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_i64(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_i16(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_i64(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_i64(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern long ffi_filter_list_manager_ffi_rust_future_complete_i64(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_i16(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_f32(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern short ffi_filter_list_manager_ffi_rust_future_complete_i16(IntPtr handle, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_f32(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_f32(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern float ffi_filter_list_manager_ffi_rust_future_complete_f32(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_u32(IntPtr handle, IntPtr uniffiCallback
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_f64(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_u32(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_f64(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_f64(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern double ffi_filter_list_manager_ffi_rust_future_complete_f64(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_u32(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_pointer(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern uint ffi_filter_list_manager_ffi_rust_future_complete_u32(IntPtr handle, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_pointer(
-            IntPtr handle
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_i32(IntPtr handle, IntPtr uniffiCallback
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_pointer(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern SafeHandle ffi_filter_list_manager_ffi_rust_future_complete_pointer(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_i32(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_rust_buffer(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_i32(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_rust_buffer(
-            IntPtr handle
+        public static extern int ffi_filter_list_manager_ffi_rust_future_complete_i32(IntPtr handle, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_rust_buffer(
-            IntPtr handle
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_u64(IntPtr handle, IntPtr uniffiCallback
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern RustBuffer ffi_filter_list_manager_ffi_rust_future_complete_rust_buffer(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_u64(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_void(
-            IntPtr handle,
-            IntPtr uniffiCallback
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_u64(IntPtr handle
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_void(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_free_void(IntPtr handle);
-
-        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern void ffi_filter_list_manager_ffi_rust_future_complete_void(
-            IntPtr handle,
-            ref RustCallStatus uniffiOutErr
+        public static extern ulong ffi_filter_list_manager_ffi_rust_future_complete_u64(IntPtr handle, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_func_make_constants_structure();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_i64(IntPtr handle, IntPtr uniffiCallback
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_func_make_default_configuration();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_i64(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_change_locale();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_i64(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_delete_custom_filter_lists();
+        public static extern long ffi_filter_list_manager_ffi_rust_future_complete_i64(IntPtr handle, ref RustCallStatus uniffiOutErr
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_enable_filter_lists();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_f32(IntPtr handle, IntPtr uniffiCallback
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_fetch_filter_list_metadata();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_f32(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_force_update_filters_by_ids();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_f32(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_all_groups();
+        public static extern float ffi_filter_list_manager_ffi_rust_future_complete_f32(IntPtr handle, ref RustCallStatus uniffiOutErr
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_all_tags();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_f64(IntPtr handle, IntPtr uniffiCallback
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_database_path();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_f64(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_database_version();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_f64(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_list_by_id();
+        public static extern double ffi_filter_list_manager_ffi_rust_future_complete_f64(IntPtr handle, ref RustCallStatus uniffiOutErr
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_lists();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_pointer(IntPtr handle, IntPtr uniffiCallback
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_install_custom_filter_from_string();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_pointer(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_install_custom_filter_list();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_pointer(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_install_filter_lists();
+        public static extern SafeHandle ffi_filter_list_manager_ffi_rust_future_complete_pointer(IntPtr handle, ref RustCallStatus uniffiOutErr
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_pull_metadata();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_rust_buffer(IntPtr handle, IntPtr uniffiCallback
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_custom_filter_rules();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_rust_buffer(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_disabled_rules();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_rust_buffer(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_custom_filter_metadata();
+        public static extern RustBuffer ffi_filter_list_manager_ffi_rust_future_complete_rust_buffer(IntPtr handle, ref RustCallStatus uniffiOutErr
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_filters();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_poll_void(IntPtr handle, IntPtr uniffiCallback
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern ushort uniffi_filter_list_manager_ffi_checksum_constructor_filterlistmanager_new();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_cancel_void(IntPtr handle
+        );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
-        public static extern uint ffi_filter_list_manager_ffi_uniffi_contract_version();
+        public static extern void ffi_filter_list_manager_ffi_rust_future_free_void(IntPtr handle
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern void ffi_filter_list_manager_ffi_rust_future_complete_void(IntPtr handle, ref RustCallStatus uniffiOutErr
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_func_make_constants_structure(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_func_make_default_configuration(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_change_locale(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_delete_custom_filter_lists(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_enable_filter_lists(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_fetch_filter_list_metadata(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_force_update_filters_by_ids(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_active_rules(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_all_groups(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_all_tags(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_database_path(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_database_version(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_list_by_id(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_lists(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_install_custom_filter_from_string(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_install_custom_filter_list(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_install_filter_lists(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_pull_metadata(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_custom_filter_rules(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_disabled_rules(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_custom_filter_metadata(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_filters(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_constructor_filterlistmanager_new(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern uint ffi_filter_list_manager_ffi_uniffi_contract_version(
+        );
 
         #endregion
 

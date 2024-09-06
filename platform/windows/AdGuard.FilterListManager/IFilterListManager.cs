@@ -58,6 +58,12 @@ namespace AdGuard.FilterListManager
         UpdateResult ForceUpdateFiltersByIds(List<long> ids, int looseTimeout);
 
         /// <summary>
+        /// Gets a list of <see cref="ActiveRulesInfo"/> from filters with `filter.is_enabled=true` flag.
+        /// </summary>
+        /// <exception cref="AgOuterException" />
+        List<ActiveRulesInfo> GetActiveRules();
+
+        /// <summary>
         /// Gets all groups from DB
         /// </summary>
         /// <exception cref="AgOuterException" />

@@ -9,6 +9,7 @@
 First run
 
 ```cmd
+cargo install uniffi-bindgen-cs --git https://github.com/NordSecurity/uniffi-bindgen-cs --tag v0.8.0+v0.25.0
 rustup target add i686-pc-windows-msvc
 rustup target add x86_64-pc-windows-msvc
 rustup target add aarch64-pc-windows-msvc

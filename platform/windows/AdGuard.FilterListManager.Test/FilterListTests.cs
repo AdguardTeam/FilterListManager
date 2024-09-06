@@ -35,6 +35,8 @@ namespace AdGuard.FilterListManager.Test
             manager.PullMetadata();
             List<FilterGroup> groups = manager.GetAllGroups();
             Assert.IsTrue(groups.Count > 0);
+            List<ActiveRulesInfo> rules = manager.GetActiveRules();
+            Assert.IsTrue(rules.Count > 0);
         }
     }
 }

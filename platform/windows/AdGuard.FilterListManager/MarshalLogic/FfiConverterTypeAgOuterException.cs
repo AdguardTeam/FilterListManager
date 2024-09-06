@@ -4,7 +4,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         : FfiConverterRustBuffer<AgOuterException>,
             CallStatusErrorHandler<AgOuterException>
     {
-        public static FfiConverterTypeAgOuterException INSTANCE =
+        public static FfiConverterTypeAgOuterException Instance =
             new FfiConverterTypeAgOuterException();
 
         public override AgOuterException Read(BigEndianStream stream)
@@ -44,15 +44,19 @@ namespace AdGuard.FilterListManager.MarshalLogic
                     return new AgOuterException.HttpClientBodyRecoveryFailedException(
                         FfiConverterString.INSTANCE.Read(stream)
                     );
-                case 11:
+                case 11: return new AgOuterException.HttpStrict200Response(FfiConverterString.INSTANCE.Read(stream));
+                case 12:
+                    return new AgOuterException.FilterContentIsLikelyNotAFilter(
+                        FfiConverterString.INSTANCE.Read(stream));
+                case 13:
                     return new AgOuterException.FilterParserException(
                         FfiConverterString.INSTANCE.Read(stream)
                     );
-                case 12:
-                    return new AgOuterException.FieldIsEmptyException(FfiConverterString.INSTANCE.Read(stream));
-                case 13:
-                    return new AgOuterException.MutexException(FfiConverterString.INSTANCE.Read(stream));
                 case 14:
+                    return new AgOuterException.FieldIsEmptyException(FfiConverterString.INSTANCE.Read(stream));
+                case 15:
+                    return new AgOuterException.MutexException(FfiConverterString.INSTANCE.Read(stream));
+                case 16:
                     return new AgOuterException.OtherException(FfiConverterString.INSTANCE.Read(stream));
                 default:
                     throw new InternalException(
@@ -88,14 +92,18 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 stream.WriteInt(9);
             else if (value is AgOuterException.HttpClientBodyRecoveryFailedException)
                 stream.WriteInt(10);
-            else if (value is AgOuterException.FilterParserException)
+            else if (value is AgOuterException.HttpStrict200Response)
                 stream.WriteInt(11);
-            else if (value is AgOuterException.FieldIsEmptyException)
+            else if (value is AgOuterException.FilterContentIsLikelyNotAFilter)
                 stream.WriteInt(12);
-            else if (value is AgOuterException.MutexException)
+            else if (value is AgOuterException.FilterParserException)
                 stream.WriteInt(13);
-            else if (value is AgOuterException.OtherException)
+            else if (value is AgOuterException.FieldIsEmptyException)
                 stream.WriteInt(14);
+            else if (value is AgOuterException.MutexException)
+                stream.WriteInt(15);
+            else if (value is AgOuterException.OtherException)
+                stream.WriteInt(16);
             else
                 throw new InternalException(
                     $"invalid error value '{value}' in FfiConverterTypeAgOuterException.Write()"
