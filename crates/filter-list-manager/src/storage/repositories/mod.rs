@@ -50,7 +50,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
+    use crate::storage::repositories::filter_locale_repository::FilterLocaleRepository;
     use crate::storage::repositories::filter_repository::FilterRepository;
     use crate::storage::repositories::{BulkDeleteRepository, Repository};
     use crate::storage::with_transaction;
@@ -99,17 +99,17 @@ mod tests {
         do_with_tests_helper(|mut helper| helper.increment_postfix());
 
         let (_, mut conn, _) = spawn_test_db_with_metadata();
-        let group_repository = FilterGroupRepository::new();
-        let original_len = group_repository.select_mapped(&conn).unwrap().len();
+        let locale_repository = FilterLocaleRepository::new();
+        let original_len = locale_repository.select_mapped(&conn).unwrap().len();
 
         assert_ne!(original_len, 0);
 
         with_transaction(&mut conn, |transaction: &Transaction| {
-            Ok(group_repository.clear(&transaction))
+            Ok(locale_repository.clear(&transaction))
         })
         .unwrap()
         .unwrap();
 
-        assert_eq!(group_repository.select_mapped(&conn).unwrap().len(), 0);
+        assert_eq!(locale_repository.select_mapped(&conn).unwrap().len(), 0);
     }
 }

@@ -88,7 +88,7 @@ impl IndexesProcessor {
         mut conn: Connection,
         filters_from_storage: Vec<FilterEntity>,
     ) -> FLMResult<()> {
-        let mut must_be_deleted: Vec<FilterId> = vec![];
+        let mut filters_must_be_deleted: Vec<FilterId> = vec![];
         let mut new_or_updated_filters: Vec<FilterEntity> = vec![];
         let mut tags_of_filters: Vec<Vec<FilterFilterTagEntity>> = vec![];
         let mut locales_of_filters: Vec<Vec<FilterLocaleEntity>> = vec![];
@@ -148,7 +148,7 @@ impl IndexesProcessor {
 
                     new_or_updated_filters.push(filter);
                 } else {
-                    must_be_deleted.push(filter_id);
+                    filters_must_be_deleted.push(filter_id);
                 }
             }
         }
@@ -166,12 +166,12 @@ impl IndexesProcessor {
 
             // Clear filter dependencies
             locales_repository.clear(&transaction)?;
-            group_repo.clear(&transaction)?;
+            group_repo.delete_index_groups(&transaction)?;
             tags_repo.clear(&transaction)?;
             // Remove old filters mappings and non-needed filters itself
-            filter_filter_tag_repository.bulk_delete(&transaction, &must_be_deleted)?;
-            rules_repository.bulk_delete(&transaction, &must_be_deleted)?;
-            filter_repository.bulk_delete(&transaction, &must_be_deleted)?;
+            filter_filter_tag_repository.bulk_delete(&transaction, &filters_must_be_deleted)?;
+            rules_repository.bulk_delete(&transaction, &filters_must_be_deleted)?;
+            filter_repository.bulk_delete(&transaction, &filters_must_be_deleted)?;
             // Clear filter dependencies localisations
             filter_localisation_repository.clear(&transaction)?;
             filter_tag_localisation_repository.clear(&transaction)?;

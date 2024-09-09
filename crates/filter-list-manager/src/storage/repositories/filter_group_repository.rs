@@ -81,6 +81,16 @@ impl FilterGroupRepository {
         Ok(out)
     }
 
+    /// This deletes groups only from index
+    pub(crate) fn delete_index_groups(&self, transaction: &Transaction) -> Result<()> {
+        let mut statement = transaction
+            .prepare(format!("DELETE FROM {} WHERE group_id > 0", Self::TABLE_NAME).as_str())?;
+
+        statement.execute(())?;
+
+        Ok(())
+    }
+
     fn hydrate(row: &Row) -> Result<FilterGroupEntity> {
         Ok(FilterGroupEntity {
             group_id: row.get(0)?,
@@ -125,5 +135,10 @@ impl Repository<FilterGroupEntity> for FilterGroupRepository {
         }
 
         Ok(())
+    }
+
+    fn clear(&self, _: &Transaction) -> Result<()> {
+        // Cannot execute this, because
+        Err(rusqlite::Error::InvalidQuery)
     }
 }
