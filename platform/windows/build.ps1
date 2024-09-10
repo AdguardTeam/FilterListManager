@@ -18,7 +18,7 @@ Function RustBuild {
     RenameOutFile "i686-pc-windows-msvc"
     & cargo build --release --package adguard-flm-ffi --target x86_64-pc-windows-msvc
     RenameOutFile "x86_64-pc-windows-msvc"
-    & cargo build --release --package adguard-flm-ffi --target aarch64-pc-windows-msvc 
+    & cargo build --release --package adguard-flm-ffi --target aarch64-pc-windows-msvc
     RenameOutFile "aarch64-pc-windows-msvc"
     Write-Output "Executing method RustBuild has been completed successfully";
 }

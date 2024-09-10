@@ -17,7 +17,7 @@ thiserror.workspace = true
 uniffi.workspace = true
 
 [features]
-default = ["rusqlite-bundled"]
+default = ["adguard-flm/default"]
 rusqlite-bundled = ["adguard-flm/rusqlite-bundled"]
 rustls-tls = ["adguard-flm/rustls-tls"]
 
