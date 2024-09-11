@@ -29,6 +29,7 @@ Default Job:
       scripts:
       - |-
         . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        UpSchemaIfNeeded "AdGuard.FilterListManager\AdGuard.FilterListManager.schema.json"
         SetRootFolder "${bamboo.root_folder}"
         InitializeProjects
         SetFirstProjectToUpdate   
@@ -97,5 +98,6 @@ variables:
   private_repo_hash: latest
 notifications: []
 labels: []
+triggers: []
 other:
   concurrent-build-plugin: system-default
