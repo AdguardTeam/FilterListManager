@@ -88,7 +88,7 @@ pub trait FilterListManager {
     /// localised with selected [`Locale`].
     fn get_full_filter_list_by_id(&self, filter_id: FilterId) -> FLMResult<Option<FullFilterList>>;
 
-    /// Save custom filter list rules.
+    /// Save custom filter list rules. Note that `filter.time_updated` will be updated too.
     ///
     /// # Failure
     ///

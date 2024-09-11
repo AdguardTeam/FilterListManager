@@ -274,20 +274,33 @@ impl FilterListManager for FilterListManagerImpl {
 
     fn save_custom_filter_rules(&self, rules: FilterListRules) -> FLMResult<()> {
         let mut conn = connect_using_configuration(&self.configuration)?;
-        let count = FilterRepository::new()
-            .count(
+        let filter_repository = FilterRepository::new();
+
+        let result = filter_repository
+            .select(
                 &conn,
                 Some(FilterRepository::custom_filter_with_id(rules.filter_id)),
             )
             .map_err(FLMError::from_database)?;
 
-        if count == 0 {
-            return Err(FLMError::EntityNotFound(rules.filter_id as i64));
-        }
+        match result {
+            Some(mut filters) if !filters.is_empty() => {
+                with_transaction(&mut conn, |transaction: &Transaction| {
+                    // SAFETY: index "0" always present in this branch until condition
+                    // `!filters.is_empty()` is met.
+                    let filter = unsafe { filters.get_unchecked_mut(0) };
 
-        RulesListRepository::new()
-            .insert_row(&mut conn, rules.into())
-            .map_err(FLMError::from_database)
+                    filter.last_update_time = Utc::now().timestamp();
+
+                    filter_repository.insert(transaction, filters)?;
+
+                    RulesListRepository::new().insert(&transaction, vec![rules.into()])
+                })
+                .map_err(FLMError::from_database)
+            }
+
+            _ => return Err(FLMError::EntityNotFound(rules.filter_id as i64)),
+        }
     }
 
     fn save_disabled_rules(
@@ -652,7 +665,10 @@ mod tests {
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::sql_generators::operator::SQLOperator;
     use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
-    use crate::{Configuration, FilterId, FilterListManager, FilterListManagerImpl};
+    use crate::{
+        Configuration, FilterId, FilterListManager, FilterListManagerImpl, FilterListRules,
+        USER_RULES_FILTER_LIST_ID,
+    };
     use chrono::{Duration, Utc};
     use std::fs;
     use std::ops::Sub;
@@ -1016,5 +1032,44 @@ mod tests {
         for filter in iter {
             assert!(filter.rules.len() > 0);
         }
+    }
+
+    #[test]
+    fn test_save_custom_filter_rules_must_update_time() {
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let _ = spawn_test_db_with_metadata();
+
+        let flm = FilterListManagerImpl::new(Configuration::default());
+
+        let rules = FilterListRules {
+            filter_id: USER_RULES_FILTER_LIST_ID,
+            rules: vec![String::from("example.com")],
+            disabled_rules: vec![],
+        };
+
+        // Set a new time here
+        flm.save_custom_filter_rules(rules.clone()).unwrap();
+
+        let original_time_updated = flm
+            .get_full_filter_list_by_id(USER_RULES_FILTER_LIST_ID)
+            .unwrap()
+            .unwrap()
+            .time_updated;
+
+        // Sleep a sec, then update once again
+        std::thread::sleep(core::time::Duration::from_secs(1));
+
+        // Set another time after sleeping a sec
+        flm.save_custom_filter_rules(rules).unwrap();
+
+        let user_rules = flm
+            .get_full_filter_list_by_id(USER_RULES_FILTER_LIST_ID)
+            .unwrap()
+            .unwrap();
+
+        assert_ne!(user_rules.time_updated, original_time_updated);
     }
 }
