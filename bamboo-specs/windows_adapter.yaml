@@ -29,8 +29,8 @@ Default Job:
       scripts:
       - |-
         . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
-        UpSchemaIfNeeded "AdGuard.FilterListManager\AdGuard.FilterListManager.schema.json"
         SetRootFolder "${bamboo.root_folder}"
+        UpSchemaIfNeeded "AdGuard.FilterListManager\AdGuard.FilterListManager.schema.json"
         InitializeProjects
         SetFirstProjectToUpdate   
   - inject-variables:
