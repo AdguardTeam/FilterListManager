@@ -79,7 +79,7 @@ let package = Package(
   targets: [
     .binaryTarget(
       name: "AdGuardFLM",
-      url: "'${ARTIFACTORY_PATH}/${ARCH_NAME}'",
+      url: "https://github.com/AdguardTeam/FilterListManager/releases/download/'${SPM_TAG}/${ARCH_NAME}'",
       checksum: "'$(swift package compute-checksum ${ARCH_NAME})'"
     ),
   ]
@@ -92,6 +92,11 @@ git tag -d "${SPM_TAG}" || true
 git tag "${SPM_TAG}"
 git remote set-url origin "${bamboo_planRepository_1_repositoryUrl}"
 git push origin "${SPM_TAG}"
+git remote add gh https://${bamboo_githubPublicRepoPassword}:@github.com/AdguardTeam/FilterListManager/
+git push gh "${SPM_TAG}" || true
+gh config set -h github.com oauth_token "${bamboo_githubPublicRepoPassword}" || exit 1
+gh release create ${SPM_TAG} -t "v${VER} for SwiftPM" -n "Prebuilt package for SwiftPM"
+gh release upload ${SPM_TAG} ${ARCH_NAME}
 
 rm "${ARCH_NAME}"
 
