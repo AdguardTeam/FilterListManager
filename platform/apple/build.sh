@@ -68,6 +68,8 @@ build_framework() {
         -I "${CARGO_TARGET_DIR}/${ARCH}/release" \
         "${CARGO_TARGET_DIR}/${ARCH}/release/${LIBRARY_ARTIFACT_NAME}" \
         -framework SystemConfiguration \
+        -framework Security \
+        -l sqlite3 \
         -o ${FRAMEWORK_VERSIONED_PATH}/AdGuardFLM
     install_name_tool -id @rpath/${FRAMEWORK_NAME}${VERSION_SUFFIX}/AdGuardFLM ${FRAMEWORK_VERSIONED_PATH}/AdGuardFLM
 }

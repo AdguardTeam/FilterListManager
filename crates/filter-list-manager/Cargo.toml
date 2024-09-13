@@ -24,7 +24,7 @@ uniffi.workspace = true
 thiserror.workspace = true
 
 [features]
-default = ["rusqlite-bundled", "reqwest/default"]
+default = ["reqwest/default"]
 rusqlite-bundled = ["rusqlite/bundled"]
 rustls-tls = ["reqwest/rustls-tls"]
 
