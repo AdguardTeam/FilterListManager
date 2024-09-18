@@ -1,5 +1,6 @@
 //! Root module of data storage operations
 use crate::storage::database_path_holder::DatabasePathHolder;
+use crate::storage::database_status::lift_up_once;
 use crate::{Configuration, FLMError, FLMResult};
 use rusqlite::{Connection, OpenFlags, Transaction};
 use std::path::PathBuf;
@@ -12,6 +13,7 @@ pub(crate) mod db_file_utils;
 pub(crate) mod entities;
 pub mod error;
 pub(crate) mod init_schema;
+mod migrations;
 pub(crate) mod repositories;
 pub(crate) mod sql_generators;
 mod utils;
@@ -24,14 +26,19 @@ pub const DNS_FILTERS_DATABASE_FILENAME: &str = "agflm_dns.db";
 #[doc(hidden)]
 /// Open a new connection to a SQLite storage. If db file does not exist, it will be created.
 ///
+/// # Safety
+///
+/// This function does not "lift" the database, use it with caution
+///
 /// # Failure
 ///
 /// `Err` if you couldn't open db
-pub fn force_connect(db_path: &PathBuf) -> FLMResult<Connection> {
-    connect_internal(
+pub unsafe fn force_connect(db_path: &PathBuf) -> FLMResult<Connection> {
+    Connection::open_with_flags(
         db_path,
-        OpenFlags::SQLITE_OPEN_CREATE | OpenFlags::SQLITE_OPEN_READ_WRITE,
+        OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_CREATE,
     )
+    .map_err(FLMError::from_database)
 }
 
 /// Creates connection to existing db from path
@@ -40,12 +47,10 @@ pub fn force_connect(db_path: &PathBuf) -> FLMResult<Connection> {
 ///
 /// returns [`AGError`] if an error encountered
 pub(crate) fn connect(db_path: &PathBuf) -> FLMResult<Connection> {
-    connect_internal(db_path, OpenFlags::SQLITE_OPEN_READ_WRITE)
-}
+    lift_up_once(db_path)?;
 
-#[inline]
-fn connect_internal(path_buf: &PathBuf, open_flags: OpenFlags) -> FLMResult<Connection> {
-    Connection::open_with_flags(path_buf, open_flags).map_err(FLMError::from_database)
+    Connection::open_with_flags(db_path, OpenFlags::SQLITE_OPEN_READ_WRITE)
+        .map_err(FLMError::from_database)
 }
 
 /// Connects to database, using the [`Configuration`] object

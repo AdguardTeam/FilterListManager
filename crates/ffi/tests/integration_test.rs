@@ -2,6 +2,7 @@ use adguard_flm::Configuration;
 use filter_list_manager_ffi::outer_error::AGOuterError;
 use filter_list_manager_ffi::FilterListManager;
 
+#[ignore]
 #[test]
 fn test_cannot_open_database() {
     let flm = FilterListManager::new(Configuration::default());

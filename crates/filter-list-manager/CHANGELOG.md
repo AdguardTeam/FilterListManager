@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2024-09-17
+
+### Fixed
+
+- Reduce build size by panic=abort, remove symbols for all platforms and do not bundle sqlite for apple
+- `install_custom_filter_*` methods with `download_url=<empty string>` drops user rules filter when called
+
+### Removed
+
+- Drop `download_url` unique constraint
+
+### Added
+- New `filter_list_manager` method `lift_up_database`
+- Migrations that run when the `lift_up_database` method is called
+- Automatic "lift" database after the very first connection to database
+
+[0.6.0]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.5.10...flm-0.6.0
+
+### Fixed
+
+- `save_custom_filter_rules` must update `filter.time_updated` too
+
 ## [0.5.10] - 2024-09-11
 
 [0.5.10]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.5.9...flm-0.5.10

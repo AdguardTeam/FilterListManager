@@ -1,5 +1,4 @@
 mod fill_database;
-mod migrations;
 mod test;
 
 use crate::cli_app::test::test;
@@ -69,20 +68,6 @@ pub(super) fn run_app() {
     let matches = cli_setup().get_matches();
 
     match matches.subcommand() {
-        Some(("migrate", sub_matches)) => {
-            let migrations_path = match sub_matches.get_one::<PathBuf>("MIGRATIONS_PATH") {
-                Some(migrations_path) => migrations_path,
-                _ => unreachable!("Cannot resolve MIGRATIONS_PATH"),
-            };
-
-            let db_path = match sub_matches.get_one::<PathBuf>("DB_PATH") {
-                Some(db_path) => db_path,
-                _ => unreachable!("Cannot resolve DB_PATH"),
-            };
-
-            migrations::entry(migrations_path, db_path);
-        }
-
         Some(("fill_database", sub_matches)) => {
             let db_path = sub_matches.get_one::<PathBuf>("DB_FOLDER_PATH").unwrap();
             let index_url = sub_matches.get_one::<String>("INDEX_URL").unwrap();

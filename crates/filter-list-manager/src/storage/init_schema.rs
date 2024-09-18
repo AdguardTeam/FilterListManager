@@ -19,12 +19,19 @@ pub(crate) fn init_schema(db_path: &PathBuf) -> FLMResult<Connection> {
         fs::create_dir_all(directory).map_err(FLMError::from_io)?;
     }
 
-    let conn = force_connect(db_path)?;
+    // SAFETY: Do not need automatic lifting database here
+    let conn = unsafe { force_connect(db_path)? };
 
     conn.execute_batch(SCHEMA_STR)
         .map_err(FLMError::from_database)?;
 
     Ok(conn)
+}
+
+/// Inits schema with connection, not PathBuf
+pub(crate) fn init_schema_with_conn(conn: &Connection) -> FLMResult<()> {
+    conn.execute_batch(SCHEMA_STR)
+        .map_err(FLMError::from_database)
 }
 
 #[cfg(test)]

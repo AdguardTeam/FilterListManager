@@ -416,6 +416,7 @@ impl FilterRepository {
                         metadata_ref.custom_filters_autoincrement_value -= 1;
                         Some(metadata_ref.custom_filters_autoincrement_value)
                     } else {
+                        // Non-custom filters always must have their own filter id
                         entity.filter_id
                     }
                 }

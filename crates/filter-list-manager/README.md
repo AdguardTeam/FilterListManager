@@ -86,6 +86,8 @@ let flm = FilterListManagerImpl::new(configuration);
 // Creates and configures the database. Populates the database with information
 // from the filter indexes (filters metadata), the paths to which are specified
 // in the configuration.
+// In addition, this method applies migrations that have not yet been applied.
+// See the lift_up_database method for details on "lifting" a database.
 flm.pull_metadata();
 
 // Then, downloads the contents of the filters.
@@ -97,6 +99,31 @@ flm.update_filters(true, 0, true);
 > working directory (**cwd**), and the database file name is generated based on
 > the format `agflm_{configuration.filter_list_type.to_string()}`. For standard
 > filters, the file path will be `$CWD/agflm_standard.db`.
+
+---
+
+### Database scheme updates
+
+Database schema updates (migrations) are possible using the `flm.lift_up_database()` method.
+The method “raises” the state of the database to the working state.
+
+**If the database doesn't exist:**
+- Creates database
+- Rolls up the schema
+- Rolls migrations
+- Performs bootstrap.
+
+**If the database is an empty file:**
+- Rolls the schema
+- Rolls migrations
+- Performs bootstrap.
+  
+... and so on.
+
+### Usage notes
+
+First connection to database almost always "lift" the database.
+So you need this only in special cases, like old database backups 
 
 ---
 

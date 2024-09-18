@@ -58,13 +58,13 @@ fn create_db_metadata() -> DBMetadataEntity {
 }
 
 /// Makes specific queries to an empty database with a schema
-pub fn db_bootstrap(mut conn: Connection) -> FLMResult<()> {
+pub fn db_bootstrap(conn: &mut Connection) -> FLMResult<()> {
     let filter_entity = make_user_rules_filter_entity();
     let rule_entity = create_user_rules_rules_list_entity();
     let custom_group = create_group_entity_for_custom_filters();
     let metadata_entity = create_db_metadata();
 
-    with_transaction(&mut conn, move |transaction: &Transaction| {
+    with_transaction(conn, move |transaction: &Transaction| {
         DBMetadataRepository::save(&transaction, &metadata_entity)?;
 
         FilterRepository::new().insert(&transaction, vec![filter_entity])?;

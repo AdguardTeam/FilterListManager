@@ -164,8 +164,8 @@ pub trait FilterListManager {
 
     /// The method is used for creating a database and downloading filters.
     /// If the database exists, it attempts to bring it to a state compatible
-    /// with the current indexes. Additionally, the method checks the downloaded
-    /// indexes for consistency.
+    /// with the current indexes. Also, migrations update will be processed in this method, too.
+    /// Additionally, the method checks the downloaded indexes for consistency.
     ///
     /// This method follows the algorithm below:
     ///
@@ -175,8 +175,9 @@ pub trait FilterListManager {
     ///     b. For each filter check that `filter.group_id` > 0 and the group
     ///        is present in the index.
     ///     c. For each filter check that tag is present in the index.
-    ///     d. filter.name (title) is not empty.
-    ///     e. Everything else is not a critical issue.
+    ///     d. `filter.name` (title) is not empty.
+    ///     e. `filter.download_url` must be unique.
+    ///     f. Everything else is not a critical issue.
     /// 3. Opens the database with `O_CREAT`.
     ///    a. Check that the database is empty (by the presence of the `filter`
     ///       table).
@@ -227,6 +228,22 @@ pub trait FilterListManager {
 
     /// Gets absolute path for current database.
     fn get_database_path(&self) -> FLMResult<String>;
+
+    /// The method “raises” the state of the database to the working state.
+    ///
+    /// **If the database doesn't exist:**
+    /// - Creates database
+    /// - Rolls up the schema
+    /// - Rolls migrations
+    /// - Performs bootstrap.
+    ///
+    /// **If the database is an empty file:**
+    /// - Rolls the schema
+    /// - Rolls migrations
+    /// - Performs bootstrap.
+    ///
+    ///... and so on.
+    fn lift_up_database(&self) -> FLMResult<()>;
 
     /// Gets version of current database scheme.
     ///

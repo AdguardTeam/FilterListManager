@@ -47,6 +47,7 @@ pub(crate) fn spawn_test_db_with_metadata() -> (IndexesProcessor, Connection, Ve
     let mut indexes_processor =
         IndexesProcessor::factory_test(connection_source.clone(), index, index_i18n);
 
+    // TODO: `connect` won't lift database here, cause it lifts only once, for one thread and one prefix
     lift_up_database(&connection_source).unwrap();
 
     indexes_processor.fill_empty_db().unwrap();

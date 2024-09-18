@@ -1,5 +1,5 @@
 use super::entities::{IndexEntity, IndexI18NEntity};
-use crate::filters::indexes::index_consistency_checker::IndexConsistencyChecker;
+use crate::filters::indexes::index_consistency_checker::check_consistency;
 use crate::storage::database_path_holder::DatabasePathHolder;
 use crate::storage::database_status::lift_up_database;
 use crate::storage::entities::filter_entity::FilterEntity;
@@ -147,9 +147,9 @@ impl IndexesProcessor {
                     filter.filter_id = None;
 
                     new_or_updated_filters.push(filter);
-                } else {
-                    filters_must_be_deleted.push(filter_id);
                 }
+
+                filters_must_be_deleted.push(filter_id);
             }
         }
 
@@ -280,7 +280,7 @@ impl IndexesProcessor {
             Err(err) => return Err(err),
         };
 
-        IndexConsistencyChecker::new().check(&index)?;
+        check_consistency(&index)?;
 
         self.loaded_index = Some(index);
         self.loaded_index_i18n = Some(index_localisations);
@@ -522,6 +522,7 @@ mod tests {
             // New id for new group
             chosen_group.group_id = rng.gen_range(99999..999999);
 
+            // Creates filter, which must be moved to custom filters after second update
             let mut chosen_filter = index_ref.borrow().filters.choose(&mut rng).unwrap().clone();
             chosen_filter.filterId = chosen_filter_id;
             chosen_filter.downloadUrl = chosen_filter_download_url.clone();
@@ -587,7 +588,7 @@ mod tests {
         // region Check testing_data
         let groups_map = groups_repository.select_mapped(&conn).unwrap();
 
-        // Group must be here
+        // Chosen group must be present in database
         assert!(groups_map.contains_key(&chosen_group_id));
 
         // region second update
@@ -616,8 +617,8 @@ mod tests {
             assert!(!second_groups_mapped.contains_key(&chosen_group_id));
 
             // Try to get chosen filter info one more time
-            // It must have a new id
-            let chosen_filter_new_info = filter_repository
+            // It must have a new id, because it was moved to custom filters
+            let mut chosen_filters_list = filter_repository
                 .select(
                     &conn,
                     Some(FieldEqualValue(
@@ -626,9 +627,12 @@ mod tests {
                     )),
                 )
                 .unwrap()
-                .unwrap()
-                .pop()
                 .unwrap();
+
+            // Must be only one filter with this download url
+            assert_eq!(chosen_filters_list.len(), 1);
+
+            let chosen_filter_new_info = chosen_filters_list.pop().unwrap();
 
             let filter_id = chosen_filter_new_info.filter_id.unwrap();
 

@@ -12,6 +12,7 @@ use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::update_filters_action::update_filters_action;
 use crate::storage::database_path_holder::DatabasePathHolder;
+use crate::storage::database_status::lift_up_database;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
 use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
@@ -487,6 +488,11 @@ impl FilterListManager for FilterListManagerImpl {
             .to_string())
     }
 
+    fn lift_up_database(&self) -> FLMResult<()> {
+        let database_path_holder = DatabasePathHolder::from_configuration(&self.configuration)?;
+        lift_up_database(&database_path_holder)
+    }
+
     fn get_database_version(&self) -> FLMResult<Option<i32>> {
         let conn = connect_using_configuration(&self.configuration)?;
         let entity = DBMetadataRepository::read(&conn).map_err(FLMError::from_database)?;
@@ -662,6 +668,7 @@ impl FilterListManager for FilterListManagerImpl {
 
 #[cfg(test)]
 mod tests {
+    use crate::storage::repositories::filter_repository::FilterRepository;
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::sql_generators::operator::SQLOperator;
     use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
@@ -672,6 +679,7 @@ mod tests {
     use chrono::{Duration, Utc};
     use std::fs;
     use std::ops::Sub;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     #[test]
     fn test_insert_custom_filter() {
@@ -1071,5 +1079,44 @@ mod tests {
             .unwrap();
 
         assert_ne!(user_rules.time_updated, original_time_updated);
+    }
+
+    #[test]
+    fn test_guard_rewrite_user_rules_filter_by_another_filter() {
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let (_, conn, _) = spawn_test_db_with_metadata();
+
+        let flm = FilterListManagerImpl::new(Configuration::default());
+
+        let _ = flm
+            .install_custom_filter_from_string(
+                String::new(),
+                SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_secs() as i64,
+                true,
+                true,
+                String::from("JJ"),
+                Some("FILTER".to_string()),
+                Some("DESC".to_string()),
+            )
+            .unwrap();
+
+        let list = FilterRepository::new()
+            .select(
+                &conn,
+                Some(SQLOperator::FieldEqualValue(
+                    "filter_id",
+                    USER_RULES_FILTER_LIST_ID.into(),
+                )),
+            )
+            .unwrap()
+            .unwrap();
+
+        assert!(!list.is_empty());
     }
 }
