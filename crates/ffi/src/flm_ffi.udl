@@ -155,6 +155,9 @@ interface FilterListManager {
     FilterListMetadata fetch_filter_list_metadata(string url);
 
     [Throws=AGOuterError]
+    void lift_up_database();
+
+    [Throws=AGOuterError]
     sequence<FilterTag> get_all_tags();
 
     [Throws=AGOuterError]

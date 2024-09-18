@@ -106,6 +106,10 @@ impl FilterListManager {
         self.wrap(move |flm| flm.fetch_filter_list_metadata(url))
     }
 
+    pub fn lift_up_database(&self) -> AGResult<()> {
+        self.wrap(|flm| flm.lift_up_database())
+    }
+
     pub fn get_all_tags(&self) -> AGResult<Vec<FilterTag>> {
         self.wrap(|flm| flm.get_all_tags())
     }

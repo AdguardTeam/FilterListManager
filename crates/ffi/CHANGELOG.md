@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2024-09-17
+## [0.6.0] - 2024-09-17
 
 ### Fixed
 - Fix windows rust lib and windows adapter build
 - Reduce build size by panic=abort, remove symbols for all platforms and do not bundle sqlite for apple
+
+### Added
+- `flm.lift_up_database` method
+
+### Changed
+- Update `adguard-flm` to `0.6`
+
+[0.6.0]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.5.10...ffi-0.6.0
 
 ## [0.5.10] - 2024-09-03
 
