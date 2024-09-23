@@ -142,7 +142,8 @@
 //! // Installs a custom filter.
 //! ```
 //! use adguard_flm::{Configuration, FilterListManagerImpl, FilterListManager};
-//! let flm = FilterListManagerImpl::new(Configuration::default());
+//! let flm = FilterListManagerImpl::new(Configuration::default())
+//!     .unwrap();
 //!
 //! let custom_filter = flm.install_custom_filter_list(
 //!     String::from("https://example.com/custom_filter.txt"),
@@ -169,7 +170,8 @@
 //!
 //! ```
 //! use adguard_flm::{Configuration, FilterListManagerImpl, FilterListManager};
-//! let flm = FilterListManagerImpl::new(Configuration::default());
+//! let flm = FilterListManagerImpl::new(Configuration::default())
+//!     .unwrap();
 //!
 //! let string_contents = String::from(r###"
 //! ! Checksum: ecbiyIyplBZKLeNzi64pGA

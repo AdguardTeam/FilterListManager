@@ -18,11 +18,11 @@ use models::FilterId;
 
 /// FilterListManager is the interface of a filter list manager.
 pub trait FilterListManager {
-    /// Constructor.
-    /// You must create its own manager for different filter lists types.
+    /// In the constructor, the object is configured and initialized depending on the passed configuration.
+    /// *NOTE:* You must create its own manager for different filter lists types.
     ///
     /// * `configuration` - Configuration object for this manager
-    fn new(configuration: Configuration) -> Self;
+    fn new(configuration: Configuration) -> FLMResult<Box<Self>>;
 
     /// Installs a custom filter list
     ///

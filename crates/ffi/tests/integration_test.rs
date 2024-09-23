@@ -5,7 +5,7 @@ use filter_list_manager_ffi::FilterListManager;
 #[ignore]
 #[test]
 fn test_cannot_open_database() {
-    let flm = FilterListManager::new(Configuration::default());
+    let flm = FilterListManager::new(Configuration::default()).unwrap();
     let result = flm.get_all_tags().err().unwrap();
 
     assert_eq!(result, AGOuterError::CannotOpenDatabase);
@@ -14,7 +14,7 @@ fn test_cannot_open_database() {
 #[ignore]
 #[test]
 fn test_errors_from_update_custom_metadata() {
-    let flm = FilterListManager::new(Configuration::default());
+    let flm = FilterListManager::new(Configuration::default()).unwrap();
 
     let title_err = flm
         .update_custom_filter_metadata(0, String::new(), true)

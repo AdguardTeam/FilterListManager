@@ -119,6 +119,7 @@ dictionary Configuration {
     string metadata_locales_url;
     string? encryption_key;
     i32 request_timeout_ms;
+    boolean auto_lift_up_database;
 };
 
 [Error]
@@ -142,6 +143,7 @@ enum AGOuterError {
 };
 
 interface FilterListManager {
+    [Throws=AGOuterError]
     constructor(Configuration configuration);
 
     [Throws=AGOuterError]

@@ -25,7 +25,7 @@ pub fn entry(
             .to_string(),
     );
 
-    let flm = FilterListManagerImpl::new(configuration);
+    let flm = FilterListManagerImpl::new(configuration).unwrap();
 
     flm.pull_metadata().unwrap();
     flm.update_filters(true, 0, true).unwrap();

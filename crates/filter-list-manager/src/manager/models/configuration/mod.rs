@@ -35,9 +35,21 @@ pub struct Configuration {
     pub metadata_locales_url: String,
     /// Optional encryption key for the storage.
     /// Should be securely stored on the device (keychain, secure storage, etc.)
+    #[deprecated(
+        note = "This property is not used now, and will be removed in version 1.0.0 or earlier"
+    )]
     pub encryption_key: Option<String>,
     /// Requests timeouts in milliseconds. Default value 60000
     pub request_timeout_ms: i32,
+    /// “Uplifting” a database is a set of measures that brings the database up to date:
+    /// * Database creation
+    /// * Filling with schema
+    /// * Creation of service tables and entities
+    /// * Migrating between versions of a given library
+    ///
+    /// If you want to disable this option, you will need to manually call `flm.lift_up_database()`
+    /// when you update the library in your application.
+    pub auto_lift_up_database: bool,
 }
 
 /// Normalized locales delimiter
@@ -71,7 +83,7 @@ impl Configuration {
 
 impl Default for Configuration {
     fn default() -> Self {
-        Configuration {
+        Self {
             filter_list_type: FilterListType::STANDARD,
             working_directory: None,
             locale: "en".to_string(),
@@ -81,6 +93,7 @@ impl Default for Configuration {
             metadata_locales_url: String::new(),
             encryption_key: None,
             request_timeout_ms: 15000,
+            auto_lift_up_database: true,
         }
     }
 }

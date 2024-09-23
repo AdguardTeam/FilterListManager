@@ -6,7 +6,7 @@ use std::time::SystemTime;
 #[allow(dead_code)]
 fn install_lists() {
     let start = SystemTime::now();
-    let manager = FilterListManagerImpl::new(Configuration::default());
+    let manager = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
     let mut max_lists = 6;
     for n in 1..max_lists {
@@ -45,6 +45,7 @@ fn install_lists() {
 #[allow(dead_code)]
 fn gets_filter_list() {
     let result = FilterListManagerImpl::new(Configuration::default())
+        .unwrap()
         .get_full_filter_list_by_id(1)
         .unwrap();
 
@@ -54,6 +55,7 @@ fn gets_filter_list() {
 #[allow(dead_code)]
 fn update_filters() {
     let updated = FilterListManagerImpl::new(Configuration::default())
+        .unwrap()
         .update_filters(false, 0, false)
         .unwrap()
         .unwrap();

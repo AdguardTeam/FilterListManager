@@ -85,10 +85,16 @@ impl FilterListManagerImpl {
 }
 
 impl FilterListManager for FilterListManagerImpl {
-    fn new(mut configuration: Configuration) -> Self {
+    fn new(mut configuration: Configuration) -> FLMResult<Box<Self>> {
         configuration.normalized();
 
-        Self { configuration }
+        if configuration.auto_lift_up_database {
+            let holder = DatabasePathHolder::from_configuration(&configuration)?;
+
+            lift_up_database(&holder)?
+        }
+
+        Ok(Box::new(Self { configuration }))
     }
 
     fn install_custom_filter_list(
@@ -719,7 +725,7 @@ mod tests {
 
         let _ = spawn_test_db_with_metadata();
 
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let path = fs::canonicalize("./tests/fixtures/1.txt").unwrap();
 
@@ -751,7 +757,8 @@ mod tests {
 
         let (_, _, inserted_filters) = spawn_test_db_with_metadata();
 
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
         let deleted = flm
             .delete_custom_filter_lists(vec![inserted_filters.first().unwrap().filter_id.unwrap()])
             .unwrap();
@@ -784,7 +791,7 @@ mod tests {
         });
 
         let _ = spawn_test_db_with_metadata();
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let title = String::from("titleeee");
         let description = String::from("dessscrriptiiiioooonnn");
@@ -811,7 +818,7 @@ mod tests {
         });
 
         let (_, conn, _) = spawn_test_db_with_metadata();
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let title = String::from("titleeee");
         let description = String::from("dessscrriptiiiioooonnn");
@@ -856,7 +863,7 @@ mod tests {
         });
 
         let _ = spawn_test_db_with_metadata();
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let download_url = String::from("http://install.custom.filter.list.from.string");
         let last_download_time = Utc::now().sub(Duration::days(5));
@@ -908,7 +915,7 @@ mod tests {
         });
 
         let _ = spawn_test_db_with_metadata();
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let download_url = String::from("http://install.custom.filter.list.from.string");
         let last_download_time = Utc::now().sub(Duration::days(5));
@@ -946,7 +953,7 @@ mod tests {
             let mut conf = Configuration::default();
             conf.locale = String::from("el");
 
-            let flm = FilterListManagerImpl::new(conf);
+            let flm = FilterListManagerImpl::new(conf).unwrap();
             let filter = flm.get_full_filter_list_by_id(1).unwrap().unwrap();
 
             assert_eq!(filter.title.as_str(), "AdGuard Ρωσικό φίλτρο");
@@ -961,7 +968,7 @@ mod tests {
             // Nonexistent
             conf.locale = String::from("31");
 
-            let flm = FilterListManagerImpl::new(conf);
+            let flm = FilterListManagerImpl::new(conf).unwrap();
             let filter = flm.get_full_filter_list_by_id(1).unwrap().unwrap();
 
             assert_eq!(filter.title.as_str(), "AdGuard Russian filter");
@@ -980,7 +987,7 @@ mod tests {
 
         let _ = spawn_test_db_with_metadata();
 
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
         let filter = flm.get_full_filter_list_by_id(257).unwrap().unwrap();
 
         assert_eq!(
@@ -1004,7 +1011,7 @@ mod tests {
 
         let _ = spawn_test_db_with_metadata();
 
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let new_filter = flm
             .install_custom_filter_from_string(
@@ -1049,7 +1056,7 @@ mod tests {
 
         let _ = spawn_test_db_with_metadata();
 
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
         let list_ids = flm
             .get_full_filter_lists()
             .unwrap()
@@ -1080,7 +1087,7 @@ mod tests {
 
         let _ = spawn_test_db_with_metadata();
 
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let rules = FilterListRules {
             filter_id: USER_RULES_FILTER_LIST_ID,
@@ -1119,7 +1126,7 @@ mod tests {
 
         let (_, conn, _) = spawn_test_db_with_metadata();
 
-        let flm = FilterListManagerImpl::new(Configuration::default());
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let _ = flm
             .install_custom_filter_from_string(
@@ -1148,5 +1155,18 @@ mod tests {
             .unwrap();
 
         assert!(!list.is_empty());
+    }
+
+    #[test]
+    fn test_database_is_automatically_lifted_in_constructor() {
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
+        let lists = flm.get_full_filter_lists().unwrap();
+
+        assert!(lists.len() > 0);
     }
 }

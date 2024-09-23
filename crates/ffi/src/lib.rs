@@ -11,6 +11,7 @@ use adguard_flm::{
     FilterListManagerImpl, FilterListMetadata, FullFilterList, StoredFilterMetadata,
 };
 pub use adguard_flm::{FilterListType, UpdateFilterError};
+use std::ops::Deref;
 use std::sync::{Mutex, MutexGuard};
 
 pub use crate::models::FilterListManagerConstants;
@@ -25,10 +26,11 @@ pub struct FilterListManager {
 }
 
 impl FilterListManager {
-    pub fn new(configuration: Configuration) -> Self {
-        Self {
-            flm: Mutex::new(FilterListManagerImpl::new(configuration)),
-        }
+    pub fn new(configuration: Configuration) -> AGResult<Self> {
+        let flm = FilterListManagerImpl::new(configuration).map_err(AGOuterError::from)?;
+        Ok(Self {
+            flm: Mutex::new(*flm),
+        })
     }
 
     pub fn install_custom_filter_list(

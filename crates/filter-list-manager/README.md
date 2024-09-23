@@ -121,10 +121,11 @@ The method “raises” the state of the database to the working state.
 ... and so on.
 
 ### Usage notes
+Starting with version `0.7.1` the database is “uplifted” automatically when the filter_list_manager constructor is called. 
+To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.
 
-First connection to database almost always "lift" the database.
-So you need this only in special cases, like old database backups 
-
+**IMPORTANT NOTE:**
+If you have disabled automatic lifting, you must invoke it yourself after each library update if you don't want to miss a migration.
 ---
 
 ### Operations with custom filters

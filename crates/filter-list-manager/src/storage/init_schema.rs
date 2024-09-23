@@ -28,12 +28,6 @@ pub(crate) fn init_schema(db_path: &PathBuf) -> FLMResult<Connection> {
     Ok(conn)
 }
 
-/// Inits schema with connection, not PathBuf
-pub(crate) fn init_schema_with_conn(conn: &Connection) -> FLMResult<()> {
-    conn.execute_batch(SCHEMA_STR)
-        .map_err(FLMError::from_database)
-}
-
 #[cfg(test)]
 mod tests {
     use crate::storage::init_schema::init_schema;

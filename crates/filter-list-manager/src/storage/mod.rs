@@ -1,6 +1,6 @@
 //! Root module of data storage operations
 use crate::storage::database_path_holder::DatabasePathHolder;
-use crate::storage::database_status::lift_up_once;
+
 use crate::{Configuration, FLMError, FLMResult};
 use rusqlite::{Connection, OpenFlags, Transaction};
 use std::path::PathBuf;
@@ -47,8 +47,6 @@ pub unsafe fn force_connect(db_path: &PathBuf) -> FLMResult<Connection> {
 ///
 /// returns [`AGError`] if an error encountered
 pub(crate) fn connect(db_path: &PathBuf) -> FLMResult<Connection> {
-    lift_up_once(db_path)?;
-
     Connection::open_with_flags(db_path, OpenFlags::SQLITE_OPEN_READ_WRITE)
         .map_err(FLMError::from_database)
 }
