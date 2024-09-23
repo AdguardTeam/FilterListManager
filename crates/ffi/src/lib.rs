@@ -8,7 +8,7 @@ use adguard_flm::{
         models::filter_group::FilterGroup, models::filter_tag::FilterTag, models::UpdateResult,
     },
     ActiveRulesInfo, Configuration, FLMResult, FilterId, FilterListManager as IFilterListManager,
-    FilterListManagerImpl, FilterListMetadata, FullFilterList,
+    FilterListManagerImpl, FilterListMetadata, FullFilterList, StoredFilterMetadata,
 };
 pub use adguard_flm::{FilterListType, UpdateFilterError};
 use std::sync::{Mutex, MutexGuard};
@@ -64,6 +64,17 @@ impl FilterListManager {
 
     pub fn get_full_filter_list_by_id(&self, id: FilterId) -> AGResult<Option<FullFilterList>> {
         self.wrap(move |flm| flm.get_full_filter_list_by_id(id))
+    }
+
+    pub fn get_stored_filters_metadata(&self) -> AGResult<Vec<StoredFilterMetadata>> {
+        self.wrap(|flm| flm.get_stored_filters_metadata())
+    }
+
+    pub fn get_stored_filters_metadata_by_id(
+        &self,
+        filter_id: FilterId,
+    ) -> AGResult<Option<StoredFilterMetadata>> {
+        self.wrap(move |flm| flm.get_stored_filter_metadata_by_id(filter_id))
     }
 
     pub fn save_custom_filter_rules(&self, rules: FilterListRules) -> AGResult<()> {

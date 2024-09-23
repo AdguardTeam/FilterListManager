@@ -1,15 +1,10 @@
-//! FullFilterList represents a filter list and all its associated metadata.
-use super::filter_tag::FilterTag;
-use super::FilterId;
-use crate::manager::models::filter_list_rules::FilterListRules;
-use crate::storage::entities::filter_entity::FilterEntity;
-use crate::StoredFilterMetadata;
+//! lightweight analog of [`crate::FullFilterList`] without filter contents
 
-/// FullFilterList represents a filter list and all its associated metadata.
-///
-/// Keep in mind that this structure has a lightweight counterpart without filter contents - [`crate::StoredFilterMetadata`]
-#[derive(Clone, Debug)]
-pub struct FullFilterList {
+use crate::storage::entities::filter_entity::FilterEntity;
+use crate::{FilterId, FilterTag};
+
+/// The lightweight analog of [`crate::FullFilterList`] without filter contents
+pub struct StoredFilterMetadata {
     /// Filter list unique ID. If the filter list comes from a registry, this
     /// ID comes from the registry and must be unique inside of it.
     /// If the filter list is a custom list or a pre-installed one (user rules)
@@ -137,54 +132,19 @@ pub struct FullFilterList {
     /// code without locale (i.e. `en`, `zh`) or with locale (i.e. `en-GB`,
     /// etc.)
     pub languages: Vec<String>,
-    /// Container for rules.
-    ///
-    /// This field can be empty when the filter list is not yet downloaded, but
-    /// it was received from the registry (using `pull_metadata`).
-    pub rules: Option<FilterListRules>,
 }
 
-impl FullFilterList {
-    /// Builds `[Self]` from `[StoredFilterMetadata]` and rules
-    pub(crate) fn from_stored_filter_metadata(
-        stored_filter_metadata: StoredFilterMetadata,
-        rules: Option<FilterListRules>,
-    ) -> Self {
-        Self {
-            id: stored_filter_metadata.id,
-            group_id: stored_filter_metadata.group_id,
-            time_updated: stored_filter_metadata.time_updated,
-            last_download_time: stored_filter_metadata.last_download_time,
-            title: stored_filter_metadata.title,
-            description: stored_filter_metadata.description,
-            version: stored_filter_metadata.version,
-            display_number: stored_filter_metadata.display_number,
-            download_url: stored_filter_metadata.download_url,
-            subscription_url: stored_filter_metadata.subscription_url,
-            tags: stored_filter_metadata.tags,
-            expires: stored_filter_metadata.expires,
-            is_trusted: stored_filter_metadata.is_trusted,
-            is_custom: stored_filter_metadata.is_custom,
-            is_enabled: stored_filter_metadata.is_enabled,
-            is_installed: stored_filter_metadata.is_installed,
-            homepage: stored_filter_metadata.homepage,
-            license: stored_filter_metadata.license,
-            checksum: stored_filter_metadata.checksum,
-            languages: stored_filter_metadata.languages,
-            rules,
-        }
-    }
+impl StoredFilterMetadata {
     /// Builds `[Self]` from `[FilterEntity]` and friends
     pub(crate) fn from_filter_entity(
         entity: FilterEntity,
         tags: Vec<FilterTag>,
         languages: Vec<String>,
-        rules: Option<FilterListRules>,
     ) -> Option<Self> {
         if let Some(filter_id) = entity.filter_id {
             let is_custom = entity.is_custom();
 
-            return Some(Self {
+            return Some(StoredFilterMetadata {
                 id: filter_id,
                 group_id: entity.group_id,
                 time_updated: entity.last_update_time,
@@ -204,7 +164,6 @@ impl FullFilterList {
                 license: entity.license,
                 checksum: entity.checksum,
                 languages,
-                rules,
                 is_installed: entity.is_installed,
             });
         }

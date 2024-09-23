@@ -144,16 +144,16 @@ special and custom filters.
 let custom_filter = flm.install_custom_filter_list(
     String::from("https://example.com/custom_filter.txt"),
     true, // The filter list is marked as trusted.
-    String::from("Custom title"),
-    String::from("Custom description")
-);
+    Some(String::from("Custom title")),
+    Some(String::from("Custom description"))
+).unwrap();
 
 // Edit metadata.
 flm.update_custom_filter_metadata(
     custom_filter.id,
     String::from("new title"),
     false // The filter list is marked as not trusted.
-);
+).unwrap();
 
 // Turn on this filter.
 flm.enable_filter_lists(vec![custom_filter.id], true);
@@ -173,6 +173,7 @@ let string_contents = String::from(r"
 ... 
 ");
 flm.install_custom_filter_from_string(
+    String::new(), // download url
     1719505304i64, // last_download_time value. Explanation: Can we update filter? Answer: (filter.last_download_time + filter.expires < now()) 
     true, // Enabled
     true, // Trusted
@@ -203,21 +204,30 @@ flm.save_disabled_rules(filter.id, /* Vec<String> */ disabled_rules_list);
 ### Get operations
 
 ```rust
-// Retrieves all filters from the database.
+// Retrieves all filters metadata from the database **with** theirs rules.
 // Returns Vec<FullFilterList>.
 flm.get_full_filter_lists();
 
-// Retrieves a filter by its ID from the database.
+// Retrieves a filter metadata by its ID from the database **with** its rules.
 // Returns Optional<FullFilterList>.
 flm.get_full_filter_list_by_id(id);
 
 // Retrieves all enabled filters as ActiveRulesInfo.
 flm.get_active_filters();
+
+// Retrieves all filters metadata from the database **without** theirs rules.
+// Returns Vec<StoredFilterMetadata>
+flm.get_stored_filters_metadata();
+
+// Retrieves a filter metadata by its ID from the database **without** its rules.
+// Returns Optional<StoredFilterMetadata>.
+flm.get_stored_filter_metadata_by_id(id);
 ```
 
 #### Example references
 
 [FullFilterList reference](./src/manager/models/full_filter_list.rs)\
+[StoredFilterMetadata reference](./src/manager/models/stored_filter_metadata.rs)\
 [ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)
 
 ### Other (All) operations

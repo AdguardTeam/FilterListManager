@@ -7,6 +7,7 @@ pub mod filter_list_rules;
 pub mod filter_tag;
 pub mod flm_error;
 pub mod full_filter_list;
+pub mod stored_filter_metadata;
 pub mod update_result;
 
 pub use self::filter_list_metadata::FilterListMetadata;

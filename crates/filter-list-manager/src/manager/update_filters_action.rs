@@ -4,7 +4,7 @@ use crate::filters::parser::filter_contents_provider::diff_path_provider::DiffPa
 use crate::filters::parser::metadata::parsers::expires::process_expires;
 use crate::filters::parser::metadata::KnownMetadataProperty;
 use crate::filters::parser::FilterParser;
-use crate::manager::full_filter_list_builder::FullFilterListBuilder;
+use crate::manager::filter_lists_builder::FullFilterListBuilder;
 use crate::manager::models::update_result::UpdateFilterError;
 use crate::manager::models::UpdateResult;
 use crate::storage::entities::diff_update_entity::DiffUpdateEntity;
@@ -12,7 +12,6 @@ use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::entities::rules_list_entity::RulesListEntity;
 use crate::storage::repositories::diff_updates_repository::{DiffUpdateRepository, DiffUpdatesMap};
 use crate::storage::repositories::filter_repository::FilterRepository;
-use crate::storage::repositories::localisation::filter_localisations_repository::FilterLocalisationRepository;
 use crate::storage::repositories::rules_list_repository::{
     MapFilterIdOnRulesString, RulesListRepository,
 };
@@ -210,14 +209,10 @@ pub(super) fn update_filters_action(
             acc
         });
 
-    let mut builder = FullFilterListBuilder::new();
+    let mut builder = FullFilterListBuilder::new(&configuration.locale);
     builder.set_rules_map(rules_map);
 
-    FilterLocalisationRepository::new()
-        .enrich_filter_lists_with_localisation(&conn, &mut filter_entities, &configuration.locale)
-        .map_err(FLMError::from_database)?;
-
-    update_result.updated_list = builder.build(conn, filter_entities)?;
+    update_result.updated_list = builder.build_full_filter_lists(conn, filter_entities)?;
 
     Ok(update_result)
 }

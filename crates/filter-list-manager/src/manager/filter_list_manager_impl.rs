@@ -26,7 +26,7 @@ use crate::{
     filters::parser::metadata::parsers::expires::process_expires,
     filters::parser::metadata::KnownMetadataProperty,
     filters::parser::FilterParser,
-    manager::full_filter_list_builder::FullFilterListBuilder,
+    manager::filter_lists_builder::FullFilterListBuilder,
     manager::FilterListManager,
     storage::{
         connect_using_configuration, entities::filter_entity::FilterEntity,
@@ -34,7 +34,7 @@ use crate::{
         repositories::rules_list_repository::RulesListRepository, repositories::Repository,
         with_transaction,
     },
-    FLMError, FLMResult,
+    FLMError, FLMResult, StoredFilterMetadata,
 };
 use chrono::{DateTime, ParseError, Utc};
 use rusqlite::types::Value;
@@ -57,16 +57,27 @@ impl FilterListManagerImpl {
             .select(&conn, where_clause)
             .map_err(FLMError::from_database)?;
 
-        if let Some(mut filters) = result {
-            FilterLocalisationRepository::new()
-                .enrich_filter_lists_with_localisation(
-                    &conn,
-                    &mut filters,
-                    &self.configuration.locale,
-                )
-                .map_err(FLMError::from_database)?;
+        if let Some(filters) = result {
+            FullFilterListBuilder::new(&self.configuration.locale)
+                .build_full_filter_lists(conn, filters)
+        } else {
+            Ok(vec![])
+        }
+    }
 
-            FullFilterListBuilder::new().build(conn, filters)
+    fn get_stored_filter_metadata_list_internal(
+        &self,
+        where_clause: Option<SQLOperator>,
+    ) -> FLMResult<Vec<StoredFilterMetadata>> {
+        let conn = connect_using_configuration(&self.configuration)?;
+
+        let result = FilterRepository::new()
+            .select(&conn, where_clause)
+            .map_err(FLMError::from_database)?;
+
+        if let Some(filters) = result {
+            FullFilterListBuilder::new(&self.configuration.locale)
+                .build_stored_filter_metadata_lists(conn, filters)
         } else {
             Ok(vec![])
         }
@@ -265,6 +276,25 @@ impl FilterListManager for FilterListManagerImpl {
             "filter_id",
             filter_id.into(),
         )))?;
+
+        Ok(if vec.is_empty() {
+            None
+        } else {
+            Some(vec.swap_remove(0))
+        })
+    }
+
+    fn get_stored_filters_metadata(&self) -> FLMResult<Vec<StoredFilterMetadata>> {
+        self.get_stored_filter_metadata_list_internal(None)
+    }
+
+    fn get_stored_filter_metadata_by_id(
+        &self,
+        filter_id: FilterId,
+    ) -> FLMResult<Option<StoredFilterMetadata>> {
+        let mut vec = self.get_stored_filter_metadata_list_internal(Some(
+            SQLOperator::FieldEqualValue("filter_id", filter_id.into()),
+        ))?;
 
         Ok(if vec.is_empty() {
             None

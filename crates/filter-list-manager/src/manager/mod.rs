@@ -1,6 +1,6 @@
 //! Filter list manager library main facade interface.
 pub mod filter_list_manager_impl;
-pub(crate) mod full_filter_list_builder;
+pub(crate) mod filter_lists_builder;
 pub mod models;
 mod update_filters_action;
 
@@ -10,7 +10,7 @@ use crate::manager::models::filter_group::FilterGroup;
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::UpdateResult;
-use crate::FLMResult;
+use crate::{FLMResult, StoredFilterMetadata};
 use models::configuration::Configuration;
 use models::filter_list_metadata::FilterListMetadata;
 use models::full_filter_list::FullFilterList;
@@ -80,13 +80,24 @@ pub trait FilterListManager {
     /// Gets all groups from DB.
     fn get_all_groups(&self) -> FLMResult<Vec<FilterGroup>>;
 
-    /// Returns all filters with all their data. Fields [`title`, `description`] will be
+    /// Returns all filters data including its rules. Fields [`title`, `description`] will be
     /// localised with selected [`Locale`].
     fn get_full_filter_lists(&self) -> FLMResult<Vec<FullFilterList>>;
 
-    /// Returns all filter data by [`FilterId`]. Fields [`title`, `description`] will be
+    /// Returns all filter data including its rules by [`FilterId`]. Fields [`title`, `description`] will be
     /// localised with selected [`Locale`].
     fn get_full_filter_list_by_id(&self, filter_id: FilterId) -> FLMResult<Option<FullFilterList>>;
+
+    /// Returns all stored filters metadata. This is the lightweight counterpart of `.get_full_filter_lists()`
+    /// Fields [`title`, `description`] will be localised with selected [`Locale`].
+    fn get_stored_filters_metadata(&self) -> FLMResult<Vec<StoredFilterMetadata>>;
+
+    /// Returns stored filter metadata by  [`FilterId`]. This is the lightweight counterpart of `.get_full_filter_list_by_id(filter_id)`
+    /// Fields [`title`, `description`] will be localised with selected [`Locale`].
+    fn get_stored_filter_metadata_by_id(
+        &self,
+        filter_id: FilterId,
+    ) -> FLMResult<Option<StoredFilterMetadata>>;
 
     /// Save custom filter list rules. Note that `filter.time_updated` will be updated too.
     ///

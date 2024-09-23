@@ -63,6 +63,29 @@ dictionary FullFilterList {
     FilterListRules? rules;
 };
 
+dictionary StoredFilterMetadata {
+    i64 id;
+    i32 group_id;
+    i64 time_updated;
+    i64 last_download_time;
+    string title;
+    string description;
+    string version;
+    i32 display_number;
+    string download_url;
+    string subscription_url;
+    sequence<FilterTag> tags;
+    i32 expires;
+    boolean is_trusted;
+    boolean is_custom;
+    boolean is_enabled;
+    boolean is_installed;
+    string homepage;
+    string license;
+    string checksum;
+    sequence<string> languages;
+};
+
 dictionary ActiveRulesInfo {
     i64 filter_id;
     i32 group_id;
@@ -138,6 +161,12 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     FullFilterList? get_full_filter_list_by_id(i64 id);
+
+    [Throws=AGOuterError]
+    sequence<StoredFilterMetadata> get_stored_filters_metadata();
+
+    [Throws=AGOuterError]
+    StoredFilterMetadata? get_stored_filters_metadata_by_id(i64 id);
 
     [Throws=AGOuterError]
     void save_custom_filter_rules(FilterListRules rules);
