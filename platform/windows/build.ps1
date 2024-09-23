@@ -1,7 +1,7 @@
 Function RenameOutFile {
     param([string]$profile_name)
-    Rename-Item -Path "target\$profile_name\release\filter_list_manager_ffi.dll" -NewName "AdGuardFLM.dll"
-    Rename-Item -Path "target\$profile_name\release\filter_list_manager_ffi.pdb" -NewName "AdGuardFLM.pdb"
+    Move-Item -Path "target\$profile_name\release\filter_list_manager_ffi.dll" -Destination "target\$profile_name\release\AdGuardFLM.dll" -Force
+    Move-Item -Path "target\$profile_name\release\filter_list_manager_ffi.pdb" -Destination "target\$profile_name\release\AdGuardFLM.pdb" -Force
 }
 
 

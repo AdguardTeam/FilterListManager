@@ -20,9 +20,9 @@ rustup target add aarch64-pc-windows-msvc
 Run from the repository folder
 
 ```cmd
-cargo build --release --package adguard-flm-ffi --target i686-pc-windows-msvc
-cargo build --release --package adguard-flm-ffi --target x86_64-pc-windows-msvc
-cargo build --release --package adguard-flm-ffi --target aarch64-pc-windows-msvc
+cargo build --release --package adguard-flm-ffi --target i686-pc-windows-msvc --features rusqlite-bundled
+cargo build --release --package adguard-flm-ffi --target x86_64-pc-windows-msvc --features rusqlite-bundled
+cargo build --release --package adguard-flm-ffi --target aarch64-pc-windows-msvc --features rusqlite-bundled
 ```
 
 The result files will be in `target\[x86_64-pc-windows-msvc|i686-pc-windows-msvc|aarch64-pc-windows-msvc]\release`.

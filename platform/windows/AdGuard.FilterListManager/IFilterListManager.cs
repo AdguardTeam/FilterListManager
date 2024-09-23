@@ -96,6 +96,19 @@ namespace AdGuard.FilterListManager
         /// <param name="id">The filter identifier.</param>
         /// <exception cref="AgOuterException" />
         FullFilterList GetFullFilterListById(long id);
+        
+        /// <summary>
+        /// Gets the stored filters metadata.
+        /// </summary>
+        /// <exception cref="AgOuterException" />
+        List<StoredFilterMetadata> GetStoredFiltersMetadata();
+
+        /// <summary>
+        /// Gets the stored filters metadata by identifier.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <exception cref="AgOuterException" />
+        StoredFilterMetadata GetStoredFiltersMetadataById(long id);
 
         /// <summary>
         /// Returns all filters with all their data. Filter metadata will be localised
@@ -209,5 +222,23 @@ namespace AdGuard.FilterListManager
             int looseTimeout,
             bool ignoreFiltersStatus
         );
+
+        /// <summary>
+        /// The method “raises” the state of the database to the working state.
+        ///
+        /// **If the database doesn't exist:**
+        /// - Creates database
+        /// - Rolls up the schema
+        /// - Rolls migrations
+        /// - Performs bootstrap.
+        ///
+        /// **If the database is an empty file:**
+        /// - Rolls the schema
+        /// - Rolls migrations
+        /// - Performs bootstrap.
+        ///
+        ///... and so on.
+        /// </summary>
+        void LiftUpDatabase();
     }
 }

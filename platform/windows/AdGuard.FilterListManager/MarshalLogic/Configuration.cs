@@ -12,7 +12,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
             string metadataUrl,
             string metadataLocalesUrl,
             string encryptionKey,
-            int requestTimeoutMs)
+            int requestTimeoutMs,
+            bool autoLiftUpDatabase)
         {
             FilterListType = filterListType;
             WorkingDirectory = workingDirectory;
@@ -23,6 +24,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             MetadataLocalesUrl = metadataLocalesUrl;
             EncryptionKey = encryptionKey;
             RequestTimeoutMs = requestTimeoutMs;
+            AutoLiftUpDatabase = autoLiftUpDatabase;
         }
 
         public FilterListType FilterListType { get; set; }
@@ -43,18 +45,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         public int RequestTimeoutMs { get; set; }
 
-        public void Deconstruct(out FilterListType filterListType, out string workingDirectory, out string locale, out int defaultFilterListExpiresPeriodSec, out List<string> compilerConditionalConstants, out string metadataUrl, out string metadataLocalesUrl, out string encryptionKey, out int requestTimeoutMs)
-        {
-            filterListType = FilterListType;
-            workingDirectory = WorkingDirectory;
-            locale = Locale;
-            defaultFilterListExpiresPeriodSec = DefaultFilterListExpiresPeriodSec;
-            compilerConditionalConstants = CompilerConditionalConstants;
-            metadataUrl = MetadataUrl;
-            metadataLocalesUrl = MetadataLocalesUrl;
-            encryptionKey = EncryptionKey;
-            requestTimeoutMs = RequestTimeoutMs;
-        }
+        public bool AutoLiftUpDatabase { get; set; }
     }
 
 }

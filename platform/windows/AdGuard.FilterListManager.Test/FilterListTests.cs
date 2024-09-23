@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AdGuard.FilterListManager.MarshalLogic;
 using AdGuard.FilterListManager.Utils;
 using NUnit.Framework;
@@ -22,17 +23,33 @@ namespace AdGuard.FilterListManager.Test
             string coreLibsDllPath = DllProvider.Instance.LibsDllPath;
             Console.WriteLine($"Rust library path is {coreLibsDllPath}");
         }
-        
+
         /// <summary>
         /// Example of a test.
         /// </summary>
         [Test]
         public void CommonTest()
         {
-            var manager = new FilterListManager(new Configuration(FilterListType.Standard, m_CurrentDirectory, "en-us",
-                10, new List<string>(), "https://filters.adtidy.org/extension/safari/filters.json", "https://filters.adtidy.org/extension/safari/filters_i18n.json", "", 0));
-
+            var manager = new FilterListManager(new Configuration(
+                FilterListType.Standard, 
+                m_CurrentDirectory,
+                "en-us",
+                10,
+                new List<string>(), 
+                "https://filters.adtidy.org/extension/safari/filters.json",
+                "https://filters.adtidy.org/extension/safari/filters_i18n.json", 
+                "", 
+                0,
+                true));
+            //manager.LiftUpDatabase(); //TODO https://jira.int.agrd.dev/browse/AG-36219
             manager.PullMetadata();
+            List<StoredFilterMetadata> metas = manager.GetStoredFiltersMetadata();
+            Assert.IsTrue(metas.Count > 0);
+
+            StoredFilterMetadata firstFilter = metas.FirstOrDefault(a => a.Id == 1);
+            Assert.IsNotNull(firstFilter);
+            StoredFilterMetadata meta = manager.GetStoredFiltersMetadataById(firstFilter.Id);
+            Assert.IsNotNull(meta);
             List<FilterGroup> groups = manager.GetAllGroups();
             Assert.IsTrue(groups.Count > 0);
             List<ActiveRulesInfo> rules = manager.GetActiveRules();

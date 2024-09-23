@@ -15,7 +15,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 metadataUrl: FfiConverterString.INSTANCE.Read(stream),
                 metadataLocalesUrl: FfiConverterString.INSTANCE.Read(stream),
                 encryptionKey: FfiConverterOptionalString.INSTANCE.Read(stream),
-                requestTimeoutMs: FfiConverterInt32.INSTANCE.Read(stream)
+                requestTimeoutMs: FfiConverterInt32.INSTANCE.Read(stream),
+                autoLiftUpDatabase: FfiConverterBoolean.INSTANCE.Read(stream)
             );
         }
 
@@ -31,7 +32,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
                    + FfiConverterString.INSTANCE.AllocationSize(value.MetadataUrl)
                    + FfiConverterString.INSTANCE.AllocationSize(value.MetadataLocalesUrl)
                    + FfiConverterOptionalString.INSTANCE.AllocationSize(value.EncryptionKey)
-                   + FfiConverterInt32.INSTANCE.AllocationSize(value.RequestTimeoutMs);
+                   + FfiConverterInt32.INSTANCE.AllocationSize(value.RequestTimeoutMs) +
+                   FfiConverterBoolean.INSTANCE.AllocationSize(value.AutoLiftUpDatabase);
         }
 
         public override void Write(Configuration value, BigEndianStream stream)
@@ -48,6 +50,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             FfiConverterString.INSTANCE.Write(value.MetadataLocalesUrl, stream);
             FfiConverterOptionalString.INSTANCE.Write(value.EncryptionKey, stream);
             FfiConverterInt32.INSTANCE.Write(value.RequestTimeoutMs, stream);
+            FfiConverterBoolean.INSTANCE.Write(value.AutoLiftUpDatabase, stream);
         }
     }
 }
