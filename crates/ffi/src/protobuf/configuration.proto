@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package filter_list_manager;
+
+enum FilterListType {
+  STANDARD = 0;
+  DNS = 1;
+}
+
+message Configuration {
+  FilterListType filter_list_type = 1;
+
+  // Absolute path for library working directory.
+  // This will be used for database operating.
+  // If value is "None", `cwd` will be used.
+  string working_directory = 2;
+
+  // Locale that needs to be used to extract localized names and descriptions.
+  // Locale `en-GB` will be normalized to internal `en_GB` representation.
+  // Default value: en.
+  string locale = 3;
+
+  // Default period for expires in seconds (unless specified in "Expires", or its value is too small).
+  // Default value: 86400 (1 day).
+  // Values < 3600 will be clamped to 3600.
+  int32 default_filter_list_expires_period_sec = 4;
+
+  // List of literal constants for filters conditional compilation.
+  repeated string compiler_conditional_constants = 5;
+
+  // URL of the index (filters.json) file.
+  string metadata_url = 6;
+
+  // URL of the locales (filters_i18n.json) file.
+  string metadata_locales_url = 7;
+
+  // Requests timeouts in milliseconds. Default value 60000 (60 seconds).
+  int32 request_timeout_ms = 8;
+
+  // “Uplifting” a database is a set of measures that brings the database up to date:
+  bool auto_lift_up_database = 9;
+}

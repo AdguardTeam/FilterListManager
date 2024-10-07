@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package filter_list_manager;
+
+message FilterTag {
+  // Filter tag id.
+  int32 id = 1;
+
+  // Filter keyword (purpose, lang, platform, etc.)
+  string keyword = 2;
+}
+
+message FilterGroup {
+  // Group id
+  int32 id = 1;
+
+  // Group name
+  string name = 2;
+
+  // Display number for ordering
+  int32 display_number = 3;
+}
+
+message FilterListRules {
+  // Associated filter id.
+  int64 filter_id = 1;
+
+  // List of all rules in the filter list.
+  repeated string rules = 2;
+
+  // List of only disabled rules.
+  repeated string disabled_rules = 3;
+}
+
+message FilterListMetadata {
+  // Title from the `! Title:` metadata field.
+  string title = 1;
+
+  // Description from the `! Description:` metadata field.
+  string description = 2;
+
+  // Time updated from the `! TimeUpdated:` metadata field.
+  string time_updated = 3;
+
+  // Version from the `! Version:` metadata field.
+  string version = 4;
+
+  // Homepage from the `! Homepage:` metadata field.
+  string homepage = 5;
+
+  // License from the `! License:` metadata field.
+  string license = 6;
+
+  // Checksum from the `! Checksum:` metadata field.
+  string checksum = 7;
+
+  // URL or local path where the filter content was downloaded from.
+  string url = 8;
+
+  // Rules count in this filter list.
+  int32 rules_count = 9;
+}
+
+message StoredFilterMetadata {
+  // Filter list unique ID
+  int64 id = 1;
+
+  // Group ID this filter list belongs to
+  int32 group_id = 2;
+
+  // Timestamp (seconds from epoch) when this filter was updated on the server
+  int64 time_updated = 3;
+
+  // Timestamp (seconds from epoch) when this filter list's content was last downloaded
+  int64 last_download_time = 4;
+
+  // Title either from the list metadata or parsed from the content
+  string title = 5;
+
+  // Description either from the list metadata or parsed from the content
+  string description = 6;
+
+  // Version either from the list metadata or parsed from the content
+  string version = 7;
+
+  // Filter list display number
+  int32 display_number = 8;
+
+  // Filter list download URL
+  string download_url = 9;
+
+  // Filter list subscription source URL
+  string subscription_url = 10;
+
+  // An array of tags of this filter list
+  repeated FilterTag tags = 11;
+
+  // Number of seconds until the filter list is considered outdated
+  int32 expires = 12;
+
+  // Indicates if the filter list is trusted or not
+  bool is_trusted = 13;
+
+  // Indicates if the filter list is custom or comes from the registry
+  bool is_custom = 14;
+
+  // Indicates whether the filter list is enabled
+  bool is_enabled = 15;
+
+  // Indicates if the filter list is installed
+  bool is_installed = 16;
+
+  // List homepage URL
+  string homepage = 17;
+
+  // List license URL
+  string license = 18;
+
+  // Filter checksum
+  string checksum = 19;
+
+  // List of languages the filter supports
+  repeated string languages = 20;
+}
+
+message FullFilterList {
+  // Filter list unique ID
+  int64 id = 1;
+
+  // Group ID this filter list belongs to
+  int32 group_id = 2;
+
+  // Timestamp (seconds from epoch) when this filter was updated on the server
+  int64 time_updated = 3;
+
+  // Timestamp (seconds from epoch) when this filter list's content was last downloaded
+  int64 last_download_time = 4;
+
+  // Title either from the list metadata or parsed from the content
+  string title = 5;
+
+  // Description either from the list metadata or parsed from the content
+  string description = 6;
+
+  // Version either from the list metadata or parsed from the content
+  string version = 7;
+
+  // Filter list display number
+  int32 display_number = 8;
+
+  // Filter list download URL
+  string download_url = 9;
+
+  // Filter list subscription source URL
+  string subscription_url = 10;
+
+  // An array of tags of this filter list
+  repeated FilterTag tags = 11;
+
+  // Number of seconds until the filter list is considered outdated
+  int32 expires = 12;
+
+  // Indicates if the filter list is trusted or not
+  bool is_trusted = 13;
+
+  // Indicates if the filter list is custom or comes from the registry
+  bool is_custom = 14;
+
+  // Indicates whether the filter list is enabled
+  bool is_enabled = 15;
+
+  // Indicates if the filter list is installed
+  bool is_installed = 16;
+
+  // List homepage URL
+  string homepage = 17;
+
+  // List license URL
+  string license = 18;
+
+  // Filter checksum
+  string checksum = 19;
+
+  // List of languages the filter supports
+  repeated string languages = 20;
+
+  // Optional container for rules
+  optional FilterListRules rules = 21;
+}

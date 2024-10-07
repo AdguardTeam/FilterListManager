@@ -1,8 +1,16 @@
 mod models;
+mod native_interface;
 pub mod outer_error;
+mod protobuf_generated;
 mod result;
 mod top_level;
 
+pub use crate::models::FilterListManagerConstants;
+use crate::outer_error::AGOuterError;
+use crate::result::AGResult;
+pub use crate::top_level::*;
+use adguard_flm::manager::models::configuration::Locale;
+use adguard_flm::manager::models::filter_list_rules::FilterListRules;
 use adguard_flm::{
     manager::{
         models::filter_group::FilterGroup, models::filter_tag::FilterTag, models::UpdateResult,
@@ -11,16 +19,12 @@ use adguard_flm::{
     FilterListManagerImpl, FilterListMetadata, FullFilterList, StoredFilterMetadata,
 };
 pub use adguard_flm::{FilterListType, UpdateFilterError};
-use std::ops::Deref;
 use std::sync::{Mutex, MutexGuard};
 
-pub use crate::models::FilterListManagerConstants;
-use crate::outer_error::AGOuterError;
-use crate::result::AGResult;
-pub use crate::top_level::*;
-use adguard_flm::manager::models::configuration::Locale;
-use adguard_flm::manager::models::filter_list_rules::FilterListRules;
+// Re-export native structs and functions
+pub use native_interface::*;
 
+#[repr(C)]
 pub struct FilterListManager {
     flm: Mutex<FilterListManagerImpl>,
 }

@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package filter_list_manager;
+
+message AGOuterError {
+  string message = 1;
+  oneof error {
+    CannotOpenDatabase cannot_open_database = 2;
+    NotADatabase not_a_database = 3;
+    DiskFull disk_full = 4;
+    EntityNotFound entity_not_found = 5;
+    PathNotFound path_not_found = 6;
+    PathHasDeniedPermission path_has_denied_permission = 7;
+    PathAlreadyExists path_already_exists = 8;
+    TimedOut timed_out = 9;
+    HttpClientNetworkError http_client_network_error = 10;
+    HttpStrict200Response http_strict_200_response = 11;
+    HttpClientBodyRecoveryFailed http_client_body_recovery_failed = 12;
+    FilterContentIsLikelyNotAFilter filter_content_is_likely_not_a_filter = 13;
+    FilterParserError filter_parser_error = 14;
+    FieldIsEmpty field_is_empty = 15;
+    Mutex mutex = 16;
+    Other other = 17;
+  }
+}
+
+message CannotOpenDatabase {}
+
+message NotADatabase {}
+
+message DiskFull {}
+
+message EntityNotFound {
+  int64 entity_id = 1;
+}
+
+message PathNotFound {
+  string path = 1;
+}
+
+message PathHasDeniedPermission {
+  string path = 1;
+}
+
+message PathAlreadyExists {
+  string path = 1;
+}
+
+// Do not duplicate the message
+message TimedOut {}
+
+// Do not duplicate the message
+message HttpClientNetworkError {}
+
+message HttpStrict200Response {
+  uint32 status_code = 1;
+  string url = 2;
+}
+
+// Do not duplicate the message
+message HttpClientBodyRecoveryFailed {}
+
+// Do not duplicate the message
+message FilterContentIsLikelyNotAFilter {}
+
+// Do not duplicate the message
+message FilterParserError {}
+
+message FieldIsEmpty {
+  string field_name = 1;
+}
+
+// Do not duplicate the message
+message Mutex {}
+
+// Do not duplicate the message
+message Other {}
+

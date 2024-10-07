@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package filter_list_manager;
+
+import "filters.proto";
+
+// ActiveRulesInfo
+message ActiveRulesInfo {
+  // Filter id for these rules
+  int64 filter_id = 1;
+
+  // Group id of the filter
+  int32 group_id = 2;
+
+  // Is this filter trusted?
+  bool is_trusted = 3;
+
+  // List of active rules.
+  repeated string rules = 4;
+}
+
+// UpdateResult
+message UpdateResult {
+  // Currently updated filters.
+  repeated FullFilterList updated_list = 1;
+
+  // Number of filters not updated due to timeout.
+  int32 remaining_filters_count = 2;
+
+  // List of entities containing the filter id and a string representation of the error
+  repeated UpdateFilterError filters_errors = 3;
+}
+
+// UpdateFilterError
+message UpdateFilterError {
+  // ID of that filter that couldn't be updated
+  int64 filter_id = 1;
+
+  // Filter error converted to a string. For debugging purposes
+  string message = 2;
+}

@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package filter_list_manager;
+
+import "outer_error.proto";
+import "filters.proto";
+import "misc_models.proto";
+
+// region Requests
+
+message InstallCustomFilterListRequest {
+  string download_url = 1;
+  bool is_trusted = 2;
+  optional string title = 3;
+  optional string description = 4;
+}
+
+message InstallCustomFilterFromStringRequest {
+  string download_url = 1;
+  int64 last_download_time = 2;
+  bool is_enabled = 3;
+  bool is_trusted = 4;
+  string filter_body = 5;
+  optional string custom_title = 6;
+  optional string custom_description = 7;
+}
+
+message EnableFilterListsRequest {
+  repeated int64 ids = 1;
+  bool is_enabled = 2;
+}
+
+message InstallFilterListsRequest {
+  repeated int64 ids = 1;
+  bool is_installed = 2;
+}
+
+message DeleteCustomFilterListsRequest {
+  repeated int64 ids = 1;
+}
+
+message GetFullFilterListByIdRequest {
+  int64 id = 1;
+}
+
+message GetStoredFiltersMetadataByIdRequest {
+  int64 id = 1;
+}
+
+message SaveCustomFilterRulesRequest {
+  FilterListRules rules = 1;
+}
+
+message SaveDisabledRulesRequest {
+  int64 filter_id = 1;
+  repeated string disabled_rules = 2;
+}
+
+message UpdateFiltersRequest {
+  bool ignore_filters_expiration = 1;
+  int32 loose_timeout = 2;
+  bool ignore_filters_status = 3;
+}
+
+message ForceUpdateFiltersByIdsRequest {
+  repeated int64 ids = 1;
+  int32 loose_timeout = 2;
+}
+
+message FetchFilterListMetadataRequest {
+  string url = 1;
+}
+
+message ChangeLocaleRequest {
+  string suggested_locale = 1;
+}
+
+message UpdateCustomFilterMetadataRequest {
+  int64 filter_id = 1;
+  string title = 2;
+  bool is_trusted = 3;
+}
+
+message EmptyRequest {}
+
+// endregion
+
+// region Responses
+
+message InstallCustomFilterListResponse {
+  FullFilterList filter_list = 1;
+  optional AGOuterError error = 2;
+}
+
+message EnableFilterListsResponse {
+  int64 count = 1;
+  optional AGOuterError error = 2;
+}
+
+message InstallFilterListsResponse {
+  int64 count = 1;
+  optional AGOuterError error = 2;
+}
+
+message DeleteCustomFilterListsResponse {
+  int64 count = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetFullFilterListsResponse {
+  repeated FullFilterList filter_lists = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetStoredFiltersMetadataResponse {
+  repeated StoredFilterMetadata filter_lists = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetStoredFilterMetadataByIdResponse {
+  StoredFilterMetadata filter_list = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetFullFilterListByIdResponse {
+  FullFilterList filter_list = 1;
+  optional AGOuterError error = 2;
+}
+
+message UpdateFiltersResponse {
+  UpdateResult result = 1;
+  optional AGOuterError error = 2;
+}
+
+message ForceUpdateFiltersByIdsResponse {
+  UpdateResult result = 1;
+  optional AGOuterError error = 2;
+}
+
+message FetchFilterListMetadataResponse {
+  FilterListMetadata metadata = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetAllTagsResponse {
+  repeated FilterTag tags = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetAllGroupsResponse {
+  repeated FilterGroup groups = 1;
+  optional AGOuterError error = 2;
+}
+
+message ChangeLocaleResponse {
+  bool success = 1;
+  optional AGOuterError error = 2;
+}
+
+message UpdateCustomFilterMetadataResponse {
+  bool success = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetDatabasePathResponse {
+  string path = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetDatabaseVersionResponse {
+  optional int32 version = 1;
+  optional AGOuterError error = 2;
+}
+
+message InstallCustomFilterFromStringResponse {
+  FullFilterList filter_list = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetActiveRulesResponse {
+  repeated ActiveRulesInfo rules = 1;
+  optional AGOuterError error = 2;
+}
+
+message EmptyResponse {
+  optional AGOuterError error = 1;
+}
+
+// endregion
