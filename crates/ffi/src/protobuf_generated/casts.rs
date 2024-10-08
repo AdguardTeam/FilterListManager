@@ -1,3 +1,5 @@
+//! Special module for conversion between flm objects and their protobuf-counterparts
+
 use crate::outer_error::AGOuterError;
 use crate::protobuf_generated::filter_list_manager;
 use adguard_flm::{

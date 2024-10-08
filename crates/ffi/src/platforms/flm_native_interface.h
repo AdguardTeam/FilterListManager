@@ -64,7 +64,7 @@ RustResponse* flm_init_protobuf(FLMConfiguration, size_t);
 RustResponse* flm_call_protobuf(FLMHandle handle, FFIMethod method, void* input_data_buffer, size_t input_buf_len);
 
 // Free Rust response with the data_len
-void flm_free_response(RustResponse* response, size_t data_len, RustResponseType discriminant);
+void flm_free_response(RustResponse* response);
 
 // Free FLMHandle
 void flm_free_handle(FLMHandle handle);

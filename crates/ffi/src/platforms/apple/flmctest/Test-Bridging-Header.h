@@ -8,6 +8,6 @@
 #ifndef Test_Bridging_Header_h
 #define Test_Bridging_Header_h
 
-#include "flm.h"
+#include "flm_native_interface.h"
 
 #endif /* Test_Bridging_Header_h */

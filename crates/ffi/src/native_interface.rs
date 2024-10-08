@@ -29,8 +29,12 @@ use std::ptr::null_mut;
 /// UNSAFE: You must manually control the release of any types folded into the “response”
 #[repr(C)]
 pub struct RustResponse {
+    /// Bytes count
     /// UNSAFE: You should put here the real data length, even for pointers
     pub result_data_len: usize,
+    /// The real allocated data length
+    /// UNSAFE: You should put here the real data length, even for pointers
+    pub result_data_capacity: usize,
     /// UNSAFE: There can be many different pointer types
     pub result_data: *mut c_void,
     /// Special response case: If request or response have failed, try to send [`AGOuterError::Other`] error with the explanation
@@ -47,6 +51,7 @@ impl Default for RustResponse {
             result_data: null_mut(),
             ffi_error: false,
             result_data_len: 0,
+            result_data_capacity: 0,
         }
     }
 }
@@ -67,7 +72,7 @@ pub struct FLMHandle {
 }
 
 impl FLMHandle {
-    /// Opaque handle factory ctor
+    /// Opaque handle factory
     pub(crate) fn new(configuration: Configuration) -> AGResult<Self> {
         Ok(Self {
             flm: FilterListManager::new(configuration)?,
@@ -80,35 +85,40 @@ impl FLMHandle {
 pub unsafe extern "C" fn flm_default_configuration_protobuf() -> *mut RustResponse {
     let conf: filter_list_manager::Configuration = Configuration::default().into();
 
-    let mut out = Box::new(RustResponse::default());
+    let mut rust_response = Box::new(RustResponse::default());
 
     let mut vec = vec![];
     if let Err(why) = conf.encode(&mut vec) {
-        println!("Decode err int rust: {}", why.to_string());
-        return build_rust_response_error(Box::new(why), out, "Cannot spawn configuration");
+        return build_rust_response_error(
+            Box::new(why),
+            rust_response,
+            "Cannot spawn configuration",
+        );
     }
 
     let len = vec.len();
+    let capacity = vec.capacity();
 
     let bytes_rust = Box::into_raw(vec.into_boxed_slice());
 
-    out.result_data_len = len;
-    out.result_data = bytes_rust as *mut c_void;
+    rust_response.result_data_capacity = capacity;
+    rust_response.result_data_len = len;
+    rust_response.result_data = bytes_rust as *mut c_void;
 
-    Box::into_raw(out)
+    Box::into_raw(rust_response)
 }
 
 /// Makes an FLM object and returns opaque pointer of [`FLMHandle`]
 #[no_mangle]
 pub unsafe extern "C" fn flm_init_protobuf(bytes: *const u8, size: usize) -> *mut RustResponse {
-    let mut result = Box::new(RustResponse::default());
+    let mut rust_response = Box::new(RustResponse::default());
 
     if bytes.is_null() || size == 0 {
         return build_rust_response_error(
             Box::new(AGOuterError::Other(String::from(
                 "Got empty configuration object, while init flm",
             ))),
-            result,
+            rust_response,
             "",
         );
     }
@@ -118,7 +128,7 @@ pub unsafe extern "C" fn flm_init_protobuf(bytes: *const u8, size: usize) -> *mu
     let Ok(conf) = decode_result else {
         return build_rust_response_error(
             Box::new(decode_result.unwrap_err()),
-            result,
+            rust_response,
             "Cannot decode Configuration",
         );
     };
@@ -127,16 +137,17 @@ pub unsafe extern "C" fn flm_init_protobuf(bytes: *const u8, size: usize) -> *mu
     let Ok(flm_handle) = factory_result else {
         return build_rust_response_error(
             Box::new(factory_result.err().unwrap()),
-            result,
+            rust_response,
             "Cannot encode new FLM Instance",
         );
     };
 
-    result.result_data = Box::into_raw(Box::new(flm_handle)) as *mut c_void;
-    result.result_data_len = size_of::<usize>(); // hmm...
-    result.response_type = RustResponseType::FLMHandlePointer;
+    rust_response.result_data = Box::into_raw(Box::new(flm_handle)) as *mut c_void;
+    rust_response.result_data_capacity = size_of::<usize>(); // hmm...
+    rust_response.result_data_len = size_of::<usize>(); // hmm...
+    rust_response.response_type = RustResponseType::FLMHandlePointer;
 
-    Box::into_raw(result)
+    Box::into_raw(rust_response)
 }
 
 /// Calls FLM method described as [`FFIMethods`] for object behind [`FLMHandle`]
@@ -505,30 +516,36 @@ pub unsafe extern "C" fn flm_call_protobuf(
         );
     }
 
+    rust_response.result_data_capacity = out_bytes_buffer.capacity();
     rust_response.result_data_len = out_bytes_buffer.len();
     rust_response.result_data = Box::into_raw(out_bytes_buffer.into_boxed_slice()) as *mut c_void;
 
     Box::leak(rust_response)
 }
 
-/// Frees memory of [`RustResponse`] objects and their data. Actions for each discriminant are different.
+/// Frees memory of [`RustResponse`] objects and their data.
+/// NOTE: Actions for each discriminant are different.
 #[no_mangle]
-pub unsafe extern "C" fn flm_free_response(
-    handle: *mut RustResponse,
-    data_len: usize,
-    discriminant: RustResponseType,
-) {
+pub unsafe extern "C" fn flm_free_response(handle: *mut RustResponse) {
     if !handle.is_null() {
         let response = Box::from_raw(handle);
 
         if !response.result_data.is_null() {
-            match discriminant {
+            // One of `Vec::from_raw_parts` invariants
+            assert!(
+                response.result_data_len <= response.result_data_capacity,
+                "Cannot free RustResponse mem, because buffer capacity greater than its length"
+            );
+
+            match response.response_type {
                 RustResponseType::RustBuffer => {
-                    // Make slice
-                    let slice =
-                        std::slice::from_raw_parts_mut(response.result_data as *mut u8, data_len);
-                    // Cast is as boxed value
-                    let _ = Box::from_raw(slice);
+                    // Placement new into allocated memory. Then autodrop after leaving block
+
+                    let _ = Vec::from_raw_parts(
+                        response.result_data as *mut u8,
+                        response.result_data_len,
+                        response.result_data_capacity,
+                    );
                 }
                 RustResponseType::FLMHandlePointer => {
                     // The handle must live. It will be deleted later in an explicit way
@@ -550,7 +567,7 @@ pub unsafe extern "C" fn flm_free_handle(handle: *mut FLMHandle) {
 #[inline]
 fn build_rust_response_error(
     error: Box<dyn std::error::Error>,
-    mut out: Box<RustResponse>,
+    mut rust_response: Box<RustResponse>,
     error_span: &str,
 ) -> *mut RustResponse {
     let mut vec = vec![];
@@ -566,12 +583,13 @@ fn build_rust_response_error(
         error.to_string()
     ));
 
-    out.result_data_len = vec.len();
-    out.ffi_error = true;
-    out.result_data = Box::into_raw(vec.into_boxed_slice()) as *mut c_void;
-    out.response_type = RustResponseType::RustBuffer;
+    rust_response.result_data_capacity = vec.capacity();
+    rust_response.result_data_len = vec.len();
+    rust_response.ffi_error = true;
+    rust_response.result_data = Box::into_raw(vec.into_boxed_slice()) as *mut c_void;
+    rust_response.response_type = RustResponseType::RustBuffer;
 
-    return Box::leak(out);
+    return Box::leak(rust_response);
 }
 
 /// This enum must have the same order as its header-file counterpart

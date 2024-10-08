@@ -7,7 +7,6 @@ fn main() {
 
     prost_build::Config::new()
         .out_dir("src/protobuf_generated")
-        .protoc_executable("/usr/local/bin/protoc") // TODO:
         .compile_protos(
             &[
                 "src/protobuf/flm_interface.proto",

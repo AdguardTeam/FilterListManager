@@ -10,7 +10,7 @@ import SwiftProtobuf
 
 /// Error container
 struct AGOuterError: Error, LocalizedError {
-    /// String representaion of error
+    /// String representation of error
     let message: String
     /// Error type with details
     public let variant: AGOuterErrorVariant
@@ -86,8 +86,8 @@ extension AGOuterErrorVariant {
             self = Self.FilterContentIsLikelyNotAFilter
         case .filterParserError(_):
             self = Self.FilterParserError
-        case .fieldIsEmpty(let conatiner):
-            self = Self.FieldIsEmpty(conatiner.fieldName)
+        case .fieldIsEmpty(let container):
+            self = Self.FieldIsEmpty(container.fieldName)
         case .mutex(_):
             self = Self.Mutex
         case .other(_):
@@ -104,7 +104,7 @@ func makeDefaultConfiguration() throws -> FilterListManager_Configuration {
     }
 
     defer {
-        flm_free_response(response, response.pointee.result_data_len, response.pointee.discriminant);
+        flm_free_response(response);
     }
 
     let byteData = Data(bytes: response.pointee.result_data, count: response.pointee.result_data_len);
@@ -131,7 +131,7 @@ func spawnConf() throws -> FilterListManager_Configuration {
     configuration.locale = "en";
     configuration.metadataURL = "https://filters.adtidy.org/extension/safari/filters.json";
     configuration.metadataLocalesURL = "https://filters.adtidy.org/extension/safari/filters_i18n.json";
-    configuration.workingDirectory = "../../../../../";
+    configuration.workingDirectory = "../../../../../../";
 
     return configuration
 }
@@ -142,9 +142,9 @@ class FLMFacade {
     init(configuration: FilterListManager_Configuration) throws {
         var newConfData = try configuration.serializedData();
 
-        let (response, bytesCount) = try newConfData.withUnsafeMutableBytes { rawBufferBointer in
-            let ptr = rawBufferBointer.baseAddress
-            let len = rawBufferBointer.count
+        let response = try newConfData.withUnsafeMutableBytes { rawBufferPointer in
+            let ptr = rawBufferPointer.baseAddress
+            let len = rawBufferPointer.count
 
             guard ptr != nil else {
                 throw FLMFacadeError.objectIsNotInited
@@ -158,11 +158,11 @@ class FLMFacade {
                 throw FLMFacadeError.rustResponseAsNullptr
             }
 
-            return (rustResponsePtr, len)
+            return rustResponsePtr
         }
 
         defer {
-            flm_free_response(response, bytesCount, response.pointee.discriminant);
+            flm_free_response(response);
         }
 
         guard response.pointee.ffi_error == false else {
@@ -190,7 +190,7 @@ class FLMFacade {
             }
 
             defer {
-                flm_free_response(rustResponsePtr, ptr_len, rustResponsePtr.pointee.discriminant);
+                flm_free_response(rustResponsePtr);
             }
 
             guard rustResponsePtr.pointee.ffi_error == false else {
