@@ -18,6 +18,7 @@ use crate::protobuf_generated::filter_list_manager::{
     UpdateFiltersResponse,
 };
 use crate::result::AGResult;
+pub use crate::top_level::*;
 use crate::FilterListManager;
 use adguard_flm::Configuration;
 use prost::Message;
