@@ -8,6 +8,7 @@
 import Foundation
 import SwiftProtobuf
 
+/// REQUIRED
 /// Error container
 struct AGOuterError: Error, LocalizedError {
     /// String representation of error
@@ -30,6 +31,7 @@ struct AGOuterError: Error, LocalizedError {
     }
 }
 
+/// REQUIRED
 enum AGOuterErrorVariant: Error {
     case CannotOpenDatabase
     case NotADatabase
@@ -96,6 +98,8 @@ extension AGOuterErrorVariant {
     }
 }
 
+/// REQUIRED
+/// Main endpoint for getting default  configuration protobuf
 func makeDefaultConfiguration() throws -> FilterListManager_Configuration {
     let pointer = flm_default_configuration_protobuf();
 
@@ -117,6 +121,7 @@ func makeDefaultConfiguration() throws -> FilterListManager_Configuration {
     return try FilterListManager_Configuration(serializedBytes: byteData)
 }
 
+/// MAY BE REQUIRED
 enum FLMFacadeError: Error {
     case objectIsNotInited
     case noDataOnResponse
@@ -136,6 +141,8 @@ func spawnConf() throws -> FilterListManager_Configuration {
     return configuration
 }
 
+/// REQUIRED
+/// Main FLM  facade
 class FLMFacade {
     private let flm_handle: UnsafeMutableRawPointer
 
