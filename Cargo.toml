@@ -16,6 +16,6 @@ security-framework = "=2.11.1" # 2.11.0 is broken with codegen-units=1
 [profile.release]
 lto = "thin"
 debug = true
-opt-level = "z"
+opt-level = "s"
 panic = "abort"
 codegen-units = 1
