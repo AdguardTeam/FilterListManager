@@ -233,7 +233,7 @@ flm.get_filter_rules_as_strings(ids /* Vec<FilterId> */);
 
 [FullFilterList reference](./src/manager/models/full_filter_list.rs)\
 [StoredFilterMetadata reference](./src/manager/models/stored_filter_metadata.rs)\
-[ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)
+[ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)\
 [FilterListRulesRaw reference](./src/manager/models/filter_list_rules_raw.rs)
 
 ### Other (All) operations

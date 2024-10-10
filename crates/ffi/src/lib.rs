@@ -20,6 +20,7 @@ use crate::result::AGResult;
 pub use crate::top_level::*;
 use adguard_flm::manager::models::configuration::Locale;
 use adguard_flm::manager::models::filter_list_rules::FilterListRules;
+use adguard_flm::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 
 pub struct FilterListManager {
     flm: Mutex<FilterListManagerImpl>,
@@ -181,6 +182,13 @@ impl FilterListManager {
 
     pub fn get_active_rules(&self) -> AGResult<Vec<ActiveRulesInfo>> {
         self.wrap(|flm| flm.get_active_rules())
+    }
+
+    pub fn get_filter_rules_as_strings(
+        &self,
+        ids: Vec<FilterId>,
+    ) -> AGResult<Vec<FilterListRulesRaw>> {
+        self.wrap(move |flm| flm.get_filter_rules_as_strings(ids))
     }
 }
 
