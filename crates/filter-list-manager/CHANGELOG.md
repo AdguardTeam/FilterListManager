@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2024-10-10
+
+### Added
+- Method `get_filter_rules_as_strings`
+
+[0.7.2]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.7.1...flm-0.7.2
+
 ## [0.7.1] - 2024-09-23
 
 ### Added 
@@ -14,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Now flm `constructor` can throw exceptions.
 - Automatic database uplifting now called in the constructor, not after very first database connection 
 
-[0.6.2]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.6.2...flm-0.7.1
+[0.7.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.6.2...flm-0.7.1
 
 ## [0.6.2] - 2024-09-23
 

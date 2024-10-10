@@ -9,6 +9,7 @@ use crate::manager::models::active_rules_info::ActiveRulesInfo;
 use crate::manager::models::configuration::{Locale, LOCALES_DELIMITER};
 use crate::manager::models::filter_group::FilterGroup;
 use crate::manager::models::filter_list_rules::FilterListRules;
+use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::update_filters_action::update_filters_action;
 use crate::storage::database_path_holder::DatabasePathHolder;
@@ -700,19 +701,47 @@ impl FilterListManager for FilterListManagerImpl {
             Ok(vec![])
         }
     }
+
+    fn get_filter_rules_as_strings(
+        &self,
+        ids: Vec<FilterId>,
+    ) -> FLMResult<Vec<FilterListRulesRaw>> {
+        let conn = connect_using_configuration(&self.configuration)?;
+
+        let result = RulesListRepository::new()
+            .select(
+                &conn,
+                Some(SQLOperator::FieldIn(
+                    "filter_id",
+                    ids.into_iter().map(Into::into).collect(),
+                )),
+            )
+            .map_err(FLMError::from_database)?;
+
+        Ok(result
+            .unwrap_or_default()
+            .into_iter()
+            .map(Into::into)
+            .collect())
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::storage::entities::rules_list_entity::RulesListEntity;
     use crate::storage::repositories::filter_repository::FilterRepository;
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
+    use crate::storage::repositories::Repository;
     use crate::storage::sql_generators::operator::SQLOperator;
+    use crate::storage::with_transaction;
     use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
     use crate::{
         Configuration, FilterId, FilterListManager, FilterListManagerImpl, FilterListRules,
         USER_RULES_FILTER_LIST_ID,
     };
     use chrono::{Duration, Utc};
+    use rand::prelude::SliceRandom;
+    use rand::thread_rng;
     use std::fs;
     use std::ops::Sub;
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -1168,5 +1197,67 @@ mod tests {
         let lists = flm.get_full_filter_lists().unwrap();
 
         assert!(lists.len() > 0);
+    }
+
+    #[test]
+    fn test_get_filter_rules_as_strings() {
+        const TEST_FILTERS_AMOUNT: usize = 3;
+        const NONEXISTENT_ID: FilterId = 9_450_000_123_456;
+
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let (_, mut conn, index_filters) = spawn_test_db_with_metadata();
+
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let filter_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+
+        let guard_id = filter_repo
+            .count(
+                &conn,
+                Some(SQLOperator::FieldIn(
+                    "filter_id",
+                    vec![NONEXISTENT_ID.into()],
+                )),
+            )
+            .unwrap();
+
+        assert_eq!(guard_id, 0);
+
+        let mut rng = thread_rng();
+        let mut ids = index_filters
+            .choose_multiple(&mut rng, TEST_FILTERS_AMOUNT)
+            .filter_map(|filter| filter.filter_id)
+            .collect::<Vec<FilterId>>();
+
+        // Add rules by ids
+        with_transaction(&mut conn, |transaction| {
+            let entities = ids
+                .clone()
+                .into_iter()
+                .map(|id| RulesListEntity {
+                    filter_id: id,
+                    text: "example.com\nexample.org".to_string(),
+                    disabled_text: "example.com".to_string(),
+                })
+                .collect();
+
+            rules_repo.insert(&transaction, entities).unwrap();
+
+            Ok(())
+        })
+        .unwrap();
+
+        ids.push(NONEXISTENT_ID);
+
+        let rules = flm.get_filter_rules_as_strings(ids).unwrap();
+
+        assert_eq!(rules.len(), TEST_FILTERS_AMOUNT);
+        assert!(rules
+            .iter()
+            .find(|rules| rules.filter_id == NONEXISTENT_ID)
+            .is_none())
     }
 }
