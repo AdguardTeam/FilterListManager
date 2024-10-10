@@ -1,18 +1,18 @@
 #!/bin/bash
 set -exf
 
+./platform/apple/configure.sh
 ./platform/apple/build.sh
 
 SUFFIX="" # Always release build
-VER="$(sed -ne 's/^ *version = "\(.*\)"/\1/p' Cargo.toml)"
+VER="$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)"
 VER="${VER}${SUFFIX}"
 
-ARCHIVE_NAME="AdGuardFLM-${VER}.zip"
+ARCH_NAME="AdGuardFLM-${VER}.zip"
 
 cd platform/apple/build/framework
 
-find ../ -name "*.zip" -delete
-zip -4yr ../"${ARCHIVE_NAME}" AdGuardFLM.xcframework
+zip -4yr "../${ARCH_NAME}" AdGuardFLM.xcframework
 
 echo '// swift-tools-version:5.3
 import PackageDescription
@@ -28,7 +28,7 @@ let package = Package(
   targets: [
     .binaryTarget(
       name: "AdGuardFLM",
-      path: "'${ARCHIVE_NAME}'"
+      path: "'${ARCH_NAME}'"
     ),
   ]
 )
