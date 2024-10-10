@@ -1,6 +1,6 @@
 [package]
 name = "adguard-flm-ffi"
-version = "0.7.4"
+version = "0.7.5"
 edition = "2021"
 homepage.workspace = true
 license-file.workspace = true
