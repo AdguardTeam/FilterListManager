@@ -4,12 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [0.7.2] - 2024-10-10
+## [0.7.7] - 2024-10-10
+
+### Fixed
+- Method `get_filter_rules_as_strings` wasn't exported in previous version 
+
+[0.7.7]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.7.6...ffi-0.7.7
+
+## [0.7.6] - 2024-10-10
 
 ### Added
 - Method `get_filter_rules_as_strings`
 
-[0.7.2]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.7.1...ffi-0.7.2
+[0.7.6]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.7.1...ffi-0.7.6
 
 ## [0.7.1] - 2024-09-23
 

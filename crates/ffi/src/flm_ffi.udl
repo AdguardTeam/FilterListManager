@@ -93,6 +93,12 @@ dictionary ActiveRulesInfo {
     sequence<string> rules;
 };
 
+dictionary FilterListRulesRaw {
+    i64 filter_id;
+    string rules;
+    string disabled_rules;
+};
+
 dictionary UpdateFilterError {
     i64 filter_id;
     string message;
@@ -214,4 +220,7 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     sequence<ActiveRulesInfo> get_active_rules();
+
+    [Throws=AGOuterError]
+    sequence<FilterListRulesRaw> get_filter_rules_as_strings(sequence<i64> ids);
 };
