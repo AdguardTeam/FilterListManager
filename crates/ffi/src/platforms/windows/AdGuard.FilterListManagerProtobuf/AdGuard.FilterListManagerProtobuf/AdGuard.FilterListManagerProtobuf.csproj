@@ -66,8 +66,8 @@
     <Compile Include="ProtobufGenerated\OuterError.cs" />
     <Compile Include="RustInterface\FFIMethod.cs" />
     <Compile Include="RustInterface\ProtobufBridge.cs" />
+    <Compile Include="RustInterface\ProtobufInterop.cs" />
     <Compile Include="RustInterface\RustResponse.cs" />
-    <Compile Include="RustInterface\ProtobufInterface.cs" />
     <Compile Include="RustInterface\RustResponseType.cs" />
     <Compile Include="Utils\Constants.cs" />
   </ItemGroup>
