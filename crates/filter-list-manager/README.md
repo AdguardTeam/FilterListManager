@@ -211,7 +211,7 @@ flm.get_full_filter_lists();
 
 // Retrieves a filter metadata by its ID from the database **with** its rules.
 // Returns Optional<FullFilterList>.
-flm.get_full_filter_list_by_id(id);
+flm.get_full_filter_list_by_id(id /* FilterId */);
 
 // Retrieves all enabled filters as ActiveRulesInfo.
 flm.get_active_filters();
@@ -222,14 +222,19 @@ flm.get_stored_filters_metadata();
 
 // Retrieves a filter metadata by its ID from the database **without** its rules.
 // Returns Optional<StoredFilterMetadata>.
-flm.get_stored_filter_metadata_by_id(id);
+flm.get_stored_filter_metadata_by_id(id /* FilterId */);
+
+// Retrieves a list of FilterListRulesRaw by IDs.
+// This method acts in the same way as the `IN` database operator. Only found entities will be returned
+flm.get_filter_rules_as_strings(ids /* Vec<FilterId> */);
 ```
 
 #### Example references
 
 [FullFilterList reference](./src/manager/models/full_filter_list.rs)\
 [StoredFilterMetadata reference](./src/manager/models/stored_filter_metadata.rs)\
-[ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)
+[ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)\
+[FilterListRulesRaw reference](./src/manager/models/filter_list_rules_raw.rs)
 
 ### Other (All) operations
 

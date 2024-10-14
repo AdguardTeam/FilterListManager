@@ -8,20 +8,13 @@ mod top_level;
 pub use crate::models::FilterListManagerConstants;
 use crate::outer_error::AGOuterError;
 use crate::result::AGResult;
-pub use crate::top_level::*;
-use adguard_flm::manager::models::configuration::Locale;
-use adguard_flm::manager::models::filter_list_rules::FilterListRules;
-use adguard_flm::{
-    manager::{
-        models::filter_group::FilterGroup, models::filter_tag::FilterTag, models::UpdateResult,
-    },
-    ActiveRulesInfo, Configuration, FLMResult, FilterId, FilterListManager as IFilterListManager,
-    FilterListManagerImpl, FilterListMetadata, FullFilterList, StoredFilterMetadata,
-};
-pub use adguard_flm::{FilterListType, UpdateFilterError};
+use adguard_flm::FilterListManager as IFilterListManager;
+pub use adguard_flm::*;
 use std::sync::{Mutex, MutexGuard};
 
 // Re-export native structs and functions
+pub use crate::top_level::*;
+use adguard_flm::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 pub use native_interface::*;
 
 #[repr(C)]
@@ -185,6 +178,13 @@ impl FilterListManager {
 
     pub fn get_active_rules(&self) -> AGResult<Vec<ActiveRulesInfo>> {
         self.wrap(|flm| flm.get_active_rules())
+    }
+
+    pub fn get_filter_rules_as_strings(
+        &self,
+        ids: Vec<FilterId>,
+    ) -> AGResult<Vec<FilterListRulesRaw>> {
+        self.wrap(move |flm| flm.get_filter_rules_as_strings(ids))
     }
 }
 

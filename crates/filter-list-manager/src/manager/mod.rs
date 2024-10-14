@@ -8,6 +8,7 @@ use crate::manager::models::active_rules_info::ActiveRulesInfo;
 use crate::manager::models::configuration::Locale;
 use crate::manager::models::filter_group::FilterGroup;
 use crate::manager::models::filter_list_rules::FilterListRules;
+use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::UpdateResult;
 use crate::{FLMResult, StoredFilterMetadata};
@@ -296,4 +297,11 @@ pub trait FilterListManager {
 
     /// Gets a list of [`ActiveRulesInfo`] from filters with `filter.is_enabled=true` flag.
     fn get_active_rules(&self) -> FLMResult<Vec<ActiveRulesInfo>>;
+
+    /// Gets a list of [`FilterListRulesRaw`] structures containing.
+    /// `rules` and `disabled_rules` as strings, directly from database fields.
+    ///
+    /// This method acts in the same way as the `IN` database operator. Only found entities will be returned
+    fn get_filter_rules_as_strings(&self, ids: Vec<FilterId>)
+        -> FLMResult<Vec<FilterListRulesRaw>>;
 }

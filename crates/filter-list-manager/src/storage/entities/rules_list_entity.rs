@@ -1,4 +1,5 @@
 use crate::manager::models::filter_list_rules::FilterListRules;
+use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::FilterId;
 
 #[derive(Clone)]
@@ -24,6 +25,16 @@ impl From<FilterListRules> for RulesListEntity {
             filter_id: value.filter_id,
             text: value.rules.join("\n"),
             disabled_text: value.disabled_rules.join("\n"),
+        }
+    }
+}
+
+impl Into<FilterListRulesRaw> for RulesListEntity {
+    fn into(self) -> FilterListRulesRaw {
+        FilterListRulesRaw {
+            filter_id: self.filter_id,
+            rules: self.text,
+            disabled_rules: self.disabled_text,
         }
     }
 }

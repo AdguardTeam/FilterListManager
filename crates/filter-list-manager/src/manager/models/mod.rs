@@ -4,6 +4,7 @@ pub mod configuration;
 pub mod filter_group;
 pub mod filter_list_metadata;
 pub mod filter_list_rules;
+pub mod filter_list_rules_raw;
 pub mod filter_tag;
 pub mod flm_error;
 pub mod full_filter_list;

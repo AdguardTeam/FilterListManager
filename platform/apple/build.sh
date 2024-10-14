@@ -68,7 +68,8 @@ build_framework() {
         -I "${CARGO_TARGET_DIR}/${ARCH}/release" \
         -no-verify-emitted-module-interface \
         -o "${CARGO_TARGET_DIR}/${ARCH}/release/deps/libAdGuardFLM.a"
-    nm -gU "${CARGO_TARGET_DIR}/${ARCH}/release/deps/libAdGuardFLM.a" | awk '/ T / {print $3}' > "${CARGO_TARGET_DIR}/${ARCH}/release"/deps/libAdGuardFLM.syms
+    nm -gU "${CARGO_TARGET_DIR}/${ARCH}/release/deps/libAdGuardFLM.a" | awk '/ (T|D|S) /{$1=$3; $2=$4; $3=$5; $4=$6; $5=$7; $6=$8; $7=$9; NF=NF-2; print}' \
+            > "${CARGO_TARGET_DIR}/${ARCH}/release"/deps/libAdGuardFLM.syms
 
     export SWIFT_LIB_DIR=$(xcrun -sdk $SWIFT_SDK swiftc -target ${SWIFT_TARGET}${MACOSX_DEPLOYMENT_TARGET}${TARGET_SUFFIX} -print-target-info | jq -r '.paths.runtimeLibraryImportPaths[0]')
     RUSTFLAGS="--cfg swift_lib_dir=\"$SWIFT_LIB_DIR\"" cargo build --release --package adguard-flm-ffi --target $ARCH
