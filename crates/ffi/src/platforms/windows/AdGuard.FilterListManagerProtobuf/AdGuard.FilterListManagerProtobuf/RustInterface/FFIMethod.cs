@@ -1,0 +1,29 @@
+﻿namespace AdGuard.FilterListManagerProtobuf.RustInterface
+{
+    public enum FFIMethod
+    {
+        InstallCustomFilterList,
+        EnableFilterLists,
+        InstallFilterLists,
+        DeleteCustomFilterLists,
+        GetFullFilterLists,
+        GetFullFilterListById,
+        GetStoredFiltersMetadata,
+        GetStoredFilterMetadataById,
+        SaveCustomFilterRules,
+        SaveDisabledRules,
+        UpdateFilters,
+        ForceUpdateFiltersByIds,
+        FetchFilterListMetadata,
+        LiftUpDatabase,
+        GetAllTags,
+        GetAllGroups,
+        ChangeLocale,
+        PullMetadata,
+        UpdateCustomFilterMetadata,
+        GetDatabasePath,
+        GetDatabaseVersion,
+        InstallCustomFilterFromString,
+        GetActiveRules
+    }
+}
