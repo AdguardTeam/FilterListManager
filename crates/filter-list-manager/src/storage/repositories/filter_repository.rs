@@ -129,7 +129,7 @@ impl FilterRepository {
 
     pub(crate) fn toggle_filter_lists(
         &self,
-        conn: &Connection,
+        tx: &Transaction,
         mut ids: Vec<FilterId>,
         next_value: bool,
     ) -> Result<usize, Error> {
@@ -149,7 +149,7 @@ impl FilterRepository {
 
         sql += build_in_clause(ids.len()).as_str();
 
-        let mut statement = conn.prepare(sql.as_str())?;
+        let mut statement = tx.prepare(sql.as_str())?;
 
         // Insert bool value at the first param position
         ids.insert(0, next_value as FilterId);
@@ -161,7 +161,7 @@ impl FilterRepository {
 
     pub(crate) fn toggle_is_installed(
         &self,
-        conn: &Connection,
+        tx: &Transaction,
         mut ids: Vec<FilterId>,
         next_value: bool,
     ) -> Result<usize, Error> {
@@ -181,7 +181,7 @@ impl FilterRepository {
 
         sql += build_in_clause(ids.len()).as_str();
 
-        let mut statement = conn.prepare(sql.as_str())?;
+        let mut statement = tx.prepare(sql.as_str())?;
 
         // Insert bool value at the first param position
         ids.insert(0, next_value as FilterId);

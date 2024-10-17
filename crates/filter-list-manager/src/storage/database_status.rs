@@ -1,3 +1,4 @@
+use rusqlite::TransactionBehavior;
 use crate::storage::connect;
 use crate::storage::database_path_holder::DatabasePathHolder;
 use crate::storage::db_bootstrap::db_bootstrap;
@@ -51,18 +52,27 @@ pub(crate) fn get_database_status(
 
 /// "Lifting" [`DatabaseStatus`] for filling database with index
 pub(crate) fn lift_up_database(database_path_holder: &DatabasePathHolder) -> FLMResult<()> {
-    match get_database_status(&database_path_holder)? {
+    let tx = match get_database_status(&database_path_holder)? {
         DatabaseStatus::NoFile | DatabaseStatus::NoSchema => {
-            let mut conn = init_schema(database_path_holder.get_calculated_path())?;
-            db_bootstrap(&mut conn)
+            let mut tx = init_schema(database_path_holder.get_calculated_path())?;
+            db_bootstrap(&mut tx).map_err(FLMError::from_database)?;
+
+            tx
         }
         DatabaseStatus::OnlySchema => {
             let mut conn = connect(&database_path_holder.get_calculated_path())?;
-            db_bootstrap(&mut conn)
+            let mut tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)
+                .map_err(FLMError::from_database)?;
+            db_bootstrap(&mut tx).map_err(FLMError::from_database)?;
+
+            tx
         }
-        DatabaseStatus::Filled => Ok(()),
+        DatabaseStatus::Filled => {
+            let mut conn = connect(database_path_holder.get_calculated_path())?;
+            conn.transaction_with_behavior(TransactionBehavior::Immediate)
+                .map_err(FLMError::from_database)?
+        },
     }?;
 
-    let mut conn = connect(database_path_holder.get_calculated_path())?;
-    run_migrations(&mut conn)
+    run_migrations(&mut tx)
 }

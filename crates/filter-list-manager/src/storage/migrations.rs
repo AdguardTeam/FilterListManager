@@ -2,7 +2,7 @@ use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::{FLMError, FLMResult};
 use include_dir::{include_dir, Dir, File};
 use regex::Regex;
-use rusqlite::Connection;
+use rusqlite::{Connection, Transaction};
 use std::cell::Cell;
 
 /// Regex for matching migration files
@@ -12,13 +12,13 @@ const FILE_MATCHING_REGEX: &str = r"(\d+)-migration.sql";
 const MIGRATIONS_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/resources/sql/migrations");
 
 /// Consistently applies migrations that have not yet been applied to the current database
-pub(super) fn run_migrations(conn: &mut Connection) -> FLMResult<()> {
+pub(super) fn run_migrations(conn: &mut Transaction) -> FLMResult<()> {
     migrations_internal(&MIGRATIONS_DIR, conn)
 }
 
 /// Runner
 #[inline]
-fn migrations_internal(dir: &Dir, conn: &mut Connection) -> FLMResult<()> {
+fn migrations_internal(dir: &Dir, conn: &mut Transaction) -> FLMResult<()> {
     let mut metadata = DBMetadataRepository::read(conn)
         .map_err(FLMError::from_database)?
         .unwrap_or_default();
@@ -134,6 +134,8 @@ mod tests {
     #[test]
     fn test_migration() {
         let mut conn = rusqlite::Connection::open_in_memory().unwrap();
+        let mut tx = conn.transaction().unwrap();
+
 
         let initial_db: &str = r###"
             CREATE TABLE [metadata] (
@@ -176,7 +178,7 @@ mod tests {
 
             let dir = Dir::new("", &entries);
 
-            migrations_internal(&dir, &mut conn).unwrap();
+            migrations_internal(&dir, &mut tx).unwrap();
 
             // Check new fields
             conn.query_row(
@@ -241,7 +243,7 @@ mod tests {
 
             let dir = Dir::new("", &entries);
 
-            migrations_internal(&dir, &mut conn).unwrap();
+            migrations_internal(&dir, &mut tx).unwrap();
 
             // Check fields removal
             conn.query_row(
@@ -289,10 +291,11 @@ mod tests {
     #[test]
     fn test_validate_migrations_syntax() {
         let mut conn = rusqlite::Connection::open_in_memory().unwrap();
+        let mut tx = conn.transaction().unwrap();
         let initial_db = include_str!("../../resources/sql/schema.sql");
 
         conn.execute_batch(initial_db).unwrap();
 
-        run_migrations(&mut conn).unwrap();
+        run_migrations(&mut tx).unwrap();
     }
 }

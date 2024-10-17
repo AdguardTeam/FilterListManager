@@ -226,6 +226,7 @@ impl FilterListManager for FilterListManagerImpl {
     fn enable_filter_lists(&self, ids: Vec<FilterId>, is_enabled: bool) -> FLMResult<usize> {
         let conn = connect_using_configuration(&self.configuration)?;
 
+        // TODO: check needs transaction
         FilterRepository::new()
             .toggle_filter_lists(&conn, ids, is_enabled)
             .map_err(FLMError::from_database)

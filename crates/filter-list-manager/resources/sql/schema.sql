@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS [metadata] (
 
 -- Main filters tables
 
-CREATE TABLE [filter] (
+CREATE TABLE IF NOT EXISTS [filter] (
    [filter_id] INTEGER PRIMARY KEY,
    [group_id] INTEGER NOT NULL,
    [version] TEXT,
@@ -28,38 +28,38 @@ CREATE TABLE [filter] (
    CONSTRAINT [download_url] UNIQUE (download_url)
 );
 
-CREATE TABLE [filter_group] (
+CREATE TABLE IF NOT EXISTS [filter_group] (
     [group_id] INTEGER NOT NULL PRIMARY KEY,
     [name] TEXT,
     [display_number] INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE [filter_tag] (
+CREATE TABLE IF NOT EXISTS [filter_tag] (
     tag_id INTEGER NOT NULL PRIMARY KEY,
     keyword TEXT
 );
 
-CREATE TABLE [rules_list] (
+CREATE TABLE IF NOT EXISTS [rules_list] (
     [filter_id] INTEGER NOT NULL,
     [rules_text] TEXT,
     [disabled_rules_text] TEXT,
     CONSTRAINT [filter_id] UNIQUE (filter_id)
 );
 
-CREATE TABLE [diff_updates] (
+CREATE TABLE IF NOT EXISTS [diff_updates] (
     [filter_id] INTEGER NOT NULL,
     [next_path] TEXT, -- which path should be resolved next
     [next_check_time] INTEGER NOT NULL,
     CONSTRAINT [filter_id] UNIQUE (filter_id)
 );
 
-CREATE TABLE [filter_filter_tag] (
+CREATE TABLE IF NOT EXISTS [filter_filter_tag] (
    [tag_id] INTEGER NOT NULL,
    [filter_id] INTEGER NOT NULL,
    CONSTRAINT [filter_filter_tag_pkey] PRIMARY KEY ([tag_id], [filter_id])
 );
 
-CREATE TABLE [filter_locale] (
+CREATE TABLE IF NOT EXISTS [filter_locale] (
      [filter_id] INTEGER NOT NULL,
      [lang] TEXT,
      CONSTRAINT [filter_locale_pkey] PRIMARY KEY ([filter_id], [lang])
@@ -67,7 +67,7 @@ CREATE TABLE [filter_locale] (
 
 -- Localisation tables
 
-CREATE TABLE [filter_localisation] (
+CREATE TABLE IF NOT EXISTS [filter_localisation] (
 	[filter_id] INTEGER NOT NULL,
 	[lang] TEXT,
     [name] TEXT,
@@ -75,14 +75,14 @@ CREATE TABLE [filter_localisation] (
     CONSTRAINT [filter_localisation_pkey] PRIMARY KEY ([filter_id], [lang])
 );
 
-CREATE TABLE [filter_group_localisation] (
+CREATE TABLE IF NOT EXISTS [filter_group_localisation] (
     [group_id] INTEGER NOT NULL,
     [lang] TEXT NOT NULL,
     [name] TEXT,
     CONSTRAINT [pkey] PRIMARY KEY ([group_id], [lang])
 );
 
-CREATE TABLE [filter_tag_localisation] (
+CREATE TABLE IF NOT EXISTS [filter_tag_localisation] (
     [tag_id] INTEGER NOT NULL,
     [lang] TEXT NOT NULL,
     [name] TEXT,

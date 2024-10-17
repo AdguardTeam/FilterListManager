@@ -1,6 +1,6 @@
 use crate::storage::force_connect;
 use crate::{FLMError, FLMResult};
-use rusqlite::Connection;
+use rusqlite::{Connection, Transaction, TransactionBehavior};
 use std::fs;
 use std::path::PathBuf;
 
@@ -8,7 +8,7 @@ use std::path::PathBuf;
 const SCHEMA_STR: &str = include_str!("../../resources/sql/schema.sql");
 
 /// Inits schema in database
-pub(crate) fn init_schema(db_path: &PathBuf) -> FLMResult<Connection> {
+pub(crate) fn init_schema(db_path: &PathBuf) -> FLMResult<Transaction> {
     // Should check full path before
     let mut directory = db_path.clone();
     // Pops filename
@@ -20,12 +20,14 @@ pub(crate) fn init_schema(db_path: &PathBuf) -> FLMResult<Connection> {
     }
 
     // SAFETY: Do not need automatic lifting database here
-    let conn = unsafe { force_connect(db_path)? };
-
-    conn.execute_batch(SCHEMA_STR)
+    let mut conn = unsafe { force_connect(db_path)? };
+    let tx = conn.transaction_with_behavior(TransactionBehavior::Immediate)
         .map_err(FLMError::from_database)?;
 
-    Ok(conn)
+    tx.execute_batch(SCHEMA_STR)
+        .map_err(FLMError::from_database)?;
+
+    Ok(tx)
 }
 
 #[cfg(test)]
