@@ -1,7 +1,7 @@
 //! Root module of data storage operations
 use crate::storage::database_configuration_holder::DatabaseConfigurationHolder;
 
-use crate::{Configuration, FLMError, FLMResult};
+use crate::{Configuration, DbJournalMode, FLMError, FLMResult};
 use rusqlite::{Connection, OpenFlags, Transaction};
 
 pub mod constants;
@@ -54,14 +54,15 @@ fn connect_internal(
     let conn = Connection::open_with_flags(connection_source.get_calculated_path(), open_flags)
         .map_err(FLMError::from_database)?;
 
-    conn.pragma_update(
-        None,
-        "journal_mode",
-        connection_source.get_journal_mode_as_str(),
-    )
-    .map_err(FLMError::from_database)?;
+    let mode = connection_source.get_journal_mode();
+    if mode != DbJournalMode::DEFAULT {
+        conn.pragma_update(None, "journal_mode", mode.as_str())
+            .map_err(FLMError::from_database)?;
+    }
 
-    conn.pragma_update(None, "busy_timeout", connection_source.get_busy_timeout())
+    println!("JOURNAL MODE: {}", mode.as_str());
+
+    conn.pragma_update(None, "busy_timeout", 175000)
         .map_err(FLMError::from_database)?;
 
     Ok(conn)

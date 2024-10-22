@@ -4,19 +4,18 @@ use adguard_flm::{FLMError, FilterParserError, HttpClientError, IOError};
 #[derive(Debug, thiserror::Error, PartialEq)]
 pub enum AGOuterError {
     /// Cannot open file by the following path
-    #[error("CannotOpenDatabase")]
+    #[error("Cannot open database")]
     CannotOpenDatabase,
 
-    // TODO: Can i make them transparent?
     /// File opened that is not a database file
-    #[error("NotADatabase")]
+    #[error("This file is not a database")]
     NotADatabase,
 
     #[error("Database is busy")]
     DatabaseBusy,
 
     /// Cannot operate, because disc is full
-    #[error("DiskFull")]
+    #[error("Disk is full")]
     DiskFull,
 
     /// Cannot find some entity in database

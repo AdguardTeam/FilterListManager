@@ -4,8 +4,11 @@
 /// Will be used in PRAGMA statements for connections.
 ///
 /// [https://www.sqlite.org/pragma.html#pragma_journal_mode](SQLite documentation)
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum DbJournalMode {
+    /// Special mode, disables changing pragma on connection start.
+    DEFAULT,
+
     WAL,
     DELETE,
     MEMORY,
@@ -24,6 +27,7 @@ impl DbJournalMode {
             DbJournalMode::TRUNCATE => "TRUNCATE",
             DbJournalMode::PERSIST => "PERSIST",
             DbJournalMode::OFF => "OFF",
+            _ => "",
         }
     }
 }

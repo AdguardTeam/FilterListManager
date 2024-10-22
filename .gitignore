@@ -18,6 +18,8 @@
 
 # Tests
 **/agflm_*.db
+**/agflm_*.db-shm
+**/agflm_*.db-wal
 **/adguard.db
 **/*.profraw
 

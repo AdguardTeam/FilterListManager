@@ -115,15 +115,6 @@ enum FilterListType {
     "DNS"
 };
 
-enum DbJournalMode {
-    "WAL",
-    "DELETE",
-    "MEMORY",
-    "TRUNCATE",
-    "PERSIST",
-    "OFF",
-};
-
 dictionary Configuration {
     FilterListType filter_list_type;
     string? working_directory;
@@ -135,8 +126,6 @@ dictionary Configuration {
     string? encryption_key;
     i32 request_timeout_ms;
     boolean auto_lift_up_database;
-    DbJournalMode db_journal_mode;
-    i32 sqlite_busy_timeout;
 };
 
 [Error]

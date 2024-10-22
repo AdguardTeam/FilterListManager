@@ -69,6 +69,7 @@ pub(super) fn update_filters_action(
         .select_rules_string_map(&conn, &filter_ids_for_diff_updates)
         .map_err(FLMError::from_database)?;
     // endregion
+    println!("BEFORE EXCLUSIVE");
     // TODO: FOR CHECKING
     let tx = conn
         .transaction_with_behavior(TransactionBehavior::Exclusive)
@@ -194,19 +195,22 @@ pub(super) fn update_filters_action(
             break;
         }
     }
+    println!("BEFORE DROP TX");
     // TODO: FOR CHECKING
     drop(tx);
+    println!("AFTER DROP TX");
     // @TODO: Remove these allocations
     let inserted_filters = filter_entities.clone();
     let inserted_rules = rule_entities.clone();
 
     with_transaction(&mut conn, |transaction: &Transaction| {
+        println!("WITH TRANSACTION");
         filter_repository.insert(transaction, inserted_filters)?;
         diff_updates_repository.insert(transaction, diff_path_entities)?;
         rule_list_repository.insert(transaction, inserted_rules)
     })
     .map_err(FLMError::from_database)?;
-
+    println!("AFTER WITH_TRANSACTION");
     let rules_map = rule_entities
         .into_iter()
         .fold(HashMap::new(), |mut acc, rule| {

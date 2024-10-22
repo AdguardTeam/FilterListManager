@@ -9,7 +9,6 @@ use std::path::PathBuf;
 pub struct DatabaseConfigurationHolder {
     calculated_path: PathBuf,
     db_journal_mode: DbJournalMode,
-    busy_timeout: i32,
 }
 
 impl DatabaseConfigurationHolder {
@@ -18,14 +17,9 @@ impl DatabaseConfigurationHolder {
         &self.calculated_path
     }
 
-    /// Gets journal_mode string representation
-    pub(crate) fn get_journal_mode_as_str(&self) -> &'static str {
-        self.db_journal_mode.as_str()
-    }
-
-    /// Gets busy timeout
-    pub(crate) fn get_busy_timeout(&self) -> i32 {
-        self.busy_timeout
+    /// Gets journal_mode
+    pub(crate) fn get_journal_mode(&self) -> DbJournalMode {
+        self.db_journal_mode
     }
 }
 
@@ -40,8 +34,7 @@ impl DatabaseConfigurationHolder {
         Ok(Self::build_with_dir(
             calculated_dir,
             configuration.filter_list_type,
-            configuration.db_journal_mode,
-            configuration.sqlite_busy_timeout,
+            DbJournalMode::WAL, // TODO: Need tests
         ))
     }
 
@@ -51,7 +44,6 @@ impl DatabaseConfigurationHolder {
         mut dir: PathBuf,
         filter_list_type: FilterListType,
         db_journal_mode: DbJournalMode,
-        busy_timeout: i32,
     ) -> Self {
         let file_name = match filter_list_type {
             FilterListType::STANDARD => STANDARD_FILTERS_DATABASE_FILENAME,
@@ -66,7 +58,6 @@ impl DatabaseConfigurationHolder {
         Self {
             calculated_path: dir,
             db_journal_mode,
-            busy_timeout,
         }
     }
 
@@ -76,7 +67,6 @@ impl DatabaseConfigurationHolder {
         mut dir: PathBuf,
         filter_list_type: FilterListType,
         db_journal_mode: DbJournalMode,
-        busy_timeout: i32,
     ) -> Self {
         let file_name = match filter_list_type {
             FilterListType::STANDARD => STANDARD_FILTERS_DATABASE_FILENAME,
@@ -88,7 +78,6 @@ impl DatabaseConfigurationHolder {
         Self {
             calculated_path: dir,
             db_journal_mode,
-            busy_timeout,
         }
     }
 }
@@ -102,7 +91,6 @@ impl DatabaseConfigurationHolder {
             cwd,
             FilterListType::STANDARD,
             DbJournalMode::WAL,
-            100_000,
         ))
     }
 }

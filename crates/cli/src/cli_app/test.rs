@@ -1,6 +1,6 @@
 use adguard_flm::manager::filter_list_manager_impl::FilterListManagerImpl;
 use adguard_flm::manager::FilterListManager;
-use adguard_flm::{Configuration, DbJournalMode};
+use adguard_flm::{Configuration, FilterListType};
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 
@@ -72,16 +72,15 @@ fn update_filters() {
 pub(crate) fn test() {
     let start = SystemTime::now();
     let mut conf = Configuration::default();
-    conf.sqlite_busy_timeout = 100_000;
-    conf.db_journal_mode = DbJournalMode::DELETE;
-    conf.metadata_url = "https://filters.adtidy.org/extension/safari/filters.json".to_string();
-    conf.metadata_locales_url =
-        "https://filters.adtidy.org/extension/safari/filters_i18n.json".to_string();
+    conf.filter_list_type = FilterListType::DNS;
+    conf.metadata_url = "http://127.0.0.1:8080/filters.json".to_string();
+    conf.metadata_locales_url = "http://127.0.0.1:8080/filters_i18n.json".to_string();
 
     let a = *FilterListManagerImpl::new(conf).unwrap();
     let flm = Arc::new(a);
     let b = Arc::clone(&flm);
     let jh1 = std::thread::spawn(move || {
+        b.pull_metadata().unwrap();
         b.update_filters(true, 0, true).unwrap();
     });
 
@@ -94,5 +93,5 @@ pub(crate) fn test() {
 
     jh1.join().unwrap();
 
-    println!("Result: {:?}", a);
+    println!("Result is some: {}", a.is_some());
 }

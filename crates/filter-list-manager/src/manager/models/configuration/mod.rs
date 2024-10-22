@@ -11,9 +11,6 @@ use std::cmp::max;
 /// Expires value shouldn't be less than this constant. In seconds
 const MINIMAL_EXPIRES_VALUE: i32 = 3600;
 
-/// Default `SQLite`'s PRAGMA [https://www.sqlite.org/c3ref/busy_timeout.html](busy_timeout) value in ms.
-const DEFAULT_SQLITE_BUSY_TIMEOUT_MS: i32 = 120_000;
-
 /// Default https?-requests timeout in ms.
 const DEFAULT_REQUEST_TIMEOUT_MS: i32 = 60000;
 
@@ -22,7 +19,6 @@ const DEFAULT_REQUEST_TIMEOUT_MS: i32 = 60000;
 const DEFAULT_EXPIRES_VALUE_FOR_FILTERS: i32 = 86400;
 
 // TODO Check clone
-#[derive(Clone)]
 /// Configuration object
 pub struct Configuration {
     /// Type of filter lists to manage
@@ -63,10 +59,6 @@ pub struct Configuration {
     /// If you want to disable this option, you will need to manually call `flm.lift_up_database()`
     /// when you update the library in your application.
     pub auto_lift_up_database: bool,
-
-    pub db_journal_mode: DbJournalMode,
-
-    pub sqlite_busy_timeout: i32,
 }
 
 /// Normalized locales delimiter
@@ -111,8 +103,6 @@ impl Default for Configuration {
             encryption_key: None,
             request_timeout_ms: DEFAULT_REQUEST_TIMEOUT_MS,
             auto_lift_up_database: true,
-            db_journal_mode: DbJournalMode::WAL,
-            sqlite_busy_timeout: DEFAULT_SQLITE_BUSY_TIMEOUT_MS,
         }
     }
 }
