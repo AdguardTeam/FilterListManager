@@ -13,6 +13,7 @@ namespace AdGuard.FilterListManager.Test
     public class FilterListTests
     {
         private readonly string m_CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        private const int REQUEST_TIMEOUT_MS = 60 * 1000;
 
         /// <summary>
         /// The main setup of the test.
@@ -20,7 +21,7 @@ namespace AdGuard.FilterListManager.Test
         [SetUp]
         public void Setup()
         {
-            string coreLibsDllPath = DllProvider.Instance.LibsDllPath;
+            string coreLibsDllPath = FilterManagerDllProvider.Instance.LibsDllPath;
             Console.WriteLine($"Rust library path is {coreLibsDllPath}");
         }
 
@@ -54,6 +55,11 @@ namespace AdGuard.FilterListManager.Test
             Assert.IsTrue(groups.Count > 0);
             List<ActiveRulesInfo> rules = manager.GetActiveRules();
             Assert.IsTrue(rules.Count > 0);
+
+            manager.UpdateFilters(true, REQUEST_TIMEOUT_MS, true);
+            List<FilterListRulesRaw> rulesRaw = manager.GetFilterRulesAsStrings(new List<long>{ firstFilter.Id });
+            Assert.IsTrue(rulesRaw.Count > 0);
+
         }
     }
 }

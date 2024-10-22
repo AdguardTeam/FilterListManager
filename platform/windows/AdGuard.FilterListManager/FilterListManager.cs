@@ -214,6 +214,20 @@ namespace AdGuard.FilterListManager
         /// <summary>
         ///<inheritdoc cref="IFilterListManager"/>
         /// </summary>
+        public List<FilterListRulesRaw> GetFilterRulesAsStrings(List<long> ids)
+        {
+            return FfiConverterSequenceTypeFilterListRulesRaw.Instance.Lift(
+                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
+                    (ref RustCallStatus status) =>
+                        UniFfiLib
+                            .uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_filter_rules_as_strings(
+                                GetHandle(), FfiConverterSequenceInt64.INSTANCE.Lower(ids), ref status)
+                ));
+        }
+
+        /// <summary>
+        ///<inheritdoc cref="IFilterListManager"/>
+        /// </summary>
         public FullFilterList GetFullFilterListById(long id)
         {
             return FfiConverterOptionalTypeFullFilterList.INSTANCE.Lift(

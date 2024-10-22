@@ -2,7 +2,7 @@ using System;
 
 namespace AdGuard.FilterListManager.MarshalLogic
 {
-    internal abstract class FfiConverter<CsType, FfiType>
+    public abstract class FfiConverter<CsType, FfiType>
     {
         // Convert an FFI type to a C# type
         public abstract CsType Lift(FfiType value);

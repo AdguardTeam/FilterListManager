@@ -9,7 +9,7 @@ namespace AdGuard.FilterListManager.Utils
     /// <summary>
     /// Class for defining the required native dlls
     /// </summary>
-    public class DllProvider : LibsDllProviderBase
+    public class FilterManagerDllProvider : LibsDllProviderBase
     {
         private const string WIN32_DLL_NAME = @"x86\" + Constants.RUST_DLL_NAME;
         private const string WIN64_DLL_NAME = @"x64\" + Constants.RUST_DLL_NAME;
@@ -47,17 +47,17 @@ namespace AdGuard.FilterListManager.Utils
         /// <summary>
         /// Native libs DLL provider
         /// </summary>
-        public DllProvider() : base(DLL_PATHS_MAP)
+        public FilterManagerDllProvider() : base(DLL_PATHS_MAP)
         {
         }
 
-        private static readonly Lazy<DllProvider> LAZY =
-            new Lazy<DllProvider>(() => new DllProvider());
+        private static readonly Lazy<FilterManagerDllProvider> LAZY =
+            new Lazy<FilterManagerDllProvider>(() => new FilterManagerDllProvider());
 
         #region Singleton
 
         /// <summary>
-        /// Gets a singleton instance of <see cref="DllProvider"/> object
+        /// Gets a singleton instance of <see cref="FilterManagerDllProvider"/> object
         /// </summary>
         public static ILibsDllProvider Instance
         {

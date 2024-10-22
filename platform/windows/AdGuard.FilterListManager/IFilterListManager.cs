@@ -91,6 +91,12 @@ namespace AdGuard.FilterListManager
         int? GetDatabaseVersion();
 
         /// <summary>
+        /// Gets the filter rules as raw <see cref="FilterListRulesRaw"/> objects.
+        /// </summary>
+        /// <param name="ids">The ids.</param>
+        List<FilterListRulesRaw> GetFilterRulesAsStrings(List<long> ids);
+
+        /// <summary>
         /// Returns all filter data by [`FilterId`]. Filter metadata will be localised
         /// </summary>
         /// <param name="id">The filter identifier.</param>
