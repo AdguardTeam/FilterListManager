@@ -635,7 +635,7 @@ mod tests {
 
         let filter_repository = FilterRepository::new();
 
-        let (_, conn, filter_lists) = spawn_test_db_with_metadata();
+        let (_, mut conn, filter_lists) = spawn_test_db_with_metadata();
 
         let mut rng = thread_rng();
 
@@ -645,9 +645,11 @@ mod tests {
             assert!(!filter.is_enabled);
         }
 
+        let tx = conn.transaction().unwrap();
         let result = filter_repository
-            .toggle_filter_lists(&conn, ids.clone(), true)
+            .toggle_filter_lists(&tx, ids.clone(), true)
             .unwrap();
+        tx.commit().unwrap();
 
         assert_eq!(result, ids.len());
 
@@ -671,7 +673,7 @@ mod tests {
 
         let filter_repository = FilterRepository::new();
 
-        let (_, conn, filter_lists) = spawn_test_db_with_metadata();
+        let (_, mut conn, filter_lists) = spawn_test_db_with_metadata();
 
         let mut rng = thread_rng();
 
@@ -681,9 +683,11 @@ mod tests {
             assert!(!filter.is_installed);
         }
 
+        let tx = conn.transaction().unwrap();
         let result = filter_repository
-            .toggle_is_installed(&conn, ids.clone(), true)
+            .toggle_is_installed(&tx, ids.clone(), true)
             .unwrap();
+        tx.commit().unwrap();
 
         assert_eq!(result, ids.len());
 

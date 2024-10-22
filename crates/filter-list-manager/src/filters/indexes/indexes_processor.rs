@@ -1,6 +1,6 @@
 use super::entities::{IndexEntity, IndexI18NEntity};
 use crate::filters::indexes::index_consistency_checker::check_consistency;
-use crate::storage::database_path_holder::DatabasePathHolder;
+use crate::storage::database_configuration_holder::DatabaseConfigurationHolder;
 use crate::storage::database_status::lift_up_database;
 use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::entities::filter_filter_tag_entity::FilterFilterTagEntity;
@@ -27,7 +27,7 @@ use std::mem::take;
 
 /// The class responsible for updating filters and rules from indexes
 pub struct IndexesProcessor {
-    connection_source: DatabasePathHolder,
+    connection_source: DatabaseConfigurationHolder,
     loaded_index: Option<IndexEntity>,
     loaded_index_i18n: Option<IndexI18NEntity>,
     connect_timeout: i32,
@@ -36,7 +36,7 @@ pub struct IndexesProcessor {
 /// Public methods
 impl IndexesProcessor {
     /// Default ctor
-    pub fn factory(connection_source: DatabasePathHolder, connect_timeout: i32) -> Self {
+    pub fn factory(connection_source: DatabaseConfigurationHolder, connect_timeout: i32) -> Self {
         Self {
             connection_source,
             connect_timeout,
@@ -329,9 +329,10 @@ impl IndexesProcessor {
             .map_err(FLMError::from_database)
     }
 
+    #[inline]
     /// Connection factory for selected source
     fn connection_factory(&self) -> FLMResult<Connection> {
-        connect(self.connection_source.get_calculated_path())
+        connect(&self.connection_source)
     }
 
     /// Tries to take index value from `self` object
@@ -352,7 +353,7 @@ impl IndexesProcessor {
 impl IndexesProcessor {
     /// Ctor for tests
     pub(crate) const fn factory_test(
-        connection_source: DatabasePathHolder,
+        connection_source: DatabaseConfigurationHolder,
         loaded_index: IndexEntity,
         loaded_index_i18n: IndexI18NEntity,
     ) -> Self {
@@ -373,7 +374,7 @@ impl IndexesProcessor {
 #[cfg(test)]
 mod tests {
     use crate::filters::indexes::indexes_processor::IndexesProcessor;
-    use crate::storage::database_path_holder::DatabasePathHolder;
+    use crate::storage::database_configuration_holder::DatabaseConfigurationHolder;
     use crate::storage::database_status::lift_up_database;
     use crate::storage::entities::rules_list_entity::RulesListEntity;
     use crate::storage::repositories::filter_filter_tag_repository::FilterFilterTagRepository;
@@ -416,7 +417,7 @@ mod tests {
         }
 
         let mut indexes = IndexesProcessor::factory_test(
-            DatabasePathHolder::factory_test().unwrap(),
+            DatabaseConfigurationHolder::factory_test().unwrap(),
             // Do clone here, because of indexes.exchange_index()
             index.clone(),
             index_localisation.clone(),
@@ -428,7 +429,7 @@ mod tests {
             .save_indices_on_empty_database(indexes.connection_factory().unwrap())
             .unwrap();
 
-        let conn = connect(indexes.connection_source.get_calculated_path()).unwrap();
+        let conn = connect(&indexes.connection_source).unwrap();
 
         let filter_repository = FilterRepository::new();
         let filters_list = filter_repository
@@ -488,7 +489,8 @@ mod tests {
         let rules_repository = RulesListRepository::new();
         let groups_repository = FilterGroupRepository::new();
 
-        let mut indexes = IndexesProcessor::factory(DatabasePathHolder::factory_test().unwrap(), 0);
+        let mut indexes =
+            IndexesProcessor::factory(DatabaseConfigurationHolder::factory_test().unwrap(), 0);
 
         let mut rng = thread_rng();
         let (mut index, index_localisation) = build_filters_indices_fixtures().unwrap();
@@ -594,7 +596,7 @@ mod tests {
         // region second update
         {
             let mut second_indexes =
-                IndexesProcessor::factory(DatabasePathHolder::factory_test().unwrap(), 0);
+                IndexesProcessor::factory(DatabaseConfigurationHolder::factory_test().unwrap(), 0);
 
             let (index_second, index_localisation_second) =
                 build_filters_indices_fixtures().unwrap();

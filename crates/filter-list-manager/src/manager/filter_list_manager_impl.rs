@@ -12,7 +12,7 @@ use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::update_filters_action::update_filters_action;
-use crate::storage::database_path_holder::DatabasePathHolder;
+use crate::storage::database_configuration_holder::DatabaseConfigurationHolder;
 use crate::storage::database_status::lift_up_database;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
@@ -46,6 +46,10 @@ use std::str::FromStr;
 pub struct FilterListManagerImpl {
     configuration: Configuration,
 }
+
+// TODO: Just for tests
+unsafe impl Send for FilterListManagerImpl {}
+unsafe impl Sync for FilterListManagerImpl {}
 
 impl FilterListManagerImpl {
     fn get_full_filter_lists_internal(
@@ -90,7 +94,7 @@ impl FilterListManager for FilterListManagerImpl {
         configuration.normalized();
 
         if configuration.auto_lift_up_database {
-            let holder = DatabasePathHolder::from_configuration(&configuration)?;
+            let holder = DatabaseConfigurationHolder::from_configuration(&configuration)?;
 
             lift_up_database(&holder)?
         }
@@ -224,20 +228,29 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn enable_filter_lists(&self, ids: Vec<FilterId>, is_enabled: bool) -> FLMResult<usize> {
-        let conn = connect_using_configuration(&self.configuration)?;
+        let mut conn = connect_using_configuration(&self.configuration)?;
+        let tx = conn.transaction().map_err(FLMError::from_database)?;
 
-        // TODO: check needs transaction
-        FilterRepository::new()
-            .toggle_filter_lists(&conn, ids, is_enabled)
-            .map_err(FLMError::from_database)
+        let result = FilterRepository::new()
+            .toggle_filter_lists(&tx, ids, is_enabled)
+            .map_err(FLMError::from_database)?;
+
+        tx.commit().map_err(FLMError::from_database)?;
+
+        Ok(result)
     }
 
     fn install_filter_lists(&self, ids: Vec<FilterId>, is_installed: bool) -> FLMResult<usize> {
-        let conn = connect_using_configuration(&self.configuration)?;
+        let mut conn = connect_using_configuration(&self.configuration)?;
+        let tx = conn.transaction().map_err(FLMError::from_database)?;
 
-        FilterRepository::new()
-            .toggle_is_installed(&conn, ids, is_installed)
-            .map_err(FLMError::from_database)
+        let result = FilterRepository::new()
+            .toggle_is_installed(&tx, ids, is_installed)
+            .map_err(FLMError::from_database)?;
+
+        tx.commit().map_err(FLMError::from_database)?;
+
+        Ok(result)
     }
 
     fn delete_custom_filter_lists(&self, ids: Vec<FilterId>) -> FLMResult<usize> {
@@ -250,7 +263,7 @@ impl FilterListManager for FilterListManagerImpl {
             .filter_custom_filters(&conn, &ids)
             .map_err(FLMError::from_database)?;
 
-        with_transaction(&mut conn, |transaction: &Transaction| {
+        with_transaction(&mut conn, move |transaction: &Transaction| {
             let rows_deleted = filter_repository.bulk_delete(transaction, &custom_filters)?;
             rules_repository.bulk_delete(transaction, &custom_filters)?;
 
@@ -471,7 +484,7 @@ impl FilterListManager for FilterListManagerImpl {
 
     fn pull_metadata(&self) -> FLMResult<()> {
         let mut processor = IndexesProcessor::factory(
-            DatabasePathHolder::from_configuration(&self.configuration)?,
+            DatabaseConfigurationHolder::from_configuration(&self.configuration)?,
             self.configuration.request_timeout_ms,
         );
 
@@ -518,7 +531,8 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_database_path(&self) -> FLMResult<String> {
-        let database_path_holder = DatabasePathHolder::from_configuration(&self.configuration)?;
+        let database_path_holder =
+            DatabaseConfigurationHolder::from_configuration(&self.configuration)?;
 
         Ok(database_path_holder
             .get_calculated_path()
@@ -527,7 +541,8 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn lift_up_database(&self) -> FLMResult<()> {
-        let database_path_holder = DatabasePathHolder::from_configuration(&self.configuration)?;
+        let database_path_holder =
+            DatabaseConfigurationHolder::from_configuration(&self.configuration)?;
         lift_up_database(&database_path_holder)
     }
 

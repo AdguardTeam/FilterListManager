@@ -20,7 +20,7 @@ use crate::storage::with_transaction;
 use crate::utils::memory::heap;
 use crate::{Configuration, FLMError, FLMResult, FilterId, FilterParserError};
 use chrono::{DateTime, ParseError, Utc};
-use rusqlite::{Connection, Transaction};
+use rusqlite::{Connection, Transaction, TransactionBehavior};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -69,6 +69,10 @@ pub(super) fn update_filters_action(
         .select_rules_string_map(&conn, &filter_ids_for_diff_updates)
         .map_err(FLMError::from_database)?;
     // endregion
+    // TODO: FOR CHECKING
+    let tx = conn
+        .transaction_with_behavior(TransactionBehavior::Exclusive)
+        .unwrap();
 
     let mut diff_path_entities: Vec<DiffUpdateEntity> = vec![];
     let rows_count = records.len();
@@ -190,7 +194,8 @@ pub(super) fn update_filters_action(
             break;
         }
     }
-
+    // TODO: FOR CHECKING
+    drop(tx);
     // @TODO: Remove these allocations
     let inserted_filters = filter_entities.clone();
     let inserted_rules = rule_entities.clone();

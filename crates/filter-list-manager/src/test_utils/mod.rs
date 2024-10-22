@@ -8,7 +8,7 @@ use tests_db::TestsDb;
 
 use crate::filters::indexes::indexes_processor::IndexesProcessor;
 use crate::storage::connect;
-use crate::storage::database_path_holder::DatabasePathHolder;
+use crate::storage::database_configuration_holder::DatabaseConfigurationHolder;
 use crate::storage::database_status::lift_up_database;
 use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::repositories::filter_repository::FilterRepository;
@@ -41,7 +41,7 @@ pub extern "C" fn tear_down() {
 
 /// Lifts database, then fills it with metadata fixtures
 pub(crate) fn spawn_test_db_with_metadata() -> (IndexesProcessor, Connection, Vec<FilterEntity>) {
-    let connection_source = DatabasePathHolder::factory_test().unwrap();
+    let connection_source = DatabaseConfigurationHolder::factory_test().unwrap();
     let (index, index_i18n) = indexes_fixtures::build_filters_indices_fixtures().unwrap();
 
     let mut indexes_processor =
@@ -51,7 +51,7 @@ pub(crate) fn spawn_test_db_with_metadata() -> (IndexesProcessor, Connection, Ve
 
     indexes_processor.fill_empty_db().unwrap();
 
-    let conn = connect(connection_source.get_calculated_path()).unwrap();
+    let conn = connect(&connection_source).unwrap();
 
     let inserted_filters = FilterRepository::new()
         .select_filters_except_bootstrapped(&conn)

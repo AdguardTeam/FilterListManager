@@ -10,9 +10,8 @@ use crate::storage::repositories::filter_group_repository::FilterGroupRepository
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
 use crate::storage::repositories::Repository;
-use crate::storage::with_transaction;
-use crate::{FLMError, FLMResult, FilterId};
-use rusqlite::{Connection, Transaction};
+use crate::FilterId;
+use rusqlite::Transaction;
 
 /// Returns the filter identifier added by default when the base is bootstrapped.
 pub(crate) fn get_bootstrapped_filter_id() -> FilterId {

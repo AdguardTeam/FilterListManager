@@ -1,23 +1,35 @@
 use crate::storage::{DNS_FILTERS_DATABASE_FILENAME, STANDARD_FILTERS_DATABASE_FILENAME};
-use crate::{Configuration, FLMError, FLMResult, FilterListType};
+use crate::{Configuration, DbJournalMode, FLMError, FLMResult, FilterListType};
 use std::env;
 use std::path::PathBuf;
 
-/// Structure for determining final database file path.
+/// Structure for database configuration. Also, used to calculate the absolute path for a database.
 /// This MUST build path in constructors.
 #[cfg_attr(test, derive(Clone))]
-pub struct DatabasePathHolder {
+pub struct DatabaseConfigurationHolder {
     calculated_path: PathBuf,
+    db_journal_mode: DbJournalMode,
+    busy_timeout: i32,
 }
 
-impl DatabasePathHolder {
+impl DatabaseConfigurationHolder {
     /// Path getter
     pub(crate) fn get_calculated_path(&self) -> &PathBuf {
         &self.calculated_path
     }
+
+    /// Gets journal_mode string representation
+    pub(crate) fn get_journal_mode_as_str(&self) -> &'static str {
+        self.db_journal_mode.as_str()
+    }
+
+    /// Gets busy timeout
+    pub(crate) fn get_busy_timeout(&self) -> i32 {
+        self.busy_timeout
+    }
 }
 
-impl DatabasePathHolder {
+impl DatabaseConfigurationHolder {
     /// Default ctor
     pub(crate) fn from_configuration(configuration: &Configuration) -> FLMResult<Self> {
         let calculated_dir = match configuration.working_directory {
@@ -28,12 +40,19 @@ impl DatabasePathHolder {
         Ok(Self::build_with_dir(
             calculated_dir,
             configuration.filter_list_type,
+            configuration.db_journal_mode,
+            configuration.sqlite_busy_timeout,
         ))
     }
 
     #[cfg(test)]
     #[inline]
-    fn build_with_dir(mut dir: PathBuf, filter_list_type: FilterListType) -> Self {
+    fn build_with_dir(
+        mut dir: PathBuf,
+        filter_list_type: FilterListType,
+        db_journal_mode: DbJournalMode,
+        busy_timeout: i32,
+    ) -> Self {
         let file_name = match filter_list_type {
             FilterListType::STANDARD => STANDARD_FILTERS_DATABASE_FILENAME,
             FilterListType::DNS => DNS_FILTERS_DATABASE_FILENAME,
@@ -46,12 +65,19 @@ impl DatabasePathHolder {
 
         Self {
             calculated_path: dir,
+            db_journal_mode,
+            busy_timeout,
         }
     }
 
     #[cfg(not(test))]
     #[inline]
-    fn build_with_dir(mut dir: PathBuf, filter_list_type: FilterListType) -> Self {
+    fn build_with_dir(
+        mut dir: PathBuf,
+        filter_list_type: FilterListType,
+        db_journal_mode: DbJournalMode,
+        busy_timeout: i32,
+    ) -> Self {
         let file_name = match filter_list_type {
             FilterListType::STANDARD => STANDARD_FILTERS_DATABASE_FILENAME,
             FilterListType::DNS => DNS_FILTERS_DATABASE_FILENAME,
@@ -61,19 +87,22 @@ impl DatabasePathHolder {
 
         Self {
             calculated_path: dir,
+            db_journal_mode,
+            busy_timeout,
         }
     }
 }
 
 #[cfg(test)]
-impl DatabasePathHolder {
-    pub(crate) fn from_filter_list_type(filter_list_type: FilterListType) -> FLMResult<Self> {
+impl DatabaseConfigurationHolder {
+    pub(crate) fn factory_test() -> FLMResult<DatabaseConfigurationHolder> {
         let cwd = env::current_dir().map_err(FLMError::from_io)?;
 
-        Ok(Self::build_with_dir(cwd, filter_list_type))
-    }
-
-    pub(crate) fn factory_test() -> FLMResult<DatabasePathHolder> {
-        Self::from_filter_list_type(FilterListType::STANDARD)
+        Ok(Self::build_with_dir(
+            cwd,
+            FilterListType::STANDARD,
+            DbJournalMode::WAL,
+            100_000,
+        ))
     }
 }

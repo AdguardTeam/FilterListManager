@@ -7,8 +7,9 @@ use adguard_flm::{
     manager::{
         models::filter_group::FilterGroup, models::filter_tag::FilterTag, models::UpdateResult,
     },
-    ActiveRulesInfo, Configuration, FLMResult, FilterId, FilterListManager as IFilterListManager,
-    FilterListManagerImpl, FilterListMetadata, FullFilterList, StoredFilterMetadata,
+    ActiveRulesInfo, Configuration, DbJournalMode, FLMResult, FilterId,
+    FilterListManager as IFilterListManager, FilterListManagerImpl, FilterListMetadata,
+    FullFilterList, StoredFilterMetadata,
 };
 pub use adguard_flm::{FilterListType, UpdateFilterError};
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};

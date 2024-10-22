@@ -250,6 +250,7 @@ pub use crate::io::http::error::HttpClientError;
 /// # Re-exports
 pub use crate::manager::filter_list_manager_impl::FilterListManagerImpl;
 pub use crate::manager::models::active_rules_info::ActiveRulesInfo;
+pub use crate::manager::models::configuration::db_journal_mode::DbJournalMode;
 pub use crate::manager::models::configuration::Configuration;
 pub use crate::manager::models::configuration::FilterListType;
 pub use crate::manager::models::configuration::Locale;

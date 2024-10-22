@@ -7,9 +7,13 @@ pub enum AGOuterError {
     #[error("CannotOpenDatabase")]
     CannotOpenDatabase,
 
+    // TODO: Can i make them transparent?
     /// File opened that is not a database file
     #[error("NotADatabase")]
     NotADatabase,
+
+    #[error("Database is busy")]
+    DatabaseBusy,
 
     /// Cannot operate, because disc is full
     #[error("DiskFull")]
@@ -73,6 +77,7 @@ impl From<FLMError> for AGOuterError {
             FLMError::Database(variant) => match variant {
                 DatabaseError::CannotOpen => Self::CannotOpenDatabase,
                 DatabaseError::NotADatabase => Self::NotADatabase,
+                DatabaseError::DatabaseBusy => Self::DatabaseBusy,
                 DatabaseError::DiskFull => Self::DiskFull,
                 DatabaseError::Other(str) => Self::Other(format!("Other database error: {}", str)),
                 _ => Self::Other(String::from("Unknown db error")),
