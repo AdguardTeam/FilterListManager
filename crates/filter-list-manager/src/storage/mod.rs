@@ -1,74 +1,20 @@
 //! Root module of data storage operations
-use crate::storage::database_path_holder::DatabasePathHolder;
 
-use crate::{Configuration, FLMError, FLMResult};
-use rusqlite::{Connection, OpenFlags, Transaction};
-use std::path::PathBuf;
+use crate::{FLMError, FLMResult};
+use rusqlite::{Connection, Transaction};
 
 pub mod constants;
-pub(crate) mod database_path_holder;
 pub(crate) mod database_status;
 pub(crate) mod db_bootstrap;
-pub(crate) mod db_file_utils;
+mod db_connection_manager;
 pub(crate) mod entities;
 pub mod error;
-pub(crate) mod init_schema;
 mod migrations;
 pub(crate) mod repositories;
 pub(crate) mod sql_generators;
 mod utils;
 
-/// Database filename for [`crate::FilterListType::STANDARD`]
-pub const STANDARD_FILTERS_DATABASE_FILENAME: &str = "agflm_standard.db";
-/// Database filename for [`crate::FilterListType::DNS`]
-pub const DNS_FILTERS_DATABASE_FILENAME: &str = "agflm_dns.db";
-
-#[doc(hidden)]
-/// Open a new connection to a SQLite storage. If db file does not exist, it will be created.
-///
-/// # Safety
-///
-/// This function does not "lift" the database, use it with caution
-///
-/// # Failure
-///
-/// `Err` if you couldn't open db
-pub unsafe fn force_connect(db_path: &PathBuf) -> FLMResult<Connection> {
-    Connection::open_with_flags(
-        db_path,
-        OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_CREATE,
-    )
-    .map_err(FLMError::from_database)
-}
-
-/// Creates connection to existing db from path
-///
-/// # Failure
-///
-/// returns [`AGError`] if an error encountered
-pub(crate) fn connect(db_path: &PathBuf) -> FLMResult<Connection> {
-    Connection::open_with_flags(db_path, OpenFlags::SQLITE_OPEN_READ_WRITE)
-        .map_err(FLMError::from_database)
-}
-
-/// Connects to database, using the [`Configuration`] object
-///
-/// # Failure
-///
-/// returns [`FLMError`] if an error encountered
-pub(crate) fn connect_using_configuration(configuration: &Configuration) -> FLMResult<Connection> {
-    let database_path_holder = DatabasePathHolder::from_configuration(configuration)?;
-    connect(database_path_holder.get_calculated_path())
-}
-
-/// Make transaction for passed connection
-///
-/// # Failure
-///
-/// returns [`rusqlite::Error`] if an error encountered
-pub(crate) fn build_transaction(conn: &mut Connection) -> rusqlite::Result<Transaction> {
-    conn.transaction()
-}
+pub use db_connection_manager::DbConnectionManager;
 
 #[doc(hidden)]
 /// Make a block, wrapped with transaction
@@ -76,13 +22,13 @@ pub(crate) fn build_transaction(conn: &mut Connection) -> rusqlite::Result<Trans
 /// # Failure
 ///
 /// returns [`rusqlite::Error`] if an error encountered
-pub(crate) fn with_transaction<F, U>(conn: &mut Connection, f: F) -> rusqlite::Result<U>
+pub(crate) fn with_transaction<F, U>(conn: &mut Connection, f: F) -> FLMResult<U>
 where
     F: FnOnce(&Transaction) -> rusqlite::Result<U>,
 {
-    let transaction = build_transaction(conn)?;
-    let out = f(&transaction)?;
-    transaction.commit()?;
+    let transaction = conn.transaction().map_err(FLMError::from_database)?;
+    let out = f(&transaction).map_err(FLMError::from_database)?;
+    transaction.commit().map_err(FLMError::from_database)?;
 
     Ok(out)
 }
@@ -102,29 +48,8 @@ pub(crate) fn spawn_transaction<F, U>(
 where
     F: FnOnce(&Transaction) -> rusqlite::Result<U>,
 {
-    let transaction = build_transaction(conn)?;
+    let transaction = conn.transaction()?;
     let out = f(&transaction)?;
 
     Ok((transaction, out))
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::storage::connect;
-    use crate::storage::database_path_holder::DatabasePathHolder;
-    use crate::storage::error::DatabaseError;
-    use crate::test_utils::do_with_tests_helper;
-    use crate::FLMError;
-
-    #[test]
-    fn test_db_file_does_not_exists() {
-        do_with_tests_helper(|mut helper| helper.increment_postfix());
-
-        let database_path_holder = DatabasePathHolder::factory_test().unwrap();
-        let connection_source = database_path_holder.get_calculated_path();
-
-        let err = connect(&connection_source).err().unwrap();
-
-        assert_eq!(err, FLMError::Database(DatabaseError::CannotOpen));
-    }
 }

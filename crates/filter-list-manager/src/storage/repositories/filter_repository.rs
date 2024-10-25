@@ -10,9 +10,11 @@ use crate::{
     storage::{entities::filter_entity::FilterEntity, repositories::Repository},
     MAXIMUM_CUSTOM_FILTER_ID, MINIMUM_CUSTOM_FILTER_ID,
 };
+use rusqlite::types::Type;
 use rusqlite::{
     named_params, params_from_iter, Connection, Error, OptionalExtension, Row, Transaction,
 };
+use std::collections::HashMap;
 
 /// Basic SQL-query with all fields
 const BASIC_SELECT_SQL: &str = r"
@@ -119,7 +121,7 @@ impl FilterRepository {
         transaction: &Transaction,
         entity: FilterEntity,
     ) -> Result<FilterEntity, Error> {
-        let last_insert_id = self.insert_internal(&transaction, vec![entity])?;
+        let last_insert_id = self.insert_internal(&transaction, &[entity])?;
 
         let mut sql = String::from(BASIC_SELECT_SQL);
         sql += "WHERE f.filter_id=?";
@@ -129,8 +131,8 @@ impl FilterRepository {
 
     pub(crate) fn toggle_filter_lists(
         &self,
-        conn: &Connection,
-        mut ids: Vec<FilterId>,
+        tx: &Transaction,
+        ids: &[FilterId],
         next_value: bool,
     ) -> Result<usize, Error> {
         if ids.is_empty() {
@@ -149,20 +151,20 @@ impl FilterRepository {
 
         sql += build_in_clause(ids.len()).as_str();
 
-        let mut statement = conn.prepare(sql.as_str())?;
+        let mut statement = tx.prepare(sql.as_str())?;
 
         // Insert bool value at the first param position
-        ids.insert(0, next_value as FilterId);
+        let first_param = [next_value as FilterId];
 
-        let rows_updated = statement.execute(params_from_iter(ids))?;
+        let rows_updated = statement.execute(params_from_iter(first_param.iter().chain(ids)))?;
 
         Ok(rows_updated)
     }
 
     pub(crate) fn toggle_is_installed(
         &self,
-        conn: &Connection,
-        mut ids: Vec<FilterId>,
+        tx: &Transaction,
+        ids: &[FilterId],
         next_value: bool,
     ) -> Result<usize, Error> {
         if ids.is_empty() {
@@ -181,12 +183,12 @@ impl FilterRepository {
 
         sql += build_in_clause(ids.len()).as_str();
 
-        let mut statement = conn.prepare(sql.as_str())?;
+        let mut statement = tx.prepare(sql.as_str())?;
 
         // Insert bool value at the first param position
-        ids.insert(0, next_value as FilterId);
+        let first_param = [next_value as FilterId];
 
-        let rows_updated = statement.execute(params_from_iter(ids))?;
+        let rows_updated = statement.execute(params_from_iter(first_param.iter().chain(ids)))?;
 
         Ok(rows_updated)
     }
@@ -196,7 +198,7 @@ impl FilterRepository {
     pub(crate) fn filter_custom_filters(
         &self,
         conn: &Connection,
-        ids: &Vec<FilterId>,
+        ids: &[FilterId],
     ) -> rusqlite::Result<Vec<FilterId>> {
         let mut sql = String::from(
             r"
@@ -258,13 +260,11 @@ impl FilterRepository {
 
         let mut statement = conn.prepare(sql.as_str())?;
 
-        let rows_optional = statement
+        let Some(rows) = statement
             .query_map(params, FilterRepository::hydrate)
-            .optional()?;
-
-        let rows = match rows_optional {
-            None => return Ok(None),
-            Some(rows) => rows,
+            .optional()?
+        else {
+            return Ok(None);
         };
 
         let mut results = Vec::new();
@@ -277,6 +277,40 @@ impl FilterRepository {
         }
 
         Ok(Some(results))
+    }
+
+    /// Selects filters mapped by [`FilterId`] by `clause`.
+    /// *Will fail if result set is empty*
+    pub(crate) fn select_mapped(
+        &self,
+        conn: &Connection,
+        where_clause: Option<SQLOperator>,
+    ) -> rusqlite::Result<HashMap<FilterId, FilterEntity>> {
+        let (sql, params) = process_where_clause(String::from(BASIC_SELECT_SQL), where_clause)?;
+
+        let mut statement = conn.prepare(sql.as_str())?;
+        let mut map = HashMap::new();
+
+        let rows = statement.query_map(params, FilterRepository::hydrate)?;
+
+        for row in rows {
+            let tmp = row?;
+
+            let filter_id = match tmp.filter_id {
+                None => {
+                    return Err(Error::InvalidColumnType(
+                        0,
+                        String::from("filter_id"),
+                        Type::Integer,
+                    ));
+                }
+                Some(ref filter) => filter.to_owned(),
+            };
+
+            map.insert(filter_id, tmp);
+        }
+
+        Ok(map)
     }
 
     /// Returns filled entity from row
@@ -306,7 +340,7 @@ impl FilterRepository {
         &self,
         transaction: &Transaction,
         filter_id: FilterId,
-        title: String,
+        title: &str,
         is_trusted: bool,
     ) -> rusqlite::Result<bool> {
         let mut statement = transaction.prepare(
@@ -333,7 +367,7 @@ impl FilterRepository {
     fn insert_internal(
         &self,
         transaction: &Transaction<'_>,
-        entities: Vec<FilterEntity>,
+        entities: &[FilterEntity],
     ) -> rusqlite::Result<i64> {
         let mut custom_filters_count: FilterId = 0;
         for entity in entities.iter() {
@@ -459,7 +493,7 @@ impl Repository<FilterEntity> for FilterRepository {
     fn insert(
         &self,
         transaction: &Transaction<'_>,
-        entities: Vec<FilterEntity>,
+        entities: &[FilterEntity],
     ) -> Result<(), Error> {
         self.insert_internal(transaction, entities).map(|_| ())
     }
@@ -481,12 +515,13 @@ mod tests {
     use crate::storage::repositories::Repository;
     use crate::storage::sql_generators::operator::SQLOperator;
     use crate::storage::with_transaction;
+    use crate::storage::DbConnectionManager;
     use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
     use crate::CUSTOM_FILTERS_GROUP_ID;
     use rand::seq::SliceRandom;
     use rand::thread_rng;
     use rusqlite::types::Value;
-    use rusqlite::Transaction;
+    use rusqlite::{Connection, Transaction};
 
     #[test]
     fn test_count_negative_filters() {
@@ -494,7 +529,8 @@ mod tests {
             helper.increment_postfix();
         });
 
-        let (_, mut conn, _) = spawn_test_db_with_metadata();
+        let source = DbConnectionManager::factory_test().unwrap();
+        let _ = spawn_test_db_with_metadata(&source);
         let filter_repository = FilterRepository::new();
 
         {
@@ -518,10 +554,15 @@ mod tests {
                 is_installed: false,
             };
 
-            with_transaction(&mut conn, |transaction: &Transaction| {
-                filter_repository.insert(transaction, vec![inserted_entity])
-            })
-            .unwrap();
+            source
+                .execute_db(|mut connection: Connection| {
+                    with_transaction(&mut connection, |transaction: &Transaction| {
+                        filter_repository.insert(transaction, &[inserted_entity])
+                    })
+                    .unwrap();
+                    Ok(())
+                })
+                .unwrap();
         }
 
         // Return all custom filters, except bootstrapped
@@ -529,20 +570,29 @@ mod tests {
             FilterRepository::except_bootstrapped_filter_ids_operator(),
         ));
 
-        let custom_filters = filter_repository.select(&conn, cond).unwrap().unwrap();
+        let count = source
+            .execute_db(|connection: Connection| {
+                let custom_filters = filter_repository
+                    .select(&connection, cond)
+                    .unwrap()
+                    .unwrap();
 
-        let inserted_filter_id = custom_filters.first().unwrap().filter_id.unwrap();
+                let inserted_filter_id = custom_filters.first().unwrap().filter_id.unwrap();
 
-        assert!(inserted_filter_id.is_negative());
+                assert!(inserted_filter_id.is_negative());
 
-        let count = filter_repository
-            .count(
-                &conn,
-                Some(SQLOperator::FieldEqualValue(
-                    "filter_id",
-                    inserted_filter_id.into(),
-                )),
-            )
+                let count = filter_repository
+                    .count(
+                        &connection,
+                        Some(SQLOperator::FieldEqualValue(
+                            "filter_id",
+                            inserted_filter_id.into(),
+                        )),
+                    )
+                    .unwrap();
+
+                Ok(count)
+            })
             .unwrap();
 
         assert_eq!(count, 1);
@@ -554,7 +604,8 @@ mod tests {
             helper.increment_postfix();
         });
 
-        let (_, mut conn, _) = spawn_test_db_with_metadata();
+        let source = DbConnectionManager::factory_test().unwrap();
+        let _ = spawn_test_db_with_metadata(&source);
         let filter_repository = FilterRepository::new();
 
         {
@@ -578,10 +629,15 @@ mod tests {
                 is_installed: false,
             };
 
-            with_transaction(&mut conn, |transaction: &Transaction| {
-                filter_repository.insert(transaction, vec![inserted_entity])
-            })
-            .unwrap();
+            source
+                .execute_db(|mut connection: Connection| {
+                    with_transaction(&mut connection, |transaction: &Transaction| {
+                        filter_repository.insert(transaction, &[inserted_entity])
+                    })
+                    .unwrap();
+                    Ok(())
+                })
+                .unwrap();
         }
 
         // Return all custom filters, except bootstrapped
@@ -589,41 +645,55 @@ mod tests {
             FilterRepository::except_bootstrapped_filter_ids_operator(),
         ));
 
-        let custom_filters = filter_repository.select(&conn, cond).unwrap().unwrap();
-
-        let inserted_filter = custom_filters.first().unwrap();
-
-        let filter_id = inserted_filter.filter_id.unwrap();
-
-        assert!(filter_id.is_negative());
-        assert_eq!(inserted_filter.is_trusted, false);
-        assert_eq!(inserted_filter.title, "Custom filter".to_string());
-
         let new_title = String::from("New title");
+        let filter_id = source
+            .execute_db(|mut connection: Connection| {
+                let custom_filters = filter_repository
+                    .select(&connection, cond)
+                    .unwrap()
+                    .unwrap();
 
-        with_transaction(&mut conn, |transaction: &Transaction| {
-            filter_repository.update_custom_filter_metadata(
-                transaction,
-                filter_id,
-                new_title.clone(),
-                true,
-            )
-        })
-        .unwrap();
+                let inserted_filter = custom_filters.first().unwrap();
 
-        {
-            let updated_filters = filter_repository
-                .select(
-                    &conn,
-                    Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
-                )
-                .unwrap()
+                let filter_id = inserted_filter.filter_id.unwrap();
+
+                assert!(filter_id.is_negative());
+                assert_eq!(inserted_filter.is_trusted, false);
+                assert_eq!(inserted_filter.title, "Custom filter".to_string());
+
+                with_transaction(&mut connection, |transaction: &Transaction| {
+                    filter_repository.update_custom_filter_metadata(
+                        transaction,
+                        filter_id,
+                        &new_title,
+                        true,
+                    )
+                })
                 .unwrap();
 
-            let updated_filter = updated_filters.first().unwrap();
+                Ok(filter_id)
+            })
+            .unwrap();
 
-            assert!(updated_filter.is_trusted);
-            assert_eq!(updated_filter.title, new_title);
+        {
+            source
+                .execute_db(|connection: Connection| {
+                    let updated_filters = filter_repository
+                        .select(
+                            &connection,
+                            Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                        )
+                        .unwrap()
+                        .unwrap();
+
+                    let updated_filter = updated_filters.first().unwrap();
+
+                    assert!(updated_filter.is_trusted);
+                    assert_eq!(updated_filter.title, new_title);
+
+                    Ok(())
+                })
+                .unwrap();
         }
     }
 
@@ -635,7 +705,8 @@ mod tests {
 
         let filter_repository = FilterRepository::new();
 
-        let (_, conn, filter_lists) = spawn_test_db_with_metadata();
+        let source = DbConnectionManager::factory_test().unwrap();
+        let (_, filter_lists) = spawn_test_db_with_metadata(&source);
 
         let mut rng = thread_rng();
 
@@ -645,22 +716,30 @@ mod tests {
             assert!(!filter.is_enabled);
         }
 
-        let result = filter_repository
-            .toggle_filter_lists(&conn, ids.clone(), true)
-            .unwrap();
+        source
+            .execute_db(|mut connection: Connection| {
+                let tx = connection.transaction().unwrap();
+                let result = filter_repository
+                    .toggle_filter_lists(&tx, ids.as_slice(), true)
+                    .unwrap();
+                tx.commit().unwrap();
 
-        assert_eq!(result, ids.len());
+                assert_eq!(result, ids.len());
 
-        let values: Vec<Value> = ids.into_iter().map(|id| Value::from(id)).collect();
+                let values: Vec<Value> = ids.into_iter().map(|id| Value::from(id)).collect();
 
-        let selected_filters = filter_repository
-            .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
+                let selected_filters = filter_repository
+                    .select(&connection, Some(SQLOperator::FieldIn("filter_id", values)))
+                    .unwrap()
+                    .unwrap();
+
+                for selected_filter in selected_filters {
+                    assert!(selected_filter.is_enabled);
+                }
+
+                Ok(())
+            })
             .unwrap()
-            .unwrap();
-
-        for selected_filter in selected_filters {
-            assert!(selected_filter.is_enabled);
-        }
     }
 
     #[test]
@@ -671,7 +750,8 @@ mod tests {
 
         let filter_repository = FilterRepository::new();
 
-        let (_, conn, filter_lists) = spawn_test_db_with_metadata();
+        let source = DbConnectionManager::factory_test().unwrap();
+        let (_, filter_lists) = spawn_test_db_with_metadata(&source);
 
         let mut rng = thread_rng();
 
@@ -681,21 +761,29 @@ mod tests {
             assert!(!filter.is_installed);
         }
 
-        let result = filter_repository
-            .toggle_is_installed(&conn, ids.clone(), true)
+        source
+            .execute_db(|mut connection: Connection| {
+                let tx = connection.transaction().unwrap();
+                let result = filter_repository
+                    .toggle_is_installed(&tx, ids.as_slice(), true)
+                    .unwrap();
+                tx.commit().unwrap();
+
+                assert_eq!(result, ids.len());
+
+                let values: Vec<Value> = ids.into_iter().map(|id| Value::from(id)).collect();
+
+                let selected_filters = filter_repository
+                    .select(&connection, Some(SQLOperator::FieldIn("filter_id", values)))
+                    .unwrap()
+                    .unwrap();
+
+                for selected_filter in selected_filters {
+                    assert!(selected_filter.is_installed);
+                }
+
+                Ok(())
+            })
             .unwrap();
-
-        assert_eq!(result, ids.len());
-
-        let values: Vec<Value> = ids.into_iter().map(|id| Value::from(id)).collect();
-
-        let selected_filters = filter_repository
-            .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
-            .unwrap()
-            .unwrap();
-
-        for selected_filter in selected_filters {
-            assert!(selected_filter.is_installed);
-        }
     }
 }

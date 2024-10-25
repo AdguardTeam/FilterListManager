@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2024-10-25
+
+### Added
+- Db queries are now executed through mutex queue 
+
+[0.8.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.7.2...flm-0.8.1
+
 ## [0.7.2] - 2024-10-10
 
 ### Added

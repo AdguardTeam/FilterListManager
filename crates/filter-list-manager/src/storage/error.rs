@@ -7,15 +7,18 @@ use rusqlite::{Error, ErrorCode};
 #[cfg_attr(test, derive(PartialEq))]
 pub enum DatabaseError {
     /// Cannot open file by the following path
-    #[error("CannotOpen")]
+    #[error("Cannot open database")]
     CannotOpen,
 
     /// File opened that is not a database file
-    #[error("NotADatabase")]
+    #[error("This file is not a database")]
     NotADatabase,
 
+    #[error("Database is busy")]
+    DatabaseBusy,
+
     /// Cannot operate, because disc is full
-    #[error("DiskFull")]
+    #[error("Disk is full")]
     DiskFull,
 
     /// Other error
@@ -30,6 +33,7 @@ impl From<Error> for DatabaseError {
                 ErrorCode::DiskFull => Self::DiskFull,
                 ErrorCode::CannotOpen => Self::CannotOpen,
                 ErrorCode::NotADatabase => Self::NotADatabase,
+                ErrorCode::DatabaseBusy => Self::DatabaseBusy,
                 _ => Self::Other(value.to_string()),
             },
             _ => Self::Other(value.to_string()),

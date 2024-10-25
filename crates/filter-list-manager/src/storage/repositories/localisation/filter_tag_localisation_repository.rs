@@ -17,7 +17,7 @@ impl Repository<FilterTagLocalisationEntity> for FilterTagLocalisationRepository
     fn insert(
         &self,
         transaction: &Transaction<'_>,
-        entities: Vec<FilterTagLocalisationEntity>,
+        entities: &[FilterTagLocalisationEntity],
     ) -> Result<(), Error> {
         let mut statement = transaction.prepare(
             r"

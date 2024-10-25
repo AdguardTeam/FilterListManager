@@ -2,7 +2,7 @@ use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::{FLMError, FLMResult};
 use include_dir::{include_dir, Dir, File};
 use regex::Regex;
-use rusqlite::Connection;
+use rusqlite::Transaction;
 use std::cell::Cell;
 
 /// Regex for matching migration files
@@ -12,26 +12,23 @@ const FILE_MATCHING_REGEX: &str = r"(\d+)-migration.sql";
 const MIGRATIONS_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/resources/sql/migrations");
 
 /// Consistently applies migrations that have not yet been applied to the current database
-pub(super) fn run_migrations(conn: &mut Connection) -> FLMResult<()> {
-    migrations_internal(&MIGRATIONS_DIR, conn)
+pub(super) fn run_migrations(tx: &mut Transaction) -> FLMResult<()> {
+    migrations_internal(&MIGRATIONS_DIR, tx)
 }
 
 /// Runner
 #[inline]
-fn migrations_internal(dir: &Dir, conn: &mut Connection) -> FLMResult<()> {
-    let mut metadata = DBMetadataRepository::read(conn)
+fn migrations_internal(dir: &Dir, tx: &mut Transaction) -> FLMResult<()> {
+    let mut metadata = DBMetadataRepository::read(tx)
         .map_err(FLMError::from_database)?
         .unwrap_or_default();
-
-    let transaction = conn.transaction().map_err(FLMError::from_database)?;
 
     let next_schema_version = Cell::new(metadata.version);
 
     for_each_migration_file(dir, |file_version, file| {
         if file_version > metadata.version {
             if let Some(contents) = file.contents_utf8() {
-                transaction
-                    .execute_batch(contents)
+                tx.execute_batch(contents)
                     .map_err(FLMError::from_database)?;
             }
 
@@ -43,16 +40,14 @@ fn migrations_internal(dir: &Dir, conn: &mut Connection) -> FLMResult<()> {
 
     // No new migrations
     if metadata.version == next_schema_version.get() {
-        transaction.rollback().map_err(FLMError::from_database)?;
-
         return Ok(());
     }
 
     metadata.version = next_schema_version.get();
 
-    DBMetadataRepository::save(&transaction, &metadata).map_err(FLMError::from_database)?;
+    DBMetadataRepository::save(&tx, &metadata).map_err(FLMError::from_database)?;
 
-    transaction.commit().map_err(FLMError::from_database)
+    Ok(())
 }
 
 /// Creates and runs an iterator over migration files
@@ -176,7 +171,9 @@ mod tests {
 
             let dir = Dir::new("", &entries);
 
-            migrations_internal(&dir, &mut conn).unwrap();
+            let mut tx = conn.transaction().unwrap();
+            migrations_internal(&dir, &mut tx).unwrap();
+            tx.commit().unwrap();
 
             // Check new fields
             conn.query_row(
@@ -241,7 +238,9 @@ mod tests {
 
             let dir = Dir::new("", &entries);
 
-            migrations_internal(&dir, &mut conn).unwrap();
+            let mut tx = conn.transaction().unwrap();
+            migrations_internal(&dir, &mut tx).unwrap();
+            tx.commit().unwrap();
 
             // Check fields removal
             conn.query_row(
@@ -289,10 +288,11 @@ mod tests {
     #[test]
     fn test_validate_migrations_syntax() {
         let mut conn = rusqlite::Connection::open_in_memory().unwrap();
+        let mut tx = conn.transaction().unwrap();
         let initial_db = include_str!("../../resources/sql/schema.sql");
 
-        conn.execute_batch(initial_db).unwrap();
+        tx.execute_batch(initial_db).unwrap();
 
-        run_migrations(&mut conn).unwrap();
+        run_migrations(&mut tx).unwrap();
     }
 }

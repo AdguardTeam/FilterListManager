@@ -6,10 +6,16 @@ pub use self::filter_list_type::FilterListType;
 pub use self::locale::Locale;
 use std::cmp::max;
 
-/// Expires value shouldn't be less than this constant
+/// Expires value shouldn't be less than this constant. In seconds
 const MINIMAL_EXPIRES_VALUE: i32 = 3600;
 
-#[derive(Clone)]
+/// Default https?-requests timeout in ms.
+const DEFAULT_REQUEST_TIMEOUT_MS: i32 = 60000;
+
+/// Default `! Expires` value for downloaded filter lists.
+/// Will be used, if value is not set in filter's metadata in seconds
+const DEFAULT_EXPIRES_VALUE_FOR_FILTERS: i32 = 86400;
+
 /// Configuration object
 pub struct Configuration {
     /// Type of filter lists to manage
@@ -87,12 +93,12 @@ impl Default for Configuration {
             filter_list_type: FilterListType::STANDARD,
             working_directory: None,
             locale: "en".to_string(),
-            default_filter_list_expires_period_sec: 86400,
+            default_filter_list_expires_period_sec: DEFAULT_EXPIRES_VALUE_FOR_FILTERS,
             compiler_conditional_constants: None,
             metadata_url: String::new(),
             metadata_locales_url: String::new(),
             encryption_key: None,
-            request_timeout_ms: 15000,
+            request_timeout_ms: DEFAULT_REQUEST_TIMEOUT_MS,
             auto_lift_up_database: true,
         }
     }

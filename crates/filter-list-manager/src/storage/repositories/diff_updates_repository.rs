@@ -64,7 +64,7 @@ impl DiffUpdateRepository {
 impl Repository<DiffUpdateEntity> for DiffUpdateRepository {
     const TABLE_NAME: &'static str = "[diff_updates]";
 
-    fn insert(&self, conn: &Transaction<'_>, entities: Vec<DiffUpdateEntity>) -> Result<(), Error> {
+    fn insert(&self, conn: &Transaction<'_>, entities: &[DiffUpdateEntity]) -> Result<(), Error> {
         let mut statements = conn.prepare(
             r"
             INSERT OR REPLACE INTO

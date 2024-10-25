@@ -10,9 +10,8 @@ use crate::storage::repositories::filter_group_repository::FilterGroupRepository
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
 use crate::storage::repositories::Repository;
-use crate::storage::with_transaction;
-use crate::{FLMError, FLMResult, FilterId};
-use rusqlite::{Connection, Transaction};
+use crate::FilterId;
+use rusqlite::Transaction;
 
 /// Returns the filter identifier added by default when the base is bootstrapped.
 pub(crate) fn get_bootstrapped_filter_id() -> FilterId {
@@ -58,22 +57,15 @@ fn create_db_metadata() -> DBMetadataEntity {
 }
 
 /// Makes specific queries to an empty database with a schema
-pub fn db_bootstrap(conn: &mut Connection) -> FLMResult<()> {
+pub(crate) fn db_bootstrap(transaction: &mut Transaction) -> rusqlite::Result<()> {
     let filter_entity = make_user_rules_filter_entity();
     let rule_entity = create_user_rules_rules_list_entity();
     let custom_group = create_group_entity_for_custom_filters();
     let metadata_entity = create_db_metadata();
 
-    with_transaction(conn, move |transaction: &Transaction| {
-        DBMetadataRepository::save(&transaction, &metadata_entity)?;
+    DBMetadataRepository::save(transaction, &metadata_entity)?;
 
-        FilterRepository::new().insert(&transaction, vec![filter_entity])?;
-
-        RulesListRepository::new().insert(&transaction, vec![rule_entity])?;
-
-        FilterGroupRepository::new().insert(&transaction, vec![custom_group])?;
-
-        Ok(())
-    })
-    .map_err(FLMError::from_database)
+    FilterRepository::new().insert(transaction, &[filter_entity])?;
+    RulesListRepository::new().insert(transaction, &[rule_entity])?;
+    FilterGroupRepository::new().insert(transaction, &[custom_group])
 }

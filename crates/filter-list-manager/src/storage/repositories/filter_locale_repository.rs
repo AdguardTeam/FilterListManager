@@ -62,7 +62,7 @@ impl Repository<FilterLocaleEntity> for FilterLocaleRepository {
     fn insert(
         &self,
         transaction: &Transaction<'_>,
-        entities: Vec<FilterLocaleEntity>,
+        entities: &[FilterLocaleEntity],
     ) -> Result<(), Error> {
         let mut statement = transaction.prepare(
             r"

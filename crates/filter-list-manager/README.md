@@ -124,8 +124,12 @@ The method “raises” the state of the database to the working state.
 Starting with version `0.7.1` the database is “uplifted” automatically when the filter_list_manager constructor is called. 
 To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.
 
-**IMPORTANT NOTE:**
+#### Storage notes. Important
+**Database lifting**\
 If you have disabled automatic lifting, you must invoke it yourself after each library update if you don't want to miss a migration.
+
+**`SQLITE_BUSY` Error**\
+The library ensures that when using a single [FLM](./src/manager/filter_list_manager_impl.rs) instance for a single database file (also, by default, a [database type](./src/manager/models/configuration/filter_list_type.rs)) in a multithreaded environment, database queries will not return [SQLITE_BUSY](https://www.sqlite.org/rescode.html#busy) errors.
 ---
 
 ### Operations with custom filters

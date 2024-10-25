@@ -107,7 +107,7 @@ impl Repository<FilterLocalisationEntity> for FilterLocalisationRepository {
     fn insert(
         &self,
         transaction: &Transaction<'_>,
-        entities: Vec<FilterLocalisationEntity>,
+        entities: &[FilterLocalisationEntity],
     ) -> rusqlite::Result<()> {
         let mut statement = transaction.prepare(
             r"

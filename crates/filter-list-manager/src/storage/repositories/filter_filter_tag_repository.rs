@@ -21,7 +21,7 @@ impl Repository<FilterFilterTagEntity> for FilterFilterTagRepository {
     fn insert(
         &self,
         transaction: &Transaction,
-        entities: Vec<FilterFilterTagEntity>,
+        entities: &[FilterFilterTagEntity],
     ) -> Result<(), rusqlite::Error> {
         let mut statement = transaction.prepare(
             r"

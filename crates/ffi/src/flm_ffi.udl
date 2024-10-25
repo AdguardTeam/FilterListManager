@@ -133,6 +133,7 @@ enum AGOuterError {
     "CannotOpenDatabase",
     "NotADatabase",
     "DiskFull",
+    "DatabaseBusy",
     "EntityNotFound",
     "PathNotFound",
     "PathHasDeniedPermission",

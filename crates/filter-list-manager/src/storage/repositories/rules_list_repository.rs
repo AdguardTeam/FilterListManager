@@ -33,7 +33,7 @@ impl RulesListRepository {
     pub(crate) fn insert_row(&self, conn: &mut Connection, entity: RulesListEntity) -> Result<()> {
         let transaction = conn.transaction()?;
 
-        self.insert(&transaction, vec![entity])
+        self.insert(&transaction, &[entity])
             .and_then(|_| transaction.commit())
     }
 
@@ -133,7 +133,7 @@ impl BulkDeleteRepository<RulesListEntity, FilterId> for RulesListRepository {
 impl Repository<RulesListEntity> for RulesListRepository {
     const TABLE_NAME: &'static str = "[rules_list]";
 
-    fn insert(&self, conn: &Transaction<'_>, entities: Vec<RulesListEntity>) -> Result<(), Error> {
+    fn insert(&self, conn: &Transaction<'_>, entities: &[RulesListEntity]) -> Result<(), Error> {
         let mut statement = conn.prepare(
             r"
                 INSERT OR REPLACE INTO
