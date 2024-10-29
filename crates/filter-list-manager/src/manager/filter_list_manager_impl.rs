@@ -13,6 +13,7 @@ use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::update_filters_action::update_filters_action;
+use crate::storage::blob::write_to_stream;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
 use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
@@ -23,6 +24,7 @@ use crate::storage::spawn_transaction;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::DbConnectionManager;
 use crate::utils::memory::heap;
+use crate::utils::parsing::LF_BYTES_SLICE;
 use crate::{
     filters::parser::metadata::parsers::expires::process_expires,
     filters::parser::metadata::KnownMetadataProperty,
@@ -38,7 +40,11 @@ use crate::{
 };
 use chrono::{DateTime, ParseError, Utc};
 use rusqlite::types::Value;
-use rusqlite::{Connection, Transaction};
+use rusqlite::{Connection, Error, Transaction};
+use std::collections::HashSet;
+use std::fs;
+use std::fs::OpenOptions;
+use std::path::Path;
 use std::str::FromStr;
 
 /// Default implementation for [`FilterListManager`]
@@ -741,6 +747,48 @@ impl FilterListManager for FilterListManagerImpl {
             .map(Into::into)
             .collect())
     }
+
+    fn save_rules_to_file_blob<P: AsRef<Path>>(
+        &self,
+        filter_id: FilterId,
+        file_path: P,
+    ) -> FLMResult<()> {
+        let file_already_exists = fs::metadata(&file_path).is_ok();
+
+        let mut handler = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .open(&file_path)
+            .map_err(FLMError::from_io)?;
+
+        self.connection_manager
+            .execute_db(|connection: Connection| {
+                let rules_repository = RulesListRepository::new();
+                let (disabled_rules, blob) = rules_repository
+                    .get_blob_handle_and_disabled_rules(&connection, filter_id)
+                    .map_err(|why| match why {
+                        Error::QueryReturnedNoRows => FLMError::EntityNotFound(filter_id),
+                        err => FLMError::from_database(err),
+                    })?;
+
+                let disabled_rules_set = disabled_rules
+                    .split(|i| i == &LF_BYTES_SLICE)
+                    .map(|value| value.to_vec())
+                    .collect::<HashSet<Vec<u8>>>();
+
+                write_to_stream(&mut handler, blob, disabled_rules_set)?;
+
+                Ok(())
+            })
+            .map_err(|why| {
+                drop(handler);
+                if !file_already_exists {
+                    fs::remove_file(&file_path).unwrap_or(());
+                }
+
+                why
+            })
+    }
 }
 
 #[cfg(test)]
@@ -761,9 +809,10 @@ mod tests {
     use rand::prelude::SliceRandom;
     use rand::thread_rng;
     use rusqlite::Connection;
-    use std::fs;
+    use std::fs::File;
     use std::ops::Sub;
     use std::time::{SystemTime, UNIX_EPOCH};
+    use std::{env, fs};
 
     #[test]
     fn test_insert_custom_filter() {
@@ -1312,5 +1361,51 @@ mod tests {
             .iter()
             .find(|rules| rules.filter_id == NONEXISTENT_ID)
             .is_none())
+    }
+
+    #[test]
+    fn test_save_rules_to_file_blob() {
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let mut path = env::current_dir().unwrap();
+        path.push("fixtures");
+        path.push(format!(
+            "test_filter_rules_{}.txt",
+            Utc::now().timestamp_micros()
+        ));
+
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
+        {
+            File::create(&path).unwrap();
+        }
+
+        let rules = FilterListRules {
+            filter_id: USER_RULES_FILTER_LIST_ID,
+            rules: vec![
+                String::from("first"),
+                String::from("second"),
+                String::from("third"),
+                String::from("fourth"),
+                String::from("fifth"),
+            ],
+            disabled_rules: vec![
+                String::from("second"),
+                String::from("fourth"),
+                String::from("second"),
+            ],
+        };
+
+        flm.save_custom_filter_rules(rules).unwrap();
+
+        flm.save_rules_to_file_blob(USER_RULES_FILTER_LIST_ID, &path)
+            .unwrap();
+
+        let test_string = fs::read_to_string(&path).unwrap();
+        fs::remove_file(&path).unwrap();
+
+        assert_eq!(test_string.as_str(), "first\nthird\nfifth");
     }
 }

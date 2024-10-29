@@ -78,3 +78,9 @@ impl FLMError {
         Self::ParseFilterError(error)
     }
 }
+
+impl From<rusqlite::Error> for FLMError {
+    fn from(value: rusqlite::Error) -> Self {
+        Self::from_database(value)
+    }
+}

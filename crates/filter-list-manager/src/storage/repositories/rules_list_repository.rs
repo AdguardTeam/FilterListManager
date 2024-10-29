@@ -1,12 +1,13 @@
 use crate::manager::models::FilterId;
+use crate::storage::blob::BlobHandleImpl;
 use crate::storage::entities::rules_list_entity::RulesListEntity;
 use crate::storage::repositories::{BulkDeleteRepository, Repository};
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::utils::{build_in_clause, process_where_clause};
-use rusqlite::Result;
 use rusqlite::{
     named_params, params_from_iter, Connection, Error, OptionalExtension, Row, Transaction,
 };
+use rusqlite::{DatabaseName, Result};
 use std::collections::HashMap;
 
 pub(crate) type MapFilterIdOnRulesList = HashMap<FilterId, RulesListEntity>;
@@ -124,6 +125,38 @@ impl RulesListRepository {
             disabled_text: row.get(2)?,
         })
     }
+
+    pub(crate) fn get_blob_handle_and_disabled_rules<'a>(
+        &'a self,
+        connection: &'a Connection,
+        filter_id: FilterId,
+    ) -> Result<(Vec<u8>, BlobHandleImpl)> {
+        let mut statement = connection.prepare(
+            r"
+            SELECT
+                rowid,
+                CAST(disabled_rules_text AS BLOB)
+            FROM
+                [rules_list]
+            WHERE
+                filter_id = ?
+        ",
+        )?;
+
+        let (row_id, disabled_rules) = statement.query_row([filter_id], |row| {
+            Ok((row.get::<usize, i64>(0)?, row.get::<usize, Vec<u8>>(1)?))
+        })?;
+
+        let blob = connection.blob_open(
+            DatabaseName::Main,
+            Self::TABLE_NAME,
+            "rules_text",
+            row_id,
+            true,
+        )?;
+
+        Ok((disabled_rules, BlobHandleImpl::new(blob)))
+    }
 }
 
 impl BulkDeleteRepository<RulesListEntity, FilterId> for RulesListRepository {
@@ -131,7 +164,7 @@ impl BulkDeleteRepository<RulesListEntity, FilterId> for RulesListRepository {
 }
 
 impl Repository<RulesListEntity> for RulesListRepository {
-    const TABLE_NAME: &'static str = "[rules_list]";
+    const TABLE_NAME: &'static str = "rules_list";
 
     fn insert(&self, conn: &Transaction<'_>, entities: &[RulesListEntity]) -> Result<(), Error> {
         let mut statement = conn.prepare(

@@ -190,7 +190,7 @@ flm.install_custom_filter_from_string(
 
 [constants]: ./crates/filter-list-manager/src/storage/constants.rs
 
-#### Operations with custom filters rules
+#### Save operations for custom filters rules
 
 ```rust
 // Saves the structure containing the filter rules.
@@ -231,6 +231,11 @@ flm.get_stored_filter_metadata_by_id(id /* FilterId */);
 // Retrieves a list of FilterListRulesRaw by IDs.
 // This method acts in the same way as the `IN` database operator. Only found entities will be returned
 flm.get_filter_rules_as_strings(ids /* Vec<FilterId> */);
+
+// Reads the rule list for a specific filter in chunks, applying exceptions from the disabled_rules list on the fly.
+// The default size of the read buffer is 1 megabyte. But this size can be exceeded if a longer string appears in the list of filter rules.
+// The main purpose of this method is to reduce RAM consumption when reading large size filters.
+flm.save_rules_to_file_blob(id /* FilterId */, file_path: /* String or AsRef<Path> */);
 ```
 
 #### Example references

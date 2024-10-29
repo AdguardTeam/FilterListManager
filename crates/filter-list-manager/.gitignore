@@ -1,1 +1,2 @@
-fixtures/nonexistent_directory
+fixtures/*
+!fixtures/.gitkeep

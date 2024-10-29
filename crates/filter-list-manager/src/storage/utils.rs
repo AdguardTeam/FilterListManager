@@ -15,7 +15,7 @@ pub(super) fn build_in_clause(placeholders_count: usize) -> String {
     if placeholders_count == 0 {
         // Special hack for empty IN list.
         // If you have an empty vector of entities, this shouldn't match *all entries*.
-        // This must much *no entries*
+        // This must match *no entries*
         return String::from(" AND 1 == 2");
     }
 

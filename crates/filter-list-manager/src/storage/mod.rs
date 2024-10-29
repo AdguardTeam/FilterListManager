@@ -3,6 +3,7 @@
 use crate::{FLMError, FLMResult};
 use rusqlite::{Connection, Transaction};
 
+pub(crate) mod blob;
 pub mod constants;
 pub(crate) mod database_status;
 pub(crate) mod db_bootstrap;
