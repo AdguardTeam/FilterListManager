@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.8.3] - 2024-10-29
+
+### Added
+- Method `save_rules_to_file_blob` for incremental writing filter rules to file
+
+[0.8.3]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.2...ffi-0.8.3
+
 ## [0.8.2] - 2024-10-25
 
 ### Changed
@@ -11,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Change mutexes at ffi to r/w lock, which w locks only for change_locale
 
 ### Added
-- DatabaseBusy` error code
+- `DatabaseBusy` error code
 
 [0.8.2]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.7.7...ffi-0.8.2
 

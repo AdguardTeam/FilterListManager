@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.2] - 2024-10-30
+## [0.8.2] - 2024-10-29
 
 ### Added
 - Method `save_rules_to_file_blob` implements SQLite incremental I/O API and makes _difference_ from disabled_rules on the fly 

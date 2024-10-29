@@ -224,4 +224,7 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     sequence<FilterListRulesRaw> get_filter_rules_as_strings(sequence<i64> ids);
+
+    [Throws=AGOuterError]
+    void save_rules_to_file_blob(i64 filter_id, string file_path);
 };

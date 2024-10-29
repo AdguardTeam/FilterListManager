@@ -188,6 +188,10 @@ impl FilterListManager {
     ) -> AGResult<Vec<FilterListRulesRaw>> {
         self.wrap(move |flm| flm.get_filter_rules_as_strings(ids))
     }
+
+    pub fn save_rules_to_file_blob(&self, filter_id: FilterId, file_path: String) -> AGResult<()> {
+        self.wrap(move |flm| flm.save_rules_to_file_blob(filter_id, file_path))
+    }
 }
 
 impl FilterListManager {
