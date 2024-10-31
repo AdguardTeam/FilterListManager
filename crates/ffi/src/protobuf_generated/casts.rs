@@ -108,6 +108,13 @@ impl From<AGOuterError> for filter_list_manager::AgOuterError {
                 )),
                 message,
             },
+
+            AGOuterError::DatabaseBusy => Self {
+                message,
+                error: Some(crate::protobuf_generated::filter_list_manager::ag_outer_error::Error::DatabaseBusy(
+                    filter_list_manager::DatabaseBusy {}
+                )),
+            },
             AGOuterError::TimedOut(message) => Self {
                 error: Some(crate::protobuf_generated::filter_list_manager::ag_outer_error::Error::TimedOut(
                     filter_list_manager::TimedOut {},

@@ -5,7 +5,7 @@ pub struct AgOuterError {
     pub message: ::prost::alloc::string::String,
     #[prost(
         oneof = "ag_outer_error::Error",
-        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17"
+        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18"
     )]
     pub error: ::core::option::Option<ag_outer_error::Error>,
 }
@@ -18,32 +18,34 @@ pub mod ag_outer_error {
         #[prost(message, tag = "3")]
         NotADatabase(super::NotADatabase),
         #[prost(message, tag = "4")]
-        DiskFull(super::DiskFull),
+        DatabaseBusy(super::DatabaseBusy),
         #[prost(message, tag = "5")]
-        EntityNotFound(super::EntityNotFound),
+        DiskFull(super::DiskFull),
         #[prost(message, tag = "6")]
-        PathNotFound(super::PathNotFound),
+        EntityNotFound(super::EntityNotFound),
         #[prost(message, tag = "7")]
-        PathHasDeniedPermission(super::PathHasDeniedPermission),
+        PathNotFound(super::PathNotFound),
         #[prost(message, tag = "8")]
-        PathAlreadyExists(super::PathAlreadyExists),
+        PathHasDeniedPermission(super::PathHasDeniedPermission),
         #[prost(message, tag = "9")]
-        TimedOut(super::TimedOut),
+        PathAlreadyExists(super::PathAlreadyExists),
         #[prost(message, tag = "10")]
-        HttpClientNetworkError(super::HttpClientNetworkError),
+        TimedOut(super::TimedOut),
         #[prost(message, tag = "11")]
-        HttpStrict200Response(super::HttpStrict200Response),
+        HttpClientNetworkError(super::HttpClientNetworkError),
         #[prost(message, tag = "12")]
-        HttpClientBodyRecoveryFailed(super::HttpClientBodyRecoveryFailed),
+        HttpStrict200Response(super::HttpStrict200Response),
         #[prost(message, tag = "13")]
-        FilterContentIsLikelyNotAFilter(super::FilterContentIsLikelyNotAFilter),
+        HttpClientBodyRecoveryFailed(super::HttpClientBodyRecoveryFailed),
         #[prost(message, tag = "14")]
-        FilterParserError(super::FilterParserError),
+        FilterContentIsLikelyNotAFilter(super::FilterContentIsLikelyNotAFilter),
         #[prost(message, tag = "15")]
-        FieldIsEmpty(super::FieldIsEmpty),
+        FilterParserError(super::FilterParserError),
         #[prost(message, tag = "16")]
-        Mutex(super::Mutex),
+        FieldIsEmpty(super::FieldIsEmpty),
         #[prost(message, tag = "17")]
+        Mutex(super::Mutex),
+        #[prost(message, tag = "18")]
         Other(super::Other),
     }
 }
@@ -53,6 +55,8 @@ pub struct CannotOpenDatabase {}
 pub struct NotADatabase {}
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct DiskFull {}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct DatabaseBusy {}
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct EntityNotFound {
     #[prost(int64, tag = "1")]
