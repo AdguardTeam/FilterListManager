@@ -99,7 +99,7 @@ impl FilterTagRepository {
 impl Repository<FilterTagEntity> for FilterTagRepository {
     const TABLE_NAME: &'static str = "[filter_tag]";
 
-    fn insert(&self, conn: &Transaction, entities: Vec<FilterTagEntity>) -> Result<(), Error> {
+    fn insert(&self, conn: &Transaction, entities: &[FilterTagEntity]) -> Result<(), Error> {
         let mut statement = conn.prepare(
             r"
             INSERT OR REPLACE INTO

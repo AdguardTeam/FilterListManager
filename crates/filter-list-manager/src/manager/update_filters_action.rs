@@ -16,10 +16,13 @@ use crate::storage::repositories::rules_list_repository::{
     MapFilterIdOnRulesString, RulesListRepository,
 };
 use crate::storage::repositories::Repository;
+use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::with_transaction;
+use crate::storage::DbConnectionManager;
 use crate::utils::memory::heap;
 use crate::{Configuration, FLMError, FLMResult, FilterId, FilterParserError};
 use chrono::{DateTime, ParseError, Utc};
+use rusqlite::types::Value;
 use rusqlite::{Connection, Transaction};
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -30,7 +33,7 @@ use std::time::Instant;
 /// Tries to update passed filters
 pub(super) fn update_filters_action(
     records: Vec<FilterEntity>,
-    mut conn: Connection,
+    db_connection_manager: &DbConnectionManager,
     ignore_filters_expiration: bool,
     ignore_filters_status: bool,
     loose_timeout: i32,
@@ -60,20 +63,32 @@ pub(super) fn update_filters_action(
         .map(|filter| filter.filter_id.unwrap())
         .collect::<Vec<FilterId>>();
 
-    let mut diff_updates_map = DiffUpdateRepository::new()
-        .select_map(&conn, &filter_ids)
-        .map_err(FLMError::from_database)?;
+    let (mut diff_updates_map, mut rules_map) =
+        db_connection_manager.execute_db(|conn: Connection| {
+            let diff_updates_map = DiffUpdateRepository::new()
+                .select_map(&conn, &filter_ids)
+                .map_err(FLMError::from_database)?;
 
-    let filter_ids_for_diff_updates = diff_updates_map.keys().cloned().collect::<Vec<FilterId>>();
-    let mut rules_map = rule_list_repository
-        .select_rules_string_map(&conn, &filter_ids_for_diff_updates)
-        .map_err(FLMError::from_database)?;
+            let filter_ids_for_diff_updates =
+                diff_updates_map.keys().cloned().collect::<Vec<FilterId>>();
+
+            let rules_map = rule_list_repository
+                .select_rules_string_map(&conn, &filter_ids_for_diff_updates)
+                .map_err(FLMError::from_database)?;
+
+            Ok((diff_updates_map, rules_map))
+        })?;
     // endregion
 
+    // Parsers with successful filter downloads
+    let mut successful_parsers_with_result: Vec<(FilterId, FilterParser)> =
+        Vec::with_capacity(filter_entities.len() / 2);
+
+    // Put here processed_filters
     let mut diff_path_entities: Vec<DiffUpdateEntity> = vec![];
     let rows_count = records.len();
     let batch_patches_container = BatchPatchesContainer::factory();
-    for (index, mut filter) in records.into_iter().enumerate() {
+    for (index, filter) in records.into_iter().enumerate() {
         if !ignore_filters_status && !filter.is_enabled {
             continue;
         }
@@ -137,52 +152,7 @@ pub(super) fn update_filters_action(
             continue;
         }
 
-        let expires = match parser.get_metadata(KnownMetadataProperty::Expires) {
-            value if value.is_empty() => 0i32,
-            value => process_expires(value.as_str()),
-        };
-
-        let diff_path = parser.get_metadata(KnownMetadataProperty::DiffPath);
-        if !diff_path.is_empty() {
-            match process_diff_path(filter_id, diff_path) {
-                Ok(Some(entity)) => diff_path_entities.push(entity),
-                Err(why) => update_result.filters_errors.push(UpdateFilterError {
-                    filter_id,
-                    message: why.to_string(),
-                }),
-                _ => {}
-            }
-        }
-
-        filter.expires = expires;
-        filter.last_download_time = current_time;
-
-        // Do not change (description and title) for custom filters,
-        // 'cause user may set this info manually
-        // So we don't need change these values for registry filters
-
-        filter.last_update_time = match parser
-            .get_metadata(KnownMetadataProperty::TimeUpdated)
-            .as_str()
-        {
-            time_slice if time_slice.len() > 0 => DateTime::from_str(time_slice)
-                .unwrap_or_else(|_: ParseError| Utc::now())
-                .timestamp(),
-
-            _ => Utc::now().timestamp(),
-        };
-
-        // Should update `parsed info` only for custom filters
-        if filter.is_custom() {
-            filter.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
-        }
-
-        filter.version = parser.get_metadata(KnownMetadataProperty::Version);
-        filter.license = parser.get_metadata(KnownMetadataProperty::License);
-        filter.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
-
-        filter_entities.push(filter);
-        rule_entities.push(parser.extract_rule_entity(filter_id));
+        successful_parsers_with_result.push((filter_id, parser));
 
         if is_use_timeout && start_time.elapsed().as_secs() > loose_timeout as u64 {
             // Set count of unprocessed filters
@@ -191,28 +161,100 @@ pub(super) fn update_filters_action(
         }
     }
 
-    // @TODO: Remove these allocations
-    let inserted_filters = filter_entities.clone();
-    let inserted_rules = rule_entities.clone();
+    let successful_filter_ids = successful_parsers_with_result
+        .iter()
+        .map(|entity| entity.0.into())
+        .collect::<Vec<Value>>();
 
-    with_transaction(&mut conn, |transaction: &Transaction| {
-        filter_repository.insert(transaction, inserted_filters)?;
-        diff_updates_repository.insert(transaction, diff_path_entities)?;
-        rule_list_repository.insert(transaction, inserted_rules)
-    })
-    .map_err(FLMError::from_database)?;
+    update_result.updated_list = db_connection_manager.execute_db(|mut conn: Connection| {
+        // Retrieve filters once again, cuz properties may have changed
+        let mut new_filters_map = filter_repository
+            .select_mapped(
+                &conn,
+                Some(SQLOperator::FieldIn("filter_id", successful_filter_ids)),
+            )
+            .map_err(FLMError::from_database)?;
 
-    let rules_map = rule_entities
-        .into_iter()
-        .fold(HashMap::new(), |mut acc, rule| {
-            acc.insert(rule.filter_id, rule);
-            acc
-        });
+        // Gets from db second time, because filters may have changes
+        for (filter_id, mut parser) in successful_parsers_with_result {
+            let Some(mut filter) = new_filters_map.remove(&filter_id) else {
+                update_result.filters_errors.push(UpdateFilterError {
+                    filter_id,
+                    message: format!(
+                        "Filter with id: {} is gone from database while updating",
+                        filter_id
+                    ),
+                });
 
-    let mut builder = FullFilterListBuilder::new(&configuration.locale);
-    builder.set_rules_map(rules_map);
+                continue;
+            };
 
-    update_result.updated_list = builder.build_full_filter_lists(conn, filter_entities)?;
+            let expires = match parser.get_metadata(KnownMetadataProperty::Expires) {
+                value if value.is_empty() => 0i32,
+                value => process_expires(value.as_str()),
+            };
+
+            let diff_path = parser.get_metadata(KnownMetadataProperty::DiffPath);
+            if !diff_path.is_empty() {
+                match process_diff_path(filter_id, diff_path) {
+                    Ok(Some(entity)) => diff_path_entities.push(entity),
+                    Err(why) => update_result.filters_errors.push(UpdateFilterError {
+                        filter_id,
+                        message: why.to_string(),
+                    }),
+                    _ => {}
+                }
+            }
+
+            filter.expires = expires;
+            filter.last_download_time = current_time;
+
+            // Do not change (description and title) for custom filters,
+            // 'cause user may set this info manually
+            // So we don't need change these values for registry filters
+
+            filter.last_update_time = match parser
+                .get_metadata(KnownMetadataProperty::TimeUpdated)
+                .as_str()
+            {
+                time_slice if time_slice.len() > 0 => DateTime::from_str(time_slice)
+                    .unwrap_or_else(|_: ParseError| Utc::now())
+                    .timestamp(),
+
+                _ => Utc::now().timestamp(),
+            };
+
+            // Should update `parsed info` only for custom filters
+            if filter.is_custom() {
+                filter.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
+            }
+
+            filter.version = parser.get_metadata(KnownMetadataProperty::Version);
+            filter.license = parser.get_metadata(KnownMetadataProperty::License);
+            filter.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
+
+            filter_entities.push(filter);
+            rule_entities.push(parser.extract_rule_entity(filter_id));
+        }
+
+        with_transaction(&mut conn, |transaction: &Transaction| {
+            filter_repository.insert(transaction, &filter_entities)?;
+            diff_updates_repository.insert(transaction, &diff_path_entities)?;
+            rule_list_repository.insert(transaction, &rule_entities)
+        })?;
+
+        let rules_map = rule_entities
+            .into_iter()
+            .fold(HashMap::new(), |mut acc, rule| {
+                acc.insert(rule.filter_id, rule);
+                acc
+            });
+
+        let mut builder = FullFilterListBuilder::new(&configuration.locale);
+        builder.set_rules_map(rules_map);
+
+        builder.build_full_filter_lists(conn, filter_entities)
+    })?;
 
     Ok(update_result)
 }

@@ -15,7 +15,7 @@ pub(crate) mod rules_list_repository;
 pub(crate) trait Repository<Entity> {
     const TABLE_NAME: &'static str;
 
-    fn insert(&self, conn: &Transaction<'_>, entities: Vec<Entity>) -> Result<(), rusqlite::Error>;
+    fn insert(&self, conn: &Transaction<'_>, entities: &[Entity]) -> Result<(), rusqlite::Error>;
 
     fn clear(&self, transaction: &Transaction) -> rusqlite::Result<()> {
         let mut statement =
@@ -54,21 +54,28 @@ mod tests {
     use crate::storage::repositories::filter_repository::FilterRepository;
     use crate::storage::repositories::{BulkDeleteRepository, Repository};
     use crate::storage::with_transaction;
+    use crate::storage::DbConnectionManager;
     use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
     use crate::FilterId;
-    use rusqlite::Transaction;
+    use rusqlite::{Connection, Transaction};
 
     #[test]
     fn test_bulk_delete_filters() {
         do_with_tests_helper(|mut helper| helper.increment_postfix());
 
-        let (_, mut conn, index_filters) = spawn_test_db_with_metadata();
+        let source = DbConnectionManager::factory_test().unwrap();
+        let (_, index_filters) = spawn_test_db_with_metadata(&source);
         let filter_repository = FilterRepository::new();
-        let original_len = filter_repository
-            .select(&conn, None)
-            .unwrap()
-            .unwrap()
-            .len();
+
+        let original_len = source
+            .execute_db(|connection: Connection| {
+                Ok(filter_repository
+                    .select(&connection, None)
+                    .unwrap()
+                    .unwrap()
+                    .len())
+            })
+            .unwrap();
 
         let delete_count: usize = 5;
 
@@ -78,17 +85,23 @@ mod tests {
             .map(|f| f.filter_id.unwrap())
             .collect();
 
-        let deleted_size = with_transaction(&mut conn, |transaction: &Transaction| {
-            Ok(filter_repository.bulk_delete(&transaction, &ids))
-        })
-        .unwrap()
-        .unwrap();
+        let (deleted_size, new_filters_count) = source
+            .execute_db(|mut connection: Connection| {
+                let deleted_size =
+                    with_transaction(&mut connection, |transaction: &Transaction| {
+                        Ok(filter_repository.bulk_delete(&transaction, &ids))
+                    })
+                    .unwrap()
+                    .unwrap();
 
-        let new_filters_count = filter_repository
-            .select(&conn, None)
-            .unwrap()
-            .unwrap()
-            .len();
+                let new_filters_count = filter_repository
+                    .select(&connection, None)
+                    .unwrap()
+                    .unwrap()
+                    .len();
+                Ok((deleted_size, new_filters_count))
+            })
+            .unwrap();
 
         assert_eq!(deleted_size, delete_count);
         assert_eq!(new_filters_count, original_len - delete_count)
@@ -98,18 +111,29 @@ mod tests {
     fn test_clear_table() {
         do_with_tests_helper(|mut helper| helper.increment_postfix());
 
-        let (_, mut conn, _) = spawn_test_db_with_metadata();
+        let source = DbConnectionManager::factory_test().unwrap();
+        let _ = spawn_test_db_with_metadata(&source);
         let locale_repository = FilterLocaleRepository::new();
-        let original_len = locale_repository.select_mapped(&conn).unwrap().len();
 
-        assert_ne!(original_len, 0);
+        source
+            .execute_db(|mut connection: Connection| {
+                let original_len = locale_repository.select_mapped(&connection).unwrap().len();
 
-        with_transaction(&mut conn, |transaction: &Transaction| {
-            Ok(locale_repository.clear(&transaction))
-        })
-        .unwrap()
-        .unwrap();
+                assert_ne!(original_len, 0);
 
-        assert_eq!(locale_repository.select_mapped(&conn).unwrap().len(), 0);
+                with_transaction(&mut connection, |transaction: &Transaction| {
+                    Ok(locale_repository.clear(&transaction))
+                })
+                .unwrap()
+                .unwrap();
+
+                assert_eq!(
+                    locale_repository.select_mapped(&connection).unwrap().len(),
+                    0
+                );
+
+                Ok(())
+            })
+            .unwrap()
     }
 }

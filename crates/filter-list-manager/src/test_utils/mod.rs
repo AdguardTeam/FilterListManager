@@ -7,11 +7,10 @@ use std::sync::{Mutex, MutexGuard, Once};
 use tests_db::TestsDb;
 
 use crate::filters::indexes::indexes_processor::IndexesProcessor;
-use crate::storage::connect;
-use crate::storage::database_path_holder::DatabasePathHolder;
-use crate::storage::database_status::lift_up_database;
 use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::repositories::filter_repository::FilterRepository;
+use crate::storage::DbConnectionManager;
+use crate::FLMError;
 use libc::atexit;
 use rusqlite::Connection;
 
@@ -40,25 +39,28 @@ pub extern "C" fn tear_down() {
 }
 
 /// Lifts database, then fills it with metadata fixtures
-pub(crate) fn spawn_test_db_with_metadata() -> (IndexesProcessor, Connection, Vec<FilterEntity>) {
-    let connection_source = DatabasePathHolder::factory_test().unwrap();
+pub(crate) fn spawn_test_db_with_metadata(
+    connection_source: &DbConnectionManager,
+) -> (IndexesProcessor, Vec<FilterEntity>) {
     let (index, index_i18n) = indexes_fixtures::build_filters_indices_fixtures().unwrap();
 
     let mut indexes_processor =
-        IndexesProcessor::factory_test(connection_source.clone(), index, index_i18n);
+        IndexesProcessor::factory_test(connection_source, index, index_i18n);
 
-    lift_up_database(&connection_source).unwrap();
+    unsafe { connection_source.lift_up_database().unwrap() }
 
-    indexes_processor.fill_empty_db().unwrap();
+    let inserted_filters = connection_source
+        .execute_db(|mut connection: Connection| {
+            indexes_processor.fill_empty_db(&mut connection).unwrap();
 
-    let conn = connect(connection_source.get_calculated_path()).unwrap();
-
-    let inserted_filters = FilterRepository::new()
-        .select_filters_except_bootstrapped(&conn)
+            FilterRepository::new()
+                .select_filters_except_bootstrapped(&connection)
+                .map_err(FLMError::from_database)
+        })
         .unwrap()
         .unwrap();
 
-    (indexes_processor, conn, inserted_filters)
+    (indexes_processor, inserted_filters)
 }
 
 /// Helper for test database naming

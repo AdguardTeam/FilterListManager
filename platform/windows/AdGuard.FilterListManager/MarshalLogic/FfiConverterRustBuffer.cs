@@ -1,6 +1,6 @@
 namespace AdGuard.FilterListManager.MarshalLogic
 {
-    internal abstract class FfiConverterRustBuffer<CsType> : FfiConverter<CsType, RustBuffer>
+    public abstract class FfiConverterRustBuffer<CsType> : FfiConverter<CsType, RustBuffer>
     {
         public override CsType Lift(RustBuffer value)
         {

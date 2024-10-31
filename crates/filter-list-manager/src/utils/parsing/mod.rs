@@ -1,6 +1,9 @@
 use nom::bytes::complete::take_while;
 use nom::IResult;
 
+/// Line feed 0xA character
+pub(crate) const LF_BYTES_SLICE: u8 = b'\n';
+
 /// Is space allowed for parsing
 pub(crate) fn is_allowed_space(c: char) -> bool {
     match c {

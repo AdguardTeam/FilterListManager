@@ -2,6 +2,7 @@ use crate::manager::models::FilterId;
 use crate::CUSTOM_FILTERS_GROUP_ID;
 
 #[derive(Clone)]
+#[cfg_attr(test, derive(Debug))]
 pub(crate) struct FilterEntity {
     pub filter_id: Option<FilterId>,
     pub title: String,

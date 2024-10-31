@@ -124,8 +124,12 @@ The method “raises” the state of the database to the working state.
 Starting with version `0.7.1` the database is “uplifted” automatically when the filter_list_manager constructor is called. 
 To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.
 
-**IMPORTANT NOTE:**
+#### Storage notes. Important
+**Database lifting**\
 If you have disabled automatic lifting, you must invoke it yourself after each library update if you don't want to miss a migration.
+
+**`SQLITE_BUSY` Error**\
+The library ensures that when using a single [FLM](./src/manager/filter_list_manager_impl.rs) instance for a single database file (also, by default, a [database type](./src/manager/models/configuration/filter_list_type.rs)) in a multithreaded environment, database queries will not return [SQLITE_BUSY](https://www.sqlite.org/rescode.html#busy) errors.
 ---
 
 ### Operations with custom filters
@@ -186,7 +190,7 @@ flm.install_custom_filter_from_string(
 
 [constants]: ./crates/filter-list-manager/src/storage/constants.rs
 
-#### Operations with custom filters rules
+#### Save operations for custom filters rules
 
 ```rust
 // Saves the structure containing the filter rules.
@@ -227,6 +231,11 @@ flm.get_stored_filter_metadata_by_id(id /* FilterId */);
 // Retrieves a list of FilterListRulesRaw by IDs.
 // This method acts in the same way as the `IN` database operator. Only found entities will be returned
 flm.get_filter_rules_as_strings(ids /* Vec<FilterId> */);
+
+// Reads the rule list for a specific filter in chunks, applying exceptions from the disabled_rules list on the fly.
+// The default size of the read buffer is 1 megabyte. But this size can be exceeded if a longer string appears in the list of filter rules.
+// The main purpose of this method is to reduce RAM consumption when reading large size filters.
+flm.save_rules_to_file_blob(id /* FilterId */, file_path: /* String or AsRef<Path> */);
 ```
 
 #### Example references

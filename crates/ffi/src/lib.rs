@@ -10,7 +10,7 @@ use crate::outer_error::AGOuterError;
 use crate::result::AGResult;
 use adguard_flm::FilterListManager as IFilterListManager;
 pub use adguard_flm::*;
-use std::sync::{Mutex, MutexGuard};
+use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 // Re-export native structs and functions
 pub use crate::top_level::*;
@@ -19,14 +19,14 @@ pub use native_interface::*;
 
 #[repr(C)]
 pub struct FilterListManager {
-    flm: Mutex<FilterListManagerImpl>,
+    flm: RwLock<FilterListManagerImpl>,
 }
 
 impl FilterListManager {
     pub fn new(configuration: Configuration) -> AGResult<Self> {
         let flm = FilterListManagerImpl::new(configuration).map_err(AGOuterError::from)?;
         Ok(Self {
-            flm: Mutex::new(*flm),
+            flm: RwLock::new(*flm),
         })
     }
 
@@ -112,7 +112,6 @@ impl FilterListManager {
     }
 
     pub fn fetch_filter_list_metadata(&self, url: String) -> AGResult<FilterListMetadata> {
-        // TODO: Do not need mutex here
         self.wrap(move |flm| flm.fetch_filter_list_metadata(url))
     }
 
@@ -129,7 +128,7 @@ impl FilterListManager {
     }
 
     pub fn change_locale(&self, suggested_locale: Locale) -> AGResult<bool> {
-        self.wrap(move |mut flm| flm.change_locale(suggested_locale))
+        self.wrap_mut(move |mut flm| flm.change_locale(suggested_locale))
     }
 
     pub fn pull_metadata(&self) -> AGResult<()> {
@@ -186,16 +185,32 @@ impl FilterListManager {
     ) -> AGResult<Vec<FilterListRulesRaw>> {
         self.wrap(move |flm| flm.get_filter_rules_as_strings(ids))
     }
+
+    pub fn save_rules_to_file_blob(&self, filter_id: FilterId, file_path: String) -> AGResult<()> {
+        self.wrap(move |flm| flm.save_rules_to_file_blob(filter_id, file_path))
+    }
 }
 
 impl FilterListManager {
     fn wrap<B, U>(&self, block: B) -> AGResult<U>
     where
-        B: FnOnce(MutexGuard<FilterListManagerImpl>) -> FLMResult<U>,
+        B: FnOnce(RwLockReadGuard<FilterListManagerImpl>) -> FLMResult<U>,
     {
         let value = self
             .flm
-            .lock()
+            .read()
+            .map_err(|why| AGOuterError::Mutex(why.to_string()))?;
+
+        block(value).map_err(AGOuterError::from)
+    }
+
+    fn wrap_mut<B, U>(&self, block: B) -> AGResult<U>
+    where
+        B: FnOnce(RwLockWriteGuard<FilterListManagerImpl>) -> FLMResult<U>,
+    {
+        let value = self
+            .flm
+            .write()
             .map_err(|why| AGOuterError::Mutex(why.to_string()))?;
 
         block(value).map_err(AGOuterError::from)

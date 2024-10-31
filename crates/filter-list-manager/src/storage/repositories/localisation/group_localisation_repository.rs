@@ -17,7 +17,7 @@ impl Repository<FilterGroupLocalisationEntity> for GroupLocalisationRepository {
     fn insert(
         &self,
         transaction: &Transaction<'_>,
-        entities: Vec<FilterGroupLocalisationEntity>,
+        entities: &[FilterGroupLocalisationEntity],
     ) -> Result<(), Error> {
         let mut statement = transaction.prepare(
             r"

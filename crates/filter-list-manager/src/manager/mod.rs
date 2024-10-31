@@ -16,6 +16,7 @@ use models::configuration::Configuration;
 use models::filter_list_metadata::FilterListMetadata;
 use models::full_filter_list::FullFilterList;
 use models::FilterId;
+use std::path::Path;
 
 /// FilterListManager is the interface of a filter list manager.
 pub trait FilterListManager {
@@ -304,4 +305,17 @@ pub trait FilterListManager {
     /// This method acts in the same way as the `IN` database operator. Only found entities will be returned
     fn get_filter_rules_as_strings(&self, ids: Vec<FilterId>)
         -> FLMResult<Vec<FilterListRulesRaw>>;
+
+    /// Reads the rule list for a specific filter in chunks, applying exceptions from the disabled_rules list on the fly.
+    /// The default size of the read buffer is 1 megabyte. But this size can be exceeded if a longer string appears in the list of filter rules.
+    /// The main purpose of this method is to reduce RAM consumption when reading large size filters.
+    ///
+    /// # Failure
+    ///
+    /// May return [`crate::FLMError::EntityNotFound()`] with [`FilterId`] if rule list is not found for such id
+    fn save_rules_to_file_blob<P: AsRef<Path>>(
+        &self,
+        filter_id: FilterId,
+        file_path: P,
+    ) -> FLMResult<()>;
 }

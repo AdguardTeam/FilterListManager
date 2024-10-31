@@ -1,13 +1,12 @@
 use super::entities::{IndexEntity, IndexI18NEntity};
 use crate::filters::indexes::index_consistency_checker::check_consistency;
-use crate::storage::database_path_holder::DatabasePathHolder;
-use crate::storage::database_status::lift_up_database;
 use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::entities::filter_filter_tag_entity::FilterFilterTagEntity;
 use crate::storage::entities::filter_locale_entity::FilterLocaleEntity;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
 use crate::storage::repositories::BulkDeleteRepository;
-use crate::storage::{connect, spawn_transaction};
+use crate::storage::spawn_transaction;
+use crate::storage::DbConnectionManager;
 use crate::{
     io::http::HttpClient,
     storage::repositories::filter_filter_tag_repository::FilterFilterTagRepository,
@@ -26,17 +25,17 @@ use std::collections::HashMap;
 use std::mem::take;
 
 /// The class responsible for updating filters and rules from indexes
-pub struct IndexesProcessor {
-    connection_source: DatabasePathHolder,
+pub struct IndexesProcessor<'a> {
+    connection_source: &'a DbConnectionManager,
     loaded_index: Option<IndexEntity>,
     loaded_index_i18n: Option<IndexI18NEntity>,
     connect_timeout: i32,
 }
 
 /// Public methods
-impl IndexesProcessor {
+impl<'a> IndexesProcessor<'a> {
     /// Default ctor
-    pub fn factory(connection_source: DatabasePathHolder, connect_timeout: i32) -> Self {
+    pub fn factory(connection_source: &'a DbConnectionManager, connect_timeout: i32) -> Self {
         Self {
             connection_source,
             connect_timeout,
@@ -64,28 +63,28 @@ impl IndexesProcessor {
         // Load indices and check consistency
         async_rt.block_on(self.fetch_indices(index_url, index_locales_url))?;
 
-        // Lifts the base state to the required level
-        lift_up_database(&self.connection_source)?;
-        let conn = self.connection_factory()?;
+        // TODO: Write to readme when we get rid of metadata
+        self.connection_source
+            .execute_db(move |mut conn: Connection| {
+                let filters_optional = FilterRepository::new()
+                    .select_filters_except_bootstrapped(&conn)
+                    .map_err(FLMError::from_database)?;
 
-        let filters_optional = FilterRepository::new()
-            .select_filters_except_bootstrapped(&conn)
-            .map_err(FLMError::from_database)?;
-
-        if let Some(loaded_filters) = filters_optional {
-            self.save_index_on_existing_database(conn, loaded_filters)
-        } else {
-            self.save_indices_on_empty_database(conn)
-        }
+                if let Some(loaded_filters) = filters_optional {
+                    self.save_index_on_existing_database(&mut conn, loaded_filters)
+                } else {
+                    self.save_indices_on_empty_database(&mut conn)
+                }
+            })
     }
 }
 
 /// Save strategies
-impl IndexesProcessor {
+impl IndexesProcessor<'_> {
     /// Saves new indexes into existing database
     fn save_index_on_existing_database(
         &mut self,
-        mut conn: Connection,
+        mut conn: &mut Connection,
         filters_from_storage: Vec<FilterEntity>,
     ) -> FLMResult<()> {
         let mut filters_must_be_deleted: Vec<FilterId> = vec![];
@@ -180,17 +179,22 @@ impl IndexesProcessor {
             // Save new or updated filters and all filter deps
             locales_repository.insert(
                 &transaction,
-                locales_of_filters.into_iter().flatten().collect(),
+                &locales_of_filters
+                    .into_iter()
+                    .flatten()
+                    .collect::<Vec<FilterLocaleEntity>>(),
             )?;
             filter_filter_tag_repository.insert(
                 &transaction,
-                tags_of_filters.into_iter().flatten().collect(),
+                &tags_of_filters
+                    .into_iter()
+                    .flatten()
+                    .collect::<Vec<FilterFilterTagEntity>>(),
             )?;
-            group_repo.insert(&transaction, index.groups)?;
-            tags_repo.insert(&transaction, index.tags)?;
+            group_repo.insert(&transaction, &index.groups)?;
+            tags_repo.insert(&transaction, &index.tags)?;
 
-            // TODO: Return saved entities on insert
-            filter_repository.insert(&transaction, new_or_updated_filters)?;
+            filter_repository.insert(&transaction, &new_or_updated_filters)?;
 
             Ok(())
         })
@@ -205,13 +209,13 @@ impl IndexesProcessor {
     }
 
     /// Saves new indexes on empty database
-    fn save_indices_on_empty_database(&mut self, mut conn: Connection) -> FLMResult<()> {
+    fn save_indices_on_empty_database(&mut self, mut conn: &mut Connection) -> FLMResult<()> {
         let index = self.exchange_index()?;
 
         let (transaction, _) = spawn_transaction(&mut conn, |transaction: &Transaction| {
-            FilterGroupRepository::new().insert(&transaction, index.groups)?;
+            FilterGroupRepository::new().insert(&transaction, &index.groups)?;
 
-            FilterTagRepository::new().insert(&transaction, index.tags)?;
+            FilterTagRepository::new().insert(&transaction, &index.tags)?;
 
             let mut filters = Vec::with_capacity(index.filters.len());
             let filter_repository = FilterRepository::new();
@@ -230,13 +234,19 @@ impl IndexesProcessor {
                 tags.push(storage_entities.tags);
             }
 
-            filter_repository.insert(&transaction, filters.clone())?;
+            filter_repository.insert(&transaction, &filters)?;
 
-            FilterLocaleRepository::new()
-                .insert(&transaction, locales.into_iter().flatten().collect())?;
+            let flattened_locales = locales
+                .into_iter()
+                .flatten()
+                .collect::<Vec<FilterLocaleEntity>>();
+            FilterLocaleRepository::new().insert(&transaction, &flattened_locales)?;
 
-            FilterFilterTagRepository::new()
-                .insert(&transaction, tags.into_iter().flatten().collect())?;
+            let flattened_tags = tags
+                .into_iter()
+                .flatten()
+                .collect::<Vec<FilterFilterTagEntity>>();
+            FilterFilterTagRepository::new().insert(&transaction, &flattened_tags)?;
 
             Ok(filters)
         })
@@ -250,7 +260,7 @@ impl IndexesProcessor {
 }
 
 /// Load indexes from server
-impl IndexesProcessor {
+impl IndexesProcessor<'_> {
     /// Fetches indices from remote server, checks index consistency fills `self` object fields.
     ///
     /// * `index_url` - Remote server URL of filters index
@@ -302,7 +312,7 @@ impl IndexesProcessor {
 }
 
 /// Misc methods
-impl IndexesProcessor {
+impl IndexesProcessor<'_> {
     /// Saves data from index localisation
     fn save_index_localisations(&mut self, transaction: &Transaction) -> FLMResult<()> {
         let localisations = match take(&mut self.loaded_index_i18n) {
@@ -317,21 +327,16 @@ impl IndexesProcessor {
         let (group_vec, tags_vec, filters_vec) = localisations.exchange()?;
 
         GroupLocalisationRepository::new()
-            .insert(&transaction, group_vec)
+            .insert(&transaction, &group_vec)
             .map_err(FLMError::from_database)?;
 
         FilterTagLocalisationRepository::new()
-            .insert(&transaction, tags_vec)
+            .insert(&transaction, &tags_vec)
             .map_err(FLMError::from_database)?;
 
         FilterLocalisationRepository::new()
-            .insert(&transaction, filters_vec)
+            .insert(&transaction, &filters_vec)
             .map_err(FLMError::from_database)
-    }
-
-    /// Connection factory for selected source
-    fn connection_factory(&self) -> FLMResult<Connection> {
-        connect(self.connection_source.get_calculated_path())
     }
 
     /// Tries to take index value from `self` object
@@ -349,10 +354,10 @@ impl IndexesProcessor {
 }
 
 #[cfg(test)]
-impl IndexesProcessor {
+impl<'a> IndexesProcessor<'a> {
     /// Ctor for tests
     pub(crate) const fn factory_test(
-        connection_source: DatabasePathHolder,
+        connection_source: &'a DbConnectionManager,
         loaded_index: IndexEntity,
         loaded_index_i18n: IndexI18NEntity,
     ) -> Self {
@@ -364,8 +369,7 @@ impl IndexesProcessor {
         }
     }
 
-    pub(crate) fn fill_empty_db(&mut self) -> FLMResult<()> {
-        let conn = self.connection_factory()?;
+    pub(crate) fn fill_empty_db(&mut self, conn: &mut Connection) -> FLMResult<()> {
         self.save_indices_on_empty_database(conn)
     }
 }
@@ -373,8 +377,6 @@ impl IndexesProcessor {
 #[cfg(test)]
 mod tests {
     use crate::filters::indexes::indexes_processor::IndexesProcessor;
-    use crate::storage::database_path_holder::DatabasePathHolder;
-    use crate::storage::database_status::lift_up_database;
     use crate::storage::entities::rules_list_entity::RulesListEntity;
     use crate::storage::repositories::filter_filter_tag_repository::FilterFilterTagRepository;
     use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
@@ -382,15 +384,18 @@ mod tests {
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::repositories::Repository;
     use crate::storage::sql_generators::operator::SQLOperator::*;
-    use crate::storage::{connect, with_transaction};
+    use crate::storage::with_transaction;
+    use crate::storage::DbConnectionManager;
     use crate::test_utils::do_with_tests_helper;
     use crate::test_utils::indexes_fixtures::build_filters_indices_fixtures;
     use crate::utils::memory::heap;
     use crate::{
-        FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID, MINIMUM_CUSTOM_FILTER_ID,
+        FLMError, FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID,
+        MINIMUM_CUSTOM_FILTER_ID,
     };
     use rand::seq::SliceRandom;
     use rand::{thread_rng, Rng};
+    use rusqlite::Connection;
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -415,25 +420,30 @@ mod tests {
             );
         }
 
+        let connection_source = DbConnectionManager::factory_test().unwrap();
         let mut indexes = IndexesProcessor::factory_test(
-            DatabasePathHolder::factory_test().unwrap(),
+            &connection_source,
             // Do clone here, because of indexes.exchange_index()
             index.clone(),
             index_localisation.clone(),
         );
 
-        lift_up_database(&indexes.connection_source).unwrap();
+        unsafe {
+            connection_source.lift_up_database().unwrap();
+        }
 
-        indexes
-            .save_indices_on_empty_database(indexes.connection_factory().unwrap())
-            .unwrap();
+        let filters_list = connection_source
+            .execute_db(|mut conn: Connection| {
+                indexes.save_indices_on_empty_database(&mut conn).unwrap();
 
-        let conn = connect(indexes.connection_source.get_calculated_path()).unwrap();
+                let filter_repository = FilterRepository::new();
 
-        let filter_repository = FilterRepository::new();
-        let filters_list = filter_repository
-            .select_filters_except_bootstrapped(&conn)
-            .unwrap()
+                let filters_list = filter_repository
+                    .select_filters_except_bootstrapped(&conn)
+                    .unwrap()
+                    .unwrap();
+                Ok(filters_list)
+            })
             .unwrap();
 
         assert_ne!(filters_list.is_empty(), true);
@@ -454,15 +464,20 @@ mod tests {
             .find(|filter| filter.filter_id == Some(DEPRECATED_FILTER_ID));
         assert!(deprecated_filter.is_none());
 
-        let conn = indexes.connection_factory().unwrap();
-        let filter_filter_tag_entities = FilterFilterTagRepository::new()
-            .select(
-                &conn,
-                Some(Not(heap(FieldEqualValue(
-                    "filter_id",
-                    DEPRECATED_FILTER_ID.into(),
-                )))),
-            )
+        let filter_filter_tag_entities = connection_source
+            .execute_db(|conn: Connection| {
+                let filter_filter_tag_entities = FilterFilterTagRepository::new()
+                    .select(
+                        &conn,
+                        Some(Not(heap(FieldEqualValue(
+                            "filter_id",
+                            DEPRECATED_FILTER_ID.into(),
+                        )))),
+                    )
+                    .unwrap();
+
+                Ok(filter_filter_tag_entities)
+            })
             .unwrap();
 
         {
@@ -488,7 +503,8 @@ mod tests {
         let rules_repository = RulesListRepository::new();
         let groups_repository = FilterGroupRepository::new();
 
-        let mut indexes = IndexesProcessor::factory(DatabasePathHolder::factory_test().unwrap(), 0);
+        let connection_manager = DbConnectionManager::factory_test().unwrap();
+        let mut indexes = IndexesProcessor::factory(&connection_manager, 0);
 
         let mut rng = thread_rng();
         let (mut index, index_localisation) = build_filters_indices_fixtures().unwrap();
@@ -506,7 +522,9 @@ mod tests {
             );
         }
 
-        lift_up_database(&indexes.connection_source).unwrap();
+        unsafe {
+            connection_manager.lift_up_database().unwrap();
+        }
 
         let container = Rc::new(RefCell::new(index));
 
@@ -546,55 +564,63 @@ mod tests {
         indexes.loaded_index = Some(index_final);
         indexes.loaded_index_i18n = Some(index_localisation.clone());
 
-        let _ = indexes
-            .save_indices_on_empty_database(indexes.connection_factory().unwrap())
+        connection_manager
+            .execute_db(|mut conn: Connection| indexes.save_indices_on_empty_database(&mut conn))
             .unwrap();
-        let mut conn = indexes.connection_factory().unwrap();
+
         {
             // Make chosen filter fully enabled
             // Now, fully enabled filter must have status = true, and have own Rules entity in DB
-            let mut new_chosen_filter = filter_repository
-                .select(
-                    &conn,
-                    Some(FieldEqualValue("filter_id", chosen_filter_id.into())),
-                )
+            connection_manager
+                .execute_db(|mut conn: Connection| {
+                    let mut new_chosen_filter = filter_repository
+                        .select(
+                            &conn,
+                            Some(FieldEqualValue("filter_id", chosen_filter_id.into())),
+                        )
+                        .unwrap()
+                        .unwrap()
+                        .pop()
+                        .unwrap();
+
+                    new_chosen_filter.is_enabled = true;
+
+                    with_transaction(&mut conn, |transaction| {
+                        let new_rules_entity = RulesListEntity {
+                            filter_id: new_chosen_filter.filter_id.clone().unwrap(),
+                            text: "".to_string(),
+                            disabled_text: "".to_string(),
+                        };
+
+                        let _ = &rules_repository
+                            .insert(&transaction, &[new_rules_entity])
+                            .unwrap();
+
+                        let _ = &filter_repository
+                            .insert(&transaction, &[new_chosen_filter])
+                            .unwrap();
+
+                        Ok(())
+                    })
+                })
                 .unwrap()
-                .unwrap()
-                .pop()
-                .unwrap();
-
-            new_chosen_filter.is_enabled = true;
-
-            with_transaction(&mut conn, |transaction| {
-                let new_rules_entity = RulesListEntity {
-                    filter_id: new_chosen_filter.filter_id.clone().unwrap(),
-                    text: "".to_string(),
-                    disabled_text: "".to_string(),
-                };
-
-                let _ = &rules_repository
-                    .insert(&transaction, vec![new_rules_entity])
-                    .unwrap();
-
-                let _ = &filter_repository
-                    .insert(&transaction, vec![new_chosen_filter])
-                    .unwrap();
-
-                Ok(())
-            })
-            .unwrap();
         }
 
         // region Check testing_data
-        let groups_map = groups_repository.select_mapped(&conn).unwrap();
+        let groups_map = connection_manager
+            .execute_db(|conn: Connection| {
+                groups_repository
+                    .select_mapped(&conn)
+                    .map_err(FLMError::from_database)
+            })
+            .unwrap();
 
         // Chosen group must be present in database
         assert!(groups_map.contains_key(&chosen_group_id));
 
         // region second update
         {
-            let mut second_indexes =
-                IndexesProcessor::factory(DatabasePathHolder::factory_test().unwrap(), 0);
+            let mut second_indexes = IndexesProcessor::factory(&connection_manager, 0);
 
             let (index_second, index_localisation_second) =
                 build_filters_indices_fixtures().unwrap();
@@ -602,64 +628,71 @@ mod tests {
             second_indexes.loaded_index = Some(index_second);
             second_indexes.loaded_index_i18n = Some(index_localisation_second);
 
-            {
-                let conn = second_indexes.connection_factory().unwrap();
-                let existed_indexes = filter_repository.select(&conn, None).unwrap().unwrap();
+            connection_manager
+                .execute_db(|mut conn: Connection| {
+                    {
+                        let existed_indexes =
+                            filter_repository.select(&conn, None).unwrap().unwrap();
+                        second_indexes
+                            .save_index_on_existing_database(&mut conn, existed_indexes)
+                            .unwrap();
+                    }
 
-                second_indexes
-                    .save_index_on_existing_database(conn, existed_indexes)
-                    .unwrap();
-            }
+                    let second_groups_mapped = groups_repository.select_mapped(&conn).unwrap();
 
-            let conn = second_indexes.connection_factory().unwrap();
-            let second_groups_mapped = groups_repository.select_mapped(&conn).unwrap();
+                    assert!(!second_groups_mapped.contains_key(&chosen_group_id));
+                    // Try to get chosen filter info one more time
+                    // It must have a new id, because it was moved to custom filters
+                    let mut chosen_filters_list = filter_repository
+                        .select(
+                            &conn,
+                            Some(FieldEqualValue(
+                                "download_url",
+                                chosen_filter_download_url.into(),
+                            )),
+                        )
+                        .unwrap()
+                        .unwrap();
 
-            assert!(!second_groups_mapped.contains_key(&chosen_group_id));
+                    // Must be only one filter with this download url
+                    assert_eq!(chosen_filters_list.len(), 1);
 
-            // Try to get chosen filter info one more time
-            // It must have a new id, because it was moved to custom filters
-            let mut chosen_filters_list = filter_repository
-                .select(
-                    &conn,
-                    Some(FieldEqualValue(
-                        "download_url",
-                        chosen_filter_download_url.into(),
-                    )),
-                )
-                .unwrap()
+                    let chosen_filter_new_info = chosen_filters_list.pop().unwrap();
+
+                    let filter_id = chosen_filter_new_info.filter_id.unwrap();
+
+                    // This filter must be moved into custom group
+                    assert_eq!(chosen_filter_new_info.group_id, CUSTOM_FILTERS_GROUP_ID);
+
+                    // FilterId must be in designated range
+                    assert!(filter_id >= MINIMUM_CUSTOM_FILTER_ID);
+                    assert!(filter_id <= MAXIMUM_CUSTOM_FILTER_ID);
+
+                    // Custom group must be removed
+                    assert!(!second_groups_mapped.contains_key(&chosen_group_id));
+
+                    Ok(())
+                })
                 .unwrap();
-
-            // Must be only one filter with this download url
-            assert_eq!(chosen_filters_list.len(), 1);
-
-            let chosen_filter_new_info = chosen_filters_list.pop().unwrap();
-
-            let filter_id = chosen_filter_new_info.filter_id.unwrap();
-
-            // This filter must be moved into custom group
-            assert_eq!(chosen_filter_new_info.group_id, CUSTOM_FILTERS_GROUP_ID);
-
-            // FilterId must be in designated range
-            assert!(filter_id >= MINIMUM_CUSTOM_FILTER_ID);
-            assert!(filter_id <= MAXIMUM_CUSTOM_FILTER_ID);
-
-            // Custom group must be removed
-            assert!(!second_groups_mapped.contains_key(&chosen_group_id));
         }
         // endregion
 
         // region test deprecated filter
-        {
-            let list = filter_repository
-                .select_filters_except_bootstrapped(&conn)
-                .unwrap()
-                .unwrap();
+        connection_manager
+            .execute_db(|conn: Connection| {
+                let list = filter_repository
+                    .select_filters_except_bootstrapped(&conn)
+                    .unwrap()
+                    .unwrap();
 
-            let found = list
-                .iter()
-                .find(|f| f.filter_id.unwrap() == DEPRECATED_FILTER_ID);
+                let found = list
+                    .iter()
+                    .find(|f| f.filter_id.unwrap() == DEPRECATED_FILTER_ID);
 
-            assert!(found.is_none())
-        }
+                assert!(found.is_none());
+
+                Ok(())
+            })
+            .unwrap();
     }
 }

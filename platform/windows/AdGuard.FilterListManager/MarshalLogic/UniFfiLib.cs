@@ -76,7 +76,9 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 new KeyValuePair<ushort, Func<ushort>>(36662,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_stored_filters_metadata),
                 new KeyValuePair<ushort, Func<ushort>>(39681,
-                    uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_stored_filters_metadata_by_id)
+                    uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_stored_filters_metadata_by_id),
+                new KeyValuePair<ushort, Func<ushort>>(20063,
+                    uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings),
 
             };
 
@@ -123,6 +125,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata(FilterListManagerSafeHandle ptr, RustBuffer url, ref RustCallStatus uniffiOutErr
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_filter_rules_as_strings(FilterListManagerSafeHandle ptr, RustBuffer ids, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
@@ -483,6 +489,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_database_version(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings(
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]

@@ -106,7 +106,7 @@ impl Repository<FilterGroupEntity> for FilterGroupRepository {
     fn insert(
         &self,
         transaction: &Transaction,
-        entities: Vec<FilterGroupEntity>,
+        entities: &[FilterGroupEntity],
     ) -> Result<(), rusqlite::Error> {
         let mut statement = transaction.prepare(
             r"
