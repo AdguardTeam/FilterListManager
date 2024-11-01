@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.8.7] - 2024-11-01
+
+### Fixed
+- `file:` protocol-based paths are being decoded the right way i.e. `Path%20With%20Spaces`
+- Now when filters are updated their versions are checked
+
+[0.8.7]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.5...ffi-0.8.7
+
 ## [0.8.5] - 2024-10-29
 
 ### Added

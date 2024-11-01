@@ -12,7 +12,7 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 name = "filter_list_manager_ffi"
 
 [dependencies]
-adguard-flm = { path = "../filter-list-manager", version = ">=0.8.2,<1.0.0", default-features = false }
+adguard-flm = { path = "../filter-list-manager", version = ">=0.8.4,<1.0.0", default-features = false }
 thiserror.workspace = true
 uniffi.workspace = true
 
