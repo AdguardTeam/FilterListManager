@@ -107,7 +107,7 @@ impl FilterParser {
         &mut self,
         url: &String,
     ) -> Result<String, FilterParserErrorContext> {
-        self.push_file(&url, true)?;
+        self.push_file(url.as_str(), true)?;
 
         let root_filter_url: String;
         if let Some(root_cursor) = self.filters_cursor.last() {
@@ -146,10 +146,10 @@ impl FilterParser {
     /// Returns [`FilterParserErrorContext`] if stack is corrupted or downloading file was unsuccessful
     fn push_file(
         &mut self,
-        absolute_url: &String,
+        mut absolute_url: &str,
         from_root: bool,
     ) -> Result<(), FilterParserErrorContext> {
-        let trimmed = absolute_url.trim_start();
+        absolute_url = absolute_url.trim_start();
         let cursor: FilterCursor;
 
         if from_root {
@@ -164,8 +164,8 @@ impl FilterParser {
                     )),
                 });
             } else {
-                let trimmed_url = trimmed.to_string();
-                match self.filter_downloader.get_filter_contents(&trimmed_url) {
+                let absolute_url = absolute_url.to_string();
+                match self.filter_downloader.get_filter_contents(&absolute_url) {
                     Ok(contents) => {
                         self.filter_downloader
                             .pre_check_filter_contents(contents.as_str())
@@ -174,7 +174,7 @@ impl FilterParser {
                         validate_checksum(contents.as_str())
                             .or_else(|why| self.build_error_with_context(why))?;
 
-                        cursor = FilterCursor::new(trimmed_url, contents);
+                        cursor = FilterCursor::new(absolute_url, contents);
                     }
                     Err(why) => {
                         // Here we haven't cursor info, so we haven't context.
@@ -193,7 +193,7 @@ impl FilterParser {
 
                 let contents = self
                     .filter_downloader
-                    .get_included_filter_contents(&absolute_url, current_scheme.into())
+                    .get_included_filter_contents(absolute_url, current_scheme.into())
                     .or_else(|why| self.build_error_with_context(why))?;
 
                 self.filter_downloader
@@ -347,7 +347,7 @@ impl FilterParser {
                 // Stop parsing metadata at the first include directive
                 self.metadata_collector.mark_reached_eod();
 
-                return self.push_file(&absolute_path, false).and_then(|_| Ok(true));
+                return self.push_file(absolute_path.as_str(), false).map(|_| true);
             }
         }
 

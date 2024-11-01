@@ -69,7 +69,7 @@ impl DiffPathProvider {
 }
 
 impl FilterContentsProvider for DiffPathProvider {
-    fn get_filter_contents(&self, root_filter_url: &String) -> Result<String, FilterParserError> {
+    fn get_filter_contents(&self, root_filter_url: &str) -> Result<String, FilterParserError> {
         let scheme = UrlSchemes::from(get_scheme(root_filter_url));
 
         let patch_file_absolute_uri =

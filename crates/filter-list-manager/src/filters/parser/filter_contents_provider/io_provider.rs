@@ -18,7 +18,7 @@ impl IOProvider {
 }
 
 impl FilterContentsProvider for IOProvider {
-    fn get_filter_contents(&self, root_filter_url: &String) -> Result<String, FilterParserError> {
+    fn get_filter_contents(&self, root_filter_url: &str) -> Result<String, FilterParserError> {
         let scheme = get_scheme(root_filter_url).unwrap_or_default();
 
         fetch_by_scheme(root_filter_url, scheme.into(), self.get_request_timeout())

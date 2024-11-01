@@ -34,7 +34,7 @@ impl HttpClient {
     ///
     /// Note! This method will fail if status_code != 200
     pub(crate) fn sync_get_file_contents(
-        url: &String,
+        url: &str,
         timeout_ms: i32,
     ) -> Result<String, HttpClientError> {
         let client_builder =

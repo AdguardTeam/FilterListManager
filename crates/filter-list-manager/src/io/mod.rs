@@ -1,6 +1,7 @@
 use crate::io::error::IOError;
-use regex::Regex;
+use reqwest::Url;
 use std::fs;
+use std::path::PathBuf;
 
 pub mod error;
 pub(crate) mod fetch_by_schemes;
@@ -39,6 +40,7 @@ pub(crate) fn get_authority(url: &str) -> Option<&str> {
 }
 
 /// [`read_filter_file`] error type
+#[cfg_attr(test, derive(Debug))]
 pub(crate) enum ReadFilterFileError {
     Io(IOError),
     Other(String),
@@ -50,15 +52,20 @@ impl From<std::io::Error> for ReadFilterFileError {
     }
 }
 
+/// For test purposes only
+#[inline]
+fn convert_file_url_to_path(url: &str) -> Result<PathBuf, ReadFilterFileError> {
+    let url = Url::parse(url).map_err(|why| ReadFilterFileError::Other(why.to_string()))?;
+
+    url.to_file_path()
+        .map_err(|_| ReadFilterFileError::Other("Cannot make path for file url".to_string()))
+}
+
 /// Tries to read filter file by url
-pub(crate) fn read_filter_file(url: &String) -> Result<String, ReadFilterFileError> {
-    let regex = Regex::new(r"file:///?").map_err(|why| {
-        return ReadFilterFileError::Other(why.to_string());
-    })?;
+pub(crate) fn read_filter_file(url: &str) -> Result<String, ReadFilterFileError> {
+    let path = convert_file_url_to_path(url)?;
 
-    let path = regex.replace(url, "");
-
-    fs::read_to_string(path.to_string()).map_err(ReadFilterFileError::from)
+    fs::read_to_string(path).map_err(ReadFilterFileError::from)
 }
 
 /// Gets a #hash value from url
@@ -82,7 +89,7 @@ pub(crate) fn get_hash_from_url(url: &String) -> Option<(String, String)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{get_authority, get_hash_from_url, get_scheme};
+    use super::{convert_file_url_to_path, get_authority, get_hash_from_url, get_scheme};
 
     #[test]
     fn test_get_scheme() {
@@ -155,5 +162,28 @@ mod tests {
 
             assert_eq!(actual, expected)
         })
+    }
+
+    #[test]
+    fn test_convert_file_url_to_path() {
+        [
+            #[cfg(unix)]
+            (
+                "file:///Volumes/http/With%20spaces",
+                "/Volumes/http/With spaces",
+            ),
+            #[cfg(windows)]
+            (
+                "file:///c:/WINDOWS/orange%20clock.avi",
+                "c:\\WINDOWS\\orange clock.avi",
+            ),
+            #[cfg(unix)]
+            ("file://localhost/etc/fstab", "/etc/fstab"),
+        ]
+        .into_iter()
+        .for_each(|(url, expected)| {
+            let actual = convert_file_url_to_path(url).unwrap();
+            assert_eq!(actual.to_string_lossy().to_string().as_str(), expected)
+        });
     }
 }
