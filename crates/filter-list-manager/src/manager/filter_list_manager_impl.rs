@@ -813,6 +813,7 @@ mod tests {
     use std::ops::Sub;
     use std::time::{SystemTime, UNIX_EPOCH};
     use std::{env, fs};
+    use url::Url;
 
     #[test]
     fn test_insert_custom_filter() {
@@ -827,15 +828,19 @@ mod tests {
 
         let path = fs::canonicalize("./tests/fixtures/1.txt").unwrap();
 
-        let mut first_filter_url = String::from("file:///");
-        first_filter_url += path.to_str().unwrap();
+        let first_filter_url = Url::from_file_path(path).unwrap();
 
         let title = String::from("first title");
         let description =
             String::from("Filter that enables ad blocking on websites in Russian language.");
 
         let full_filter_list = flm
-            .install_custom_filter_list(first_filter_url, true, Some(title.clone()), None)
+            .install_custom_filter_list(
+                first_filter_url.to_string(),
+                true,
+                Some(title.clone()),
+                None,
+            )
             .unwrap();
 
         assert!(full_filter_list.is_custom);
@@ -866,14 +871,17 @@ mod tests {
         assert_eq!(deleted, 0);
 
         let path = fs::canonicalize("./tests/fixtures/1.txt").unwrap();
-
-        let mut first_filter_url = String::from("file:///");
-        first_filter_url += path.to_str().unwrap();
+        let first_filter_url = Url::from_file_path(path).unwrap();
 
         let title = String::from("first title");
 
         let full_filter_list = flm
-            .install_custom_filter_list(first_filter_url, true, Some(title.clone()), None)
+            .install_custom_filter_list(
+                first_filter_url.to_string(),
+                true,
+                Some(title.clone()),
+                None,
+            )
             .unwrap();
 
         let custom_was_deleted = flm

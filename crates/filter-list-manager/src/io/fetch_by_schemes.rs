@@ -3,7 +3,7 @@ use crate::io::{http::HttpClient, read_filter_file, url_schemes::UrlSchemes};
 
 /// Synchronously fetch contents from absolute url
 pub(crate) fn fetch_by_scheme(
-    absolute_url: &String,
+    absolute_url: &str,
     scheme: UrlSchemes,
     request_timeout: i32,
 ) -> Result<String, FilterParserError> {

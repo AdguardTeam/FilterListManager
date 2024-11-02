@@ -18,7 +18,7 @@ impl StringProvider {
 }
 
 impl FilterContentsProvider for StringProvider {
-    fn get_filter_contents(&self, _: &String) -> Result<String, FilterParserError> {
+    fn get_filter_contents(&self, _: &str) -> Result<String, FilterParserError> {
         Ok(self.filter_body.clone())
     }
 

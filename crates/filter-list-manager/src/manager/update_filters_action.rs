@@ -229,7 +229,13 @@ pub(super) fn update_filters_action(
                 filter.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
             }
 
-            filter.version = parser.get_metadata(KnownMetadataProperty::Version);
+            // TODO: Spike, until we implement streaming parsing and/or index downloading before update;
+            let new_version = parser.get_metadata(KnownMetadataProperty::Version);
+            if !filter.version.is_empty() && filter.version == new_version {
+                continue;
+            }
+
+            filter.version = new_version;
             filter.license = parser.get_metadata(KnownMetadataProperty::License);
             filter.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
 
