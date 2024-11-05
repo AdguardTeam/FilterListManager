@@ -60,17 +60,18 @@ impl RulesListRepository {
         Ok(results)
     }
 
-    /// Gets rules strings mapped by [`FilterId`] for provided `for_ids`
-    pub(crate) fn select_rules_string_map(
+    /// Gets rules strings and disabled_rules strings mapped by [`FilterId`] for provided `for_ids`
+    pub(crate) fn select_rules_maps(
         &self,
         conn: &Connection,
         for_ids: &[FilterId],
-    ) -> Result<MapFilterIdOnRulesString> {
+    ) -> Result<(MapFilterIdOnRulesString, MapFilterIdOnRulesString)> {
         let mut sql = String::from(
             r"
             SELECT
                 filter_id,
-                rules_text
+                rules_text,
+                disabled_rules_text,
             FROM
                 [rules_list]
             WHERE
@@ -84,12 +85,16 @@ impl RulesListRepository {
 
         let mut rows = statement.query(params_from_iter(for_ids))?;
 
-        let mut results = HashMap::new();
+        let mut rules = HashMap::new();
+        let mut disabled_rules = HashMap::new();
         while let Some(row) = rows.next()? {
-            results.insert(row.get(0)?, row.get(1)?);
+            let id: FilterId = row.get(0)?;
+
+            rules.insert(id, row.get(1)?);
+            disabled_rules.insert(id, row.get(2)?);
         }
 
-        Ok(results)
+        Ok((rules, disabled_rules))
     }
 
     pub(crate) fn select(
@@ -174,7 +179,7 @@ impl RulesListRepository {
             FROM
                 [rules_list]
             WHERE
-                filter_id IN
+                filter_id
         ",
         );
 

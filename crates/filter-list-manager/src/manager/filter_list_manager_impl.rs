@@ -1428,4 +1428,53 @@ mod tests {
 
         assert_eq!(test_string.as_str(), "first\nthird\nfifth");
     }
+
+    #[test]
+    fn test_get_disabled_rules() {
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let source = DbConnectionManager::factory_test().unwrap();
+        let (_, index_filters) = spawn_test_db_with_metadata(&source);
+
+        let last_filter_id = index_filters.last().unwrap().filter_id.unwrap();
+        let first_filter_id = index_filters.first().unwrap().filter_id.unwrap();
+
+        source
+            .execute_db(|mut connection: Connection| {
+                let rules1 = RulesListEntity {
+                    filter_id: last_filter_id,
+                    text: "Text\nDisabled Text\n123".to_string(),
+                    disabled_text: "Disabled Text\n123".to_string(),
+                };
+
+                let rules2 = RulesListEntity {
+                    filter_id: first_filter_id,
+                    text: "Text2\nDisabled Text2".to_string(),
+                    disabled_text: "Disabled Text2".to_string(),
+                };
+
+                let tx = connection.transaction().unwrap();
+                let repo = RulesListRepository::new();
+
+                repo.insert(&tx, vec![rules1, rules2].as_slice()).unwrap();
+
+                tx.commit().unwrap();
+
+                Ok(())
+            })
+            .unwrap();
+
+        drop(source);
+
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
+        let actual = flm
+            .get_disabled_rules(vec![first_filter_id, last_filter_id])
+            .unwrap();
+
+        assert_eq!(actual[0].text.as_str(), "Disabled Text2");
+        assert_eq!(actual[1].text.as_str(), "Disabled Text\n123");
+    }
 }

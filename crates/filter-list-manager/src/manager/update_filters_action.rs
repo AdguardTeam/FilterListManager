@@ -63,7 +63,7 @@ pub(super) fn update_filters_action(
         .map(|filter| filter.filter_id.unwrap())
         .collect::<Vec<FilterId>>();
 
-    let (mut diff_updates_map, mut old_rules_map) =
+    let (mut diff_updates_map, mut old_rules_map, mut disabled_rules_map) =
         db_connection_manager.execute_db(|conn: Connection| {
             let diff_updates_map = diff_updates_repository
                 .select_map(&conn, &filter_ids)
@@ -72,11 +72,11 @@ pub(super) fn update_filters_action(
             let filter_ids_for_diff_updates =
                 diff_updates_map.keys().cloned().collect::<Vec<FilterId>>();
 
-            let rules_map = rule_list_repository
-                .select_rules_string_map(&conn, &filter_ids_for_diff_updates)
+            let (rules_map, disabled_rules_map) = rule_list_repository
+                .select_rules_maps(&conn, &filter_ids_for_diff_updates)
                 .map_err(FLMError::from_database)?;
 
-            Ok((diff_updates_map, rules_map))
+            Ok((diff_updates_map, rules_map, disabled_rules_map))
         })?;
     // endregion
 
@@ -252,7 +252,9 @@ pub(super) fn update_filters_action(
         let new_rules_map = rule_entities
             .into_iter()
             .fold(HashMap::new(), |mut acc, mut rule| {
-                rule.disabled_text = old_rules_map.remove(&rule.filter_id).unwrap_or_default();
+                rule.disabled_text = disabled_rules_map
+                    .remove(&rule.filter_id)
+                    .unwrap_or_default();
                 acc.insert(rule.filter_id, rule);
                 acc
             });
