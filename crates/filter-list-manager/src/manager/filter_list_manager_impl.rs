@@ -8,6 +8,7 @@ use crate::filters::parser::diff_updates::process_diff_path::process_diff_path;
 use crate::filters::parser::filter_contents_provider::string_provider::StringProvider;
 use crate::manager::models::active_rules_info::ActiveRulesInfo;
 use crate::manager::models::configuration::{Locale, LOCALES_DELIMITER};
+use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
 use crate::manager::models::filter_group::FilterGroup;
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
@@ -494,7 +495,7 @@ impl FilterListManager for FilterListManagerImpl {
             &self.connection_manager,
             self.configuration.request_timeout_ms,
         );
-        // Pass DbExecutor
+
         processor.sync_metadata(
             &self.configuration.metadata_url,
             &self.configuration.metadata_locales_url,
@@ -546,6 +547,8 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn lift_up_database(&self) -> FLMResult<()> {
+        // SAFETY: Safe, as long as the call to this function does not get inside the `execute_db` closure one way or another
+        // @see DbConnectionManager
         unsafe { self.connection_manager.lift_up_database() }
     }
 
@@ -787,6 +790,15 @@ impl FilterListManager for FilterListManagerImpl {
                 }
 
                 why
+            })
+    }
+
+    fn get_disabled_rules(&self, ids: Vec<FilterId>) -> FLMResult<Vec<DisabledRulesRaw>> {
+        self.connection_manager
+            .execute_db(|connection: Connection| {
+                RulesListRepository::new()
+                    .get_disabled_rules_by_ids(&connection, &ids)
+                    .map_err(FLMError::from_database)
             })
     }
 }

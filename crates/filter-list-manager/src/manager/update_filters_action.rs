@@ -63,9 +63,9 @@ pub(super) fn update_filters_action(
         .map(|filter| filter.filter_id.unwrap())
         .collect::<Vec<FilterId>>();
 
-    let (mut diff_updates_map, mut rules_map) =
+    let (mut diff_updates_map, mut old_rules_map) =
         db_connection_manager.execute_db(|conn: Connection| {
-            let diff_updates_map = DiffUpdateRepository::new()
+            let diff_updates_map = diff_updates_repository
                 .select_map(&conn, &filter_ids)
                 .map_err(FLMError::from_database)?;
 
@@ -118,7 +118,7 @@ pub(super) fn update_filters_action(
             configuration,
             &mut diff_updates_map,
             current_time,
-            &mut rules_map,
+            &mut old_rules_map,
             &batch_patches_container,
             &filter,
         );
@@ -249,15 +249,16 @@ pub(super) fn update_filters_action(
             rule_list_repository.insert(transaction, &rule_entities)
         })?;
 
-        let rules_map = rule_entities
+        let new_rules_map = rule_entities
             .into_iter()
-            .fold(HashMap::new(), |mut acc, rule| {
+            .fold(HashMap::new(), |mut acc, mut rule| {
+                rule.disabled_text = old_rules_map.remove(&rule.filter_id).unwrap_or_default();
                 acc.insert(rule.filter_id, rule);
                 acc
             });
 
         let mut builder = FullFilterListBuilder::new(&configuration.locale);
-        builder.set_rules_map(rules_map);
+        builder.set_rules_map(new_rules_map);
 
         builder.build_full_filter_lists(conn, filter_entities)
     })?;

@@ -1,3 +1,4 @@
+use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
 use crate::manager::models::FilterId;
 use crate::storage::blob::BlobHandleImpl;
 use crate::storage::entities::rules_list_entity::RulesListEntity;
@@ -44,7 +45,8 @@ impl RulesListRepository {
         conn: &Connection,
         where_clause: Option<SQLOperator>,
     ) -> Result<MapFilterIdOnRulesList> {
-        let (sql, params) = process_where_clause(String::from(BASIC_SELECT_SQL), where_clause)?;
+        let mut sql = String::from(BASIC_SELECT_SQL);
+        let params = process_where_clause(&mut sql, where_clause)?;
         let mut statement = conn.prepare(sql.as_str())?;
 
         let rows = statement.query_map(params, RulesListRepository::hydrate)?;
@@ -95,7 +97,8 @@ impl RulesListRepository {
         connection: &Connection,
         where_clause: Option<SQLOperator>,
     ) -> Result<Option<Vec<RulesListEntity>>> {
-        let (sql, params) = process_where_clause(String::from(BASIC_SELECT_SQL), where_clause)?;
+        let mut sql = String::from(BASIC_SELECT_SQL);
+        let params = process_where_clause(&mut sql, where_clause)?;
         let mut statement = connection.prepare(sql.as_str())?;
 
         let option = statement
@@ -156,6 +159,43 @@ impl RulesListRepository {
         )?;
 
         Ok((disabled_rules, BlobHandleImpl::new(blob)))
+    }
+
+    pub(crate) fn get_disabled_rules_by_ids(
+        &self,
+        connection: &Connection,
+        ids: &[FilterId],
+    ) -> Result<Vec<DisabledRulesRaw>> {
+        let mut sql = String::from(
+            r"
+            SELECT
+                filter_id,
+                disabled_rules_text
+            FROM
+                [rules_list]
+            WHERE
+                filter_id IN
+        ",
+        );
+
+        sql += build_in_clause(ids.len()).as_str();
+        let params = params_from_iter(ids);
+
+        let mut statement = connection.prepare(sql.as_str())?;
+
+        let mut out = vec![];
+        let Some(mut rows) = statement.query(params).optional()? else {
+            return Ok(out);
+        };
+
+        while let Some(row) = rows.next()? {
+            out.push(DisabledRulesRaw {
+                filter_id: row.get(0)?,
+                text: row.get(1)?,
+            })
+        }
+
+        Ok(out)
     }
 }
 
