@@ -16,6 +16,11 @@ dictionary FilterGroup {
     i32 display_number;
 };
 
+dictionary DisabledRulesRaw {
+    i64 filter_id;
+    string text;
+};
+
 dictionary FilterListMetadata {
     string title;
     string description;
@@ -227,4 +232,7 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     void save_rules_to_file_blob(i64 filter_id, string file_path);
+
+    [Throws=AGOuterError]
+    sequence<DisabledRulesRaw> get_disabled_rules(sequence<i64> ids);
 };
