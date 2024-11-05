@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.8.11] - 2024-11-05
+
+### Fixed
+- fixed `flm-0.8.5` release 
+
+[0.8.11]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.9...ffi-0.8.11
+
 ## [0.8.9] - 2024-11-05
 
 ### Fixed
