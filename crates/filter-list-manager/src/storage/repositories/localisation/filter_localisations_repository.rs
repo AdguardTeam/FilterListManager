@@ -52,11 +52,9 @@ impl FilterLocalisationRepository {
                 description
             FROM
                [filter_localisation]
-            WHERE
-                filter_id
-        ",
+            WHERE ",
         );
-        sql += build_in_clause(filters.len()).as_str();
+        sql += build_in_clause("filter_id", filters.len()).as_str();
         sql += " AND lang = ?";
 
         let mut statement = connection.prepare(sql.as_str())?;

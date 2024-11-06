@@ -74,12 +74,10 @@ impl RulesListRepository {
                 disabled_rules_text,
             FROM
                 [rules_list]
-            WHERE
-                filter_id
-        ",
+            WHERE ",
         );
 
-        sql += build_in_clause(for_ids.len()).as_str();
+        sql += build_in_clause("filter_id", for_ids.len()).as_str();
 
         let mut statement = conn.prepare(sql.as_str())?;
 
@@ -178,12 +176,10 @@ impl RulesListRepository {
                 disabled_rules_text
             FROM
                 [rules_list]
-            WHERE
-                filter_id
-        ",
+            WHERE ",
         );
 
-        sql += build_in_clause(ids.len()).as_str();
+        sql += build_in_clause("filter_id", ids.len()).as_str();
         let params = params_from_iter(ids);
 
         let mut statement = connection.prepare(sql.as_str())?;

@@ -29,12 +29,10 @@ impl DiffUpdateRepository {
                 next_check_time
             FROM
                 [diff_updates]
-            WHERE
-                filter_id
-        ",
+            WHERE ",
         );
 
-        sql += build_in_clause(for_ids.len()).as_str();
+        sql += build_in_clause("filter_id", for_ids.len()).as_str();
 
         let mut statement = conn.prepare(sql.as_str())?;
 

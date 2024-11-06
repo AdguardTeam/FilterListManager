@@ -97,7 +97,7 @@ impl<'a> SQLOperator<'a> {
                 let len = vec.len();
                 container.borrow_mut().append(&mut vec);
 
-                format!("{}{}", field, build_in_clause(len))
+                format!("{}", build_in_clause(field, len))
             }
         }
     }
