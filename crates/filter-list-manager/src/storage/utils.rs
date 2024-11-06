@@ -33,18 +33,16 @@ pub(super) fn build_in_clause(placeholders_count: usize) -> String {
 ///
 /// Returns modified or original SQL string and [`ParamsFromIter`] value for query methods
 pub(super) fn process_where_clause(
-    mut sql: String,
+    sql: &mut String,
     where_clause: Option<SQLOperator>,
-) -> rusqlite::Result<(String, ParamsFromIter<Vec<Value>>)> {
-    let params = if let Some(clause) = where_clause {
+) -> rusqlite::Result<ParamsFromIter<Vec<Value>>> {
+    Ok(if let Some(clause) = where_clause {
         let values = SQLOperator::process(clause)?;
-        sql += "WHERE ";
-        sql += values.0.as_str();
+        sql.push_str("WHERE ");
+        sql.push_str(values.0.as_str());
 
         params_from_iter(values.1)
     } else {
         params_from_iter(vec![])
-    };
-
-    Ok((sql, params))
+    })
 }

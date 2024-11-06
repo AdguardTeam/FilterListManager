@@ -107,7 +107,8 @@ impl FilterRepository {
         conn: &Connection,
         where_clause: Option<SQLOperator>,
     ) -> rusqlite::Result<i32> {
-        let (sql, params) = process_where_clause(String::from(BASIC_COUNT_SQL), where_clause)?;
+        let mut sql = String::from(BASIC_COUNT_SQL);
+        let params = process_where_clause(&mut sql, where_clause)?;
         let mut statement = conn.prepare(sql.as_str())?;
 
         let count_result = statement.query_row(params, |row| row.get(0)).optional()?;
@@ -256,7 +257,8 @@ impl FilterRepository {
         conn: &Connection,
         where_clause: Option<SQLOperator>,
     ) -> Result<Option<Vec<FilterEntity>>, Error> {
-        let (sql, params) = process_where_clause(String::from(BASIC_SELECT_SQL), where_clause)?;
+        let mut sql = String::from(BASIC_SELECT_SQL);
+        let params = process_where_clause(&mut sql, where_clause)?;
 
         let mut statement = conn.prepare(sql.as_str())?;
 
@@ -286,7 +288,8 @@ impl FilterRepository {
         conn: &Connection,
         where_clause: Option<SQLOperator>,
     ) -> rusqlite::Result<HashMap<FilterId, FilterEntity>> {
-        let (sql, params) = process_where_clause(String::from(BASIC_SELECT_SQL), where_clause)?;
+        let mut sql = String::from(BASIC_SELECT_SQL);
+        let params = process_where_clause(&mut sql, where_clause)?;
 
         let mut statement = conn.prepare(sql.as_str())?;
         let mut map = HashMap::new();

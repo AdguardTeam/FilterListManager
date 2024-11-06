@@ -76,7 +76,9 @@ impl FilterFilterTagRepository {
     ) -> rusqlite::Result<Vec<FilterFilterTagEntity>> {
         use crate::storage::utils::process_where_clause;
 
-        let (sql, params) = process_where_clause(String::from(BASIC_SELECT_SQL), where_clause)?;
+        let mut sql = String::from(BASIC_SELECT_SQL);
+
+        let params = process_where_clause(&mut sql, where_clause)?;
 
         let mut statement = conn.prepare(sql.as_str())?;
 

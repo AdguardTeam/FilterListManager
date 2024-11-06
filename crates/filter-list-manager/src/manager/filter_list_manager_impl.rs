@@ -8,6 +8,7 @@ use crate::filters::parser::diff_updates::process_diff_path::process_diff_path;
 use crate::filters::parser::filter_contents_provider::string_provider::StringProvider;
 use crate::manager::models::active_rules_info::ActiveRulesInfo;
 use crate::manager::models::configuration::{Locale, LOCALES_DELIMITER};
+use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
 use crate::manager::models::filter_group::FilterGroup;
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
@@ -494,7 +495,7 @@ impl FilterListManager for FilterListManagerImpl {
             &self.connection_manager,
             self.configuration.request_timeout_ms,
         );
-        // Pass DbExecutor
+
         processor.sync_metadata(
             &self.configuration.metadata_url,
             &self.configuration.metadata_locales_url,
@@ -546,6 +547,8 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn lift_up_database(&self) -> FLMResult<()> {
+        // SAFETY: Safe, as long as the call to this function does not get inside the `execute_db` closure one way or another
+        // @see DbConnectionManager
         unsafe { self.connection_manager.lift_up_database() }
     }
 
@@ -787,6 +790,15 @@ impl FilterListManager for FilterListManagerImpl {
                 }
 
                 why
+            })
+    }
+
+    fn get_disabled_rules(&self, ids: Vec<FilterId>) -> FLMResult<Vec<DisabledRulesRaw>> {
+        self.connection_manager
+            .execute_db(|connection: Connection| {
+                RulesListRepository::new()
+                    .get_disabled_rules_by_ids(&connection, &ids)
+                    .map_err(FLMError::from_database)
             })
     }
 }
@@ -1415,5 +1427,54 @@ mod tests {
         fs::remove_file(&path).unwrap();
 
         assert_eq!(test_string.as_str(), "first\nthird\nfifth");
+    }
+
+    #[test]
+    fn test_get_disabled_rules() {
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let source = DbConnectionManager::factory_test().unwrap();
+        let (_, index_filters) = spawn_test_db_with_metadata(&source);
+
+        let last_filter_id = index_filters.last().unwrap().filter_id.unwrap();
+        let first_filter_id = index_filters.first().unwrap().filter_id.unwrap();
+
+        source
+            .execute_db(|mut connection: Connection| {
+                let rules1 = RulesListEntity {
+                    filter_id: last_filter_id,
+                    text: "Text\nDisabled Text\n123".to_string(),
+                    disabled_text: "Disabled Text\n123".to_string(),
+                };
+
+                let rules2 = RulesListEntity {
+                    filter_id: first_filter_id,
+                    text: "Text2\nDisabled Text2".to_string(),
+                    disabled_text: "Disabled Text2".to_string(),
+                };
+
+                let tx = connection.transaction().unwrap();
+                let repo = RulesListRepository::new();
+
+                repo.insert(&tx, vec![rules1, rules2].as_slice()).unwrap();
+
+                tx.commit().unwrap();
+
+                Ok(())
+            })
+            .unwrap();
+
+        drop(source);
+
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
+        let actual = flm
+            .get_disabled_rules(vec![first_filter_id, last_filter_id])
+            .unwrap();
+
+        assert_eq!(actual[0].text.as_str(), "Disabled Text2");
+        assert_eq!(actual[1].text.as_str(), "Disabled Text\n123");
     }
 }

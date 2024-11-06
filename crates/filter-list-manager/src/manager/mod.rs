@@ -6,6 +6,7 @@ mod update_filters_action;
 
 use crate::manager::models::active_rules_info::ActiveRulesInfo;
 use crate::manager::models::configuration::Locale;
+use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
 use crate::manager::models::filter_group::FilterGroup;
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
@@ -318,4 +319,7 @@ pub trait FilterListManager {
         filter_id: FilterId,
         file_path: P,
     ) -> FLMResult<()>;
+
+    /// Returns lists of disabled rules by list of filter IDs
+    fn get_disabled_rules(&self, ids: Vec<FilterId>) -> FLMResult<Vec<DisabledRulesRaw>>;
 }

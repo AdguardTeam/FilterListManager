@@ -14,6 +14,9 @@ use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 // Re-export native structs and functions
 pub use crate::top_level::*;
+use adguard_flm::manager::models::configuration::Locale;
+use adguard_flm::manager::models::disabled_rules_raw::DisabledRulesRaw;
+use adguard_flm::manager::models::filter_list_rules::FilterListRules;
 use adguard_flm::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 pub use native_interface::*;
 
@@ -188,6 +191,10 @@ impl FilterListManager {
 
     pub fn save_rules_to_file_blob(&self, filter_id: FilterId, file_path: String) -> AGResult<()> {
         self.wrap(move |flm| flm.save_rules_to_file_blob(filter_id, file_path))
+    }
+
+    pub fn get_disabled_rules(&self, ids: Vec<FilterId>) -> AGResult<Vec<DisabledRulesRaw>> {
+        self.wrap(move |flm| flm.get_disabled_rules(ids))
     }
 }
 
