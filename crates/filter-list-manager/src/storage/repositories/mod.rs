@@ -36,10 +36,9 @@ where
     fn bulk_delete(&self, transaction: &Transaction, ids: &Vec<PK>) -> rusqlite::Result<usize> {
         let mut statement = transaction.prepare(
             format!(
-                "DELETE FROM {} WHERE {} {}",
+                "DELETE FROM {} WHERE {}",
                 Self::TABLE_NAME,
-                Self::PK_FIELD,
-                build_in_clause(ids.len())
+                build_in_clause(Self::PK_FIELD, ids.len())
             )
             .as_str(),
         )?;

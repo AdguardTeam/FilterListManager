@@ -146,11 +146,10 @@ impl FilterRepository {
                 [filter]
             SET
                 is_enabled=?1
-            WHERE
-                filter_id",
+            WHERE ",
         );
 
-        sql += build_in_clause(ids.len()).as_str();
+        sql += build_in_clause("filter_id", ids.len()).as_str();
 
         let mut statement = tx.prepare(sql.as_str())?;
 
@@ -178,11 +177,10 @@ impl FilterRepository {
                 [filter]
             SET
                 is_installed=?1
-            WHERE
-                filter_id",
+            WHERE ",
         );
 
-        sql += build_in_clause(ids.len()).as_str();
+        sql += build_in_clause("filter_id", ids.len()).as_str();
 
         let mut statement = tx.prepare(sql.as_str())?;
 
@@ -208,12 +206,10 @@ impl FilterRepository {
                 filter_id
             FROM
                 [filter]
-            WHERE
-                filter_id
-        ",
+            WHERE ",
         );
 
-        sql += build_in_clause(ids.len()).as_str();
+        sql += build_in_clause("filter_id", ids.len()).as_str();
 
         // Check that filter is custom, by the group presence
         let mut statement = conn.prepare(sql.as_str())?;
