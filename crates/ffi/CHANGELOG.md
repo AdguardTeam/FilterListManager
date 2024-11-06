@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.8.13] - 2024-11-06
+
+### Fixed
+- Fix where clause for empty entities list
+
+[0.8.13]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.11...ffi-0.8.13
+
 ## [0.8.11] - 2024-11-05
 
 ### Fixed
