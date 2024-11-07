@@ -32,6 +32,25 @@ impl RulesListRepository {
         Self {}
     }
 
+    #[cfg(test)]
+    /// Gets all rules, except bootstrapped
+    pub(crate) fn select_rules_except_bootstrapped(
+        &self,
+        connection: &Connection,
+    ) -> Result<Option<Vec<RulesListEntity>>> {
+        use crate::storage::db_bootstrap::get_bootstrapped_filter_id;
+        use crate::storage::sql_generators::operator::SQLOperator::{FieldEqualValue, Not};
+        use crate::utils::memory::heap;
+
+        self.select(
+            &connection,
+            Some(Not(heap(FieldEqualValue(
+                "filter_id",
+                get_bootstrapped_filter_id().into(),
+            )))),
+        )
+    }
+
     pub(crate) fn insert_row(&self, conn: &mut Connection, entity: RulesListEntity) -> Result<()> {
         let transaction = conn.transaction()?;
 

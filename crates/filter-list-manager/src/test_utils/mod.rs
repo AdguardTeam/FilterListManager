@@ -2,6 +2,8 @@ pub(crate) mod indexes_fixtures;
 pub(crate) mod tests_db;
 
 use once_cell::sync::Lazy;
+use std::fs;
+use std::path::PathBuf;
 use std::sync::{Mutex, MutexGuard, Once};
 
 use tests_db::TestsDb;
@@ -74,4 +76,22 @@ where
         .unwrap_or_else(|poisoned| poisoned.into_inner());
 
     f(helper)
+}
+
+/// I hope this file will be "almost" always removed after the tests
+pub(crate) struct RAIIFile(PathBuf);
+
+impl RAIIFile {
+    pub(crate) fn new(path: &PathBuf, contents: &str) -> Self {
+        fs::write(&path, contents).unwrap();
+        Self(path.to_path_buf())
+    }
+}
+
+impl Drop for RAIIFile {
+    fn drop(&mut self) {
+        if fs::metadata(&self.0).is_ok() {
+            fs::remove_file(&self.0).unwrap()
+        }
+    }
 }
