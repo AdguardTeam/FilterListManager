@@ -71,7 +71,7 @@ impl RulesListRepository {
             SELECT
                 filter_id,
                 rules_text,
-                disabled_rules_text,
+                disabled_rules_text
             FROM
                 [rules_list]
             WHERE ",
