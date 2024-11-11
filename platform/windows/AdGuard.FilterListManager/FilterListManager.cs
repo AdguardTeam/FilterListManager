@@ -6,9 +6,9 @@ namespace AdGuard.FilterListManager
     /// <summary>
     /// Main <see cref="IFilterListManager"/> implementation.
     /// </summary>
-    /// <seealso cref="FFIObject&lt;FilterListManagerSafeHandle&gt;" />
+    /// <seealso cref="FfiObject{THandle}" />
     /// <seealso cref="IFilterListManager" />
-    public class FilterListManager : FFIObject<FilterListManagerSafeHandle>, IFilterListManager
+    public class FilterListManager : FfiObject<FilterListManagerSafeHandle>, IFilterListManager
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterListManager"/> class.
@@ -26,7 +26,7 @@ namespace AdGuard.FilterListManager
                 UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_constructor_filterlistmanager_new(
-                            FfiConverterTypeConfiguration.INSTANCE.Lower(configuration),
+                            FfiConverterTypeConfiguration.Instance.Lower(configuration),
                             ref status
                         )
                 )
@@ -38,13 +38,13 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public bool ChangeLocale(string suggestedLocale)
         {
-            return FfiConverterBoolean.INSTANCE.Lift(
+            return FfiConverterBoolean.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_change_locale(
                             GetHandle(),
-                            FfiConverterString.INSTANCE.Lower(suggestedLocale),
+                            FfiConverterString.Instance.Lower(suggestedLocale),
                             ref status
                         )
                 )
@@ -56,13 +56,13 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public long DeleteCustomFilterLists(List<long> ids)
         {
-            return FfiConverterInt64.INSTANCE.Lift(
+            return FfiConverterInt64.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_delete_custom_filter_lists(
                             GetHandle(),
-                            FfiConverterSequenceInt64.INSTANCE.Lower(ids),
+                            FfiConverterSequenceInt64.Instance.Lower(ids),
                             ref status
                         )
                 )
@@ -74,14 +74,14 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public long EnableFilterLists(List<long> ids, bool isEnabled)
         {
-            return FfiConverterInt64.INSTANCE.Lift(
+            return FfiConverterInt64.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_enable_filter_lists(
                             GetHandle(),
-                            FfiConverterSequenceInt64.INSTANCE.Lower(ids),
-                            FfiConverterBoolean.INSTANCE.Lower(isEnabled),
+                            FfiConverterSequenceInt64.Instance.Lower(ids),
+                            FfiConverterBoolean.Instance.Lower(isEnabled),
                             ref status
                         )
                 )
@@ -93,13 +93,13 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public FilterListMetadata FetchFilterListMetadata(string url)
         {
-            return FfiConverterTypeFilterListMetadata.INSTANCE.Lift(
+            return FfiConverterTypeFilterListMetadata.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata(
                             GetHandle(),
-                            FfiConverterString.INSTANCE.Lower(url),
+                            FfiConverterString.Instance.Lower(url),
                             ref status
                         )
                 )
@@ -111,14 +111,14 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public UpdateResult ForceUpdateFiltersByIds(List<long> ids, int looseTimeout)
         {
-            return FfiConverterOptionalTypeUpdateResult.INSTANCE.Lift(
+            return FfiConverterOptionalTypeUpdateResult.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_force_update_filters_by_ids(
                             GetHandle(),
-                            FfiConverterSequenceInt64.INSTANCE.Lower(ids),
-                            FfiConverterInt32.INSTANCE.Lower(looseTimeout),
+                            FfiConverterSequenceInt64.Instance.Lower(ids),
+                            FfiConverterInt32.Instance.Lower(looseTimeout),
                             ref status
                         )
                 )
@@ -131,7 +131,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public List<ActiveRulesInfo> GetActiveRules()
         {
-            return FfiConverterSequenceTypeActiveRulesInfo.INSTANCE.Lift(
+            return FfiConverterSequenceTypeActiveRulesInfo.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
@@ -148,7 +148,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public List<FilterGroup> GetAllGroups()
         {
-            return FfiConverterSequenceTypeFilterGroup.INSTANCE.Lift(
+            return FfiConverterSequenceTypeFilterGroup.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
@@ -165,7 +165,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public List<FilterTag> GetAllTags()
         {
-            return FfiConverterSequenceTypeFilterTag.INSTANCE.Lift(
+            return FfiConverterSequenceTypeFilterTag.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
@@ -182,7 +182,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public string GetDatabasePath()
         {
-            return FfiConverterString.INSTANCE.Lift(
+            return FfiConverterString.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
@@ -199,7 +199,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public int? GetDatabaseVersion()
         {
-            return FfiConverterOptionalInt32.INSTANCE.Lift(
+            return FfiConverterOptionalInt32.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
@@ -214,6 +214,19 @@ namespace AdGuard.FilterListManager
         /// <summary>
         ///<inheritdoc cref="IFilterListManager"/>
         /// </summary>
+        public List<DisabledRulesRaw> GetDisabledRules(List<long> ids)
+        {
+            return FfiConverterSequenceTypeDisabledRulesRaw.Instance.Lift(
+                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
+                    (ref RustCallStatus status) =>
+                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_disabled_rules(
+                            GetHandle(), FfiConverterSequenceInt64.Instance.Lower(ids), ref status)
+                ));
+        }
+
+        /// <summary>
+        ///<inheritdoc cref="IFilterListManager"/>
+        /// </summary>
         public List<FilterListRulesRaw> GetFilterRulesAsStrings(List<long> ids)
         {
             return FfiConverterSequenceTypeFilterListRulesRaw.Instance.Lift(
@@ -221,7 +234,7 @@ namespace AdGuard.FilterListManager
                     (ref RustCallStatus status) =>
                         UniFfiLib
                             .uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_filter_rules_as_strings(
-                                GetHandle(), FfiConverterSequenceInt64.INSTANCE.Lower(ids), ref status)
+                                GetHandle(), FfiConverterSequenceInt64.Instance.Lower(ids), ref status)
                 ));
         }
 
@@ -230,13 +243,13 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public FullFilterList GetFullFilterListById(long id)
         {
-            return FfiConverterOptionalTypeFullFilterList.INSTANCE.Lift(
+            return FfiConverterOptionalTypeFullFilterList.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_list_by_id(
                             GetHandle(),
-                            FfiConverterInt64.INSTANCE.Lower(id),
+                            FfiConverterInt64.Instance.Lower(id),
                             ref status
                         )
                 )
@@ -266,7 +279,7 @@ namespace AdGuard.FilterListManager
                 UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib
-                            .uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_stored_filters_metadata_by_id(GetHandle(), FfiConverterInt64.INSTANCE.Lower(id), ref status)
+                            .uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_stored_filters_metadata_by_id(GetHandle(), FfiConverterInt64.Instance.Lower(id), ref status)
                 ));
         }
 
@@ -275,7 +288,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public List<FullFilterList> GetFullFilterLists()
         {
-            return FfiConverterSequenceTypeFullFilterList.INSTANCE.Lift(
+            return FfiConverterSequenceTypeFullFilterList.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
@@ -300,19 +313,19 @@ namespace AdGuard.FilterListManager
             string customDescription
         )
         {
-            return FfiConverterTypeFullFilterList.INSTANCE.Lift(
+            return FfiConverterTypeFullFilterList.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_custom_filter_from_string(
                             GetHandle(),
-                            FfiConverterString.INSTANCE.Lower(downloadUrl),
-                            FfiConverterInt64.INSTANCE.Lower(lastDownloadTime),
-                            FfiConverterBoolean.INSTANCE.Lower(isEnabled),
-                            FfiConverterBoolean.INSTANCE.Lower(isTrusted),
-                            FfiConverterString.INSTANCE.Lower(filterBody),
-                            FfiConverterOptionalString.INSTANCE.Lower(customTitle),
-                            FfiConverterOptionalString.INSTANCE.Lower(customDescription),
+                            FfiConverterString.Instance.Lower(downloadUrl),
+                            FfiConverterInt64.Instance.Lower(lastDownloadTime),
+                            FfiConverterBoolean.Instance.Lower(isEnabled),
+                            FfiConverterBoolean.Instance.Lower(isTrusted),
+                            FfiConverterString.Instance.Lower(filterBody),
+                            FfiConverterOptionalString.Instance.Lower(customTitle),
+                            FfiConverterOptionalString.Instance.Lower(customDescription),
                             ref status
                         )
                 )
@@ -329,16 +342,16 @@ namespace AdGuard.FilterListManager
             string description
         )
         {
-            return FfiConverterTypeFullFilterList.INSTANCE.Lift(
+            return FfiConverterTypeFullFilterList.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_custom_filter_list(
                             GetHandle(),
-                            FfiConverterString.INSTANCE.Lower(downloadUrl),
-                            FfiConverterBoolean.INSTANCE.Lower(isTrusted),
-                            FfiConverterOptionalString.INSTANCE.Lower(title),
-                            FfiConverterOptionalString.INSTANCE.Lower(description),
+                            FfiConverterString.Instance.Lower(downloadUrl),
+                            FfiConverterBoolean.Instance.Lower(isTrusted),
+                            FfiConverterOptionalString.Instance.Lower(title),
+                            FfiConverterOptionalString.Instance.Lower(description),
                             ref status
                         )
                 )
@@ -350,14 +363,14 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public long InstallFilterLists(List<long> ids, bool isInstalled)
         {
-            return FfiConverterInt64.INSTANCE.Lift(
+            return FfiConverterInt64.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_filter_lists(
                             GetHandle(),
-                            FfiConverterSequenceInt64.INSTANCE.Lower(ids),
-                            FfiConverterBoolean.INSTANCE.Lower(isInstalled),
+                            FfiConverterSequenceInt64.Instance.Lower(ids),
+                            FfiConverterBoolean.Instance.Lower(isInstalled),
                             ref status
                         )
                 )
@@ -389,7 +402,7 @@ namespace AdGuard.FilterListManager
                 (ref RustCallStatus status) =>
                     UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_custom_filter_rules(
                         GetHandle(),
-                        FfiConverterTypeFilterListRules.INSTANCE.Lower(rules),
+                        FfiConverterTypeFilterListRules.Instance.Lower(rules),
                         ref status
                     )
             );
@@ -405,8 +418,8 @@ namespace AdGuard.FilterListManager
                 (ref RustCallStatus status) =>
                     UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_disabled_rules(
                         GetHandle(),
-                        FfiConverterInt64.INSTANCE.Lower(filterId),
-                        FfiConverterSequenceString.INSTANCE.Lower(disabledRules),
+                        FfiConverterInt64.Instance.Lower(filterId),
+                        FfiConverterSequenceString.Instance.Lower(disabledRules),
                         ref status
                     )
             );
@@ -415,17 +428,29 @@ namespace AdGuard.FilterListManager
         /// <summary>
         ///<inheritdoc cref="IFilterListManager"/>
         /// </summary>
+        public void SaveRulesToFileBlob(long filterId, string filePath)
+        {
+            UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance, (ref RustCallStatus status) =>
+                UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_rules_to_file_blob(
+                    GetHandle(), FfiConverterInt64.Instance.Lower(filterId),
+                    FfiConverterString.Instance.Lower(filePath), ref status)
+            );
+        }
+
+        /// <summary>
+        ///<inheritdoc cref="IFilterListManager"/>
+        /// </summary>
         public bool UpdateCustomFilterMetadata(long filterId, string title, bool isTrusted)
         {
-            return FfiConverterBoolean.INSTANCE.Lift(
+            return FfiConverterBoolean.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_custom_filter_metadata(
                             GetHandle(),
-                            FfiConverterInt64.INSTANCE.Lower(filterId),
-                            FfiConverterString.INSTANCE.Lower(title),
-                            FfiConverterBoolean.INSTANCE.Lower(isTrusted),
+                            FfiConverterInt64.Instance.Lower(filterId),
+                            FfiConverterString.Instance.Lower(title),
+                            FfiConverterBoolean.Instance.Lower(isTrusted),
                             ref status
                         )
                 )
@@ -441,15 +466,15 @@ namespace AdGuard.FilterListManager
             bool ignoreFiltersStatus
         )
         {
-            return FfiConverterOptionalTypeUpdateResult.INSTANCE.Lift(
+            return FfiConverterOptionalTypeUpdateResult.Instance.Lift(
                 UniffiHelpers.RustCallWithError(
                     FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_filters(
                             GetHandle(),
-                            FfiConverterBoolean.INSTANCE.Lower(ignoreFiltersExpiration),
-                            FfiConverterInt32.INSTANCE.Lower(looseTimeout),
-                            FfiConverterBoolean.INSTANCE.Lower(ignoreFiltersStatus),
+                            FfiConverterBoolean.Instance.Lower(ignoreFiltersExpiration),
+                            FfiConverterInt32.Instance.Lower(looseTimeout),
+                            FfiConverterBoolean.Instance.Lower(ignoreFiltersStatus),
                             ref status
                         )
                 )

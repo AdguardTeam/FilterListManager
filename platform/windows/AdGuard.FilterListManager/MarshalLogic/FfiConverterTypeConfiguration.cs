@@ -2,55 +2,55 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterTypeConfiguration : FfiConverterRustBuffer<Configuration>
     {
-        public static FfiConverterTypeConfiguration INSTANCE = new FfiConverterTypeConfiguration();
+        public static FfiConverterTypeConfiguration Instance = new FfiConverterTypeConfiguration();
 
         public override Configuration Read(BigEndianStream stream)
         {
             return new Configuration(
-                filterListType: FfiConverterTypeFilterListType.INSTANCE.Read(stream),
-                workingDirectory: FfiConverterOptionalString.INSTANCE.Read(stream),
-                locale: FfiConverterString.INSTANCE.Read(stream),
-                defaultFilterListExpiresPeriodSec: FfiConverterInt32.INSTANCE.Read(stream),
-                compilerConditionalConstants: FfiConverterOptionalSequenceString.INSTANCE.Read(stream),
-                metadataUrl: FfiConverterString.INSTANCE.Read(stream),
-                metadataLocalesUrl: FfiConverterString.INSTANCE.Read(stream),
-                encryptionKey: FfiConverterOptionalString.INSTANCE.Read(stream),
-                requestTimeoutMs: FfiConverterInt32.INSTANCE.Read(stream),
-                autoLiftUpDatabase: FfiConverterBoolean.INSTANCE.Read(stream)
+                filterListType: FfiConverterTypeFilterListType.Instance.Read(stream),
+                workingDirectory: FfiConverterOptionalString.Instance.Read(stream),
+                locale: FfiConverterString.Instance.Read(stream),
+                defaultFilterListExpiresPeriodSec: FfiConverterInt32.Instance.Read(stream),
+                compilerConditionalConstants: FfiConverterOptionalSequenceString.Instance.Read(stream),
+                metadataUrl: FfiConverterString.Instance.Read(stream),
+                metadataLocalesUrl: FfiConverterString.Instance.Read(stream),
+                encryptionKey: FfiConverterOptionalString.Instance.Read(stream),
+                requestTimeoutMs: FfiConverterInt32.Instance.Read(stream),
+                autoLiftUpDatabase: FfiConverterBoolean.Instance.Read(stream)
             );
         }
 
         public override int AllocationSize(Configuration value)
         {
-            return FfiConverterTypeFilterListType.INSTANCE.AllocationSize(value.FilterListType)
-                   + FfiConverterOptionalString.INSTANCE.AllocationSize(value.WorkingDirectory)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.Locale)
-                   + FfiConverterInt32.INSTANCE.AllocationSize(value.DefaultFilterListExpiresPeriodSec)
-                   + FfiConverterOptionalSequenceString.INSTANCE.AllocationSize(
+            return FfiConverterTypeFilterListType.Instance.AllocationSize(value.FilterListType)
+                   + FfiConverterOptionalString.Instance.AllocationSize(value.WorkingDirectory)
+                   + FfiConverterString.Instance.AllocationSize(value.Locale)
+                   + FfiConverterInt32.Instance.AllocationSize(value.DefaultFilterListExpiresPeriodSec)
+                   + FfiConverterOptionalSequenceString.Instance.AllocationSize(
                        value.CompilerConditionalConstants
                    )
-                   + FfiConverterString.INSTANCE.AllocationSize(value.MetadataUrl)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.MetadataLocalesUrl)
-                   + FfiConverterOptionalString.INSTANCE.AllocationSize(value.EncryptionKey)
-                   + FfiConverterInt32.INSTANCE.AllocationSize(value.RequestTimeoutMs) +
-                   FfiConverterBoolean.INSTANCE.AllocationSize(value.AutoLiftUpDatabase);
+                   + FfiConverterString.Instance.AllocationSize(value.MetadataUrl)
+                   + FfiConverterString.Instance.AllocationSize(value.MetadataLocalesUrl)
+                   + FfiConverterOptionalString.Instance.AllocationSize(value.EncryptionKey)
+                   + FfiConverterInt32.Instance.AllocationSize(value.RequestTimeoutMs) +
+                   FfiConverterBoolean.Instance.AllocationSize(value.AutoLiftUpDatabase);
         }
 
         public override void Write(Configuration value, BigEndianStream stream)
         {
-            FfiConverterTypeFilterListType.INSTANCE.Write(value.FilterListType, stream);
-            FfiConverterOptionalString.INSTANCE.Write(value.WorkingDirectory, stream);
-            FfiConverterString.INSTANCE.Write(value.Locale, stream);
-            FfiConverterInt32.INSTANCE.Write(value.DefaultFilterListExpiresPeriodSec, stream);
-            FfiConverterOptionalSequenceString.INSTANCE.Write(
+            FfiConverterTypeFilterListType.Instance.Write(value.FilterListType, stream);
+            FfiConverterOptionalString.Instance.Write(value.WorkingDirectory, stream);
+            FfiConverterString.Instance.Write(value.Locale, stream);
+            FfiConverterInt32.Instance.Write(value.DefaultFilterListExpiresPeriodSec, stream);
+            FfiConverterOptionalSequenceString.Instance.Write(
                 value.CompilerConditionalConstants,
                 stream
             );
-            FfiConverterString.INSTANCE.Write(value.MetadataUrl, stream);
-            FfiConverterString.INSTANCE.Write(value.MetadataLocalesUrl, stream);
-            FfiConverterOptionalString.INSTANCE.Write(value.EncryptionKey, stream);
-            FfiConverterInt32.INSTANCE.Write(value.RequestTimeoutMs, stream);
-            FfiConverterBoolean.INSTANCE.Write(value.AutoLiftUpDatabase, stream);
+            FfiConverterString.Instance.Write(value.MetadataUrl, stream);
+            FfiConverterString.Instance.Write(value.MetadataLocalesUrl, stream);
+            FfiConverterOptionalString.Instance.Write(value.EncryptionKey, stream);
+            FfiConverterInt32.Instance.Write(value.RequestTimeoutMs, stream);
+            FfiConverterBoolean.Instance.Write(value.AutoLiftUpDatabase, stream);
         }
     }
 }

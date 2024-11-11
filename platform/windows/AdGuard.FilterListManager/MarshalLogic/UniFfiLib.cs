@@ -24,7 +24,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
             return method.Name;
         }
 
-        private static readonly List<KeyValuePair<ushort, Func<ushort>>> API_CHECKSUM_MAP =
+        /// <summary>
+        /// The API checksum map. We are provided with Rust-backed checksums functions (*_checksum_*). This map is to call and check using these checksums.
+        /// </summary>
+        private static readonly List<KeyValuePair<ushort, Func<ushort>>> ApiChecksumMap =
             new List<KeyValuePair<ushort, Func<ushort>>>
             {
                 new KeyValuePair<ushort, Func<ushort>>(29147,
@@ -47,6 +50,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_database_path),
                 new KeyValuePair<ushort, Func<ushort>>(16124,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_database_version),
+                new KeyValuePair<ushort, Func<ushort>>(38694,
+                    uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_disabled_rules),
                 new KeyValuePair<ushort, Func<ushort>>(12308,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_list_by_id),
                 new KeyValuePair<ushort, Func<ushort>>(7447,
@@ -63,6 +68,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_custom_filter_rules),
                 new KeyValuePair<ushort, Func<ushort>>(36828,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_disabled_rules),
+                new KeyValuePair<ushort, Func<ushort>>(1505,
+                    uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_rules_to_file_blob),
                 new KeyValuePair<ushort, Func<ushort>>(30898,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_custom_filter_metadata),
                 new KeyValuePair<ushort, Func<ushort>>(2861,
@@ -84,7 +91,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         static void UniffiCheckApiChecksums()
         {
-            foreach (KeyValuePair<ushort, Func<ushort>> apiChecksum in API_CHECKSUM_MAP)
+            foreach (KeyValuePair<ushort, Func<ushort>> apiChecksum in ApiChecksumMap)
             {
                 ushort checksum = apiChecksum.Value();
                 if (checksum == apiChecksum.Key)
@@ -156,6 +163,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_disabled_rules(FilterListManagerSafeHandle ptr, RustBuffer ids, ref RustCallStatus uniffiOutErr
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_list_by_id(FilterListManagerSafeHandle ptr, long id, ref RustCallStatus uniffiOutErr
         );
 
@@ -185,6 +196,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_disabled_rules(FilterListManagerSafeHandle ptr, long filterId, RustBuffer disabledRules, ref RustCallStatus uniffiOutErr
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_rules_to_file_blob(FilterListManagerSafeHandle ptr, long filterId, RustBuffer filePath, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
@@ -492,6 +507,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_disabled_rules(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings(
         );
 
@@ -525,6 +544,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_disabled_rules(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_rules_to_file_blob(
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]

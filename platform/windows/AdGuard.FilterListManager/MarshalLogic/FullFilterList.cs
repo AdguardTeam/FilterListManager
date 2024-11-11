@@ -2,8 +2,35 @@ using System.Collections.Generic;
 
 namespace AdGuard.FilterListManager.MarshalLogic
 {
+    /// <summary>
+    /// Fill info about the filter from the list
+    /// </summary>
     public class FullFilterList
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FullFilterList"/> class.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="groupId">The group identifier.</param>
+        /// <param name="timeUpdated">The time updated.</param>
+        /// <param name="lastDownloadTime">The last download time.</param>
+        /// <param name="title">The title.</param>
+        /// <param name="description">The description.</param>
+        /// <param name="version">The version.</param>
+        /// <param name="displayNumber">The display number.</param>
+        /// <param name="downloadUrl">The download URL.</param>
+        /// <param name="subscriptionUrl">The subscription URL.</param>
+        /// <param name="tags">The tags.</param>
+        /// <param name="expires">The expires.</param>
+        /// <param name="isTrusted">if set to <c>true</c> [is trusted].</param>
+        /// <param name="isCustom">if set to <c>true</c> [is custom].</param>
+        /// <param name="isEnabled">if set to <c>true</c> [is enabled].</param>
+        /// <param name="isInstalled">if set to <c>true</c> [is installed].</param>
+        /// <param name="homepage">The homepage.</param>
+        /// <param name="license">The license.</param>
+        /// <param name="checksum">The checksum.</param>
+        /// <param name="languages">The languages.</param>
+        /// <param name="rules">The rules.</param>
         public FullFilterList(long id,
             int groupId,
             long timeUpdated,
@@ -49,51 +76,121 @@ namespace AdGuard.FilterListManager.MarshalLogic
             this.rules = rules;
         }
 
+        /// <summary>
+        /// Gets or sets the filter identifier.
+        /// </summary>
         public long id { get; set; }
-        public int groupId { get; set; }
-        public long timeUpdated { get; set; }
-        public long lastDownloadTime { get; set; }
-        public string title { get; set; }
-        public string description { get; set; }
-        public string version { get; set; }
-        public int displayNumber { get; set; }
-        public string downloadUrl { get; set; }
-        public string subscriptionUrl { get; set; }
-        public List<FilterTag> tags { get; set; }
-        public int expires { get; set; }
-        public bool isTrusted { get; set; }
-        public bool isCustom { get; set; }
-        public bool isEnabled { get; set; }
-        public bool isInstalled { get; set; }
-        public string homepage { get; set; }
-        public string license { get; set; }
-        public string checksum { get; set; }
-        public List<string> languages { get; set; }
-        public FilterListRules rules { get; set; }
 
-        public void Deconstruct(out long id, out int groupId, out long timeUpdated, out long lastDownloadTime, out string title, out string description, out string version, out int displayNumber, out string downloadUrl, out string subscriptionUrl, out List<FilterTag> tags, out int expires, out bool isTrusted, out bool isCustom, out bool isEnabled, out bool isInstalled, out string homepage, out string license, out string checksum, out List<string> languages, out FilterListRules rules)
-        {
-            id = this.id;
-            groupId = this.groupId;
-            timeUpdated = this.timeUpdated;
-            lastDownloadTime = this.lastDownloadTime;
-            title = this.title;
-            description = this.description;
-            version = this.version;
-            displayNumber = this.displayNumber;
-            downloadUrl = this.downloadUrl;
-            subscriptionUrl = this.subscriptionUrl;
-            tags = this.tags;
-            expires = this.expires;
-            isTrusted = this.isTrusted;
-            isCustom = this.isCustom;
-            isEnabled = this.isEnabled;
-            isInstalled = this.isInstalled;
-            homepage = this.homepage;
-            license = this.license;
-            checksum = this.checksum;
-            languages = this.languages;
-            rules = this.rules;
-        }
+        /// <summary>
+        /// Gets or sets the group identifier.
+        /// </summary>
+        public int groupId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the time updated.
+        /// </summary>
+        public long timeUpdated { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last download time.
+        /// </summary>
+        public long lastDownloadTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the title.
+        /// </summary>
+        public string title { get; set; }
+
+        /// <summary>
+        /// Gets or sets the description.
+        /// </summary>
+        public string description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the version.
+        /// </summary>
+        public string version { get; set; }
+
+        /// <summary>
+        /// Gets or sets the display number.
+        /// </summary>
+        public int displayNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the download URL.
+        /// </summary>
+        public string downloadUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the subscription URL.
+        /// </summary>
+        public string subscriptionUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tags.
+        /// </summary>
+        public List<FilterTag> tags { get; set; }
+
+        /// <summary>
+        /// Gets or sets when this filter the expires.
+        /// </summary>
+        public int expires { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this filter is trusted.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this filter is trusted; otherwise, <c>false</c>.
+        /// </value>
+        public bool isTrusted { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this filter is custom.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this filter is custom; otherwise, <c>false</c>.
+        /// </value>
+        public bool isCustom { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this filter is enabled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this filter is enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool isEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this filter is installed.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this filter is installed; otherwise, <c>false</c>.
+        /// </value>
+        public bool isInstalled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the homepage of the filter.
+        /// </summary>
+        public string homepage { get; set; }
+
+        /// <summary>
+        /// Gets or sets the license string.
+        /// </summary>
+        public string license { get; set; }
+
+        /// <summary>
+        /// Gets or sets the checksum.
+        /// </summary>
+        public string checksum { get; set; }
+
+        /// <summary>
+        /// Gets or sets the languages of the filter.
+        /// </summary>
+        public List<string> languages { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the rules entity of th filter.
+        /// </summary>
+        public FilterListRules rules { get; set; }
     }
 }

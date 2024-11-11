@@ -3,10 +3,14 @@ using System.Linq;
 
 namespace AdGuard.FilterListManager.MarshalLogic
 {
+    /// <summary>
+    /// List(FilterListRulesRaw) to <see cref="RustBuffer"/> converter
+    /// </summary>
     public class FfiConverterSequenceTypeFilterListRulesRaw : FfiConverterRustBuffer<List<FilterListRulesRaw>>
     {
         public static FfiConverterSequenceTypeFilterListRulesRaw Instance = new FfiConverterSequenceTypeFilterListRulesRaw();
 
+        /// <inheritdoc/>
         public override List<FilterListRulesRaw> Read(BigEndianStream stream)
         {
             var length = stream.ReadInt();
@@ -18,6 +22,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             return result;
         }
 
+        /// <inheritdoc/>
         public override int AllocationSize(List<FilterListRulesRaw> value)
         {
             var sizeForLength = 4;
@@ -32,6 +37,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             return sizeForLength + sizeForItems;
         }
 
+        /// <inheritdoc/>
         public override void Write(List<FilterListRulesRaw> value, BigEndianStream stream)
         {
             // details/1-empty-list-as-default-method-parameter.md

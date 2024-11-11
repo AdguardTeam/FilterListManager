@@ -7,7 +7,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         // Call a rust function that returns a Result<>.  Pass in the Error class companion that corresponds to the Err
         public static TU RustCallWithError<TU, TE>(
-            CallStatusErrorHandler<TE> errorHandler,
+            ICallStatusErrorHandler<TE> errorHandler,
             RustCallFunc<TU> callback
         )
             where TE : UniffiException
@@ -31,7 +31,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 // an empty buffer.
                 if (status.error_buf.len > 0)
                 {
-                    throw new PanicException(FfiConverterString.INSTANCE.Lift(status.error_buf));
+                    throw new PanicException(FfiConverterString.Instance.Lift(status.error_buf));
                 }
 
                 throw new PanicException("Rust panic");
@@ -42,7 +42,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         // Call a rust function that returns a Result<>.  Pass in the Error class companion that corresponds to the Err
         public static void RustCallWithError<TE>(
-            CallStatusErrorHandler<TE> errorHandler,
+            ICallStatusErrorHandler<TE> errorHandler,
             RustCallAction callback
         )
             where TE : UniffiException
@@ -60,7 +60,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         // Call a rust function that returns a plain value
         public static TU RustCall<TU>(RustCallFunc<TU> callback)
         {
-            return RustCallWithError(NullCallStatusErrorHandler.INSTANCE, callback);
+            return RustCallWithError(NullCallStatusErrorHandler.Instance, callback);
         }
 
         // Call a rust function that returns a plain value

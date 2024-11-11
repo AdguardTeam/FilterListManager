@@ -2,7 +2,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterInt32 : FfiConverter<int, int>
     {
-        public static FfiConverterInt32 INSTANCE = new FfiConverterInt32();
+        public static FfiConverterInt32 Instance = new FfiConverterInt32();
 
         public override int Lift(int value)
         {

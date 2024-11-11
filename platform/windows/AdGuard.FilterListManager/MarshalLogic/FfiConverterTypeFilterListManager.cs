@@ -5,7 +5,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
     internal class FfiConverterTypeFilterListManager
         : FfiConverter<FilterListManager, FilterListManagerSafeHandle>
     {
-        public static FfiConverterTypeFilterListManager INSTANCE =
+        public static FfiConverterTypeFilterListManager Instance =
             new FfiConverterTypeFilterListManager();
 
         public override FilterListManagerSafeHandle Lower(FilterListManager value)

@@ -1,5 +1,8 @@
 ﻿namespace AdGuard.FilterListManager.Utils
 {
+    /// <summary>
+    /// Main lib constants
+    /// </summary>
     internal class Constants
     {
         /// <summary>

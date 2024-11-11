@@ -2,7 +2,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterOptionalString : FfiConverterRustBuffer<string>
     {
-        public static FfiConverterOptionalString INSTANCE = new FfiConverterOptionalString();
+        public static FfiConverterOptionalString Instance = new FfiConverterOptionalString();
 
         public override string Read(BigEndianStream stream)
         {
@@ -10,7 +10,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             {
                 return null;
             }
-            return FfiConverterString.INSTANCE.Read(stream);
+            return FfiConverterString.Instance.Read(stream);
         }
 
         public override int AllocationSize(string value)
@@ -20,7 +20,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 return 1;
             }
 
-            return 1 + FfiConverterString.INSTANCE.AllocationSize(value);
+            return 1 + FfiConverterString.Instance.AllocationSize(value);
         }
 
         public override void Write(string value, BigEndianStream stream)
@@ -32,7 +32,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             else
             {
                 stream.WriteByte(1);
-                FfiConverterString.INSTANCE.Write(value, stream);
+                FfiConverterString.Instance.Write(value, stream);
             }
         }
     }

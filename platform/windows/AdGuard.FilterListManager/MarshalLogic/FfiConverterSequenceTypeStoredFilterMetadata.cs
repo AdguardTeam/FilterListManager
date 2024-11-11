@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace AdGuard.FilterListManager.MarshalLogic
 {
+    
     internal class FfiConverterSequenceTypeStoredFilterMetadata : FfiConverterRustBuffer<List<StoredFilterMetadata>>
     {
         public static FfiConverterSequenceTypeStoredFilterMetadata Instance = new FfiConverterSequenceTypeStoredFilterMetadata();

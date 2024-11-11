@@ -2,9 +2,8 @@ using System;
 
 namespace AdGuard.FilterListManager.MarshalLogic
 {
-    interface CallStatusErrorHandler<E>
-        where E : Exception
+    internal interface ICallStatusErrorHandler<out T> where T : Exception
     {
-        E Lift(RustBuffer error_buf);
+        T Lift(RustBuffer errorBuf);
     }
 }
