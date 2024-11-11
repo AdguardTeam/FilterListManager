@@ -56,24 +56,20 @@ pub(super) fn update_filters_action(
         filters_errors: vec![],
     };
 
-    // region Diff updates
     let filter_ids = records
         .iter()
         .filter(|filter| filter.filter_id.is_some())
         .map(|filter| filter.filter_id.unwrap())
         .collect::<Vec<FilterId>>();
 
-    let (mut diff_updates_map, mut old_rules_map, mut disabled_rules_map) =
-        db_connection_manager.execute_db(|conn: Connection| {
+    let (mut diff_updates_map, mut rules_map, mut disabled_rules_map) = db_connection_manager
+        .execute_db(|conn: Connection| {
             let diff_updates_map = diff_updates_repository
                 .select_map(&conn, &filter_ids)
                 .map_err(FLMError::from_database)?;
 
-            let filter_ids_for_diff_updates =
-                diff_updates_map.keys().cloned().collect::<Vec<FilterId>>();
-
             let (rules_map, disabled_rules_map) = rule_list_repository
-                .select_rules_maps(&conn, &filter_ids_for_diff_updates)
+                .select_rules_maps(&conn, &filter_ids)
                 .map_err(FLMError::from_database)?;
 
             Ok((diff_updates_map, rules_map, disabled_rules_map))
@@ -118,7 +114,7 @@ pub(super) fn update_filters_action(
             configuration,
             &mut diff_updates_map,
             current_time,
-            &mut old_rules_map,
+            &mut rules_map,
             &batch_patches_container,
             &filter,
         );
@@ -231,7 +227,12 @@ pub(super) fn update_filters_action(
 
             // TODO: Spike, until we implement streaming parsing and/or index downloading before update;
             let new_version = parser.get_metadata(KnownMetadataProperty::Version);
-            if !filter.version.is_empty() && filter.version == new_version {
+            if !filter.version.is_empty() && filter.version == new_version &&
+                // Extra spike, 'cause we may already have metadata, but not the filters
+                // This stupid spike is here, 'cause we MIGHT fall in situation,
+                // when filter metadata.version is provided, it is up-to-date, BUT empty rules object is saved
+                rules_map.get(&filter_id).map(|old_rules| !old_rules.is_empty()).unwrap_or_default()
+            {
                 continue;
             }
 
@@ -240,7 +241,13 @@ pub(super) fn update_filters_action(
             filter.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
 
             filter_entities.push(filter);
-            rule_entities.push(parser.extract_rule_entity(filter_id));
+
+            let mut new_rule = parser.extract_rule_entity(filter_id);
+            new_rule.disabled_text = disabled_rules_map
+                .remove(&new_rule.filter_id)
+                .unwrap_or_default();
+
+            rule_entities.push(new_rule);
         }
 
         with_transaction(&mut conn, |transaction: &Transaction| {
@@ -251,10 +258,7 @@ pub(super) fn update_filters_action(
 
         let new_rules_map = rule_entities
             .into_iter()
-            .fold(HashMap::new(), |mut acc, mut rule| {
-                rule.disabled_text = disabled_rules_map
-                    .remove(&rule.filter_id)
-                    .unwrap_or_default();
+            .fold(HashMap::new(), |mut acc, rule| {
                 acc.insert(rule.filter_id, rule);
                 acc
             });
@@ -314,4 +318,534 @@ fn build_parser(
     }
 
     Ok(None)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::update_filters_action;
+    use crate::storage::entities::filter_entity::FilterEntity;
+    use crate::storage::entities::rules_list_entity::RulesListEntity;
+    use crate::storage::repositories::filter_repository::FilterRepository;
+    use crate::storage::repositories::rules_list_repository::RulesListRepository;
+    use crate::storage::repositories::Repository;
+    use crate::storage::DbConnectionManager;
+    use crate::test_utils::{do_with_tests_helper, RAIIFile};
+    use crate::{Configuration, FilterId};
+    use chrono::Utc;
+    use rusqlite::Connection;
+    use std::{env, thread};
+    use url::Url;
+
+    #[test]
+    fn test_update_filters_action() {
+        let timestamp = Utc::now().timestamp_micros();
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let source = DbConnectionManager::factory_test().unwrap();
+
+        unsafe { source.lift_up_database().unwrap() }
+
+        let mut _files_guard = vec![];
+
+        // This creates filter in the fixtures folder
+        let mut write_rules = |rules: RulesListEntity| -> (Url, RulesListEntity) {
+            let mut path = env::current_dir().unwrap();
+            path.push("fixtures");
+            path.push(format!(
+                "{}_update_filters_action_{}_{:?}.txt",
+                timestamp,
+                &rules.filter_id,
+                thread::current().id()
+            ));
+
+            let filter_url = Url::from_file_path(&path).unwrap();
+
+            _files_guard.push(RAIIFile::new(&path, rules.text.as_str()));
+
+            (filter_url, rules)
+        };
+
+        let first_filter_id = 1;
+        let second_filter_id = 2;
+        let third_filter_id = -100011;
+        let fourth_filter_id = -100012;
+        let fifth_filter_id = 5;
+
+        let mut filter1 = FilterEntity::default();
+        filter1.filter_id = Some(first_filter_id);
+        filter1.group_id = 1;
+        filter1.is_enabled = true;
+        filter1.title = String::from("Filter1");
+        let (download_url1, rules1) = write_rules(RulesListEntity {
+            filter_id: first_filter_id,
+            text: "Filter1\nNonFilter1".to_string(),
+            disabled_text: "NonFilter1".to_string(),
+        });
+        filter1.download_url = download_url1.to_string();
+
+        let mut filter2 = FilterEntity::default();
+        filter2.group_id = 1;
+        filter2.filter_id = Some(second_filter_id);
+        filter2.title = String::from("Filter2");
+        let (download_url2, rules2) = write_rules(RulesListEntity {
+            filter_id: second_filter_id,
+            text: "Filter2\nNonFilter2".to_string(),
+            disabled_text: "NonFilter2".to_string(),
+        });
+        filter2.download_url = download_url2.to_string();
+
+        let mut filter3 = FilterEntity::default();
+        filter3.filter_id = Some(third_filter_id);
+        filter3.title = String::from("Filter3");
+        filter3.is_enabled = true;
+        let (download_url3, rules3) = write_rules(RulesListEntity {
+            filter_id: third_filter_id,
+            text: "Filter3\nNonFilter3".to_string(),
+            disabled_text: "NonFilter3".to_string(),
+        });
+        filter3.download_url = download_url3.to_string();
+
+        // This filter shouldn't be updated
+        let mut filter4 = FilterEntity::default();
+        filter4.filter_id = Some(fourth_filter_id);
+        filter4.title = String::from("Filter4");
+        filter4.last_download_time = Utc::now().timestamp();
+        filter4.last_update_time = Utc::now().timestamp();
+        filter4.is_enabled = true;
+        let (download_url4, rules4) = write_rules(RulesListEntity {
+            filter_id: fourth_filter_id,
+            text: "Filter4\nNonFilter4".to_string(),
+            disabled_text: "NonFilter4".to_string(),
+        });
+        filter4.download_url = download_url4.to_string();
+
+        // Special case - not yet installed filter
+        let mut filter5 = FilterEntity::default();
+        filter5.filter_id = Some(fifth_filter_id);
+        filter5.group_id = 1;
+        filter5.title = String::from("Filter5");
+        filter5.is_enabled = true;
+        // Another special case: Rules is not installed, but version already came from metadata.
+        // Expected behaviour: rules must be installed
+        filter5.version = String::from("2.0.1");
+        let (download_url5, rules5) = write_rules(RulesListEntity {
+            filter_id: fifth_filter_id,
+            text: "\n!Version: 2.0.1\nFilter5\nNonFilter5".to_string(),
+            // Disabled rules weren't written that way.
+            // It will be mistaken to put here non-empty string
+            disabled_text: String::new(),
+        });
+        filter5.download_url = download_url5.to_string();
+
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+
+        let installed_filters = source
+            .execute_db(|mut connection: Connection| {
+                let tx = connection.transaction().unwrap();
+                filters_repo
+                    .insert(&tx, &vec![filter1, filter2, filter3, filter4, filter5])
+                    .unwrap();
+
+                rules_repo
+                    .insert(
+                        &tx,
+                        &vec![
+                            rules1.clone(),
+                            rules2.clone(),
+                            rules3.clone(),
+                            rules4.clone(),
+                        ],
+                    )
+                    .unwrap();
+
+                tx.commit().unwrap();
+
+                let installed_filters = filters_repo
+                    .select_filters_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap();
+
+                let rules_lists_count = rules_repo
+                    .select_rules_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap()
+                    .len();
+
+                assert_eq!(rules_lists_count, 4);
+
+                Ok(installed_filters)
+            })
+            .unwrap();
+
+        assert_eq!(installed_filters.len(), 5);
+
+        // Write new data into all filters
+        let (_, new_rules1) = write_rules(RulesListEntity {
+            filter_id: first_filter_id,
+            text: "Filter1_new\nNonFilter1_new".to_string(),
+            disabled_text: rules1.disabled_text,
+        });
+
+        let _ = write_rules(RulesListEntity {
+            filter_id: second_filter_id,
+            text: "Filter2_new\nNonFilter2_new".to_string(),
+            disabled_text: rules2.clone().disabled_text,
+        });
+
+        let (_, new_rules3) = write_rules(RulesListEntity {
+            filter_id: third_filter_id,
+            text: "Filter3_new\nNonFilter3_new".to_string(),
+            disabled_text: rules3.disabled_text,
+        });
+
+        let _ = write_rules(RulesListEntity {
+            filter_id: fourth_filter_id,
+            text: "Filter4_new\nNonFilter4_new".to_string(),
+            disabled_text: rules4.clone().disabled_text,
+        });
+
+        let result = update_filters_action(
+            installed_filters,
+            &source,
+            false,
+            false,
+            0,
+            &Configuration::default(),
+        )
+        .unwrap();
+
+        let updated_ids = result
+            .updated_list
+            .iter()
+            .map(|item| item.id)
+            .collect::<Vec<FilterId>>();
+
+        // No errors here
+        assert!(result.filters_errors.is_empty());
+
+        // Filters 1,3,5
+        assert_eq!(updated_ids.len(), 3);
+        // First filter is enabled and ready for update by expires
+        assert!(updated_ids
+            .iter()
+            .find(|id| id == &&first_filter_id)
+            .is_some());
+        // Third filter is enabled and ready for update by expires
+        assert!(updated_ids
+            .iter()
+            .find(|id| id == &&third_filter_id)
+            .is_some());
+        // Fifth filter is just installed
+        assert!(updated_ids
+            .iter()
+            .find(|id| id == &&fifth_filter_id)
+            .is_some());
+
+        source
+            .execute_db(|connection: Connection| {
+                let rules = rules_repo
+                    .select_rules_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap();
+
+                let first_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == first_filter_id)
+                    .unwrap();
+
+                let second_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == second_filter_id)
+                    .unwrap();
+
+                let third_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == third_filter_id)
+                    .unwrap();
+
+                let fourth_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == fourth_filter_id)
+                    .unwrap();
+
+                let fifth_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == fifth_filter_id)
+                    .unwrap();
+
+                // These will be updated
+                assert_eq!(first_filter, &new_rules1);
+                assert_eq!(third_filter, &new_rules3);
+
+                // These wasn't update
+                assert_eq!(second_filter, &rules2);
+                assert_eq!(fourth_filter, &rules4);
+
+                // This will be written as new during the update
+                assert_eq!(fifth_filter, &rules5);
+
+                Ok(())
+            })
+            .unwrap()
+    }
+
+    #[test]
+    fn test_force_update_filters_action() {
+        let timestamp = Utc::now().timestamp_micros();
+        do_with_tests_helper(|mut helper| {
+            helper.increment_postfix();
+        });
+
+        let source = DbConnectionManager::factory_test().unwrap();
+
+        unsafe { source.lift_up_database().unwrap() }
+
+        let mut _files_guard = vec![];
+
+        // This creates filter in the fixtures folder
+        let mut write_rules = |rules: RulesListEntity| -> (Url, RulesListEntity) {
+            let mut path = env::current_dir().unwrap();
+            path.push("fixtures");
+            path.push(format!(
+                "{}_update_filters_action_{}_{:?}.txt",
+                timestamp,
+                &rules.filter_id,
+                thread::current().id()
+            ));
+
+            let filter_url = Url::from_file_path(&path).unwrap();
+
+            _files_guard.push(RAIIFile::new(&path, rules.text.as_str()));
+
+            (filter_url, rules)
+        };
+
+        let first_filter_id = 1;
+        let second_filter_id = 2;
+        let third_filter_id = -100011;
+        let fourth_filter_id = -100012;
+        let fifth_filter_id = 5;
+
+        let mut filter1 = FilterEntity::default();
+        filter1.filter_id = Some(first_filter_id);
+        filter1.group_id = 1;
+        filter1.is_enabled = true;
+        filter1.title = String::from("Filter1");
+        let (download_url1, rules1) = write_rules(RulesListEntity {
+            filter_id: first_filter_id,
+            text: "Filter1\nNonFilter1".to_string(),
+            disabled_text: "NonFilter1".to_string(),
+        });
+        filter1.download_url = download_url1.to_string();
+
+        let mut filter2 = FilterEntity::default();
+        filter2.group_id = 1;
+        filter2.filter_id = Some(second_filter_id);
+        filter2.title = String::from("Filter2");
+        let (download_url2, rules2) = write_rules(RulesListEntity {
+            filter_id: second_filter_id,
+            text: "Filter2\nNonFilter2".to_string(),
+            disabled_text: "NonFilter2".to_string(),
+        });
+        filter2.download_url = download_url2.to_string();
+
+        let mut filter3 = FilterEntity::default();
+        filter3.filter_id = Some(third_filter_id);
+        filter3.title = String::from("Filter3");
+        filter3.is_enabled = true;
+        let (download_url3, rules3) = write_rules(RulesListEntity {
+            filter_id: third_filter_id,
+            text: "Filter3\nNonFilter3".to_string(),
+            disabled_text: "NonFilter3".to_string(),
+        });
+        filter3.download_url = download_url3.to_string();
+
+        // This filter shouldn't be updated
+        let mut filter4 = FilterEntity::default();
+        filter4.filter_id = Some(fourth_filter_id);
+        filter4.title = String::from("Filter4");
+        filter4.last_download_time = Utc::now().timestamp();
+        filter4.last_update_time = Utc::now().timestamp();
+        filter4.is_enabled = true;
+        let (download_url4, rules4) = write_rules(RulesListEntity {
+            filter_id: fourth_filter_id,
+            text: "Filter4\nNonFilter4".to_string(),
+            disabled_text: "NonFilter4".to_string(),
+        });
+        filter4.download_url = download_url4.to_string();
+
+        // Special case - not yet installed filter
+        let mut filter5 = FilterEntity::default();
+        filter5.filter_id = Some(fifth_filter_id);
+        filter5.group_id = 1;
+        filter5.title = String::from("Filter5");
+        filter5.is_enabled = true;
+        // Another special case: Rules is not installed, but version already came from metadata.
+        // Expected behaviour: rules must be installed
+        filter5.version = String::from("2.0.1");
+        let (download_url5, rules5) = write_rules(RulesListEntity {
+            filter_id: fifth_filter_id,
+            text: "\n!Version: 2.0.1\nFilter5\nNonFilter5".to_string(),
+            // Disabled rules weren't written that way.
+            // It will be mistaken to put here non-empty string
+            disabled_text: String::new(),
+        });
+        filter5.download_url = download_url5.to_string();
+
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+
+        let installed_filters = source
+            .execute_db(|mut connection: Connection| {
+                let tx = connection.transaction().unwrap();
+                filters_repo
+                    .insert(&tx, &vec![filter1, filter2, filter3, filter4, filter5])
+                    .unwrap();
+
+                rules_repo
+                    .insert(
+                        &tx,
+                        &vec![
+                            rules1.clone(),
+                            rules2.clone(),
+                            rules3.clone(),
+                            rules4.clone(),
+                        ],
+                    )
+                    .unwrap();
+
+                tx.commit().unwrap();
+
+                let installed_filters = filters_repo
+                    .select_filters_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap();
+
+                let rules_lists_count = rules_repo
+                    .select_rules_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap()
+                    .len();
+
+                assert_eq!(rules_lists_count, 4);
+
+                Ok(installed_filters)
+            })
+            .unwrap();
+
+        assert_eq!(installed_filters.len(), 5);
+
+        // Write new data into all filters
+        let (_, new_rules1) = write_rules(RulesListEntity {
+            filter_id: first_filter_id,
+            text: "Filter1_new\nNonFilter1_new".to_string(),
+            disabled_text: rules1.clone().disabled_text,
+        });
+
+        let (_, new_rules2) = write_rules(RulesListEntity {
+            filter_id: second_filter_id,
+            text: "Filter2_new\nNonFilter2_new".to_string(),
+            disabled_text: rules2.clone().disabled_text,
+        });
+
+        let (_, new_rules3) = write_rules(RulesListEntity {
+            filter_id: third_filter_id,
+            text: "Filter3_new\nNonFilter3_new".to_string(),
+            disabled_text: rules3.clone().disabled_text,
+        });
+
+        let (_, new_rules4) = write_rules(RulesListEntity {
+            filter_id: fourth_filter_id,
+            text: "Filter4_new\nNonFilter4_new".to_string(),
+            disabled_text: rules4.clone().disabled_text,
+        });
+
+        let result = update_filters_action(
+            installed_filters,
+            &source,
+            true,
+            true,
+            0,
+            &Configuration::default(),
+        )
+        .unwrap();
+
+        let updated_ids = result
+            .updated_list
+            .iter()
+            .map(|item| item.id)
+            .collect::<Vec<FilterId>>();
+
+        // No errors here
+        assert!(result.filters_errors.is_empty());
+
+        // All filters were updated
+        assert_eq!(updated_ids.len(), 5);
+
+        // First filter is enabled and ready for update by expires
+        assert!(updated_ids
+            .iter()
+            .find(|id| id == &&first_filter_id)
+            .is_some());
+        // Third filter is enabled and ready for update by expires
+        assert!(updated_ids
+            .iter()
+            .find(|id| id == &&third_filter_id)
+            .is_some());
+        // Fifth filter is just installed
+        assert!(updated_ids
+            .iter()
+            .find(|id| id == &&fifth_filter_id)
+            .is_some());
+
+        source
+            .execute_db(|connection: Connection| {
+                let rules = rules_repo
+                    .select_rules_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap();
+
+                let first_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == first_filter_id)
+                    .unwrap();
+
+                let second_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == second_filter_id)
+                    .unwrap();
+
+                let third_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == third_filter_id)
+                    .unwrap();
+
+                let fourth_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == fourth_filter_id)
+                    .unwrap();
+
+                let fifth_filter = rules
+                    .iter()
+                    .find(|rules| rules.filter_id == fifth_filter_id)
+                    .unwrap();
+
+                // These will be updated
+                assert_eq!(first_filter, &new_rules1);
+                assert_eq!(third_filter, &new_rules3);
+
+                // These wasn't update
+                assert_eq!(second_filter, &new_rules2);
+                assert_eq!(fourth_filter, &new_rules4);
+
+                // This will be written as new during the update
+                assert_eq!(fifth_filter, &rules5);
+
+                Ok(())
+            })
+            .unwrap()
+    }
 }

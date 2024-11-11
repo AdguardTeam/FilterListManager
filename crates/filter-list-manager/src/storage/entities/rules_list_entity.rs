@@ -3,6 +3,7 @@ use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::FilterId;
 
 #[derive(Clone)]
+#[cfg_attr(test, derive(Debug, Eq, PartialEq))]
 pub(crate) struct RulesListEntity {
     pub(crate) filter_id: FilterId,
     pub(crate) text: String,

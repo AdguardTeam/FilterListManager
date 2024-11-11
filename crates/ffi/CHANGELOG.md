@@ -4,7 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [0.8.13] - 2024-11-06
+## [0.8.17] - 2024-11-07
+
+### Fixed
+- Fixed all problems in `update_filters` and write tests
+
+[0.8.17]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.13...ffi-0.8.15
+
+## [0.8.15] - 2024-11-07
+
+### Fixed
+- Fix SQL error in update_filters
+
+[0.8.15]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.13...ffi-0.8.15
+
+## [0.8.15] - 2024-11-06
 
 ### Fixed
 - Fix where clause for empty entities list

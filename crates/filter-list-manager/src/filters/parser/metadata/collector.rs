@@ -41,7 +41,7 @@ impl MetadataCollector {
         let (prop, value) = match line.split_once(METADATA_SPLIT_TOKEN) {
             Some(parts) => (
                 parts.0.trim_start_matches(METADATA_LINE_MARKER).trim(),
-                parts.1,
+                parts.1.trim(),
             ),
             None => return,
         };
@@ -56,10 +56,10 @@ impl MetadataCollector {
     }
 
     pub(crate) fn get(&self, prop: KnownMetadataProperty) -> String {
-        match self.values.get(&prop) {
-            None => String::new(),
-            Some(str) => String::from(str.trim()),
-        }
+        self.values
+            .get(&prop)
+            .map(ToOwned::to_owned)
+            .unwrap_or_default()
     }
 
     /// If we need to mark collector as "reached eod" from outside
