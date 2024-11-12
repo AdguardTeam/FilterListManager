@@ -32,6 +32,25 @@ message FilterListRules {
   repeated string disabled_rules = 3;
 }
 
+message FilterListRulesRaw {
+  // Associated filter id.
+  int64 filter_id = 1;
+
+  // List of all rules in the filter list as string.
+  string rules = 2;
+
+  // List of only disabled rules as string.
+  string disabled_rules = 3;
+}
+
+message DisabledRulesRaw {
+  // Associated filter id.
+  int64 filter_id = 1;
+
+  // List of only disabled rules as string.
+  string text = 2;
+}
+
 message FilterListMetadata {
   // Title from the `! Title:` metadata field.
   string title = 1;

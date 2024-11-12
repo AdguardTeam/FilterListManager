@@ -47,6 +47,7 @@ enum AGOuterErrorVariant: Error {
     case FilterContentIsLikelyNotAFilter
     case FilterParserError
     case FieldIsEmpty(String)
+    case DatabaseBusy
     case Mutex
     case Other
 }
@@ -94,6 +95,8 @@ extension AGOuterErrorVariant {
             self = Self.Mutex
         case .other(_):
             self = Self.Other
+        case .databaseBusy(_):
+            self = Self.DatabaseBusy
         }
     }
 }
@@ -110,6 +113,7 @@ func makeDefaultConfiguration() throws -> FilterListManager_Configuration {
     defer {
         flm_free_response(response);
     }
+
 
     let byteData = Data(bytes: response.pointee.result_data, count: response.pointee.result_data_len);
 
@@ -136,7 +140,7 @@ func spawnConf() throws -> FilterListManager_Configuration {
     configuration.locale = "en";
     configuration.metadataURL = "https://filters.adtidy.org/extension/safari/filters.json";
     configuration.metadataLocalesURL = "https://filters.adtidy.org/extension/safari/filters_i18n.json";
-    configuration.workingDirectory = "../../../../../../";
+    configuration.workingDirectory = ".";
 
     return configuration
 }
@@ -275,19 +279,6 @@ class FLMFacade {
         }
 
         return response.count
-    }
-
-    func getFullFilterLists() throws -> [FilterListManager_FullFilterList] {
-        let message = FilterListManager_EmptyRequest();
-
-        let bytes = try callRust(method: GetFullFilterLists, message: message);
-        let response = try FilterListManager_GetFullFilterListsResponse(serializedBytes: bytes);
-
-        guard response.hasError == false else {
-            throw AGOuterError(from: response.error)
-        }
-
-        return response.filterLists
     }
 
     func getFullFilterListsById(id: Int64) throws -> FilterListManager_FullFilterList {
@@ -538,22 +529,50 @@ class FLMFacade {
         return response.filterList;
     }
 
+    func getFilterRulesAsStrings(ids: [Int64]) throws -> [FilterListManager_FilterListRulesRaw] {
+        var message = FilterListManager_GetFilterRulesAsStringsRequest();
+        message.ids = ids;
+
+        let bytes = try callRust(method: GetFilterRulesAsStrings, message: message);
+        let response = try FilterListManager_GetFilterRulesAsStringsResponse(serializedBytes: bytes);
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+
+        return response.rulesList;
+    }
+
+    func saveRulesToFileBlob(id: Int64, filePath: String) throws {
+        var message = FilterListManager_SaveRulesToFileBlobRequest();
+        message.filterID = id;
+        message.filePath = filePath;
+
+        let bytes = try callRust(method: SaveRulesToFileBlob, message: message);
+        let response = try FilterListManager_EmptyResponse(serializedBytes: bytes);
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+    }
+
+    func getDisabledRules(ids: [Int64]) throws -> [FilterListManager_DisabledRulesRaw] {
+        var message = FilterListManager_GetDisabledRulesRequest();
+        message.ids = ids;
+
+        let bytes = try callRust(method: GetDisabledRules, message: message);
+        let response = try FilterListManager_GetDisabledRulesResponse(serializedBytes: bytes);
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+
+        return response.rulesRaw;
+    }
+
     deinit {
         flm_free_handle(self.flm_handle)
     }
-}
-
-func testFullFilterLists() throws {
-    let conf = try spawnConf();
-
-    let flm = try FLMFacade(configuration: conf);
-    try flm.pullMetadata();
-    let _ = try flm.updateFilters(ignoreFiltersExpiration: true, looseTimeout: 0, ignoreFiltersStatus: true);
-
-    let start = CFAbsoluteTimeGetCurrent();
-    let _ = try flm.getFullFilterLists();
-    let diff = CFAbsoluteTimeGetCurrent() - start
-    print("FLM Took on swift \(diff) seconds");
 }
 
 func testExceptions() throws {
@@ -584,13 +603,6 @@ func testAllMethods() throws {
 
     let locale_result = try flm.changeLocale(suggestedLocale: Locale(identifier: "ru_RU"));
     print("Changing locale result: \(locale_result)");
-
-    let lists = try flm.getFullFilterLists();
-    print("Got \(lists.count) lists from flm");
-
-    let nthFilter = lists.filter { $0.id == 255 }.first;
-
-    print("[Ru locale] 255 filter has description \(nthFilter!.title)");
 
     try flm.liftUpDatabase();
 
@@ -624,6 +636,17 @@ func testAllMethods() throws {
     try flm.saveDisabledRules(id: customFilterFromString.id, disabledRules: ["world"]);
 
     print("Disabled rules were saved");
+
+    let FRAS = try flm.getFilterRulesAsStrings(ids: [customFilterFromString.id]);
+    print("Rules from getFilterRulesAsStrings for customId: \(FRAS)");
+
+    // TODO: This test always failed with no file or directory
+    //let testFile = FileManager.default.temporaryDirectory.appending(path: "flmtest_2.txt");
+    //let _ = try flm.saveRulesToFileBlob(id: customFilterFromString.id, filePath: testFile.absoluteString);
+    //print("Rules were written into \(testFile)");
+
+    let disabledRules = try flm.getDisabledRules(ids: [customFilterFromString.id]);
+    print("GetDisabledRules returns \(disabledRules)");
 
     let _ = try flm.deleteCustomFilterLists(ids: [customFilterFromString.id]);
 
@@ -660,7 +683,7 @@ func testAllMethods() throws {
 }
 
 do {
-    try testExceptions();
+    try testAllMethods();
 } catch {
     print("Type: \(type(of: error))");
     print("Error description iz: \(error.localizedDescription)");

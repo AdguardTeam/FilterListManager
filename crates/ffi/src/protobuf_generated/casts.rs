@@ -3,9 +3,9 @@
 use crate::outer_error::AGOuterError;
 use crate::protobuf_generated::filter_list_manager;
 use adguard_flm::{
-    ActiveRulesInfo, Configuration, FilterGroup, FilterListMetadata, FilterListRules,
-    FilterListType, FilterTag, FullFilterList, StoredFilterMetadata, UpdateFilterError,
-    UpdateResult,
+    ActiveRulesInfo, Configuration, DisabledRulesRaw, FilterGroup, FilterListMetadata,
+    FilterListRules, FilterListRulesRaw, FilterListType, FilterTag, FullFilterList,
+    StoredFilterMetadata, UpdateFilterError, UpdateResult,
 };
 
 impl From<Configuration> for filter_list_manager::Configuration {
@@ -55,7 +55,6 @@ impl Into<Configuration> for filter_list_manager::Configuration {
             compiler_conditional_constants,
             metadata_url: self.metadata_url,
             metadata_locales_url: self.metadata_locales_url,
-            encryption_key: None, // @TODO: MUST BE REMOVED
             request_timeout_ms: self.request_timeout_ms,
             auto_lift_up_database: self.auto_lift_up_database,
         }
@@ -318,6 +317,25 @@ impl From<StoredFilterMetadata> for filter_list_manager::StoredFilterMetadata {
             license: value.license,
             checksum: value.checksum,
             languages: value.languages,
+        }
+    }
+}
+
+impl From<FilterListRulesRaw> for filter_list_manager::FilterListRulesRaw {
+    fn from(value: FilterListRulesRaw) -> Self {
+        Self {
+            filter_id: value.filter_id,
+            rules: value.rules,
+            disabled_rules: value.disabled_rules,
+        }
+    }
+}
+
+impl From<DisabledRulesRaw> for filter_list_manager::DisabledRulesRaw {
+    fn from(value: DisabledRulesRaw) -> Self {
+        Self {
+            filter_id: value.filter_id,
+            text: value.text,
         }
     }
 }

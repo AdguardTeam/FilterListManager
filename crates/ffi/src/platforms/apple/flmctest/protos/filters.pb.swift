@@ -20,7 +20,6 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-/// Структура FilterTag
 struct FilterListManager_FilterTag {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -37,7 +36,6 @@ struct FilterListManager_FilterTag {
   init() {}
 }
 
-/// Структура FilterGroup
 struct FilterListManager_FilterGroup {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -57,7 +55,6 @@ struct FilterListManager_FilterGroup {
   init() {}
 }
 
-/// Структура FilterListRules
 struct FilterListManager_FilterListRules {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -77,7 +74,41 @@ struct FilterListManager_FilterListRules {
   init() {}
 }
 
-/// Структура FilterListMetadata
+struct FilterListManager_FilterListRulesRaw {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// Associated filter id.
+  var filterID: Int64 = 0
+
+  /// List of all rules in the filter list as string.
+  var rules: String = String()
+
+  /// List of only disabled rules as string.
+  var disabledRules: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct FilterListManager_DisabledRulesRaw {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// Associated filter id.
+  var filterID: Int64 = 0
+
+  /// List of only disabled rules as string.
+  var text: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
 struct FilterListManager_FilterListMetadata {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -115,7 +146,6 @@ struct FilterListManager_FilterListMetadata {
   init() {}
 }
 
-/// Структура StoredFilterMetadata
 struct FilterListManager_StoredFilterMetadata {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -248,7 +278,6 @@ struct FilterListManager_StoredFilterMetadata {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-/// Структура FullFilterList
 struct FilterListManager_FullFilterList {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -395,6 +424,8 @@ struct FilterListManager_FullFilterList {
 extension FilterListManager_FilterTag: @unchecked Sendable {}
 extension FilterListManager_FilterGroup: @unchecked Sendable {}
 extension FilterListManager_FilterListRules: @unchecked Sendable {}
+extension FilterListManager_FilterListRulesRaw: @unchecked Sendable {}
+extension FilterListManager_DisabledRulesRaw: @unchecked Sendable {}
 extension FilterListManager_FilterListMetadata: @unchecked Sendable {}
 extension FilterListManager_StoredFilterMetadata: @unchecked Sendable {}
 extension FilterListManager_FullFilterList: @unchecked Sendable {}
@@ -525,6 +556,88 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
     if lhs.filterID != rhs.filterID {return false}
     if lhs.rules != rhs.rules {return false}
     if lhs.disabledRules != rhs.disabledRules {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".FilterListRulesRaw"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "filter_id"),
+    2: .same(proto: "rules"),
+    3: .standard(proto: "disabled_rules"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.rules) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.disabledRules) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.filterID != 0 {
+      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+    }
+    if !self.rules.isEmpty {
+      try visitor.visitSingularStringField(value: self.rules, fieldNumber: 2)
+    }
+    if !self.disabledRules.isEmpty {
+      try visitor.visitSingularStringField(value: self.disabledRules, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: FilterListManager_FilterListRulesRaw, rhs: FilterListManager_FilterListRulesRaw) -> Bool {
+    if lhs.filterID != rhs.filterID {return false}
+    if lhs.rules != rhs.rules {return false}
+    if lhs.disabledRules != rhs.disabledRules {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension FilterListManager_DisabledRulesRaw: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".DisabledRulesRaw"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "filter_id"),
+    2: .same(proto: "text"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.text) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.filterID != 0 {
+      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+    }
+    if !self.text.isEmpty {
+      try visitor.visitSingularStringField(value: self.text, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: FilterListManager_DisabledRulesRaw, rhs: FilterListManager_DisabledRulesRaw) -> Bool {
+    if lhs.filterID != rhs.filterID {return false}
+    if lhs.text != rhs.text {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

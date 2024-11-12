@@ -539,11 +539,15 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_database_path(&self) -> FLMResult<String> {
-        Ok(self
-            .connection_manager
-            .get_calculated_path()
-            .to_string_lossy()
-            .to_string())
+        let path = self.connection_manager.get_calculated_path();
+
+        if path.is_absolute() {
+            Ok(path.to_string_lossy().to_string())
+        } else {
+            path.canonicalize()
+                .map_err(FLMError::from_io)
+                .map(|path| path.to_string_lossy().to_string())
+        }
     }
 
     fn lift_up_database(&self) -> FLMResult<()> {

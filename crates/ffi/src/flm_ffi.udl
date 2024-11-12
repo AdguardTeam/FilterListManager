@@ -128,7 +128,6 @@ dictionary Configuration {
     sequence<string>? compiler_conditional_constants;
     string metadata_url;
     string metadata_locales_url;
-    string? encryption_key;
     i32 request_timeout_ms;
     boolean auto_lift_up_database;
 };
@@ -169,9 +168,6 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     i64 delete_custom_filter_lists(sequence<i64> ids);
-
-    [Throws=AGOuterError]
-    sequence<FullFilterList> get_full_filter_lists();
 
     [Throws=AGOuterError]
     FullFilterList? get_full_filter_list_by_id(i64 id);

@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EC29A61A2CAA91F60076AFC8 /* libfilter_list_manager_ffi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EC29A6192CAA91F60076AFC8 /* libfilter_list_manager_ffi.dylib */; };
-		EC29A61B2CAA91F60076AFC8 /* libfilter_list_manager_ffi.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = EC29A6192CAA91F60076AFC8 /* libfilter_list_manager_ffi.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		EC469E132C91E89200F98770 /* outer_error.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC469E0E2C91E89200F98770 /* outer_error.pb.swift */; };
 		EC469E142C91E89200F98770 /* flm_interface.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC469E0F2C91E89200F98770 /* flm_interface.pb.swift */; };
 		EC469E152C91E89200F98770 /* misc_models.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC469E102C91E89200F98770 /* misc_models.pb.swift */; };
@@ -17,6 +15,8 @@
 		EC8FC8872C8A32F5004B3141 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC8FC8862C8A32F5004B3141 /* SystemConfiguration.framework */; };
 		EC8FC8902C8B48D1004B3141 /* SwiftProtobuf in Frameworks */ = {isa = PBXBuildFile; productRef = EC8FC88F2C8B48D1004B3141 /* SwiftProtobuf */; };
 		EC8FC8942C8B48D1004B3141 /* protoc-gen-swift in Frameworks */ = {isa = PBXBuildFile; productRef = EC8FC8932C8B48D1004B3141 /* protoc-gen-swift */; };
+		ECC0E1182CE20C650034A40F /* libfilter_list_manager_ffi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ECBD2EF92C91D48B00B0FC76 /* libfilter_list_manager_ffi.dylib */; };
+		ECC0E1192CE20C650034A40F /* libfilter_list_manager_ffi.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = ECBD2EF92C91D48B00B0FC76 /* libfilter_list_manager_ffi.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		ECF9EBEE2C8A30E100509620 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECF9EBED2C8A30E100509620 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,7 +27,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				EC29A61B2CAA91F60076AFC8 /* libfilter_list_manager_ffi.dylib in Embed Libraries */,
+				ECC0E1192CE20C650034A40F /* libfilter_list_manager_ffi.dylib in Embed Libraries */,
 			);
 			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -44,7 +44,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		EC29A6192CAA91F60076AFC8 /* libfilter_list_manager_ffi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfilter_list_manager_ffi.dylib; path = ../../../../../../target/release/libfilter_list_manager_ffi.dylib; sourceTree = "<group>"; };
 		EC469E0E2C91E89200F98770 /* outer_error.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = outer_error.pb.swift; sourceTree = "<group>"; };
 		EC469E0F2C91E89200F98770 /* flm_interface.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = flm_interface.pb.swift; sourceTree = "<group>"; };
 		EC469E102C91E89200F98770 /* misc_models.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = misc_models.pb.swift; sourceTree = "<group>"; };
@@ -53,8 +52,7 @@
 		EC8FC8862C8A32F5004B3141 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		EC8FC88A2C8A3A8B004B3141 /* Test-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Test-Bridging-Header.h"; sourceTree = "<group>"; };
 		EC8FC88B2C8A3C49004B3141 /* flm_native_interface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = flm_native_interface.h; path = ../../flm_native_interface.h; sourceTree = "<group>"; };
-		EC8FC88C2C8A3DFD004B3141 /* libfilter_list_manager_ffi.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfilter_list_manager_ffi.a; path = ../../../../../../target/debug/libfilter_list_manager_ffi.a; sourceTree = "<group>"; };
-		ECBD2EF92C91D48B00B0FC76 /* libfilter_list_manager_ffi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfilter_list_manager_ffi.dylib; path = ../../../../../../target/debug/libfilter_list_manager_ffi.dylib; sourceTree = "<group>"; };
+		ECBD2EF92C91D48B00B0FC76 /* libfilter_list_manager_ffi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfilter_list_manager_ffi.dylib; path = ../../../../../../target/release/libfilter_list_manager_ffi.dylib; sourceTree = "<group>"; };
 		ECBD2EFD2C91D5D600B0FC76 /* flmctest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = flmctest.entitlements; sourceTree = "<group>"; };
 		ECBD2EFF2C91E44200B0FC76 /* filters.proto */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.protobuf; path = filters.proto; sourceTree = "<group>"; };
 		ECBD2F002C91E44200B0FC76 /* outer_error.proto */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.protobuf; path = outer_error.proto; sourceTree = "<group>"; };
@@ -70,7 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC29A61A2CAA91F60076AFC8 /* libfilter_list_manager_ffi.dylib in Frameworks */,
+				ECC0E1182CE20C650034A40F /* libfilter_list_manager_ffi.dylib in Frameworks */,
 				EC8FC8942C8B48D1004B3141 /* protoc-gen-swift in Frameworks */,
 				EC8FC8872C8A32F5004B3141 /* SystemConfiguration.framework in Frameworks */,
 				EC8FC8902C8B48D1004B3141 /* SwiftProtobuf in Frameworks */,
@@ -139,8 +137,6 @@
 			isa = PBXGroup;
 			children = (
 				ECBD2EF92C91D48B00B0FC76 /* libfilter_list_manager_ffi.dylib */,
-				EC29A6192CAA91F60076AFC8 /* libfilter_list_manager_ffi.dylib */,
-				EC8FC88C2C8A3DFD004B3141 /* libfilter_list_manager_ffi.a */,
 				EC8FC8862C8A32F5004B3141 /* SystemConfiguration.framework */,
 			);
 			name = Frameworks;
@@ -353,6 +349,7 @@
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = VWMJ48UJ62;
 				ENABLE_HARDENED_RUNTIME = YES;
 				LIBRARY_SEARCH_PATHS = ../../../../../../target/release;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				OTHER_CFLAGS = "-L../../../../../../target/release";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -371,6 +368,7 @@
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = VWMJ48UJ62;
 				ENABLE_HARDENED_RUNTIME = YES;
 				LIBRARY_SEARCH_PATHS = ../../../../../../target/release;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-L../../../../../../target/release";
 				PRODUCT_NAME = "$(TARGET_NAME)";

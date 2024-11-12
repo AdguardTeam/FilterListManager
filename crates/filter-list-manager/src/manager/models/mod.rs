@@ -12,7 +12,9 @@ pub mod full_filter_list;
 pub mod stored_filter_metadata;
 pub mod update_result;
 
+pub use self::disabled_rules_raw::DisabledRulesRaw;
 pub use self::filter_list_metadata::FilterListMetadata;
+pub use self::filter_list_rules_raw::FilterListRulesRaw;
 pub use self::flm_error::FLMError;
 pub use self::full_filter_list::FullFilterList;
 pub use self::update_result::UpdateResult;

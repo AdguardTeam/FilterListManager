@@ -14,10 +14,6 @@ use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 // Re-export native structs and functions
 pub use crate::top_level::*;
-use adguard_flm::manager::models::configuration::Locale;
-use adguard_flm::manager::models::disabled_rules_raw::DisabledRulesRaw;
-use adguard_flm::manager::models::filter_list_rules::FilterListRules;
-use adguard_flm::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 pub use native_interface::*;
 
 #[repr(C)]
@@ -58,10 +54,6 @@ impl FilterListManager {
 
     pub fn delete_custom_filter_lists(&self, ids: Vec<FilterId>) -> AGResult<i64> {
         self.wrap(move |flm| flm.delete_custom_filter_lists(ids).map(|v| v as i64))
-    }
-
-    pub fn get_full_filter_lists(&self) -> AGResult<Vec<FullFilterList>> {
-        self.wrap(|flm| flm.get_full_filter_lists())
     }
 
     pub fn get_full_filter_list_by_id(&self, id: FilterId) -> AGResult<Option<FullFilterList>> {

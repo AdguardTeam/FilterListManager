@@ -9,11 +9,13 @@ use crate::protobuf_generated::filter_list_manager::{
     EnableFilterListsResponse, FetchFilterListMetadataRequest, FetchFilterListMetadataResponse,
     ForceUpdateFiltersByIdsRequest, ForceUpdateFiltersByIdsResponse, GetActiveRulesResponse,
     GetAllGroupsResponse, GetAllTagsResponse, GetDatabasePathResponse, GetDatabaseVersionResponse,
-    GetFullFilterListByIdRequest, GetStoredFilterMetadataByIdResponse,
-    GetStoredFiltersMetadataByIdRequest, GetStoredFiltersMetadataResponse,
-    InstallCustomFilterFromStringRequest, InstallCustomFilterFromStringResponse,
-    InstallCustomFilterListRequest, InstallCustomFilterListResponse, InstallFilterListsRequest,
-    InstallFilterListsResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
+    GetDisabledRulesRequest, GetDisabledRulesResponse, GetFilterRulesAsStringsRequest,
+    GetFilterRulesAsStringsResponse, GetFullFilterListByIdRequest,
+    GetStoredFilterMetadataByIdResponse, GetStoredFiltersMetadataByIdRequest,
+    GetStoredFiltersMetadataResponse, InstallCustomFilterFromStringRequest,
+    InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
+    InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
+    SaveCustomFilterRulesRequest, SaveDisabledRulesRequest, SaveRulesToFileBlobRequest,
     UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse, UpdateFiltersRequest,
     UpdateFiltersResponse,
 };
@@ -58,7 +60,7 @@ impl Default for RustResponse {
 }
 
 /// Discriminant for [`RustResponse`] result_data value
-#[repr(C)]
+#[repr(u8)]
 pub enum RustResponseType {
     /// Contains u8 pointer with size
     RustBuffer,
@@ -291,24 +293,6 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::GetFullFilterLists => match flm_handle.flm.get_full_filter_lists() {
-            Ok(list) => {
-                let converted = list
-                    .into_iter()
-                    .map(Into::into)
-                    .collect::<Vec<filter_list_manager::FullFilterList>>();
-
-                filter_list_manager::GetFullFilterListsResponse {
-                    filter_lists: converted,
-                    error: None,
-                }
-            }
-            Err(why) => filter_list_manager::GetFullFilterListsResponse {
-                filter_lists: vec![],
-                error: Some(why.into()),
-            },
-        }
-        .encode(&mut out_bytes_buffer),
         FFIMethods::GetFullFilterListById => {
             let request = decode_input_request!(GetFullFilterListByIdRequest);
 
@@ -507,6 +491,48 @@ pub unsafe extern "C" fn flm_call_protobuf(
             },
         }
         .encode(&mut out_bytes_buffer),
+        FFIMethods::GetFilterRulesAsStrings => {
+            let request = decode_input_request!(GetFilterRulesAsStringsRequest);
+
+            match flm_handle.flm.get_filter_rules_as_strings(request.ids) {
+                Ok(value) => GetFilterRulesAsStringsResponse {
+                    rules_list: value.into_iter().map(Into::into).collect(),
+                    error: None,
+                },
+                Err(why) => GetFilterRulesAsStringsResponse {
+                    rules_list: vec![],
+                    error: Some(why.into()),
+                },
+            }
+        }
+        .encode(&mut out_bytes_buffer),
+        FFIMethods::SaveRulesToFileBlob => {
+            let request = decode_input_request!(SaveRulesToFileBlobRequest);
+
+            EmptyResponse {
+                error: flm_handle
+                    .flm
+                    .save_rules_to_file_blob(request.filter_id, request.file_path)
+                    .err()
+                    .map(Into::into),
+            }
+        }
+        .encode(&mut out_bytes_buffer),
+        FFIMethods::GetDisabledRules => {
+            let request = decode_input_request!(GetDisabledRulesRequest);
+
+            match flm_handle.flm.get_disabled_rules(request.ids) {
+                Ok(value) => GetDisabledRulesResponse {
+                    rules_raw: value.into_iter().map(Into::into).collect(),
+                    error: None,
+                },
+                Err(why) => GetDisabledRulesResponse {
+                    rules_raw: vec![],
+                    error: Some(why.into()),
+                },
+            }
+        }
+        .encode(&mut out_bytes_buffer),
     };
 
     if let Err(encode_error) = encode_result {
@@ -600,7 +626,6 @@ pub enum FFIMethods {
     EnableFilterLists,
     InstallFilterLists,
     DeleteCustomFilterLists,
-    GetFullFilterLists,
     GetFullFilterListById,
     GetStoredFiltersMetadata,
     GetStoredFilterMetadataById,
@@ -619,4 +644,7 @@ pub enum FFIMethods {
     GetDatabaseVersion,
     InstallCustomFilterFromString,
     GetActiveRules,
+    GetFilterRulesAsStrings,
+    SaveRulesToFileBlob,
+    GetDisabledRules,
 }

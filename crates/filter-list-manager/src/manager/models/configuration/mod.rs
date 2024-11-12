@@ -39,12 +39,6 @@ pub struct Configuration {
     pub metadata_url: String,
     /// URL of the locales (filters_i18n.json) file
     pub metadata_locales_url: String,
-    /// Optional encryption key for the storage.
-    /// Should be securely stored on the device (keychain, secure storage, etc.)
-    #[deprecated(
-        note = "This property is not used now, and will be removed in version 1.0.0 or earlier"
-    )]
-    pub encryption_key: Option<String>,
     /// Requests timeouts in milliseconds. Default value 60000
     pub request_timeout_ms: i32,
     /// “Uplifting” a database is a set of measures that brings the database up to date:
@@ -97,7 +91,6 @@ impl Default for Configuration {
             compiler_conditional_constants: None,
             metadata_url: String::new(),
             metadata_locales_url: String::new(),
-            encryption_key: None,
             request_timeout_ms: DEFAULT_REQUEST_TIMEOUT_MS,
             auto_lift_up_database: true,
         }

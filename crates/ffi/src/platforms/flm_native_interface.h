@@ -14,7 +14,6 @@ typedef enum FFIMethod {
     EnableFilterLists,
     InstallFilterLists,
     DeleteCustomFilterLists,
-    GetFullFilterLists,
     GetFullFilterListById,
     GetStoredFiltersMetadata,
     GetStoredFilterMetadataById,
@@ -33,6 +32,9 @@ typedef enum FFIMethod {
     GetDatabaseVersion,
     InstallCustomFilterFromString,
     GetActiveRules,
+    GetFilterRulesAsStrings,
+    SaveRulesToFileBlob,
+    GetDisabledRules
 } FFIMethod;
 
 // Response data possible discriminants
@@ -48,6 +50,8 @@ typedef enum RustResponseType {
 typedef struct RustResponse {
     // Protobuf length
     size_t result_data_len;
+    // The real allocated data length
+    void* result_data_capacity;
     // Result protobuf
     void* result_data;
     // Special case if result couldn't be processed: (abnormal ffi behaviour)

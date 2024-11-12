@@ -81,6 +81,19 @@ message UpdateCustomFilterMetadataRequest {
   bool is_trusted = 3;
 }
 
+message GetFilterRulesAsStringsRequest {
+  repeated int64 ids = 1;
+}
+
+message SaveRulesToFileBlobRequest {
+  int64 filter_id = 1;
+  string file_path = 2;
+}
+
+message GetDisabledRulesRequest {
+  repeated int64 ids = 1;
+}
+
 message EmptyRequest {}
 
 // endregion
@@ -104,11 +117,6 @@ message InstallFilterListsResponse {
 
 message DeleteCustomFilterListsResponse {
   int64 count = 1;
-  optional AGOuterError error = 2;
-}
-
-message GetFullFilterListsResponse {
-  repeated FullFilterList filter_lists = 1;
   optional AGOuterError error = 2;
 }
 
@@ -179,6 +187,16 @@ message InstallCustomFilterFromStringResponse {
 
 message GetActiveRulesResponse {
   repeated ActiveRulesInfo rules = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetFilterRulesAsStringsResponse {
+  repeated FilterListRulesRaw rules_list = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetDisabledRulesResponse {
+  repeated DisabledRulesRaw rules_raw = 1;
   optional AGOuterError error = 2;
 }
 

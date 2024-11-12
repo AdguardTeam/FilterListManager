@@ -144,6 +144,27 @@ pub struct FilterListRules {
     pub disabled_rules: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FilterListRulesRaw {
+    /// Associated filter id.
+    #[prost(int64, tag = "1")]
+    pub filter_id: i64,
+    /// List of all rules in the filter list as string.
+    #[prost(string, tag = "2")]
+    pub rules: ::prost::alloc::string::String,
+    /// List of only disabled rules as string.
+    #[prost(string, tag = "3")]
+    pub disabled_rules: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DisabledRulesRaw {
+    /// Associated filter id.
+    #[prost(int64, tag = "1")]
+    pub filter_id: i64,
+    /// List of only disabled rules as string.
+    #[prost(string, tag = "2")]
+    pub text: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterListMetadata {
     /// Title from the `! Title:` metadata field.
     #[prost(string, tag = "1")]
@@ -445,6 +466,23 @@ pub struct UpdateCustomFilterMetadataRequest {
     #[prost(bool, tag = "3")]
     pub is_trusted: bool,
 }
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetFilterRulesAsStringsRequest {
+    #[prost(int64, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i64>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct SaveRulesToFileBlobRequest {
+    #[prost(int64, tag = "1")]
+    pub filter_id: i64,
+    #[prost(string, tag = "2")]
+    pub file_path: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDisabledRulesRequest {
+    #[prost(int64, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i64>,
+}
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct EmptyRequest {}
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -472,13 +510,6 @@ pub struct InstallFilterListsResponse {
 pub struct DeleteCustomFilterListsResponse {
     #[prost(int64, tag = "1")]
     pub count: i64,
-    #[prost(message, optional, tag = "2")]
-    pub error: ::core::option::Option<AgOuterError>,
-}
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetFullFilterListsResponse {
-    #[prost(message, repeated, tag = "1")]
-    pub filter_lists: ::prost::alloc::vec::Vec<FullFilterList>,
     #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }
@@ -577,6 +608,20 @@ pub struct InstallCustomFilterFromStringResponse {
 pub struct GetActiveRulesResponse {
     #[prost(message, repeated, tag = "1")]
     pub rules: ::prost::alloc::vec::Vec<ActiveRulesInfo>,
+    #[prost(message, optional, tag = "2")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetFilterRulesAsStringsResponse {
+    #[prost(message, repeated, tag = "1")]
+    pub rules_list: ::prost::alloc::vec::Vec<FilterListRulesRaw>,
+    #[prost(message, optional, tag = "2")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDisabledRulesResponse {
+    #[prost(message, repeated, tag = "1")]
+    pub rules_raw: ::prost::alloc::vec::Vec<DisabledRulesRaw>,
     #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }

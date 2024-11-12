@@ -45,6 +45,14 @@ struct FilterListManager_AGOuterError {
     set {error = .notADatabase(newValue)}
   }
 
+  var databaseBusy: FilterListManager_DatabaseBusy {
+    get {
+      if case .databaseBusy(let v)? = error {return v}
+      return FilterListManager_DatabaseBusy()
+    }
+    set {error = .databaseBusy(newValue)}
+  }
+
   var diskFull: FilterListManager_DiskFull {
     get {
       if case .diskFull(let v)? = error {return v}
@@ -162,6 +170,7 @@ struct FilterListManager_AGOuterError {
   enum OneOf_Error: Equatable {
     case cannotOpenDatabase(FilterListManager_CannotOpenDatabase)
     case notADatabase(FilterListManager_NotADatabase)
+    case databaseBusy(FilterListManager_DatabaseBusy)
     case diskFull(FilterListManager_DiskFull)
     case entityNotFound(FilterListManager_EntityNotFound)
     case pathNotFound(FilterListManager_PathNotFound)
@@ -189,6 +198,10 @@ struct FilterListManager_AGOuterError {
       }()
       case (.notADatabase, .notADatabase): return {
         guard case .notADatabase(let l) = lhs, case .notADatabase(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.databaseBusy, .databaseBusy): return {
+        guard case .databaseBusy(let l) = lhs, case .databaseBusy(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       case (.diskFull, .diskFull): return {
@@ -277,6 +290,16 @@ struct FilterListManager_NotADatabase {
 }
 
 struct FilterListManager_DiskFull {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct FilterListManager_DatabaseBusy {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -443,6 +466,7 @@ extension FilterListManager_AGOuterError.OneOf_Error: @unchecked Sendable {}
 extension FilterListManager_CannotOpenDatabase: @unchecked Sendable {}
 extension FilterListManager_NotADatabase: @unchecked Sendable {}
 extension FilterListManager_DiskFull: @unchecked Sendable {}
+extension FilterListManager_DatabaseBusy: @unchecked Sendable {}
 extension FilterListManager_EntityNotFound: @unchecked Sendable {}
 extension FilterListManager_PathNotFound: @unchecked Sendable {}
 extension FilterListManager_PathHasDeniedPermission: @unchecked Sendable {}
@@ -468,20 +492,21 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
     1: .same(proto: "message"),
     2: .standard(proto: "cannot_open_database"),
     3: .standard(proto: "not_a_database"),
-    4: .standard(proto: "disk_full"),
-    5: .standard(proto: "entity_not_found"),
-    6: .standard(proto: "path_not_found"),
-    7: .standard(proto: "path_has_denied_permission"),
-    8: .standard(proto: "path_already_exists"),
-    9: .standard(proto: "timed_out"),
-    10: .standard(proto: "http_client_network_error"),
-    11: .standard(proto: "http_strict_200_response"),
-    12: .standard(proto: "http_client_body_recovery_failed"),
-    13: .standard(proto: "filter_content_is_likely_not_a_filter"),
-    14: .standard(proto: "filter_parser_error"),
-    15: .standard(proto: "field_is_empty"),
-    16: .same(proto: "mutex"),
-    17: .same(proto: "other"),
+    4: .standard(proto: "database_busy"),
+    5: .standard(proto: "disk_full"),
+    6: .standard(proto: "entity_not_found"),
+    7: .standard(proto: "path_not_found"),
+    8: .standard(proto: "path_has_denied_permission"),
+    9: .standard(proto: "path_already_exists"),
+    10: .standard(proto: "timed_out"),
+    11: .standard(proto: "http_client_network_error"),
+    12: .standard(proto: "http_strict_200_response"),
+    13: .standard(proto: "http_client_body_recovery_failed"),
+    14: .standard(proto: "filter_content_is_likely_not_a_filter"),
+    15: .standard(proto: "filter_parser_error"),
+    16: .standard(proto: "field_is_empty"),
+    17: .same(proto: "mutex"),
+    18: .same(proto: "other"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -518,6 +543,19 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
         }
       }()
       case 4: try {
+        var v: FilterListManager_DatabaseBusy?
+        var hadOneofValue = false
+        if let current = self.error {
+          hadOneofValue = true
+          if case .databaseBusy(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.error = .databaseBusy(v)
+        }
+      }()
+      case 5: try {
         var v: FilterListManager_DiskFull?
         var hadOneofValue = false
         if let current = self.error {
@@ -530,7 +568,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .diskFull(v)
         }
       }()
-      case 5: try {
+      case 6: try {
         var v: FilterListManager_EntityNotFound?
         var hadOneofValue = false
         if let current = self.error {
@@ -543,7 +581,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .entityNotFound(v)
         }
       }()
-      case 6: try {
+      case 7: try {
         var v: FilterListManager_PathNotFound?
         var hadOneofValue = false
         if let current = self.error {
@@ -556,7 +594,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .pathNotFound(v)
         }
       }()
-      case 7: try {
+      case 8: try {
         var v: FilterListManager_PathHasDeniedPermission?
         var hadOneofValue = false
         if let current = self.error {
@@ -569,7 +607,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .pathHasDeniedPermission(v)
         }
       }()
-      case 8: try {
+      case 9: try {
         var v: FilterListManager_PathAlreadyExists?
         var hadOneofValue = false
         if let current = self.error {
@@ -582,7 +620,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .pathAlreadyExists(v)
         }
       }()
-      case 9: try {
+      case 10: try {
         var v: FilterListManager_TimedOut?
         var hadOneofValue = false
         if let current = self.error {
@@ -595,7 +633,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .timedOut(v)
         }
       }()
-      case 10: try {
+      case 11: try {
         var v: FilterListManager_HttpClientNetworkError?
         var hadOneofValue = false
         if let current = self.error {
@@ -608,7 +646,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .httpClientNetworkError(v)
         }
       }()
-      case 11: try {
+      case 12: try {
         var v: FilterListManager_HttpStrict200Response?
         var hadOneofValue = false
         if let current = self.error {
@@ -621,7 +659,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .httpStrict200Response(v)
         }
       }()
-      case 12: try {
+      case 13: try {
         var v: FilterListManager_HttpClientBodyRecoveryFailed?
         var hadOneofValue = false
         if let current = self.error {
@@ -634,7 +672,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .httpClientBodyRecoveryFailed(v)
         }
       }()
-      case 13: try {
+      case 14: try {
         var v: FilterListManager_FilterContentIsLikelyNotAFilter?
         var hadOneofValue = false
         if let current = self.error {
@@ -647,7 +685,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .filterContentIsLikelyNotAFilter(v)
         }
       }()
-      case 14: try {
+      case 15: try {
         var v: FilterListManager_FilterParserError?
         var hadOneofValue = false
         if let current = self.error {
@@ -660,7 +698,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .filterParserError(v)
         }
       }()
-      case 15: try {
+      case 16: try {
         var v: FilterListManager_FieldIsEmpty?
         var hadOneofValue = false
         if let current = self.error {
@@ -673,7 +711,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .fieldIsEmpty(v)
         }
       }()
-      case 16: try {
+      case 17: try {
         var v: FilterListManager_Mutex?
         var hadOneofValue = false
         if let current = self.error {
@@ -686,7 +724,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .mutex(v)
         }
       }()
-      case 17: try {
+      case 18: try {
         var v: FilterListManager_Other?
         var hadOneofValue = false
         if let current = self.error {
@@ -721,61 +759,65 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
       guard case .notADatabase(let v)? = self.error else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
     }()
+    case .databaseBusy?: try {
+      guard case .databaseBusy(let v)? = self.error else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+    }()
     case .diskFull?: try {
       guard case .diskFull(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
     }()
     case .entityNotFound?: try {
       guard case .entityNotFound(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
     }()
     case .pathNotFound?: try {
       guard case .pathNotFound(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 7)
     }()
     case .pathHasDeniedPermission?: try {
       guard case .pathHasDeniedPermission(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 7)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
     }()
     case .pathAlreadyExists?: try {
       guard case .pathAlreadyExists(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 9)
     }()
     case .timedOut?: try {
       guard case .timedOut(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 9)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 10)
     }()
     case .httpClientNetworkError?: try {
       guard case .httpClientNetworkError(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 10)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 11)
     }()
     case .httpStrict200Response?: try {
       guard case .httpStrict200Response(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 11)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 12)
     }()
     case .httpClientBodyRecoveryFailed?: try {
       guard case .httpClientBodyRecoveryFailed(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 12)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 13)
     }()
     case .filterContentIsLikelyNotAFilter?: try {
       guard case .filterContentIsLikelyNotAFilter(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 13)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 14)
     }()
     case .filterParserError?: try {
       guard case .filterParserError(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 14)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 15)
     }()
     case .fieldIsEmpty?: try {
       guard case .fieldIsEmpty(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 15)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 16)
     }()
     case .mutex?: try {
       guard case .mutex(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 16)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 17)
     }()
     case .other?: try {
       guard case .other(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 17)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 18)
     }()
     case nil: break
     }
@@ -842,6 +884,25 @@ extension FilterListManager_DiskFull: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 
   static func ==(lhs: FilterListManager_DiskFull, rhs: FilterListManager_DiskFull) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension FilterListManager_DatabaseBusy: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".DatabaseBusy"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let _ = try decoder.nextFieldNumber() {
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: FilterListManager_DatabaseBusy, rhs: FilterListManager_DatabaseBusy) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
