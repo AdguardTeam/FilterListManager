@@ -2,7 +2,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterString : FfiConverter<string, RustBuffer>
     {
-        public static FfiConverterString INSTANCE = new FfiConverterString();
+        public static FfiConverterString Instance = new FfiConverterString();
 
         // Note: we don't inherit from FfiConverterRustBuffer, because we use a
         // special encoding when lowering/lifting.  We can use `RustBuffer.len` to

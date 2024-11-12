@@ -5,7 +5,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     internal class FfiConverterSequenceTypeActiveRulesInfo : FfiConverterRustBuffer<List<ActiveRulesInfo>>
     {
-        public static FfiConverterSequenceTypeActiveRulesInfo INSTANCE = new FfiConverterSequenceTypeActiveRulesInfo();
+        public static FfiConverterSequenceTypeActiveRulesInfo Instance = new FfiConverterSequenceTypeActiveRulesInfo();
 
         public override List<ActiveRulesInfo> Read(BigEndianStream stream)
         {
@@ -13,7 +13,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             var result = new List<ActiveRulesInfo>(length);
             for (int i = 0; i < length; i++)
             {
-                result.Add(FfiConverterTypeActiveRulesInfo.INSTANCE.Read(stream));
+                result.Add(FfiConverterTypeActiveRulesInfo.Instance.Read(stream));
             }
             return result;
         }
@@ -28,7 +28,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 return sizeForLength;
             }
 
-            var sizeForItems = value.Select(item => FfiConverterTypeActiveRulesInfo.INSTANCE.AllocationSize(item)).Sum();
+            var sizeForItems = value.Select(item => FfiConverterTypeActiveRulesInfo.Instance.AllocationSize(item)).Sum();
             return sizeForLength + sizeForItems;
         }
 
@@ -42,7 +42,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             }
 
             stream.WriteInt(value.Count);
-            value.ForEach(item => FfiConverterTypeActiveRulesInfo.INSTANCE.Write(item, stream));
+            value.ForEach(item => FfiConverterTypeActiveRulesInfo.Instance.Write(item, stream));
         }
     }
 }

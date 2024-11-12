@@ -2,24 +2,35 @@ using System;
 
 namespace AdGuard.FilterListManager.MarshalLogic
 {
-    public abstract class FFIObject<THandle> : IDisposable
-        where THandle : FFISafeHandle
+    /// <summary>
+    /// Base holder class for disposable handle
+    /// </summary>
+    /// <typeparam name="THandle">The type of the handle.</typeparam>
+    /// <seealso cref="IDisposable" />
+    public abstract class FfiObject<THandle> : IDisposable
+        where THandle : FfiSafeHandle
     {
-        private THandle handle;
+        private readonly THandle m_handle;
 
-        public FFIObject(THandle handle)
+        protected FfiObject(THandle handle)
         {
-            this.handle = handle;
+            m_handle = handle;
         }
 
+        /// <summary>
+        /// Gets the handle.
+        /// </summary>
         public THandle GetHandle()
         {
-            return handle;
+            return m_handle;
         }
 
+        /// <summary>
+        /// <inheritdoc cref="IDisposable"/>
+        /// </summary>
         public void Dispose()
         {
-            handle.Dispose();
+            m_handle.Dispose();
         }
     }
 }

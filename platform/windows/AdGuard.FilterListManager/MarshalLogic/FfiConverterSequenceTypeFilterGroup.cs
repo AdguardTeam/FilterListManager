@@ -5,7 +5,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterSequenceTypeFilterGroup : FfiConverterRustBuffer<List<FilterGroup>>
     {
-        public static FfiConverterSequenceTypeFilterGroup INSTANCE =
+        public static FfiConverterSequenceTypeFilterGroup Instance =
             new FfiConverterSequenceTypeFilterGroup();
 
         public override List<FilterGroup> Read(BigEndianStream stream)
@@ -14,7 +14,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             var result = new List<FilterGroup>(length);
             for (int i = 0; i < length; i++)
             {
-                result.Add(FfiConverterTypeFilterGroup.INSTANCE.Read(stream));
+                result.Add(FfiConverterTypeFilterGroup.Instance.Read(stream));
             }
             return result;
         }
@@ -30,7 +30,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             }
 
             var sizeForItems = value
-                .Select(item => FfiConverterTypeFilterGroup.INSTANCE.AllocationSize(item))
+                .Select(item => FfiConverterTypeFilterGroup.Instance.AllocationSize(item))
                 .Sum();
             return sizeForLength + sizeForItems;
         }
@@ -45,7 +45,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             }
 
             stream.WriteInt(value.Count);
-            value.ForEach(item => FfiConverterTypeFilterGroup.INSTANCE.Write(item, stream));
+            value.ForEach(item => FfiConverterTypeFilterGroup.Instance.Write(item, stream));
         }
     }
 }

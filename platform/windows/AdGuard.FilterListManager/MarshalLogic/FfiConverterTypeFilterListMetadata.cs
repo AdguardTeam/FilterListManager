@@ -2,48 +2,48 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterTypeFilterListMetadata : FfiConverterRustBuffer<FilterListMetadata>
     {
-        public static FfiConverterTypeFilterListMetadata INSTANCE =
+        public static FfiConverterTypeFilterListMetadata Instance =
             new FfiConverterTypeFilterListMetadata();
 
         public override FilterListMetadata Read(BigEndianStream stream)
         {
             return new FilterListMetadata(
-                title: FfiConverterString.INSTANCE.Read(stream),
-                description: FfiConverterString.INSTANCE.Read(stream),
-                timeUpdated: FfiConverterString.INSTANCE.Read(stream),
-                version: FfiConverterString.INSTANCE.Read(stream),
-                homepage: FfiConverterString.INSTANCE.Read(stream),
-                license: FfiConverterString.INSTANCE.Read(stream),
-                checksum: FfiConverterString.INSTANCE.Read(stream),
-                url: FfiConverterString.INSTANCE.Read(stream),
-                rulesCount: FfiConverterInt32.INSTANCE.Read(stream)
+                title: FfiConverterString.Instance.Read(stream),
+                description: FfiConverterString.Instance.Read(stream),
+                timeUpdated: FfiConverterString.Instance.Read(stream),
+                version: FfiConverterString.Instance.Read(stream),
+                homepage: FfiConverterString.Instance.Read(stream),
+                license: FfiConverterString.Instance.Read(stream),
+                checksum: FfiConverterString.Instance.Read(stream),
+                url: FfiConverterString.Instance.Read(stream),
+                rulesCount: FfiConverterInt32.Instance.Read(stream)
             );
         }
 
         public override int AllocationSize(FilterListMetadata value)
         {
-            return FfiConverterString.INSTANCE.AllocationSize(value.title)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.description)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.timeUpdated)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.version)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.homepage)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.license)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.checksum)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.url)
-                   + FfiConverterInt32.INSTANCE.AllocationSize(value.rulesCount);
+            return FfiConverterString.Instance.AllocationSize(value.title)
+                   + FfiConverterString.Instance.AllocationSize(value.description)
+                   + FfiConverterString.Instance.AllocationSize(value.timeUpdated)
+                   + FfiConverterString.Instance.AllocationSize(value.version)
+                   + FfiConverterString.Instance.AllocationSize(value.homepage)
+                   + FfiConverterString.Instance.AllocationSize(value.license)
+                   + FfiConverterString.Instance.AllocationSize(value.checksum)
+                   + FfiConverterString.Instance.AllocationSize(value.url)
+                   + FfiConverterInt32.Instance.AllocationSize(value.rulesCount);
         }
 
         public override void Write(FilterListMetadata value, BigEndianStream stream)
         {
-            FfiConverterString.INSTANCE.Write(value.title, stream);
-            FfiConverterString.INSTANCE.Write(value.description, stream);
-            FfiConverterString.INSTANCE.Write(value.timeUpdated, stream);
-            FfiConverterString.INSTANCE.Write(value.version, stream);
-            FfiConverterString.INSTANCE.Write(value.homepage, stream);
-            FfiConverterString.INSTANCE.Write(value.license, stream);
-            FfiConverterString.INSTANCE.Write(value.checksum, stream);
-            FfiConverterString.INSTANCE.Write(value.url, stream);
-            FfiConverterInt32.INSTANCE.Write(value.rulesCount, stream);
+            FfiConverterString.Instance.Write(value.title, stream);
+            FfiConverterString.Instance.Write(value.description, stream);
+            FfiConverterString.Instance.Write(value.timeUpdated, stream);
+            FfiConverterString.Instance.Write(value.version, stream);
+            FfiConverterString.Instance.Write(value.homepage, stream);
+            FfiConverterString.Instance.Write(value.license, stream);
+            FfiConverterString.Instance.Write(value.checksum, stream);
+            FfiConverterString.Instance.Write(value.url, stream);
+            FfiConverterInt32.Instance.Write(value.rulesCount, stream);
         }
     }
 }

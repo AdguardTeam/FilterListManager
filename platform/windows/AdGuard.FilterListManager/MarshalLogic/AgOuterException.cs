@@ -55,6 +55,20 @@ namespace AdGuard.FilterListManager.MarshalLogic
         }
 
         /// <summary>
+        /// Occurs if the DB is busy.
+        /// </summary>
+        /// <seealso cref="AgOuterException" />
+        public class DatabaseBusy : AgOuterException
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="AgOuterException.DiskFullException"/> class.
+            /// </summary>
+            /// <param name="message">The message.</param>
+            public DatabaseBusy(string message)
+                : base(message) { }
+        }
+
+        /// <summary>
         /// Occurs if the entity hasn't been found in the filter DB.
         /// </summary>
         /// <seealso cref="AgOuterException" />

@@ -2,7 +2,7 @@
 {
     internal class FfiConverterInt64 : FfiConverter<long, long>
     {
-        public static FfiConverterInt64 INSTANCE = new FfiConverterInt64();
+        public static FfiConverterInt64 Instance = new FfiConverterInt64();
 
         public override long Lift(long value)
         {

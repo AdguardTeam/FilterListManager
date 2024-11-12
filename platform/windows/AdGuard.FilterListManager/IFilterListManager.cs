@@ -91,6 +91,12 @@ namespace AdGuard.FilterListManager
         int? GetDatabaseVersion();
 
         /// <summary>
+        /// Returns lists of disabled rules by list of filter IDs as List(DisabledRulesRaw)
+        /// </summary>
+        /// <param name="ids">The filter ids.</param>
+        List<DisabledRulesRaw> GetDisabledRules(List<long> ids);
+
+        /// <summary>
         /// Gets the filter rules as raw <see cref="FilterListRulesRaw"/> objects.
         /// </summary>
         /// <param name="ids">The ids.</param>
@@ -200,6 +206,16 @@ namespace AdGuard.FilterListManager
         /// <exception cref="AgOuterException">Throws if rules_list entity does not exist for passed `filter_id`.
         /// This because if you want to keep disabled filters, you should already have a `rules_list` entity</exception>
         void SaveDisabledRules(long filterId, List<string> disabledRules);
+
+        /// <summary>
+        /// Reads the rule list for a specific filter in chunks, applying exceptions from the disabled_rules list on the fly.
+        /// The default size of the read buffer is 1 megabyte. But this size can be exceeded if a longer string appears in the list of filter rules.
+        /// The main purpose of this method is to reduce RAM consumption when reading large size filters.
+        /// </summary>
+        /// <param name="filterId">The filter identifier.</param>
+        /// <param name="filePath">The file path.</param>
+        /// <exception cref="AgOuterException"></exception>
+        void SaveRulesToFileBlob(long filterId, string filePath);
 
         /// <summary>
         /// Updates custom filter data.

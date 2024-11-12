@@ -1,31 +1,37 @@
 ﻿namespace AdGuard.FilterListManager.MarshalLogic
 {
+    /// <summary>
+    /// List(FilterListRulesRaw) to <see cref="RustBuffer"/> converter
+    /// </summary>
     public class FfiConverterTypeFilterListRulesRaw : FfiConverterRustBuffer<FilterListRulesRaw>
     {
         public static FfiConverterTypeFilterListRulesRaw Instance = new FfiConverterTypeFilterListRulesRaw();
 
+        ///  <inheritdoc/>
         public override FilterListRulesRaw Read(BigEndianStream stream)
         {
             return new FilterListRulesRaw(
-                @filterId: FfiConverterInt64.INSTANCE.Read(stream),
-                @rules: FfiConverterString.INSTANCE.Read(stream),
-                @disabledRules: FfiConverterString.INSTANCE.Read(stream)
+                filterId: FfiConverterInt64.Instance.Read(stream),
+                rules: FfiConverterString.Instance.Read(stream),
+                disabledRules: FfiConverterString.Instance.Read(stream)
             );
         }
 
+        ///  <inheritdoc/>
         public override int AllocationSize(FilterListRulesRaw value)
         {
             return
-                FfiConverterInt64.INSTANCE.AllocationSize(value.FilterId) +
-                FfiConverterString.INSTANCE.AllocationSize(value.Rules) +
-                FfiConverterString.INSTANCE.AllocationSize(value.DisabledRules);
+                FfiConverterInt64.Instance.AllocationSize(value.FilterId) +
+                FfiConverterString.Instance.AllocationSize(value.Rules) +
+                FfiConverterString.Instance.AllocationSize(value.DisabledRules);
         }
 
+        ///  <inheritdoc/>
         public override void Write(FilterListRulesRaw value, BigEndianStream stream)
         {
-            FfiConverterInt64.INSTANCE.Write(value.FilterId, stream);
-            FfiConverterString.INSTANCE.Write(value.Rules, stream);
-            FfiConverterString.INSTANCE.Write(value.DisabledRules, stream);
+            FfiConverterInt64.Instance.Write(value.FilterId, stream);
+            FfiConverterString.Instance.Write(value.Rules, stream);
+            FfiConverterString.Instance.Write(value.DisabledRules, stream);
         }
     }
 }

@@ -31,18 +31,17 @@ namespace AdGuard.FilterListManager.Test
         [Test]
         public void CommonTest()
         {
-            var manager = new FilterListManager(new Configuration(
+            IFilterListManager manager = new FilterListManager(new Configuration(
                 FilterListType.Standard, 
                 m_CurrentDirectory,
                 "en-us",
                 10,
-                new List<string>(), 
-                "https://filters.adtidy.org/extension/safari/filters.json",
-                "https://filters.adtidy.org/extension/safari/filters_i18n.json", 
+                new List<string>(),
+                "https://filters.adtidy.org/windows/filters.json",
+                "https://filters.adtidy.org/windows/filters_i18n.json", 
                 "", 
                 0,
                 true));
-            //manager.LiftUpDatabase(); //TODO https://jira.int.agrd.dev/browse/AG-36219
             manager.PullMetadata();
             List<StoredFilterMetadata> metas = manager.GetStoredFiltersMetadata();
             Assert.IsTrue(metas.Count > 0);
@@ -55,9 +54,14 @@ namespace AdGuard.FilterListManager.Test
             Assert.IsTrue(groups.Count > 0);
             List<ActiveRulesInfo> rules = manager.GetActiveRules();
             Assert.IsTrue(rules.Count > 0);
-
+            
+            var rulesIds = new List<long> { firstFilter.Id };
+            manager.InstallFilterLists(rulesIds, true);
             manager.UpdateFilters(true, REQUEST_TIMEOUT_MS, true);
-            List<FilterListRulesRaw> rulesRaw = manager.GetFilterRulesAsStrings(new List<long>{ firstFilter.Id });
+            List<FilterListRulesRaw> rulesRaw = manager.GetFilterRulesAsStrings(rulesIds);
+            Assert.IsTrue(rulesRaw.Count > 0);
+
+            manager.GetDisabledRules(rulesIds);
             Assert.IsTrue(rulesRaw.Count > 0);
 
         }

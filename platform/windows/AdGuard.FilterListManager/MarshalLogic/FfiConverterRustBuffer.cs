@@ -1,13 +1,25 @@
 namespace AdGuard.FilterListManager.MarshalLogic
 {
-    public abstract class FfiConverterRustBuffer<CsType> : FfiConverter<CsType, RustBuffer>
+    /// <summary>
+    /// C# types - <see cref="RustBuffer"/> converter
+    /// </summary>
+    /// <typeparam name="TCsType">The type of the cs type.</typeparam>
+    public abstract class FfiConverterRustBuffer<TCsType> : FfiConverter<TCsType, RustBuffer>
     {
-        public override CsType Lift(RustBuffer value)
+        /// <summary>
+        /// Convert an FFI type to a C# type
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public override TCsType Lift(RustBuffer value)
         {
             return LiftFromRustBuffer(value);
         }
 
-        public override RustBuffer Lower(CsType value)
+        /// <summary>
+        /// Convert C# type to an FFI type
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public override RustBuffer Lower(TCsType value)
         {
             return LowerIntoRustBuffer(value);
         }

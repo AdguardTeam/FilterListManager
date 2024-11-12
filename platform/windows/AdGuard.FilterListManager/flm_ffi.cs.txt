@@ -478,6 +478,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_disabled_rules(FilterListManagerSafeHandle @ptr,RustBuffer @ids,ref RustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("adguard-flm")]
     public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_filter_rules_as_strings(FilterListManagerSafeHandle @ptr,RustBuffer @ids,ref RustCallStatus _uniffi_out_err
     );
 
@@ -523,6 +527,10 @@ static class _UniFFILib {
 
     [DllImport("adguard-flm")]
     public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_disabled_rules(FilterListManagerSafeHandle @ptr,long @filterId,RustBuffer @disabledRules,ref RustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("adguard-flm")]
+    public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_rules_to_file_blob(FilterListManagerSafeHandle @ptr,long @filterId,RustBuffer @filePath,ref RustCallStatus _uniffi_out_err
     );
 
     [DllImport("adguard-flm")]
@@ -818,6 +826,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_disabled_rules(
+    );
+
+    [DllImport("adguard-flm")]
     public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings(
     );
 
@@ -863,6 +875,10 @@ static class _UniFFILib {
 
     [DllImport("adguard-flm")]
     public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_disabled_rules(
+    );
+
+    [DllImport("adguard-flm")]
+    public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_rules_to_file_blob(
     );
 
     [DllImport("adguard-flm")]
@@ -964,6 +980,12 @@ static class _UniFFILib {
             }
         }
         {
+            var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_disabled_rules();
+            if (checksum != 38694) {
+                throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_disabled_rules` checksum `38694`, library returned `{checksum}`");
+            }
+        }
+        {
             var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings();
             if (checksum != 20063) {
                 throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings` checksum `20063`, library returned `{checksum}`");
@@ -1033,6 +1055,12 @@ static class _UniFFILib {
             var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_disabled_rules();
             if (checksum != 36828) {
                 throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_disabled_rules` checksum `36828`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_rules_to_file_blob();
+            if (checksum != 1505) {
+                throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_rules_to_file_blob` checksum `1505`, library returned `{checksum}`");
             }
         }
         {
@@ -1306,6 +1334,9 @@ internal interface IFilterListManager {
     int? GetDatabaseVersion();
     
     /// <exception cref="AgOuterException"></exception>
+    List<DisabledRulesRaw> GetDisabledRules(List<long> @ids);
+    
+    /// <exception cref="AgOuterException"></exception>
     List<FilterListRulesRaw> GetFilterRulesAsStrings(List<long> @ids);
     
     /// <exception cref="AgOuterException"></exception>
@@ -1340,6 +1371,9 @@ internal interface IFilterListManager {
     
     /// <exception cref="AgOuterException"></exception>
     void SaveDisabledRules(long @filterId, List<String> @disabledRules);
+    
+    /// <exception cref="AgOuterException"></exception>
+    void SaveRulesToFileBlob(long @filterId, String @filePath);
     
     /// <exception cref="AgOuterException"></exception>
     bool UpdateCustomFilterMetadata(long @filterId, String @title, bool @isTrusted);
@@ -1451,6 +1485,14 @@ internal class FilterListManager: FFIObject<FilterListManagerSafeHandle>, IFilte
     }
     
     /// <exception cref="AgOuterException"></exception>
+    public List<DisabledRulesRaw> GetDisabledRules(List<long> @ids) {
+        return FfiConverterSequenceTypeDisabledRulesRaw.INSTANCE.Lift(
+    _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
+    _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_disabled_rules(this.GetHandle(), FfiConverterSequenceInt64.INSTANCE.Lower(@ids), ref _status)
+));
+    }
+    
+    /// <exception cref="AgOuterException"></exception>
     public List<FilterListRulesRaw> GetFilterRulesAsStrings(List<long> @ids) {
         return FfiConverterSequenceTypeFilterListRulesRaw.INSTANCE.Lift(
     _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
@@ -1542,6 +1584,14 @@ internal class FilterListManager: FFIObject<FilterListManagerSafeHandle>, IFilte
     public void SaveDisabledRules(long @filterId, List<String> @disabledRules) {
     _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
     _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_disabled_rules(this.GetHandle(), FfiConverterInt64.INSTANCE.Lower(@filterId), FfiConverterSequenceString.INSTANCE.Lower(@disabledRules), ref _status)
+);
+    }
+    
+    
+    /// <exception cref="AgOuterException"></exception>
+    public void SaveRulesToFileBlob(long @filterId, String @filePath) {
+    _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
+    _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_rules_to_file_blob(this.GetHandle(), FfiConverterInt64.INSTANCE.Lower(@filterId), FfiConverterString.INSTANCE.Lower(@filePath), ref _status)
 );
     }
     
@@ -1687,6 +1737,36 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterOptionalString.INSTANCE.Write(value.@encryptionKey, stream);
             FfiConverterInt32.INSTANCE.Write(value.@requestTimeoutMs, stream);
             FfiConverterBoolean.INSTANCE.Write(value.@autoLiftUpDatabase, stream);
+    }
+}
+
+
+
+internal record DisabledRulesRaw (
+    long @filterId, 
+    String @text
+) {
+}
+
+class FfiConverterTypeDisabledRulesRaw: FfiConverterRustBuffer<DisabledRulesRaw> {
+    public static FfiConverterTypeDisabledRulesRaw INSTANCE = new FfiConverterTypeDisabledRulesRaw();
+
+    public override DisabledRulesRaw Read(BigEndianStream stream) {
+        return new DisabledRulesRaw(
+            @filterId: FfiConverterInt64.INSTANCE.Read(stream),
+            @text: FfiConverterString.INSTANCE.Read(stream)
+        );
+    }
+
+    public override int AllocationSize(DisabledRulesRaw value) {
+        return
+            FfiConverterInt64.INSTANCE.AllocationSize(value.@filterId) +
+            FfiConverterString.INSTANCE.AllocationSize(value.@text);
+    }
+
+    public override void Write(DisabledRulesRaw value, BigEndianStream stream) {
+            FfiConverterInt64.INSTANCE.Write(value.@filterId, stream);
+            FfiConverterString.INSTANCE.Write(value.@text, stream);
     }
 }
 
@@ -2212,6 +2292,10 @@ internal class AgOuterException: UniffiException {
         public DiskFull(string message): base(message) {}
     }
     
+    public class DatabaseBusy: AgOuterException {
+        public DatabaseBusy(string message): base(message) {}
+    }
+    
     public class EntityNotFound: AgOuterException {
         public EntityNotFound(string message): base(message) {}
     }
@@ -2275,19 +2359,20 @@ class FfiConverterTypeAgOuterException : FfiConverterRustBuffer<AgOuterException
             case 1: return new AgOuterException.CannotOpenDatabase(FfiConverterString.INSTANCE.Read(stream));
             case 2: return new AgOuterException.NotADatabase(FfiConverterString.INSTANCE.Read(stream));
             case 3: return new AgOuterException.DiskFull(FfiConverterString.INSTANCE.Read(stream));
-            case 4: return new AgOuterException.EntityNotFound(FfiConverterString.INSTANCE.Read(stream));
-            case 5: return new AgOuterException.PathNotFound(FfiConverterString.INSTANCE.Read(stream));
-            case 6: return new AgOuterException.PathHasDeniedPermission(FfiConverterString.INSTANCE.Read(stream));
-            case 7: return new AgOuterException.PathAlreadyExists(FfiConverterString.INSTANCE.Read(stream));
-            case 8: return new AgOuterException.TimedOut(FfiConverterString.INSTANCE.Read(stream));
-            case 9: return new AgOuterException.HttpClientNetworkException(FfiConverterString.INSTANCE.Read(stream));
-            case 10: return new AgOuterException.HttpClientBodyRecoveryFailed(FfiConverterString.INSTANCE.Read(stream));
-            case 11: return new AgOuterException.HttpStrict200Response(FfiConverterString.INSTANCE.Read(stream));
-            case 12: return new AgOuterException.FilterContentIsLikelyNotAFilter(FfiConverterString.INSTANCE.Read(stream));
-            case 13: return new AgOuterException.FilterParserException(FfiConverterString.INSTANCE.Read(stream));
-            case 14: return new AgOuterException.FieldIsEmpty(FfiConverterString.INSTANCE.Read(stream));
-            case 15: return new AgOuterException.Mutex(FfiConverterString.INSTANCE.Read(stream));
-            case 16: return new AgOuterException.Other(FfiConverterString.INSTANCE.Read(stream));
+            case 4: return new AgOuterException.DatabaseBusy(FfiConverterString.INSTANCE.Read(stream));
+            case 5: return new AgOuterException.EntityNotFound(FfiConverterString.INSTANCE.Read(stream));
+            case 6: return new AgOuterException.PathNotFound(FfiConverterString.INSTANCE.Read(stream));
+            case 7: return new AgOuterException.PathHasDeniedPermission(FfiConverterString.INSTANCE.Read(stream));
+            case 8: return new AgOuterException.PathAlreadyExists(FfiConverterString.INSTANCE.Read(stream));
+            case 9: return new AgOuterException.TimedOut(FfiConverterString.INSTANCE.Read(stream));
+            case 10: return new AgOuterException.HttpClientNetworkException(FfiConverterString.INSTANCE.Read(stream));
+            case 11: return new AgOuterException.HttpClientBodyRecoveryFailed(FfiConverterString.INSTANCE.Read(stream));
+            case 12: return new AgOuterException.HttpStrict200Response(FfiConverterString.INSTANCE.Read(stream));
+            case 13: return new AgOuterException.FilterContentIsLikelyNotAFilter(FfiConverterString.INSTANCE.Read(stream));
+            case 14: return new AgOuterException.FilterParserException(FfiConverterString.INSTANCE.Read(stream));
+            case 15: return new AgOuterException.FieldIsEmpty(FfiConverterString.INSTANCE.Read(stream));
+            case 16: return new AgOuterException.Mutex(FfiConverterString.INSTANCE.Read(stream));
+            case 17: return new AgOuterException.Other(FfiConverterString.INSTANCE.Read(stream));
             default:
                 throw new InternalException(String.Format("invalid error value '{0}' in FfiConverterTypeAgOuterException.Read()", value));
         }
@@ -2308,44 +2393,47 @@ class FfiConverterTypeAgOuterException : FfiConverterRustBuffer<AgOuterException
             case AgOuterException.DiskFull:
                 stream.WriteInt(3);
                 break;
-            case AgOuterException.EntityNotFound:
+            case AgOuterException.DatabaseBusy:
                 stream.WriteInt(4);
                 break;
-            case AgOuterException.PathNotFound:
+            case AgOuterException.EntityNotFound:
                 stream.WriteInt(5);
                 break;
-            case AgOuterException.PathHasDeniedPermission:
+            case AgOuterException.PathNotFound:
                 stream.WriteInt(6);
                 break;
-            case AgOuterException.PathAlreadyExists:
+            case AgOuterException.PathHasDeniedPermission:
                 stream.WriteInt(7);
                 break;
-            case AgOuterException.TimedOut:
+            case AgOuterException.PathAlreadyExists:
                 stream.WriteInt(8);
                 break;
-            case AgOuterException.HttpClientNetworkException:
+            case AgOuterException.TimedOut:
                 stream.WriteInt(9);
                 break;
-            case AgOuterException.HttpClientBodyRecoveryFailed:
+            case AgOuterException.HttpClientNetworkException:
                 stream.WriteInt(10);
                 break;
-            case AgOuterException.HttpStrict200Response:
+            case AgOuterException.HttpClientBodyRecoveryFailed:
                 stream.WriteInt(11);
                 break;
-            case AgOuterException.FilterContentIsLikelyNotAFilter:
+            case AgOuterException.HttpStrict200Response:
                 stream.WriteInt(12);
                 break;
-            case AgOuterException.FilterParserException:
+            case AgOuterException.FilterContentIsLikelyNotAFilter:
                 stream.WriteInt(13);
                 break;
-            case AgOuterException.FieldIsEmpty:
+            case AgOuterException.FilterParserException:
                 stream.WriteInt(14);
                 break;
-            case AgOuterException.Mutex:
+            case AgOuterException.FieldIsEmpty:
                 stream.WriteInt(15);
                 break;
-            case AgOuterException.Other:
+            case AgOuterException.Mutex:
                 stream.WriteInt(16);
+                break;
+            case AgOuterException.Other:
+                stream.WriteInt(17);
                 break;
             default:
                 throw new InternalException(String.Format("invalid error value '{0}' in FfiConverterTypeAgOuterException.Write()", value));
@@ -2717,6 +2805,45 @@ class FfiConverterSequenceTypeActiveRulesInfo: FfiConverterRustBuffer<List<Activ
 
         stream.WriteInt(value.Count);
         value.ForEach(item => FfiConverterTypeActiveRulesInfo.INSTANCE.Write(item, stream));
+    }
+}
+
+
+
+
+class FfiConverterSequenceTypeDisabledRulesRaw: FfiConverterRustBuffer<List<DisabledRulesRaw>> {
+    public static FfiConverterSequenceTypeDisabledRulesRaw INSTANCE = new FfiConverterSequenceTypeDisabledRulesRaw();
+
+    public override List<DisabledRulesRaw> Read(BigEndianStream stream) {
+        var length = stream.ReadInt();
+        var result = new List<DisabledRulesRaw>(length);
+        for (int i = 0; i < length; i++) {
+            result.Add(FfiConverterTypeDisabledRulesRaw.INSTANCE.Read(stream));
+        }
+        return result;
+    }
+
+    public override int AllocationSize(List<DisabledRulesRaw> value) {
+        var sizeForLength = 4;
+
+        // details/1-empty-list-as-default-method-parameter.md
+        if (value == null) {
+            return sizeForLength;
+        }
+
+        var sizeForItems = value.Select(item => FfiConverterTypeDisabledRulesRaw.INSTANCE.AllocationSize(item)).Sum();
+        return sizeForLength + sizeForItems;
+    }
+
+    public override void Write(List<DisabledRulesRaw> value, BigEndianStream stream) {
+        // details/1-empty-list-as-default-method-parameter.md
+        if (value == null) {
+            stream.WriteInt(0);
+            return;
+        }
+
+        stream.WriteInt(value.Count);
+        value.ForEach(item => FfiConverterTypeDisabledRulesRaw.INSTANCE.Write(item, stream));
     }
 }
 

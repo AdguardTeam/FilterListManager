@@ -4,7 +4,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterTypeFilterListType : FfiConverterRustBuffer<FilterListType>
     {
-        public static FfiConverterTypeFilterListType INSTANCE = new FfiConverterTypeFilterListType();
+        public static FfiConverterTypeFilterListType Instance = new FfiConverterTypeFilterListType();
 
         public override FilterListType Read(BigEndianStream stream)
         {

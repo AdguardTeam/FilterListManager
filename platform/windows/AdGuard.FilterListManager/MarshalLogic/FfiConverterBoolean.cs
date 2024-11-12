@@ -2,7 +2,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterBoolean : FfiConverter<bool, sbyte>
     {
-        public static FfiConverterBoolean INSTANCE = new FfiConverterBoolean();
+        public static FfiConverterBoolean Instance = new FfiConverterBoolean();
 
         public override bool Lift(sbyte value)
         {

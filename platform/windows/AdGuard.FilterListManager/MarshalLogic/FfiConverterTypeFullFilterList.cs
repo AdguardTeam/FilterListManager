@@ -2,83 +2,83 @@ namespace AdGuard.FilterListManager.MarshalLogic
 {
     class FfiConverterTypeFullFilterList : FfiConverterRustBuffer<FullFilterList>
     {
-        public static FfiConverterTypeFullFilterList INSTANCE = new FfiConverterTypeFullFilterList();
+        public static FfiConverterTypeFullFilterList Instance = new FfiConverterTypeFullFilterList();
 
         public override FullFilterList Read(BigEndianStream stream)
         {
             return new FullFilterList(
-                id: FfiConverterInt64.INSTANCE.Read(stream),
-                groupId: FfiConverterInt32.INSTANCE.Read(stream),
-                timeUpdated: FfiConverterInt64.INSTANCE.Read(stream),
-                lastDownloadTime: FfiConverterInt64.INSTANCE.Read(stream),
-                title: FfiConverterString.INSTANCE.Read(stream),
-                description: FfiConverterString.INSTANCE.Read(stream),
-                version: FfiConverterString.INSTANCE.Read(stream),
-                displayNumber: FfiConverterInt32.INSTANCE.Read(stream),
-                downloadUrl: FfiConverterString.INSTANCE.Read(stream),
-                subscriptionUrl: FfiConverterString.INSTANCE.Read(stream),
-                tags: FfiConverterSequenceTypeFilterTag.INSTANCE.Read(stream),
-                expires: FfiConverterInt32.INSTANCE.Read(stream),
-                isTrusted: FfiConverterBoolean.INSTANCE.Read(stream),
-                isCustom: FfiConverterBoolean.INSTANCE.Read(stream),
-                isEnabled: FfiConverterBoolean.INSTANCE.Read(stream),
-                isInstalled: FfiConverterBoolean.INSTANCE.Read(stream),
-                homepage: FfiConverterString.INSTANCE.Read(stream),
-                license: FfiConverterString.INSTANCE.Read(stream),
-                checksum: FfiConverterString.INSTANCE.Read(stream),
-                languages: FfiConverterSequenceString.INSTANCE.Read(stream),
-                rules: FfiConverterOptionalTypeFilterListRules.INSTANCE.Read(stream)
+                id: FfiConverterInt64.Instance.Read(stream),
+                groupId: FfiConverterInt32.Instance.Read(stream),
+                timeUpdated: FfiConverterInt64.Instance.Read(stream),
+                lastDownloadTime: FfiConverterInt64.Instance.Read(stream),
+                title: FfiConverterString.Instance.Read(stream),
+                description: FfiConverterString.Instance.Read(stream),
+                version: FfiConverterString.Instance.Read(stream),
+                displayNumber: FfiConverterInt32.Instance.Read(stream),
+                downloadUrl: FfiConverterString.Instance.Read(stream),
+                subscriptionUrl: FfiConverterString.Instance.Read(stream),
+                tags: FfiConverterSequenceTypeFilterTag.Instance.Read(stream),
+                expires: FfiConverterInt32.Instance.Read(stream),
+                isTrusted: FfiConverterBoolean.Instance.Read(stream),
+                isCustom: FfiConverterBoolean.Instance.Read(stream),
+                isEnabled: FfiConverterBoolean.Instance.Read(stream),
+                isInstalled: FfiConverterBoolean.Instance.Read(stream),
+                homepage: FfiConverterString.Instance.Read(stream),
+                license: FfiConverterString.Instance.Read(stream),
+                checksum: FfiConverterString.Instance.Read(stream),
+                languages: FfiConverterSequenceString.Instance.Read(stream),
+                rules: FfiConverterOptionalTypeFilterListRules.Instance.Read(stream)
             );
         }
 
         public override int AllocationSize(FullFilterList value)
         {
-            return FfiConverterInt64.INSTANCE.AllocationSize(value.id)
-                   + FfiConverterInt32.INSTANCE.AllocationSize(value.groupId)
-                   + FfiConverterInt64.INSTANCE.AllocationSize(value.timeUpdated)
-                   + FfiConverterInt64.INSTANCE.AllocationSize(value.lastDownloadTime)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.title)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.description)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.version)
-                   + FfiConverterInt32.INSTANCE.AllocationSize(value.displayNumber)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.downloadUrl)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.subscriptionUrl)
-                   + FfiConverterSequenceTypeFilterTag.INSTANCE.AllocationSize(value.tags)
-                   + FfiConverterInt32.INSTANCE.AllocationSize(value.expires)
-                   + FfiConverterBoolean.INSTANCE.AllocationSize(value.isTrusted)
-                   + FfiConverterBoolean.INSTANCE.AllocationSize(value.isCustom)
-                   + FfiConverterBoolean.INSTANCE.AllocationSize(value.isEnabled)
-                   + FfiConverterBoolean.INSTANCE.AllocationSize(value.isInstalled)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.homepage)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.license)
-                   + FfiConverterString.INSTANCE.AllocationSize(value.checksum)
-                   + FfiConverterSequenceString.INSTANCE.AllocationSize(value.languages)
-                   + FfiConverterOptionalTypeFilterListRules.INSTANCE.AllocationSize(value.rules);
+            return FfiConverterInt64.Instance.AllocationSize(value.id)
+                   + FfiConverterInt32.Instance.AllocationSize(value.groupId)
+                   + FfiConverterInt64.Instance.AllocationSize(value.timeUpdated)
+                   + FfiConverterInt64.Instance.AllocationSize(value.lastDownloadTime)
+                   + FfiConverterString.Instance.AllocationSize(value.title)
+                   + FfiConverterString.Instance.AllocationSize(value.description)
+                   + FfiConverterString.Instance.AllocationSize(value.version)
+                   + FfiConverterInt32.Instance.AllocationSize(value.displayNumber)
+                   + FfiConverterString.Instance.AllocationSize(value.downloadUrl)
+                   + FfiConverterString.Instance.AllocationSize(value.subscriptionUrl)
+                   + FfiConverterSequenceTypeFilterTag.Instance.AllocationSize(value.tags)
+                   + FfiConverterInt32.Instance.AllocationSize(value.expires)
+                   + FfiConverterBoolean.Instance.AllocationSize(value.isTrusted)
+                   + FfiConverterBoolean.Instance.AllocationSize(value.isCustom)
+                   + FfiConverterBoolean.Instance.AllocationSize(value.isEnabled)
+                   + FfiConverterBoolean.Instance.AllocationSize(value.isInstalled)
+                   + FfiConverterString.Instance.AllocationSize(value.homepage)
+                   + FfiConverterString.Instance.AllocationSize(value.license)
+                   + FfiConverterString.Instance.AllocationSize(value.checksum)
+                   + FfiConverterSequenceString.Instance.AllocationSize(value.languages)
+                   + FfiConverterOptionalTypeFilterListRules.Instance.AllocationSize(value.rules);
         }
 
         public override void Write(FullFilterList value, BigEndianStream stream)
         {
-            FfiConverterInt64.INSTANCE.Write(value.id, stream);
-            FfiConverterInt32.INSTANCE.Write(value.groupId, stream);
-            FfiConverterInt64.INSTANCE.Write(value.timeUpdated, stream);
-            FfiConverterInt64.INSTANCE.Write(value.lastDownloadTime, stream);
-            FfiConverterString.INSTANCE.Write(value.title, stream);
-            FfiConverterString.INSTANCE.Write(value.description, stream);
-            FfiConverterString.INSTANCE.Write(value.version, stream);
-            FfiConverterInt32.INSTANCE.Write(value.displayNumber, stream);
-            FfiConverterString.INSTANCE.Write(value.subscriptionUrl, stream);
-            FfiConverterString.INSTANCE.Write(value.downloadUrl, stream);
-            FfiConverterSequenceTypeFilterTag.INSTANCE.Write(value.tags, stream);
-            FfiConverterInt32.INSTANCE.Write(value.expires, stream);
-            FfiConverterBoolean.INSTANCE.Write(value.isTrusted, stream);
-            FfiConverterBoolean.INSTANCE.Write(value.isCustom, stream);
-            FfiConverterBoolean.INSTANCE.Write(value.isEnabled, stream);
-            FfiConverterBoolean.INSTANCE.Write(value.isInstalled, stream);
-            FfiConverterString.INSTANCE.Write(value.homepage, stream);
-            FfiConverterString.INSTANCE.Write(value.license, stream);
-            FfiConverterString.INSTANCE.Write(value.checksum, stream);
-            FfiConverterSequenceString.INSTANCE.Write(value.languages, stream);
-            FfiConverterOptionalTypeFilterListRules.INSTANCE.Write(value.rules, stream);
+            FfiConverterInt64.Instance.Write(value.id, stream);
+            FfiConverterInt32.Instance.Write(value.groupId, stream);
+            FfiConverterInt64.Instance.Write(value.timeUpdated, stream);
+            FfiConverterInt64.Instance.Write(value.lastDownloadTime, stream);
+            FfiConverterString.Instance.Write(value.title, stream);
+            FfiConverterString.Instance.Write(value.description, stream);
+            FfiConverterString.Instance.Write(value.version, stream);
+            FfiConverterInt32.Instance.Write(value.displayNumber, stream);
+            FfiConverterString.Instance.Write(value.subscriptionUrl, stream);
+            FfiConverterString.Instance.Write(value.downloadUrl, stream);
+            FfiConverterSequenceTypeFilterTag.Instance.Write(value.tags, stream);
+            FfiConverterInt32.Instance.Write(value.expires, stream);
+            FfiConverterBoolean.Instance.Write(value.isTrusted, stream);
+            FfiConverterBoolean.Instance.Write(value.isCustom, stream);
+            FfiConverterBoolean.Instance.Write(value.isEnabled, stream);
+            FfiConverterBoolean.Instance.Write(value.isInstalled, stream);
+            FfiConverterString.Instance.Write(value.homepage, stream);
+            FfiConverterString.Instance.Write(value.license, stream);
+            FfiConverterString.Instance.Write(value.checksum, stream);
+            FfiConverterSequenceString.Instance.Write(value.languages, stream);
+            FfiConverterOptionalTypeFilterListRules.Instance.Write(value.rules, stream);
         }
     }
 }

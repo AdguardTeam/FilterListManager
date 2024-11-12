@@ -3,48 +3,52 @@ using System.IO;
 
 namespace AdGuard.FilterListManager.MarshalLogic
 {
+    /// <summary>
+    /// Special Big Endian stream implementation.
+    /// https://github.com/dotnet/runtime/issues/26904
+    /// </summary>
     public class BigEndianStream
     {
-        private readonly Stream m_Stream;
+        private readonly Stream m_stream;
 
         public BigEndianStream(Stream stream)
         {
-            this.m_Stream = stream;
+            m_stream = stream;
         }
 
         public bool HasRemaining()
         {
-            return m_Stream.Length - m_Stream.Position > 0;
+            return m_stream.Length - m_stream.Position > 0;
         }
 
         public long Position
         {
-            get => m_Stream.Position;
-            set => m_Stream.Position = value;
+            get => m_stream.Position;
+            set => m_stream.Position = value;
         }
 
         public void WriteBytes(byte[] value)
         {
-            m_Stream.Write(value, 0, value.Length);
+            m_stream.Write(value, 0, value.Length);
         }
 
         public void WriteByte(byte value)
         {
-            m_Stream.WriteByte(value);
+            m_stream.WriteByte(value);
         }
 
         public void WriteUShort(ushort value)
         {
-            m_Stream.WriteByte((byte)(value >> 8));
-            m_Stream.WriteByte((byte)value);
+            m_stream.WriteByte((byte)(value >> 8));
+            m_stream.WriteByte((byte)value);
         }
 
         public void WriteUInt(uint value)
         {
-            m_Stream.WriteByte((byte)(value >> 24));
-            m_Stream.WriteByte((byte)(value >> 16));
-            m_Stream.WriteByte((byte)(value >> 8));
-            m_Stream.WriteByte((byte)value);
+            m_stream.WriteByte((byte)(value >> 24));
+            m_stream.WriteByte((byte)(value >> 16));
+            m_stream.WriteByte((byte)(value >> 8));
+            m_stream.WriteByte((byte)value);
         }
 
         public void WriteULong(ulong value)
@@ -55,7 +59,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         public void WriteSByte(sbyte value)
         {
-            m_Stream.WriteByte((byte)value);
+            m_stream.WriteByte((byte)value);
         }
 
         public void WriteShort(short value)
@@ -90,30 +94,30 @@ namespace AdGuard.FilterListManager.MarshalLogic
         {
             CheckRemaining(length);
             byte[] result = new byte[length];
-            m_Stream.Read(result, 0, length);
+            m_stream.Read(result, 0, length);
             return result;
         }
 
         public byte ReadByte()
         {
             CheckRemaining(1);
-            return Convert.ToByte(m_Stream.ReadByte());
+            return Convert.ToByte(m_stream.ReadByte());
         }
 
         public ushort ReadUShort()
         {
             CheckRemaining(2);
-            return (ushort)(m_Stream.ReadByte() << 8 | m_Stream.ReadByte());
+            return (ushort)(m_stream.ReadByte() << 8 | m_stream.ReadByte());
         }
 
         public uint ReadUInt()
         {
             CheckRemaining(4);
             return (uint)(
-                m_Stream.ReadByte() << 24
-                | m_Stream.ReadByte() << 16
-                | m_Stream.ReadByte() << 8
-                | m_Stream.ReadByte()
+                m_stream.ReadByte() << 24
+                | m_stream.ReadByte() << 16
+                | m_stream.ReadByte() << 8
+                | m_stream.ReadByte()
             );
         }
 
@@ -158,7 +162,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         private void CheckRemaining(int length)
         {
-            if (m_Stream.Length - m_Stream.Position < length)
+            if (m_stream.Length - m_stream.Position < length)
             {
                 throw new StreamUnderflowException();
             }
