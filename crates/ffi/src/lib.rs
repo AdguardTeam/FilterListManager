@@ -13,10 +13,9 @@ pub use adguard_flm::*;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 // Re-export native structs and functions
+pub use crate::native_interface::*;
 pub use crate::top_level::*;
-pub use native_interface::*;
 
-#[repr(C)]
 pub struct FilterListManager {
     flm: RwLock<FilterListManagerImpl>,
 }

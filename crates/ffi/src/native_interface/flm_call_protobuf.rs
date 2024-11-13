@@ -1,8 +1,8 @@
-//! This module for C functions and structs
+//! A dispatcher module that passes the FFI function call to the right method internally on the Rust side
 
+use crate::native_interface::{build_rust_response_error, FLMHandle, RustResponse};
 use crate::outer_error::AGOuterError;
 use crate::protobuf_generated::filter_list_manager;
-use crate::protobuf_generated::filter_list_manager::ag_outer_error::Error as ProtobufErrorEnum;
 use crate::protobuf_generated::filter_list_manager::{
     ChangeLocaleRequest, ChangeLocaleResponse, DeleteCustomFilterListsRequest,
     DeleteCustomFilterListsResponse, EmptyResponse, EnableFilterListsRequest,
@@ -19,145 +19,44 @@ use crate::protobuf_generated::filter_list_manager::{
     UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse, UpdateFiltersRequest,
     UpdateFiltersResponse,
 };
-use crate::result::AGResult;
-pub use crate::top_level::*;
-use crate::FilterListManager;
-use adguard_flm::Configuration;
 use prost::Message;
 use std::ffi::c_void;
-use std::mem::size_of;
-use std::ptr::null_mut;
 
-/// Container for rust-formed responses into external world
-/// UNSAFE: You must manually control the release of any types folded into the “response”
+/// Representation of method handle for [`flm_call_protobuf`]
 #[repr(C)]
-pub struct RustResponse {
-    /// Bytes count
-    /// UNSAFE: You should put here the real data length, even for pointers
-    pub result_data_len: usize,
-    /// The real allocated data length
-    /// UNSAFE: You should put here the real data length, even for pointers
-    pub result_data_capacity: usize,
-    /// UNSAFE: There can be many different pointer types
-    pub result_data: *mut c_void,
-    /// Special response case: If request or response have failed, try to send [`AGOuterError::Other`] error with the explanation
-    /// See: [`build_rust_response_error`]
-    pub ffi_error: bool,
-    /// Data type discriminant
-    pub response_type: RustResponseType,
+pub enum FFIMethod {
+    InstallCustomFilterList,
+    EnableFilterLists,
+    InstallFilterLists,
+    DeleteCustomFilterLists,
+    GetFullFilterListById,
+    GetStoredFiltersMetadata,
+    GetStoredFilterMetadataById,
+    SaveCustomFilterRules,
+    SaveDisabledRules,
+    UpdateFilters,
+    ForceUpdateFiltersByIds,
+    FetchFilterListMetadata,
+    LiftUpDatabase,
+    GetAllTags,
+    GetAllGroups,
+    ChangeLocale,
+    PullMetadata,
+    UpdateCustomFilterMetadata,
+    GetDatabasePath,
+    GetDatabaseVersion,
+    InstallCustomFilterFromString,
+    GetActiveRules,
+    GetFilterRulesAsStrings,
+    SaveRulesToFileBlob,
+    GetDisabledRules,
 }
 
-impl Default for RustResponse {
-    fn default() -> Self {
-        Self {
-            response_type: RustResponseType::RustBuffer,
-            result_data: null_mut(),
-            ffi_error: false,
-            result_data_len: 0,
-            result_data_capacity: 0,
-        }
-    }
-}
-
-/// Discriminant for [`RustResponse`] result_data value
-#[repr(u8)]
-pub enum RustResponseType {
-    /// Contains u8 pointer with size
-    RustBuffer,
-    /// Contains [`FLMHandle`]
-    FLMHandlePointer,
-}
-
-/// Opaque handle for external world
-#[repr(C)]
-pub struct FLMHandle {
-    pub(crate) flm: FilterListManager,
-}
-
-impl FLMHandle {
-    /// Opaque handle factory
-    pub(crate) fn new(configuration: Configuration) -> AGResult<Self> {
-        Ok(Self {
-            flm: FilterListManager::new(configuration)?,
-        })
-    }
-}
-
-/// Makes default [`Configuration`] object as protobuf in [`RustResponse`]
-#[no_mangle]
-pub unsafe extern "C" fn flm_default_configuration_protobuf() -> *mut RustResponse {
-    let conf: filter_list_manager::Configuration = Configuration::default().into();
-
-    let mut rust_response = Box::new(RustResponse::default());
-
-    let mut vec = vec![];
-    if let Err(why) = conf.encode(&mut vec) {
-        return build_rust_response_error(
-            Box::new(why),
-            rust_response,
-            "Cannot spawn configuration",
-        );
-    }
-
-    let len = vec.len();
-    let capacity = vec.capacity();
-
-    let bytes_rust = Box::into_raw(vec.into_boxed_slice());
-
-    rust_response.result_data_capacity = capacity;
-    rust_response.result_data_len = len;
-    rust_response.result_data = bytes_rust as *mut c_void;
-
-    Box::into_raw(rust_response)
-}
-
-/// Makes an FLM object and returns opaque pointer of [`FLMHandle`]
-#[no_mangle]
-pub unsafe extern "C" fn flm_init_protobuf(bytes: *const u8, size: usize) -> *mut RustResponse {
-    let mut rust_response = Box::new(RustResponse::default());
-
-    if bytes.is_null() || size == 0 {
-        return build_rust_response_error(
-            Box::new(AGOuterError::Other(String::from(
-                "Got empty configuration object, while init flm",
-            ))),
-            rust_response,
-            "",
-        );
-    }
-
-    let config_data = std::slice::from_raw_parts(bytes, size);
-    let decode_result = filter_list_manager::Configuration::decode(config_data);
-    let Ok(conf) = decode_result else {
-        return build_rust_response_error(
-            Box::new(decode_result.unwrap_err()),
-            rust_response,
-            "Cannot decode Configuration",
-        );
-    };
-
-    let factory_result = FLMHandle::new(conf.into());
-    let Ok(flm_handle) = factory_result else {
-        return build_rust_response_error(
-            Box::new(factory_result.err().unwrap()),
-            rust_response,
-            "Cannot encode new FLM Instance",
-        );
-    };
-
-    rust_response.result_data = Box::into_raw(Box::new(flm_handle)) as *mut c_void;
-    rust_response.result_data_capacity = size_of::<usize>(); // hmm...
-    rust_response.result_data_len = size_of::<usize>(); // hmm...
-    rust_response.response_type = RustResponseType::FLMHandlePointer;
-
-    Box::into_raw(rust_response)
-}
-
-/// Calls FLM method described as [`FFIMethods`] for object behind [`FLMHandle`]
+/// Calls FLM method described as [`FFIMethod`] for object behind [`FLMHandle`]
 #[no_mangle]
 pub unsafe extern "C" fn flm_call_protobuf(
     handle: *mut FLMHandle,
-    method: FFIMethods,
+    method: FFIMethod,
     input_buffer: *mut u8,
     input_buf_len: usize,
 ) -> *mut RustResponse {
@@ -214,7 +113,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
     }
 
     let encode_result = match method {
-        FFIMethods::InstallCustomFilterList => {
+        FFIMethod::InstallCustomFilterList => {
             let request = decode_input_request!(InstallCustomFilterListRequest);
 
             match flm_handle.flm.install_custom_filter_list(
@@ -234,7 +133,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::EnableFilterLists => {
+        FFIMethod::EnableFilterLists => {
             let request = decode_input_request!(EnableFilterListsRequest);
 
             do_simple_match!(
@@ -245,7 +144,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
                 count
             )
         }
-        FFIMethods::InstallFilterLists => {
+        FFIMethod::InstallFilterLists => {
             let request = decode_input_request!(InstallFilterListsRequest);
 
             do_simple_match!(
@@ -256,7 +155,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
                 count
             )
         }
-        FFIMethods::DeleteCustomFilterLists => {
+        FFIMethod::DeleteCustomFilterLists => {
             let request = decode_input_request!(DeleteCustomFilterListsRequest);
 
             do_simple_match!(
@@ -265,7 +164,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
                 count
             )
         }
-        FFIMethods::GetStoredFiltersMetadata => {
+        FFIMethod::GetStoredFiltersMetadata => {
             match flm_handle.flm.get_stored_filters_metadata() {
                 Ok(value) => GetStoredFiltersMetadataResponse {
                     filter_lists: value.into_iter().map(Into::into).collect(),
@@ -278,7 +177,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::GetStoredFilterMetadataById => {
+        FFIMethod::GetStoredFilterMetadataById => {
             let request = decode_input_request!(GetStoredFiltersMetadataByIdRequest);
 
             match flm_handle.flm.get_stored_filters_metadata_by_id(request.id) {
@@ -293,7 +192,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::GetFullFilterListById => {
+        FFIMethod::GetFullFilterListById => {
             let request = decode_input_request!(GetFullFilterListByIdRequest);
 
             match flm_handle.flm.get_full_filter_list_by_id(request.id) {
@@ -308,7 +207,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
             .encode(&mut out_bytes_buffer)
         }
-        FFIMethods::SaveCustomFilterRules => {
+        FFIMethod::SaveCustomFilterRules => {
             let request = decode_input_request!(SaveCustomFilterRulesRequest);
 
             let Some(rules) = request.rules else {
@@ -327,7 +226,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
             .encode(&mut out_bytes_buffer)
         }
-        FFIMethods::SaveDisabledRules => {
+        FFIMethod::SaveDisabledRules => {
             let request = decode_input_request!(SaveDisabledRulesRequest);
 
             EmptyResponse {
@@ -339,7 +238,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
             .encode(&mut out_bytes_buffer)
         }
-        FFIMethods::UpdateFilters => {
+        FFIMethod::UpdateFilters => {
             let request = decode_input_request!(UpdateFiltersRequest);
 
             match flm_handle.flm.update_filters(
@@ -358,7 +257,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
             .encode(&mut out_bytes_buffer)
         }
-        FFIMethods::ForceUpdateFiltersByIds => {
+        FFIMethod::ForceUpdateFiltersByIds => {
             let request = decode_input_request!(ForceUpdateFiltersByIdsRequest);
 
             match flm_handle
@@ -376,7 +275,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
             .encode(&mut out_bytes_buffer)
         }
-        FFIMethods::FetchFilterListMetadata => {
+        FFIMethod::FetchFilterListMetadata => {
             let request = decode_input_request!(FetchFilterListMetadataRequest);
 
             match flm_handle.flm.fetch_filter_list_metadata(request.url) {
@@ -391,11 +290,11 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
             .encode(&mut out_bytes_buffer)
         }
-        FFIMethods::LiftUpDatabase => EmptyResponse {
+        FFIMethod::LiftUpDatabase => EmptyResponse {
             error: flm_handle.flm.lift_up_database().err().map(Into::into),
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::GetAllTags => match flm_handle.flm.get_all_tags() {
+        FFIMethod::GetAllTags => match flm_handle.flm.get_all_tags() {
             Ok(tags) => GetAllTagsResponse {
                 tags: tags.into_iter().map(Into::into).collect(),
                 error: None,
@@ -406,7 +305,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             },
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::GetAllGroups => match flm_handle.flm.get_all_groups() {
+        FFIMethod::GetAllGroups => match flm_handle.flm.get_all_groups() {
             Ok(groups) => GetAllGroupsResponse {
                 groups: groups.into_iter().map(Into::into).collect(),
                 error: None,
@@ -417,7 +316,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             },
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::ChangeLocale => {
+        FFIMethod::ChangeLocale => {
             let request = decode_input_request!(ChangeLocaleRequest);
 
             do_simple_match!(
@@ -426,11 +325,11 @@ pub unsafe extern "C" fn flm_call_protobuf(
                 success
             )
         }
-        FFIMethods::PullMetadata => EmptyResponse {
+        FFIMethod::PullMetadata => EmptyResponse {
             error: flm_handle.flm.pull_metadata().err().map(Into::into),
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::UpdateCustomFilterMetadata => {
+        FFIMethod::UpdateCustomFilterMetadata => {
             let request = decode_input_request!(UpdateCustomFilterMetadataRequest);
 
             do_simple_match!(
@@ -443,21 +342,21 @@ pub unsafe extern "C" fn flm_call_protobuf(
                 success
             )
         }
-        FFIMethods::GetDatabasePath => {
+        FFIMethod::GetDatabasePath => {
             do_simple_match!(
                 flm_handle.flm.get_database_path(),
                 GetDatabasePathResponse,
                 path
             )
         }
-        FFIMethods::GetDatabaseVersion => {
+        FFIMethod::GetDatabaseVersion => {
             do_simple_match!(
                 flm_handle.flm.get_database_version(),
                 GetDatabaseVersionResponse,
                 version
             )
         }
-        FFIMethods::InstallCustomFilterFromString => {
+        FFIMethod::InstallCustomFilterFromString => {
             let request = decode_input_request!(InstallCustomFilterFromStringRequest);
 
             match flm_handle.flm.install_custom_filter_from_string(
@@ -480,7 +379,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
             .encode(&mut out_bytes_buffer)
         }
-        FFIMethods::GetActiveRules => match flm_handle.flm.get_active_rules() {
+        FFIMethod::GetActiveRules => match flm_handle.flm.get_active_rules() {
             Ok(value) => GetActiveRulesResponse {
                 rules: value.into_iter().map(Into::into).collect(),
                 error: None,
@@ -491,7 +390,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             },
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::GetFilterRulesAsStrings => {
+        FFIMethod::GetFilterRulesAsStrings => {
             let request = decode_input_request!(GetFilterRulesAsStringsRequest);
 
             match flm_handle.flm.get_filter_rules_as_strings(request.ids) {
@@ -506,7 +405,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::SaveRulesToFileBlob => {
+        FFIMethod::SaveRulesToFileBlob => {
             let request = decode_input_request!(SaveRulesToFileBlobRequest);
 
             EmptyResponse {
@@ -518,7 +417,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethods::GetDisabledRules => {
+        FFIMethod::GetDisabledRules => {
             let request = decode_input_request!(GetDisabledRulesRequest);
 
             match flm_handle.flm.get_disabled_rules(request.ids) {
@@ -548,103 +447,4 @@ pub unsafe extern "C" fn flm_call_protobuf(
     rust_response.result_data = Box::into_raw(out_bytes_buffer.into_boxed_slice()) as *mut c_void;
 
     Box::leak(rust_response)
-}
-
-/// Frees memory of [`RustResponse`] objects and their data.
-/// NOTE: Actions for each discriminant are different.
-#[no_mangle]
-pub unsafe extern "C" fn flm_free_response(handle: *mut RustResponse) {
-    if !handle.is_null() {
-        let response = Box::from_raw(handle);
-
-        if !response.result_data.is_null() {
-            // One of `Vec::from_raw_parts` invariants
-            assert!(
-                response.result_data_len <= response.result_data_capacity,
-                "Cannot free RustResponse mem, because buffer capacity greater than its length"
-            );
-
-            match response.response_type {
-                RustResponseType::RustBuffer => {
-                    // Placement new into allocated memory. Then autodrop after leaving block
-
-                    let _ = Vec::from_raw_parts(
-                        response.result_data as *mut u8,
-                        response.result_data_len,
-                        response.result_data_capacity,
-                    );
-                }
-                RustResponseType::FLMHandlePointer => {
-                    // The handle must live. It will be deleted later in an explicit way
-                }
-            }
-        }
-    }
-}
-
-/// Drops [`FLMHandle`]
-#[no_mangle]
-pub unsafe extern "C" fn flm_free_handle(handle: *mut FLMHandle) {
-    if !handle.is_null() {
-        let _ = Box::from_raw(handle);
-    }
-}
-
-/// This represents short-circuit error for FFI processing. Returns as [`RustResponse`] with `.ffi_error = true`
-#[inline]
-fn build_rust_response_error(
-    error: Box<dyn std::error::Error>,
-    mut rust_response: Box<RustResponse>,
-    error_span: &str,
-) -> *mut RustResponse {
-    let mut vec = vec![];
-    filter_list_manager::AgOuterError {
-        message: format!("{}: {}", error_span, error.to_string()),
-        error: Some(ProtobufErrorEnum::Other(filter_list_manager::Other {})),
-    }
-    .encode(&mut vec)
-    // All that's left is to fall with the right error
-    .expect(&format!(
-        "[Cannot encode error message] {}: {}",
-        error_span,
-        error.to_string()
-    ));
-
-    rust_response.result_data_capacity = vec.capacity();
-    rust_response.result_data_len = vec.len();
-    rust_response.ffi_error = true;
-    rust_response.result_data = Box::into_raw(vec.into_boxed_slice()) as *mut c_void;
-    rust_response.response_type = RustResponseType::RustBuffer;
-
-    return Box::leak(rust_response);
-}
-
-/// This enum must have the same order as its header-file counterpart
-#[repr(C)]
-pub enum FFIMethods {
-    InstallCustomFilterList,
-    EnableFilterLists,
-    InstallFilterLists,
-    DeleteCustomFilterLists,
-    GetFullFilterListById,
-    GetStoredFiltersMetadata,
-    GetStoredFilterMetadataById,
-    SaveCustomFilterRules,
-    SaveDisabledRules,
-    UpdateFilters,
-    ForceUpdateFiltersByIds,
-    FetchFilterListMetadata,
-    LiftUpDatabase,
-    GetAllTags,
-    GetAllGroups,
-    ChangeLocale,
-    PullMetadata,
-    UpdateCustomFilterMetadata,
-    GetDatabasePath,
-    GetDatabaseVersion,
-    InstallCustomFilterFromString,
-    GetActiveRules,
-    GetFilterRulesAsStrings,
-    SaveRulesToFileBlob,
-    GetDisabledRules,
 }

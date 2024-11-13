@@ -1,9 +1,11 @@
+use cbindgen;
+use cbindgen::Config;
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 use uniffi;
 
-fn main() {
+fn build_proto() {
     // Encountered problems, while running in IDE
     if cfg!(unix) && env::var_os("PROTOC").is_none() {
         if let Some(shell) = env::var_os("SHELL") {
@@ -39,7 +41,33 @@ fn main() {
         .unwrap();
 
     println!("cargo:rerun-if-changed=src/protobuf");
+}
 
+fn run_cbindgen() {
+    let crate_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let mut config_path = PathBuf::from(&crate_dir);
+    config_path.push("cbindgen.toml");
+
+    let config = Config::from_file(config_path).unwrap();
+    cbindgen::Builder::new()
+        .with_crate(&crate_dir)
+        .with_config(config)
+        .generate()
+        .unwrap()
+        .write_to_file("src/platforms/flm_native_interface.h");
+
+    println!("cargo:rerun-if-changed=cbindgen.toml");
+    println!("cargo:rerun-if-changed=src/native_interface");
+}
+
+fn main() {
+    // Build protobuf for rust-side
+    build_proto();
+
+    // Build a header file for native_interface
+    run_cbindgen();
+
+    // Build uniffi
     uniffi::generate_scaffolding("src/flm_ffi.udl").unwrap();
 
     if let Ok(swift_lib_dir) = env::var("CARGO_CFG_SWIFT_LIB_DIR") {

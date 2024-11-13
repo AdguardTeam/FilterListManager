@@ -3,17 +3,18 @@ use adguard_flm::{
     USER_RULES_FILTER_LIST_ID,
 };
 
+#[repr(C)]
 /// Structure used for passing constants through FFI
 pub struct FilterListManagerConstants {
     /// Filter ID for *User rules* filter
-    pub user_rules_id: FilterId,
+    pub user_rules_id: i64,
     /// Group ID for special *custom filters group*
     pub custom_group_id: i32,
     /// Group ID for *special service filters*
     pub special_group_id: i32,
     /// Smallest possible filter_id. You can safely occupy any filter with an id lower than this number.
     /// The library is guaranteed to never create a filter with this id
-    pub smallest_filter_id: FilterId,
+    pub smallest_filter_id: i64,
 }
 
 impl Default for FilterListManagerConstants {

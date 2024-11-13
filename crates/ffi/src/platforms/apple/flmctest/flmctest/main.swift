@@ -148,7 +148,7 @@ func spawnConf() throws -> FilterListManager_Configuration {
 /// REQUIRED
 /// Main FLM  facade
 class FLMFacade {
-    private let flm_handle: UnsafeMutableRawPointer
+    private let flm_handle: OpaquePointer
 
     init(configuration: FilterListManager_Configuration) throws {
         var newConfData = try configuration.serializedData();
@@ -184,7 +184,7 @@ class FLMFacade {
             throw AGOuterError(from: error)
         }
 
-        self.flm_handle = response.pointee.result_data;
+        self.flm_handle = OpaquePointer(response.pointee.result_data)
     }
 
     private func callRust(method: FFIMethod, message: Message) throws -> Data {
