@@ -3,247 +3,213 @@ using FilterListManager;
 using AdGuard.FilterListManagerProtobuf.RustInterface;
 using Google.Protobuf;
 using System.Collections.Generic;
+using AdGuard.Utils.Serializers;
 
 namespace AdGuard.FilterListManagerProtobuf
 {
-
-    public class FilterListManager
+    public class FilterListManager : IFilterListManager
     {
         protected IntPtr FLMHandle;
+        private readonly ISerializer<byte[]> m_Serializer;
 
         /// <summary>
         ///  header - crates/ffi/src/flm_native_interface.h
         ///  swift.file - crates/ffi/src/platforms/apple/flmctest/flmctest/main.swift
         ///  protobuf schema - crates/ffi/src/protobuf
         /// </summary>
-
-        
         /// Spawns configuration for set up
         public static Configuration SpawnDefaultConfiguration()
         {
             return ProtobufBridge.MakeDefaultConfiguration();
         }
 
-        public FilterListManager(Configuration configuration)
+        public FilterListManager(Configuration configuration, ISerializer<byte[]> serializer)
         {
             FLMHandle = ProtobufBridge.InitFLM(configuration);
+            m_Serializer = serializer;
         }
 
-        protected byte[] CallRust(FFIMethod method, IMessage message)
+        protected TMessage CallRust<TMessage>(FFIMethod method, IMessage message) 
+            where TMessage : IMessage, IAGOuterError
         {
-            return ProtobufBridge.CallRust(FLMHandle, method, message.ToByteArray());
+            byte[] args = message.ToByteArray();
+            byte[] data = ProtobufBridge.CallRust(FLMHandle, method, args);
+            TMessage response = m_Serializer.DeserializeObject<TMessage>(data);
+            if (response.Error != null)
+            {
+                throw new AGOuterException(response.Error);
+            }
+
+            return response;
         }
+        
+        #region IFilterListManager members
 
         public FullFilterList InstallCustomFilterList(
-            string downloadURL,
+            string downloadUrl,
             bool isTrusted,
             string title, /* Nullable */
-            string description /* Nullable */
-        )
+            string description /* Nullable */)
         {
-            var request = new InstallCustomFilterListRequest
+            InstallCustomFilterListRequest request = new InstallCustomFilterListRequest
             {
-                DownloadUrl = downloadURL,
+                DownloadUrl = downloadUrl,
                 IsTrusted = isTrusted,
                 Title = title,
                 Description = description
             };
 
-            var responseBytes = CallRust(FFIMethod.InstallCustomFilterList, request);
-            var response = InstallCustomFilterFromStringResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
+            InstallCustomFilterFromStringResponse response = 
+                CallRust<InstallCustomFilterFromStringResponse>(
+                    FFIMethod.InstallCustomFilterList, 
+                    request);
             return response.FilterList;
         }
 
-        public long EnableFilterLists(IEnumerable<long> ids, bool isEnabled) {
-            var request = new EnableFilterListsRequest
+        public long EnableFilterLists(IEnumerable<long> ids, bool isEnabled) 
+        {
+            EnableFilterListsRequest request = new EnableFilterListsRequest
             {
                 IsEnabled = isEnabled
             };
 
             request.Ids.AddRange(ids);
-
-            var responseBytes = CallRust(FFIMethod.EnableFilterLists, request);
-            var response = EnableFilterListsResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
+            EnableFilterListsResponse response = CallRust<EnableFilterListsResponse>(FFIMethod.EnableFilterLists, request);
             return response.Count;
         }
 
         public long InstallFilterLists(IEnumerable<long> ids, bool isInstalled)
         {
-            var request = new InstallFilterListsRequest
+            InstallFilterListsRequest request = new InstallFilterListsRequest
             {
                 IsInstalled = isInstalled
             };
 
             request.Ids.AddRange(ids);
-
-            var responseBytes = CallRust(FFIMethod.EnableFilterLists, request);
-            var response = InstallFilterListsResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
+            InstallFilterListsResponse response = 
+                CallRust<InstallFilterListsResponse>(FFIMethod.EnableFilterLists, request);
             return response.Count;
         }
 
         public long DeleteCustomFilterLists(IEnumerable<long> ids)
         {
-            var request = new DeleteCustomFilterListsRequest();
+            DeleteCustomFilterListsRequest request = new DeleteCustomFilterListsRequest();
             request.Ids.AddRange(ids);
-
-            var responseBytes = CallRust(FFIMethod.EnableFilterLists, request);
-            var response = DeleteCustomFilterListsResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
+            DeleteCustomFilterListsResponse response = 
+                CallRust<DeleteCustomFilterListsResponse>(FFIMethod.EnableFilterLists, request);
             return response.Count;
-        }
-
-        public IEnumerable<FullFilterList> GetFullFilterLists()
-        {
-            var request = new EmptyRequest();
-
-            var responseBytes = CallRust(FFIMethod.EnableFilterLists, request);
-            var response = GetFullFilterListsResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
-            return response.FilterLists;
         }
 
         public FullFilterList GetFullFilterListById(long filterId)
         {
-            var request = new GetFullFilterListByIdRequest
+            GetFullFilterListByIdRequest request = new GetFullFilterListByIdRequest
             {
                 Id = filterId
             };
 
-            var responseBytes = CallRust(FFIMethod.GetFullFilterListById, request);
-            var response = GetFullFilterListByIdResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
+            GetFullFilterListByIdResponse response = CallRust<GetFullFilterListByIdResponse>(FFIMethod.GetFullFilterListById, request);
             return response.FilterList;
         }
 
         public IEnumerable<StoredFilterMetadata> GetStoredFiltersMetadata()
         {
-            var request = new EmptyRequest();
-
-            var responseBytes = CallRust(FFIMethod.GetStoredFiltersMetadata, request);
-            var response = GetStoredFiltersMetadataResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
+            EmptyRequest request = new EmptyRequest();
+            GetStoredFiltersMetadataResponse response = 
+                CallRust<GetStoredFiltersMetadataResponse>(FFIMethod.GetStoredFiltersMetadata, request);
             return response.FilterLists;
         }
 
         public StoredFilterMetadata GetStoredFilterMetadataById(long filterId)
         {
-            var request = new GetStoredFiltersMetadataByIdRequest
+            GetStoredFiltersMetadataByIdRequest request = new GetStoredFiltersMetadataByIdRequest
             {
                 Id = filterId
             };
 
-            var responseBytes = CallRust(FFIMethod.GetStoredFilterMetadataById, request);
-            var response = GetStoredFilterMetadataByIdResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
+            GetStoredFilterMetadataByIdResponse response = 
+                CallRust<GetStoredFilterMetadataByIdResponse>(FFIMethod.GetStoredFilterMetadataById, request);
             return response.FilterList;
         }
 
         public void SaveCustomFilterRules(FilterListRules rules)
         {
-            var request = new SaveCustomFilterRulesRequest
+            SaveCustomFilterRulesRequest request = new SaveCustomFilterRulesRequest
             {
                 Rules = rules
             };
 
-            var responseBytes = CallRust(FFIMethod.SaveCustomFilterRules, request);
-            var response = EmptyResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
+            CallRust<EmptyResponse>(FFIMethod.SaveCustomFilterRules, request);
         }
 
         public void SaveDisabledRules(long id, List<string> disabledRules)
         {
-            var request = new SaveDisabledRulesRequest
+            SaveDisabledRulesRequest request = new SaveDisabledRulesRequest
             {
                 FilterId = id
             };
 
             request.DisabledRules.AddRange(disabledRules);
-
-            var responseBytes = CallRust(FFIMethod.SaveCustomFilterRules, request);
-            var response = EmptyResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
+            CallRust<EmptyResponse>(FFIMethod.SaveCustomFilterRules, request);
         }
 
         public UpdateResult UpdateFilters(
-            bool ignoreFiltersExiration,
+            bool ignoreFiltersExpiration,
             int looseTimeout,
             bool ignoreFilterStatus
         )
         {
-            var message = new UpdateFiltersRequest
+            UpdateFiltersRequest message = new UpdateFiltersRequest
             {
-                IgnoreFiltersExpiration = ignoreFiltersExiration,
+                IgnoreFiltersExpiration = ignoreFiltersExpiration,
                 LooseTimeout = looseTimeout,
                 IgnoreFiltersStatus = ignoreFilterStatus
             };
 
-            var responseBytes = CallRust(FFIMethod.UpdateFilters, message);
-            var response = UpdateFiltersResponse.Parser.ParseFrom(responseBytes);
-
-            if (response.Error != null)
-            {
-                throw new AGOuterError(response.Error);
-            }
-
+            UpdateFiltersResponse response = 
+                CallRust<UpdateFiltersResponse>(FFIMethod.UpdateFilters, message);
             return response.Result;
         }
+        
+        #endregion
 
         // TODO: Add methods in FFIMethod order 
 
+
+        #region IDisposable members
+
         ~FilterListManager()
+        {
+            Dispose(false);
+        }
+        
+        private void ReleaseManagedResources()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ReleaseUnmanagedResources()
         {
             ProtobufBridge.FreeFLMHandle(FLMHandle);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ReleaseManagedResources();
+            }
+            
+            ReleaseUnmanagedResources();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
+        
     }
 }

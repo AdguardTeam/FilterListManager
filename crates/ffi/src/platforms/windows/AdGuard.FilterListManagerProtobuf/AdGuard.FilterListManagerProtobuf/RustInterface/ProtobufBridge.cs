@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using AdGuard.Utils.Base.Interop;
 using FilterListManager;
 using Google.Protobuf;
 using AGErrorProtobuf = FilterListManager.AGOuterError;
@@ -11,18 +12,15 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
         internal static Configuration MakeDefaultConfiguration()
         {
             IntPtr responsePtr = ProtobufInterop.flm_default_configuration_protobuf();
-            RustResponse response = (RustResponse) Marshal.PtrToStructure(responsePtr, typeof(RustResponse));
-
-            byte[] byteData = new byte[response.result_data_len];
+            RustResponse response = MarshalUtils.PtrToStructure<RustResponse>(responsePtr);
+            byte[] byteData = new byte[response.ResultDataLen];
             // NEEDS COPY? Or unsafe?
-            Marshal.Copy(response.result_data, byteData, 0, (int) response.result_data_len);
+            Marshal.Copy(response.ResultData, byteData, 0, (int) response.ResultDataLen);
             ProtobufInterop.flm_free_response(responsePtr);
-
-            if (response.ffi_error)
+            if (response.FfiError)
             {
-                var error = AGErrorProtobuf.Parser.ParseFrom(byteData);
-
-                throw new AGOuterError(error);
+                AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(byteData);
+                throw new AGOuterException(error);
             }
 
             return Configuration.Parser.ParseFrom(byteData);
@@ -30,49 +28,48 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
 
         internal static IntPtr InitFLM(Configuration configuration)
         {
-            byte[] bytes = configuration.ToByteArray();
-
-            IntPtr dataPointer = Marshal.AllocHGlobal(bytes.Length);
-
-            try {
-                Marshal.Copy(bytes, 0, dataPointer, bytes.Length);
-
-                return ProtobufInterop.flm_init_protobuf(dataPointer, (ulong)bytes.Length);
+            byte[] data = configuration.ToByteArray();
+            IntPtr pData = IntPtr.Zero;
+            try
+            {
+                pData = Marshal.AllocHGlobal(data.Length);
+                Marshal.Copy(data, 0, pData, data.Length);
+                return ProtobufInterop.flm_init_protobuf(pData, (ulong)data.Length);
             }
             finally
             {
-                Marshal.FreeHGlobal(dataPointer);
+                MarshalUtils.SafeFreeHGlobal(pData);
             }
         }
 
-        internal static byte[] CallRust(IntPtr FLMHandle, FFIMethod Method, byte[] Args)
+        internal static byte[] CallRust(IntPtr flmHandle, FFIMethod method, byte[] args)
         {
-            IntPtr dataPointer = Marshal.AllocHGlobal(Args.Length);
-
+            IntPtr pData = IntPtr.Zero;
+            IntPtr pResponse = IntPtr.Zero;
             try
             {
-                Marshal.Copy(Args, 0, dataPointer, Args.Length);
-
-                IntPtr responsePtr = ProtobufInterop.flm_call_protobuf(FLMHandle, Method, dataPointer, (ulong)Args.Length);
-                RustResponse response = (RustResponse)Marshal.PtrToStructure(responsePtr, typeof(RustResponse));
-                
-                byte[] byteData = new byte[response.result_data_len];
-                Marshal.Copy(responsePtr, byteData, 0, (int) response.result_data_len);
-
-                ProtobufInterop.flm_free_response(responsePtr);
-
-                if (response.ffi_error)
+                pData = Marshal.AllocHGlobal(args.Length);
+                Marshal.Copy(args, 0, pData, args.Length);
+                pResponse = ProtobufInterop.flm_call_protobuf(flmHandle, method, pData, (ulong)args.Length);
+                RustResponse response = MarshalUtils.PtrToStructure<RustResponse>(pResponse);
+                byte[] data = new byte[response.ResultDataLen];
+                Marshal.Copy(pResponse, data, 0, (int) response.ResultDataLen);
+                if (!response.FfiError)
                 {
-                    var error = AGErrorProtobuf.Parser.ParseFrom(byteData);
-
-                    throw new AGOuterError(error);
+                    return data;
                 }
-
-                return byteData;
+                
+                AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(data);
+                throw new AGOuterException(error);
             }
             finally
             {
-                Marshal.FreeHGlobal(dataPointer);
+                if (pResponse != IntPtr.Zero)
+                {
+                    ProtobufInterop.flm_free_response(pResponse);
+                }
+                
+                MarshalUtils.SafeFreeHGlobal(pData);
             }
         }
 
