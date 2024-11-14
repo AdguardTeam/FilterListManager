@@ -11,8 +11,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
         public override DisabledRulesRaw Read(BigEndianStream stream)
         {
             return new DisabledRulesRaw(
-                @filterId: FfiConverterInt64.Instance.Read(stream),
-                @text: FfiConverterString.Instance.Read(stream)
+                filterId: FfiConverterInt64.Instance.Read(stream),
+                text: FfiConverterString.Instance.Read(stream)
             );
         }
 

@@ -86,7 +86,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_stored_filters_metadata_by_id),
                 new KeyValuePair<ushort, Func<ushort>>(20063,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings),
-
+                new KeyValuePair<ushort, Func<ushort>>(29147,
+                    uniffi_filter_list_manager_ffi_checksum_func_make_constants_structure),
+                new KeyValuePair<ushort, Func<ushort>>(58681,
+                    uniffi_filter_list_manager_ffi_checksum_func_make_default_configuration)
             };
 
         static void UniffiCheckApiChecksums()
@@ -576,6 +579,14 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_stored_filters_metadata_by_id(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_fn_func_make_constants_structure(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_fn_func_make_default_configuration(
         );
 
         #endregion
