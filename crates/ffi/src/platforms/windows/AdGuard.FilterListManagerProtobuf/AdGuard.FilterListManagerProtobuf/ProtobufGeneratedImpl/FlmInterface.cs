@@ -1,4 +1,8 @@
 // ReSharper disable CheckNamespace
+
+using AdGuard.FilterListManagerProtobuf.ProtobufGeneratedImpl;
+
+
 namespace FilterListManager
 {
     public partial class InstallCustomFilterListResponse : IAGOuterError
@@ -72,10 +76,16 @@ namespace FilterListManager
     public partial class GetActiveRulesResponse : IAGOuterError 
     {
     }
-    
-    
 
     public partial class EmptyResponse : IAGOuterError 
+    {
+    }
+    
+    public partial class GetFilterRulesAsStringsResponse : IAGOuterError 
+    {
+    }
+    
+    public partial class GetDisabledRulesResponse : IAGOuterError 
     {
     }
 }

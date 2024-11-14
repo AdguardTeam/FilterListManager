@@ -6,7 +6,6 @@
         EnableFilterLists,
         InstallFilterLists,
         DeleteCustomFilterLists,
-        GetFullFilterLists,
         GetFullFilterListById,
         GetStoredFiltersMetadata,
         GetStoredFilterMetadataById,
@@ -24,6 +23,9 @@
         GetDatabasePath,
         GetDatabaseVersion,
         InstallCustomFilterFromString,
-        GetActiveRules
+        GetActiveRules,
+        GetFilterRulesAsStrings,
+        SaveRulesToFileBlob,
+        GetDisabledRules
     }
 }
