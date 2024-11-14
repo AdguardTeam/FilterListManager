@@ -20,16 +20,16 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-struct FilterListManager_AGOuterError {
+public struct FilterListManager_AGOuterError {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var message: String = String()
+  public var message: String = String()
 
-  var error: FilterListManager_AGOuterError.OneOf_Error? = nil
+  public var error: FilterListManager_AGOuterError.OneOf_Error? = nil
 
-  var cannotOpenDatabase: FilterListManager_CannotOpenDatabase {
+  public var cannotOpenDatabase: FilterListManager_CannotOpenDatabase {
     get {
       if case .cannotOpenDatabase(let v)? = error {return v}
       return FilterListManager_CannotOpenDatabase()
@@ -37,7 +37,7 @@ struct FilterListManager_AGOuterError {
     set {error = .cannotOpenDatabase(newValue)}
   }
 
-  var notADatabase: FilterListManager_NotADatabase {
+  public var notADatabase: FilterListManager_NotADatabase {
     get {
       if case .notADatabase(let v)? = error {return v}
       return FilterListManager_NotADatabase()
@@ -45,7 +45,7 @@ struct FilterListManager_AGOuterError {
     set {error = .notADatabase(newValue)}
   }
 
-  var databaseBusy: FilterListManager_DatabaseBusy {
+  public var databaseBusy: FilterListManager_DatabaseBusy {
     get {
       if case .databaseBusy(let v)? = error {return v}
       return FilterListManager_DatabaseBusy()
@@ -53,7 +53,7 @@ struct FilterListManager_AGOuterError {
     set {error = .databaseBusy(newValue)}
   }
 
-  var diskFull: FilterListManager_DiskFull {
+  public var diskFull: FilterListManager_DiskFull {
     get {
       if case .diskFull(let v)? = error {return v}
       return FilterListManager_DiskFull()
@@ -61,7 +61,7 @@ struct FilterListManager_AGOuterError {
     set {error = .diskFull(newValue)}
   }
 
-  var entityNotFound: FilterListManager_EntityNotFound {
+  public var entityNotFound: FilterListManager_EntityNotFound {
     get {
       if case .entityNotFound(let v)? = error {return v}
       return FilterListManager_EntityNotFound()
@@ -69,7 +69,7 @@ struct FilterListManager_AGOuterError {
     set {error = .entityNotFound(newValue)}
   }
 
-  var pathNotFound: FilterListManager_PathNotFound {
+  public var pathNotFound: FilterListManager_PathNotFound {
     get {
       if case .pathNotFound(let v)? = error {return v}
       return FilterListManager_PathNotFound()
@@ -77,7 +77,7 @@ struct FilterListManager_AGOuterError {
     set {error = .pathNotFound(newValue)}
   }
 
-  var pathHasDeniedPermission: FilterListManager_PathHasDeniedPermission {
+  public var pathHasDeniedPermission: FilterListManager_PathHasDeniedPermission {
     get {
       if case .pathHasDeniedPermission(let v)? = error {return v}
       return FilterListManager_PathHasDeniedPermission()
@@ -85,7 +85,7 @@ struct FilterListManager_AGOuterError {
     set {error = .pathHasDeniedPermission(newValue)}
   }
 
-  var pathAlreadyExists: FilterListManager_PathAlreadyExists {
+  public var pathAlreadyExists: FilterListManager_PathAlreadyExists {
     get {
       if case .pathAlreadyExists(let v)? = error {return v}
       return FilterListManager_PathAlreadyExists()
@@ -93,7 +93,7 @@ struct FilterListManager_AGOuterError {
     set {error = .pathAlreadyExists(newValue)}
   }
 
-  var timedOut: FilterListManager_TimedOut {
+  public var timedOut: FilterListManager_TimedOut {
     get {
       if case .timedOut(let v)? = error {return v}
       return FilterListManager_TimedOut()
@@ -101,7 +101,7 @@ struct FilterListManager_AGOuterError {
     set {error = .timedOut(newValue)}
   }
 
-  var httpClientNetworkError: FilterListManager_HttpClientNetworkError {
+  public var httpClientNetworkError: FilterListManager_HttpClientNetworkError {
     get {
       if case .httpClientNetworkError(let v)? = error {return v}
       return FilterListManager_HttpClientNetworkError()
@@ -109,7 +109,7 @@ struct FilterListManager_AGOuterError {
     set {error = .httpClientNetworkError(newValue)}
   }
 
-  var httpStrict200Response: FilterListManager_HttpStrict200Response {
+  public var httpStrict200Response: FilterListManager_HttpStrict200Response {
     get {
       if case .httpStrict200Response(let v)? = error {return v}
       return FilterListManager_HttpStrict200Response()
@@ -117,7 +117,7 @@ struct FilterListManager_AGOuterError {
     set {error = .httpStrict200Response(newValue)}
   }
 
-  var httpClientBodyRecoveryFailed: FilterListManager_HttpClientBodyRecoveryFailed {
+  public var httpClientBodyRecoveryFailed: FilterListManager_HttpClientBodyRecoveryFailed {
     get {
       if case .httpClientBodyRecoveryFailed(let v)? = error {return v}
       return FilterListManager_HttpClientBodyRecoveryFailed()
@@ -125,7 +125,7 @@ struct FilterListManager_AGOuterError {
     set {error = .httpClientBodyRecoveryFailed(newValue)}
   }
 
-  var filterContentIsLikelyNotAFilter: FilterListManager_FilterContentIsLikelyNotAFilter {
+  public var filterContentIsLikelyNotAFilter: FilterListManager_FilterContentIsLikelyNotAFilter {
     get {
       if case .filterContentIsLikelyNotAFilter(let v)? = error {return v}
       return FilterListManager_FilterContentIsLikelyNotAFilter()
@@ -133,7 +133,7 @@ struct FilterListManager_AGOuterError {
     set {error = .filterContentIsLikelyNotAFilter(newValue)}
   }
 
-  var filterParserError: FilterListManager_FilterParserError {
+  public var filterParserError: FilterListManager_FilterParserError {
     get {
       if case .filterParserError(let v)? = error {return v}
       return FilterListManager_FilterParserError()
@@ -141,7 +141,7 @@ struct FilterListManager_AGOuterError {
     set {error = .filterParserError(newValue)}
   }
 
-  var fieldIsEmpty: FilterListManager_FieldIsEmpty {
+  public var fieldIsEmpty: FilterListManager_FieldIsEmpty {
     get {
       if case .fieldIsEmpty(let v)? = error {return v}
       return FilterListManager_FieldIsEmpty()
@@ -149,7 +149,7 @@ struct FilterListManager_AGOuterError {
     set {error = .fieldIsEmpty(newValue)}
   }
 
-  var mutex: FilterListManager_Mutex {
+  public var mutex: FilterListManager_Mutex {
     get {
       if case .mutex(let v)? = error {return v}
       return FilterListManager_Mutex()
@@ -157,7 +157,7 @@ struct FilterListManager_AGOuterError {
     set {error = .mutex(newValue)}
   }
 
-  var other: FilterListManager_Other {
+  public var other: FilterListManager_Other {
     get {
       if case .other(let v)? = error {return v}
       return FilterListManager_Other()
@@ -165,9 +165,9 @@ struct FilterListManager_AGOuterError {
     set {error = .other(newValue)}
   }
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum OneOf_Error: Equatable {
+  public enum OneOf_Error: Equatable {
     case cannotOpenDatabase(FilterListManager_CannotOpenDatabase)
     case notADatabase(FilterListManager_NotADatabase)
     case databaseBusy(FilterListManager_DatabaseBusy)
@@ -187,7 +187,7 @@ struct FilterListManager_AGOuterError {
     case other(FilterListManager_Other)
 
   #if !swift(>=4.1)
-    static func ==(lhs: FilterListManager_AGOuterError.OneOf_Error, rhs: FilterListManager_AGOuterError.OneOf_Error) -> Bool {
+    public static func ==(lhs: FilterListManager_AGOuterError.OneOf_Error, rhs: FilterListManager_AGOuterError.OneOf_Error) -> Bool {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
@@ -266,198 +266,198 @@ struct FilterListManager_AGOuterError {
   #endif
   }
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_CannotOpenDatabase {
+public struct FilterListManager_CannotOpenDatabase {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_NotADatabase {
+public struct FilterListManager_NotADatabase {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_DiskFull {
+public struct FilterListManager_DiskFull {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_DatabaseBusy {
+public struct FilterListManager_DatabaseBusy {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_EntityNotFound {
+public struct FilterListManager_EntityNotFound {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var entityID: Int64 = 0
+  public var entityID: Int64 = 0
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_PathNotFound {
+public struct FilterListManager_PathNotFound {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var path: String = String()
+  public var path: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_PathHasDeniedPermission {
+public struct FilterListManager_PathHasDeniedPermission {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var path: String = String()
+  public var path: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_PathAlreadyExists {
+public struct FilterListManager_PathAlreadyExists {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var path: String = String()
+  public var path: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
-}
-
-/// Do not duplicate the message
-struct FilterListManager_TimedOut {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
+  public init() {}
 }
 
 /// Do not duplicate the message
-struct FilterListManager_HttpClientNetworkError {
+public struct FilterListManager_TimedOut {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
-}
-
-struct FilterListManager_HttpStrict200Response {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var statusCode: UInt32 = 0
-
-  var url: String = String()
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
+  public init() {}
 }
 
 /// Do not duplicate the message
-struct FilterListManager_HttpClientBodyRecoveryFailed {
+public struct FilterListManager_HttpClientNetworkError {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
+}
+
+public struct FilterListManager_HttpStrict200Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var statusCode: UInt32 = 0
+
+  public var url: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
 }
 
 /// Do not duplicate the message
-struct FilterListManager_FilterContentIsLikelyNotAFilter {
+public struct FilterListManager_HttpClientBodyRecoveryFailed {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
 /// Do not duplicate the message
-struct FilterListManager_FilterParserError {
+public struct FilterListManager_FilterContentIsLikelyNotAFilter {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
-}
-
-struct FilterListManager_FieldIsEmpty {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var fieldName: String = String()
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
+  public init() {}
 }
 
 /// Do not duplicate the message
-struct FilterListManager_Mutex {
+public struct FilterListManager_FilterParserError {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
+}
+
+public struct FilterListManager_FieldIsEmpty {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var fieldName: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
 }
 
 /// Do not duplicate the message
-struct FilterListManager_Other {
+public struct FilterListManager_Mutex {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
+}
+
+/// Do not duplicate the message
+public struct FilterListManager_Other {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
@@ -487,8 +487,8 @@ extension FilterListManager_Other: @unchecked Sendable {}
 fileprivate let _protobuf_package = "filter_list_manager"
 
 extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".AGOuterError"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".AGOuterError"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "message"),
     2: .standard(proto: "cannot_open_database"),
     3: .standard(proto: "not_a_database"),
@@ -509,7 +509,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
     18: .same(proto: "other"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -742,7 +742,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -824,7 +824,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_AGOuterError, rhs: FilterListManager_AGOuterError) -> Bool {
+  public static func ==(lhs: FilterListManager_AGOuterError, rhs: FilterListManager_AGOuterError) -> Bool {
     if lhs.message != rhs.message {return false}
     if lhs.error != rhs.error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -833,88 +833,88 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
 }
 
 extension FilterListManager_CannotOpenDatabase: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".CannotOpenDatabase"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".CannotOpenDatabase"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_CannotOpenDatabase, rhs: FilterListManager_CannotOpenDatabase) -> Bool {
+  public static func ==(lhs: FilterListManager_CannotOpenDatabase, rhs: FilterListManager_CannotOpenDatabase) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_NotADatabase: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".NotADatabase"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".NotADatabase"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_NotADatabase, rhs: FilterListManager_NotADatabase) -> Bool {
+  public static func ==(lhs: FilterListManager_NotADatabase, rhs: FilterListManager_NotADatabase) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_DiskFull: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".DiskFull"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".DiskFull"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_DiskFull, rhs: FilterListManager_DiskFull) -> Bool {
+  public static func ==(lhs: FilterListManager_DiskFull, rhs: FilterListManager_DiskFull) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_DatabaseBusy: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".DatabaseBusy"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".DatabaseBusy"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_DatabaseBusy, rhs: FilterListManager_DatabaseBusy) -> Bool {
+  public static func ==(lhs: FilterListManager_DatabaseBusy, rhs: FilterListManager_DatabaseBusy) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_EntityNotFound: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".EntityNotFound"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".EntityNotFound"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "entity_id"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -926,14 +926,14 @@ extension FilterListManager_EntityNotFound: SwiftProtobuf.Message, SwiftProtobuf
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.entityID != 0 {
       try visitor.visitSingularInt64Field(value: self.entityID, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_EntityNotFound, rhs: FilterListManager_EntityNotFound) -> Bool {
+  public static func ==(lhs: FilterListManager_EntityNotFound, rhs: FilterListManager_EntityNotFound) -> Bool {
     if lhs.entityID != rhs.entityID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -941,12 +941,12 @@ extension FilterListManager_EntityNotFound: SwiftProtobuf.Message, SwiftProtobuf
 }
 
 extension FilterListManager_PathNotFound: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".PathNotFound"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".PathNotFound"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "path"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -958,14 +958,14 @@ extension FilterListManager_PathNotFound: SwiftProtobuf.Message, SwiftProtobuf._
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.path.isEmpty {
       try visitor.visitSingularStringField(value: self.path, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_PathNotFound, rhs: FilterListManager_PathNotFound) -> Bool {
+  public static func ==(lhs: FilterListManager_PathNotFound, rhs: FilterListManager_PathNotFound) -> Bool {
     if lhs.path != rhs.path {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -973,12 +973,12 @@ extension FilterListManager_PathNotFound: SwiftProtobuf.Message, SwiftProtobuf._
 }
 
 extension FilterListManager_PathHasDeniedPermission: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".PathHasDeniedPermission"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".PathHasDeniedPermission"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "path"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -990,14 +990,14 @@ extension FilterListManager_PathHasDeniedPermission: SwiftProtobuf.Message, Swif
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.path.isEmpty {
       try visitor.visitSingularStringField(value: self.path, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_PathHasDeniedPermission, rhs: FilterListManager_PathHasDeniedPermission) -> Bool {
+  public static func ==(lhs: FilterListManager_PathHasDeniedPermission, rhs: FilterListManager_PathHasDeniedPermission) -> Bool {
     if lhs.path != rhs.path {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1005,12 +1005,12 @@ extension FilterListManager_PathHasDeniedPermission: SwiftProtobuf.Message, Swif
 }
 
 extension FilterListManager_PathAlreadyExists: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".PathAlreadyExists"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".PathAlreadyExists"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "path"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1022,14 +1022,14 @@ extension FilterListManager_PathAlreadyExists: SwiftProtobuf.Message, SwiftProto
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.path.isEmpty {
       try visitor.visitSingularStringField(value: self.path, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_PathAlreadyExists, rhs: FilterListManager_PathAlreadyExists) -> Bool {
+  public static func ==(lhs: FilterListManager_PathAlreadyExists, rhs: FilterListManager_PathAlreadyExists) -> Bool {
     if lhs.path != rhs.path {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1037,51 +1037,51 @@ extension FilterListManager_PathAlreadyExists: SwiftProtobuf.Message, SwiftProto
 }
 
 extension FilterListManager_TimedOut: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".TimedOut"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".TimedOut"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_TimedOut, rhs: FilterListManager_TimedOut) -> Bool {
+  public static func ==(lhs: FilterListManager_TimedOut, rhs: FilterListManager_TimedOut) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_HttpClientNetworkError: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".HttpClientNetworkError"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".HttpClientNetworkError"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_HttpClientNetworkError, rhs: FilterListManager_HttpClientNetworkError) -> Bool {
+  public static func ==(lhs: FilterListManager_HttpClientNetworkError, rhs: FilterListManager_HttpClientNetworkError) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_HttpStrict200Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".HttpStrict200Response"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".HttpStrict200Response"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "status_code"),
     2: .same(proto: "url"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1094,7 +1094,7 @@ extension FilterListManager_HttpStrict200Response: SwiftProtobuf.Message, SwiftP
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.statusCode != 0 {
       try visitor.visitSingularUInt32Field(value: self.statusCode, fieldNumber: 1)
     }
@@ -1104,7 +1104,7 @@ extension FilterListManager_HttpStrict200Response: SwiftProtobuf.Message, SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_HttpStrict200Response, rhs: FilterListManager_HttpStrict200Response) -> Bool {
+  public static func ==(lhs: FilterListManager_HttpStrict200Response, rhs: FilterListManager_HttpStrict200Response) -> Bool {
     if lhs.statusCode != rhs.statusCode {return false}
     if lhs.url != rhs.url {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1113,69 +1113,69 @@ extension FilterListManager_HttpStrict200Response: SwiftProtobuf.Message, SwiftP
 }
 
 extension FilterListManager_HttpClientBodyRecoveryFailed: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".HttpClientBodyRecoveryFailed"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".HttpClientBodyRecoveryFailed"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_HttpClientBodyRecoveryFailed, rhs: FilterListManager_HttpClientBodyRecoveryFailed) -> Bool {
+  public static func ==(lhs: FilterListManager_HttpClientBodyRecoveryFailed, rhs: FilterListManager_HttpClientBodyRecoveryFailed) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_FilterContentIsLikelyNotAFilter: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FilterContentIsLikelyNotAFilter"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".FilterContentIsLikelyNotAFilter"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FilterContentIsLikelyNotAFilter, rhs: FilterListManager_FilterContentIsLikelyNotAFilter) -> Bool {
+  public static func ==(lhs: FilterListManager_FilterContentIsLikelyNotAFilter, rhs: FilterListManager_FilterContentIsLikelyNotAFilter) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_FilterParserError: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FilterParserError"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".FilterParserError"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FilterParserError, rhs: FilterListManager_FilterParserError) -> Bool {
+  public static func ==(lhs: FilterListManager_FilterParserError, rhs: FilterListManager_FilterParserError) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_FieldIsEmpty: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FieldIsEmpty"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FieldIsEmpty"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "field_name"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1187,14 +1187,14 @@ extension FilterListManager_FieldIsEmpty: SwiftProtobuf.Message, SwiftProtobuf._
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.fieldName.isEmpty {
       try visitor.visitSingularStringField(value: self.fieldName, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FieldIsEmpty, rhs: FilterListManager_FieldIsEmpty) -> Bool {
+  public static func ==(lhs: FilterListManager_FieldIsEmpty, rhs: FilterListManager_FieldIsEmpty) -> Bool {
     if lhs.fieldName != rhs.fieldName {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1202,38 +1202,38 @@ extension FilterListManager_FieldIsEmpty: SwiftProtobuf.Message, SwiftProtobuf._
 }
 
 extension FilterListManager_Mutex: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Mutex"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".Mutex"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_Mutex, rhs: FilterListManager_Mutex) -> Bool {
+  public static func ==(lhs: FilterListManager_Mutex, rhs: FilterListManager_Mutex) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_Other: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Other"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".Other"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_Other, rhs: FilterListManager_Other) -> Bool {
+  public static func ==(lhs: FilterListManager_Other, rhs: FilterListManager_Other) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

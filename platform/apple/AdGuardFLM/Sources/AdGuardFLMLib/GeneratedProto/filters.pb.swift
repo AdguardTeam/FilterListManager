@@ -20,402 +20,402 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-struct FilterListManager_FilterTag {
+public struct FilterListManager_FilterTag {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Filter tag id.
-  var id: Int32 = 0
+  public var id: Int32 = 0
 
   /// Filter keyword (purpose, lang, platform, etc.)
-  var keyword: String = String()
+  public var keyword: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_FilterGroup {
+public struct FilterListManager_FilterGroup {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Group id
-  var id: Int32 = 0
+  public var id: Int32 = 0
 
   /// Group name
-  var name: String = String()
+  public var name: String = String()
 
   /// Display number for ordering
-  var displayNumber: Int32 = 0
+  public var displayNumber: Int32 = 0
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_FilterListRules {
+public struct FilterListManager_FilterListRules {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Associated filter id.
-  var filterID: Int64 = 0
+  public var filterID: Int64 = 0
 
   /// List of all rules in the filter list.
-  var rules: [String] = []
+  public var rules: [String] = []
 
   /// List of only disabled rules.
-  var disabledRules: [String] = []
+  public var disabledRules: [String] = []
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_FilterListRulesRaw {
+public struct FilterListManager_FilterListRulesRaw {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Associated filter id.
-  var filterID: Int64 = 0
+  public var filterID: Int64 = 0
 
   /// List of all rules in the filter list as string.
-  var rules: String = String()
+  public var rules: String = String()
 
   /// List of only disabled rules as string.
-  var disabledRules: String = String()
+  public var disabledRules: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_DisabledRulesRaw {
+public struct FilterListManager_DisabledRulesRaw {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Associated filter id.
-  var filterID: Int64 = 0
+  public var filterID: Int64 = 0
 
   /// List of only disabled rules as string.
-  var text: String = String()
+  public var text: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_FilterListMetadata {
+public struct FilterListManager_FilterListMetadata {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Title from the `! Title:` metadata field.
-  var title: String = String()
+  public var title: String = String()
 
   /// Description from the `! Description:` metadata field.
-  var description_p: String = String()
+  public var description_p: String = String()
 
   /// Time updated from the `! TimeUpdated:` metadata field.
-  var timeUpdated: String = String()
+  public var timeUpdated: String = String()
 
   /// Version from the `! Version:` metadata field.
-  var version: String = String()
+  public var version: String = String()
 
   /// Homepage from the `! Homepage:` metadata field.
-  var homepage: String = String()
+  public var homepage: String = String()
 
   /// License from the `! License:` metadata field.
-  var license: String = String()
+  public var license: String = String()
 
   /// Checksum from the `! Checksum:` metadata field.
-  var checksum: String = String()
+  public var checksum: String = String()
 
   /// URL or local path where the filter content was downloaded from.
-  var url: String = String()
+  public var url: String = String()
 
   /// Rules count in this filter list.
-  var rulesCount: Int32 = 0
+  public var rulesCount: Int32 = 0
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_StoredFilterMetadata {
+public struct FilterListManager_StoredFilterMetadata {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Filter list unique ID
-  var id: Int64 {
+  public var id: Int64 {
     get {return _storage._id}
     set {_uniqueStorage()._id = newValue}
   }
 
   /// Group ID this filter list belongs to
-  var groupID: Int32 {
+  public var groupID: Int32 {
     get {return _storage._groupID}
     set {_uniqueStorage()._groupID = newValue}
   }
 
   /// Timestamp (seconds from epoch) when this filter was updated on the server
-  var timeUpdated: Int64 {
+  public var timeUpdated: Int64 {
     get {return _storage._timeUpdated}
     set {_uniqueStorage()._timeUpdated = newValue}
   }
 
   /// Timestamp (seconds from epoch) when this filter list's content was last downloaded
-  var lastDownloadTime: Int64 {
+  public var lastDownloadTime: Int64 {
     get {return _storage._lastDownloadTime}
     set {_uniqueStorage()._lastDownloadTime = newValue}
   }
 
   /// Title either from the list metadata or parsed from the content
-  var title: String {
+  public var title: String {
     get {return _storage._title}
     set {_uniqueStorage()._title = newValue}
   }
 
   /// Description either from the list metadata or parsed from the content
-  var description_p: String {
+  public var description_p: String {
     get {return _storage._description_p}
     set {_uniqueStorage()._description_p = newValue}
   }
 
   /// Version either from the list metadata or parsed from the content
-  var version: String {
+  public var version: String {
     get {return _storage._version}
     set {_uniqueStorage()._version = newValue}
   }
 
   /// Filter list display number
-  var displayNumber: Int32 {
+  public var displayNumber: Int32 {
     get {return _storage._displayNumber}
     set {_uniqueStorage()._displayNumber = newValue}
   }
 
   /// Filter list download URL
-  var downloadURL: String {
+  public var downloadURL: String {
     get {return _storage._downloadURL}
     set {_uniqueStorage()._downloadURL = newValue}
   }
 
   /// Filter list subscription source URL
-  var subscriptionURL: String {
+  public var subscriptionURL: String {
     get {return _storage._subscriptionURL}
     set {_uniqueStorage()._subscriptionURL = newValue}
   }
 
   /// An array of tags of this filter list
-  var tags: [FilterListManager_FilterTag] {
+  public var tags: [FilterListManager_FilterTag] {
     get {return _storage._tags}
     set {_uniqueStorage()._tags = newValue}
   }
 
   /// Number of seconds until the filter list is considered outdated
-  var expires: Int32 {
+  public var expires: Int32 {
     get {return _storage._expires}
     set {_uniqueStorage()._expires = newValue}
   }
 
   /// Indicates if the filter list is trusted or not
-  var isTrusted: Bool {
+  public var isTrusted: Bool {
     get {return _storage._isTrusted}
     set {_uniqueStorage()._isTrusted = newValue}
   }
 
   /// Indicates if the filter list is custom or comes from the registry
-  var isCustom: Bool {
+  public var isCustom: Bool {
     get {return _storage._isCustom}
     set {_uniqueStorage()._isCustom = newValue}
   }
 
   /// Indicates whether the filter list is enabled
-  var isEnabled: Bool {
+  public var isEnabled: Bool {
     get {return _storage._isEnabled}
     set {_uniqueStorage()._isEnabled = newValue}
   }
 
   /// Indicates if the filter list is installed
-  var isInstalled: Bool {
+  public var isInstalled: Bool {
     get {return _storage._isInstalled}
     set {_uniqueStorage()._isInstalled = newValue}
   }
 
   /// List homepage URL
-  var homepage: String {
+  public var homepage: String {
     get {return _storage._homepage}
     set {_uniqueStorage()._homepage = newValue}
   }
 
   /// List license URL
-  var license: String {
+  public var license: String {
     get {return _storage._license}
     set {_uniqueStorage()._license = newValue}
   }
 
   /// Filter checksum
-  var checksum: String {
+  public var checksum: String {
     get {return _storage._checksum}
     set {_uniqueStorage()._checksum = newValue}
   }
 
   /// List of languages the filter supports
-  var languages: [String] {
+  public var languages: [String] {
     get {return _storage._languages}
     set {_uniqueStorage()._languages = newValue}
   }
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct FilterListManager_FullFilterList {
+public struct FilterListManager_FullFilterList {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// Filter list unique ID
-  var id: Int64 {
+  public var id: Int64 {
     get {return _storage._id}
     set {_uniqueStorage()._id = newValue}
   }
 
   /// Group ID this filter list belongs to
-  var groupID: Int32 {
+  public var groupID: Int32 {
     get {return _storage._groupID}
     set {_uniqueStorage()._groupID = newValue}
   }
 
   /// Timestamp (seconds from epoch) when this filter was updated on the server
-  var timeUpdated: Int64 {
+  public var timeUpdated: Int64 {
     get {return _storage._timeUpdated}
     set {_uniqueStorage()._timeUpdated = newValue}
   }
 
   /// Timestamp (seconds from epoch) when this filter list's content was last downloaded
-  var lastDownloadTime: Int64 {
+  public var lastDownloadTime: Int64 {
     get {return _storage._lastDownloadTime}
     set {_uniqueStorage()._lastDownloadTime = newValue}
   }
 
   /// Title either from the list metadata or parsed from the content
-  var title: String {
+  public var title: String {
     get {return _storage._title}
     set {_uniqueStorage()._title = newValue}
   }
 
   /// Description either from the list metadata or parsed from the content
-  var description_p: String {
+  public var description_p: String {
     get {return _storage._description_p}
     set {_uniqueStorage()._description_p = newValue}
   }
 
   /// Version either from the list metadata or parsed from the content
-  var version: String {
+  public var version: String {
     get {return _storage._version}
     set {_uniqueStorage()._version = newValue}
   }
 
   /// Filter list display number
-  var displayNumber: Int32 {
+  public var displayNumber: Int32 {
     get {return _storage._displayNumber}
     set {_uniqueStorage()._displayNumber = newValue}
   }
 
   /// Filter list download URL
-  var downloadURL: String {
+  public var downloadURL: String {
     get {return _storage._downloadURL}
     set {_uniqueStorage()._downloadURL = newValue}
   }
 
   /// Filter list subscription source URL
-  var subscriptionURL: String {
+  public var subscriptionURL: String {
     get {return _storage._subscriptionURL}
     set {_uniqueStorage()._subscriptionURL = newValue}
   }
 
   /// An array of tags of this filter list
-  var tags: [FilterListManager_FilterTag] {
+  public var tags: [FilterListManager_FilterTag] {
     get {return _storage._tags}
     set {_uniqueStorage()._tags = newValue}
   }
 
   /// Number of seconds until the filter list is considered outdated
-  var expires: Int32 {
+  public var expires: Int32 {
     get {return _storage._expires}
     set {_uniqueStorage()._expires = newValue}
   }
 
   /// Indicates if the filter list is trusted or not
-  var isTrusted: Bool {
+  public var isTrusted: Bool {
     get {return _storage._isTrusted}
     set {_uniqueStorage()._isTrusted = newValue}
   }
 
   /// Indicates if the filter list is custom or comes from the registry
-  var isCustom: Bool {
+  public var isCustom: Bool {
     get {return _storage._isCustom}
     set {_uniqueStorage()._isCustom = newValue}
   }
 
   /// Indicates whether the filter list is enabled
-  var isEnabled: Bool {
+  public var isEnabled: Bool {
     get {return _storage._isEnabled}
     set {_uniqueStorage()._isEnabled = newValue}
   }
 
   /// Indicates if the filter list is installed
-  var isInstalled: Bool {
+  public var isInstalled: Bool {
     get {return _storage._isInstalled}
     set {_uniqueStorage()._isInstalled = newValue}
   }
 
   /// List homepage URL
-  var homepage: String {
+  public var homepage: String {
     get {return _storage._homepage}
     set {_uniqueStorage()._homepage = newValue}
   }
 
   /// List license URL
-  var license: String {
+  public var license: String {
     get {return _storage._license}
     set {_uniqueStorage()._license = newValue}
   }
 
   /// Filter checksum
-  var checksum: String {
+  public var checksum: String {
     get {return _storage._checksum}
     set {_uniqueStorage()._checksum = newValue}
   }
 
   /// List of languages the filter supports
-  var languages: [String] {
+  public var languages: [String] {
     get {return _storage._languages}
     set {_uniqueStorage()._languages = newValue}
   }
 
   /// Optional container for rules
-  var rules: FilterListManager_FilterListRules {
+  public var rules: FilterListManager_FilterListRules {
     get {return _storage._rules ?? FilterListManager_FilterListRules()}
     set {_uniqueStorage()._rules = newValue}
   }
   /// Returns true if `rules` has been explicitly set.
-  var hasRules: Bool {return _storage._rules != nil}
+  public var hasRules: Bool {return _storage._rules != nil}
   /// Clears the value of `rules`. Subsequent reads from it will return its default value.
-  mutating func clearRules() {_uniqueStorage()._rules = nil}
+  public mutating func clearRules() {_uniqueStorage()._rules = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
 }
@@ -436,13 +436,13 @@ extension FilterListManager_FullFilterList: @unchecked Sendable {}
 fileprivate let _protobuf_package = "filter_list_manager"
 
 extension FilterListManager_FilterTag: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FilterTag"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FilterTag"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
     2: .same(proto: "keyword"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -455,7 +455,7 @@ extension FilterListManager_FilterTag: SwiftProtobuf.Message, SwiftProtobuf._Mes
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.id != 0 {
       try visitor.visitSingularInt32Field(value: self.id, fieldNumber: 1)
     }
@@ -465,7 +465,7 @@ extension FilterListManager_FilterTag: SwiftProtobuf.Message, SwiftProtobuf._Mes
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FilterTag, rhs: FilterListManager_FilterTag) -> Bool {
+  public static func ==(lhs: FilterListManager_FilterTag, rhs: FilterListManager_FilterTag) -> Bool {
     if lhs.id != rhs.id {return false}
     if lhs.keyword != rhs.keyword {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -474,14 +474,14 @@ extension FilterListManager_FilterTag: SwiftProtobuf.Message, SwiftProtobuf._Mes
 }
 
 extension FilterListManager_FilterGroup: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FilterGroup"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FilterGroup"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
     2: .same(proto: "name"),
     3: .standard(proto: "display_number"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -495,7 +495,7 @@ extension FilterListManager_FilterGroup: SwiftProtobuf.Message, SwiftProtobuf._M
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.id != 0 {
       try visitor.visitSingularInt32Field(value: self.id, fieldNumber: 1)
     }
@@ -508,7 +508,7 @@ extension FilterListManager_FilterGroup: SwiftProtobuf.Message, SwiftProtobuf._M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FilterGroup, rhs: FilterListManager_FilterGroup) -> Bool {
+  public static func ==(lhs: FilterListManager_FilterGroup, rhs: FilterListManager_FilterGroup) -> Bool {
     if lhs.id != rhs.id {return false}
     if lhs.name != rhs.name {return false}
     if lhs.displayNumber != rhs.displayNumber {return false}
@@ -518,14 +518,14 @@ extension FilterListManager_FilterGroup: SwiftProtobuf.Message, SwiftProtobuf._M
 }
 
 extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FilterListRules"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FilterListRules"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_id"),
     2: .same(proto: "rules"),
     3: .standard(proto: "disabled_rules"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -539,7 +539,7 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
       try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
     }
@@ -552,7 +552,7 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FilterListRules, rhs: FilterListManager_FilterListRules) -> Bool {
+  public static func ==(lhs: FilterListManager_FilterListRules, rhs: FilterListManager_FilterListRules) -> Bool {
     if lhs.filterID != rhs.filterID {return false}
     if lhs.rules != rhs.rules {return false}
     if lhs.disabledRules != rhs.disabledRules {return false}
@@ -562,14 +562,14 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
 }
 
 extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FilterListRulesRaw"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FilterListRulesRaw"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_id"),
     2: .same(proto: "rules"),
     3: .standard(proto: "disabled_rules"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -583,7 +583,7 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
       try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
     }
@@ -596,7 +596,7 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FilterListRulesRaw, rhs: FilterListManager_FilterListRulesRaw) -> Bool {
+  public static func ==(lhs: FilterListManager_FilterListRulesRaw, rhs: FilterListManager_FilterListRulesRaw) -> Bool {
     if lhs.filterID != rhs.filterID {return false}
     if lhs.rules != rhs.rules {return false}
     if lhs.disabledRules != rhs.disabledRules {return false}
@@ -606,13 +606,13 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
 }
 
 extension FilterListManager_DisabledRulesRaw: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".DisabledRulesRaw"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".DisabledRulesRaw"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_id"),
     2: .same(proto: "text"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -625,7 +625,7 @@ extension FilterListManager_DisabledRulesRaw: SwiftProtobuf.Message, SwiftProtob
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
       try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
     }
@@ -635,7 +635,7 @@ extension FilterListManager_DisabledRulesRaw: SwiftProtobuf.Message, SwiftProtob
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_DisabledRulesRaw, rhs: FilterListManager_DisabledRulesRaw) -> Bool {
+  public static func ==(lhs: FilterListManager_DisabledRulesRaw, rhs: FilterListManager_DisabledRulesRaw) -> Bool {
     if lhs.filterID != rhs.filterID {return false}
     if lhs.text != rhs.text {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -644,8 +644,8 @@ extension FilterListManager_DisabledRulesRaw: SwiftProtobuf.Message, SwiftProtob
 }
 
 extension FilterListManager_FilterListMetadata: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FilterListMetadata"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FilterListMetadata"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "title"),
     2: .same(proto: "description"),
     3: .standard(proto: "time_updated"),
@@ -657,7 +657,7 @@ extension FilterListManager_FilterListMetadata: SwiftProtobuf.Message, SwiftProt
     9: .standard(proto: "rules_count"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -677,7 +677,7 @@ extension FilterListManager_FilterListMetadata: SwiftProtobuf.Message, SwiftProt
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.title.isEmpty {
       try visitor.visitSingularStringField(value: self.title, fieldNumber: 1)
     }
@@ -708,7 +708,7 @@ extension FilterListManager_FilterListMetadata: SwiftProtobuf.Message, SwiftProt
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FilterListMetadata, rhs: FilterListManager_FilterListMetadata) -> Bool {
+  public static func ==(lhs: FilterListManager_FilterListMetadata, rhs: FilterListManager_FilterListMetadata) -> Bool {
     if lhs.title != rhs.title {return false}
     if lhs.description_p != rhs.description_p {return false}
     if lhs.timeUpdated != rhs.timeUpdated {return false}
@@ -724,8 +724,8 @@ extension FilterListManager_FilterListMetadata: SwiftProtobuf.Message, SwiftProt
 }
 
 extension FilterListManager_StoredFilterMetadata: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".StoredFilterMetadata"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".StoredFilterMetadata"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
     2: .standard(proto: "group_id"),
     3: .standard(proto: "time_updated"),
@@ -805,7 +805,7 @@ extension FilterListManager_StoredFilterMetadata: SwiftProtobuf.Message, SwiftPr
     return _storage
   }
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     _ = _uniqueStorage()
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       while let fieldNumber = try decoder.nextFieldNumber() {
@@ -839,7 +839,7 @@ extension FilterListManager_StoredFilterMetadata: SwiftProtobuf.Message, SwiftPr
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       if _storage._id != 0 {
         try visitor.visitSingularInt64Field(value: _storage._id, fieldNumber: 1)
@@ -905,7 +905,7 @@ extension FilterListManager_StoredFilterMetadata: SwiftProtobuf.Message, SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_StoredFilterMetadata, rhs: FilterListManager_StoredFilterMetadata) -> Bool {
+  public static func ==(lhs: FilterListManager_StoredFilterMetadata, rhs: FilterListManager_StoredFilterMetadata) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -940,8 +940,8 @@ extension FilterListManager_StoredFilterMetadata: SwiftProtobuf.Message, SwiftPr
 }
 
 extension FilterListManager_FullFilterList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FullFilterList"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FullFilterList"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
     2: .standard(proto: "group_id"),
     3: .standard(proto: "time_updated"),
@@ -1024,7 +1024,7 @@ extension FilterListManager_FullFilterList: SwiftProtobuf.Message, SwiftProtobuf
     return _storage
   }
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     _ = _uniqueStorage()
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1059,7 +1059,7 @@ extension FilterListManager_FullFilterList: SwiftProtobuf.Message, SwiftProtobuf
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every if/case branch local when no optimizations
@@ -1132,7 +1132,7 @@ extension FilterListManager_FullFilterList: SwiftProtobuf.Message, SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FullFilterList, rhs: FilterListManager_FullFilterList) -> Bool {
+  public static func ==(lhs: FilterListManager_FullFilterList, rhs: FilterListManager_FullFilterList) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0

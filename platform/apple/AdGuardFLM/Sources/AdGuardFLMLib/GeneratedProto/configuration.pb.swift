@@ -20,17 +20,17 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-enum FilterListManager_FilterListType: SwiftProtobuf.Enum {
-  typealias RawValue = Int
+public enum FilterListManager_FilterListType: SwiftProtobuf.Enum {
+  public typealias RawValue = Int
   case standard // = 0
   case dns // = 1
   case UNRECOGNIZED(Int)
 
-  init() {
+  public init() {
     self = .standard
   }
 
-  init?(rawValue: Int) {
+  public init?(rawValue: Int) {
     switch rawValue {
     case 0: self = .standard
     case 1: self = .dns
@@ -38,7 +38,7 @@ enum FilterListManager_FilterListType: SwiftProtobuf.Enum {
     }
   }
 
-  var rawValue: Int {
+  public var rawValue: Int {
     switch self {
     case .standard: return 0
     case .dns: return 1
@@ -52,7 +52,7 @@ enum FilterListManager_FilterListType: SwiftProtobuf.Enum {
 
 extension FilterListManager_FilterListType: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
-  static var allCases: [FilterListManager_FilterListType] = [
+  public static let allCases: [FilterListManager_FilterListType] = [
     .standard,
     .dns,
   ]
@@ -60,46 +60,46 @@ extension FilterListManager_FilterListType: CaseIterable {
 
 #endif  // swift(>=4.2)
 
-struct FilterListManager_Configuration {
+public struct FilterListManager_Configuration {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterListType: FilterListManager_FilterListType = .standard
+  public var filterListType: FilterListManager_FilterListType = .standard
 
   /// Absolute path for library working directory.
   /// This will be used for database operating.
   /// If value is "None", `cwd` will be used.
-  var workingDirectory: String = String()
+  public var workingDirectory: String = String()
 
   /// Locale that needs to be used to extract localized names and descriptions.
   /// Locale `en-GB` will be normalized to internal `en_GB` representation.
   /// Default value: en.
-  var locale: String = String()
+  public var locale: String = String()
 
   /// Default period for expires in seconds (unless specified in "Expires", or its value is too small).
   /// Default value: 86400 (1 day).
   /// Values < 3600 will be clamped to 3600.
-  var defaultFilterListExpiresPeriodSec: Int32 = 0
+  public var defaultFilterListExpiresPeriodSec: Int32 = 0
 
   /// List of literal constants for filters conditional compilation.
-  var compilerConditionalConstants: [String] = []
+  public var compilerConditionalConstants: [String] = []
 
   /// URL of the index (filters.json) file.
-  var metadataURL: String = String()
+  public var metadataURL: String = String()
 
   /// URL of the locales (filters_i18n.json) file.
-  var metadataLocalesURL: String = String()
+  public var metadataLocalesURL: String = String()
 
   /// Requests timeouts in milliseconds. Default value 60000 (60 seconds).
-  var requestTimeoutMs: Int32 = 0
+  public var requestTimeoutMs: Int32 = 0
 
   /// “Uplifting” a database is a set of measures that brings the database up to date:
-  var autoLiftUpDatabase: Bool = false
+  public var autoLiftUpDatabase: Bool = false
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
@@ -112,15 +112,15 @@ extension FilterListManager_Configuration: @unchecked Sendable {}
 fileprivate let _protobuf_package = "filter_list_manager"
 
 extension FilterListManager_FilterListType: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "STANDARD"),
     1: .same(proto: "DNS"),
   ]
 }
 
 extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Configuration"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".Configuration"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_list_type"),
     2: .standard(proto: "working_directory"),
     3: .same(proto: "locale"),
@@ -132,7 +132,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     9: .standard(proto: "auto_lift_up_database"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -152,7 +152,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterListType != .standard {
       try visitor.visitSingularEnumField(value: self.filterListType, fieldNumber: 1)
     }
@@ -183,7 +183,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_Configuration, rhs: FilterListManager_Configuration) -> Bool {
+  public static func ==(lhs: FilterListManager_Configuration, rhs: FilterListManager_Configuration) -> Bool {
     if lhs.filterListType != rhs.filterListType {return false}
     if lhs.workingDirectory != rhs.workingDirectory {return false}
     if lhs.locale != rhs.locale {return false}
