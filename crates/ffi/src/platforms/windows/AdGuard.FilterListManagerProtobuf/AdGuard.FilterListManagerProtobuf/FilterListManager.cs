@@ -154,8 +154,7 @@ namespace AdGuard.FilterListManagerProtobuf
                 IgnoreFiltersStatus = ignoreFilterStatus
             };
 
-            UpdateFiltersResponse response = 
-                CallRust<UpdateFiltersResponse>(request);
+            UpdateFiltersResponse response = CallRust<UpdateFiltersResponse>(request);
             return response.Result;
         }
 
@@ -350,7 +349,6 @@ namespace AdGuard.FilterListManagerProtobuf
         
         private void ReleaseManagedResources()
         {
-            throw new NotImplementedException();
         }
 
         private void ReleaseUnmanagedResources()

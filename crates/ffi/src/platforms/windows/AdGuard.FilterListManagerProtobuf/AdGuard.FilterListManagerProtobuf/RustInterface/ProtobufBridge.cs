@@ -11,19 +11,12 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
     {
         internal static Configuration MakeDefaultConfiguration()
         {
-            IntPtr responsePtr = ProtobufInterop.flm_default_configuration_protobuf();
-            RustResponse response = MarshalUtils.PtrToStructure<RustResponse>(responsePtr);
-            byte[] byteData = new byte[response.ResultDataLen];
-            // NEEDS COPY? Or unsafe?
-            Marshal.Copy(response.ResultData, byteData, 0, (int) response.ResultDataLen);
-            ProtobufInterop.flm_free_response(responsePtr);
-            if (response.FfiError)
-            {
-                AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(byteData);
-                throw new AGOuterException(error);
-            }
-
-            return Configuration.Parser.ParseFrom(byteData);
+            MarshalUtils.ag_buffer resultDataAgBuffer = GetNativeResult(
+                ProtobufInterop.flm_default_configuration_protobuf);
+            byte[] resultDataBytes = new byte[resultDataAgBuffer.size];
+            Marshal.Copy(resultDataAgBuffer.data, resultDataBytes, 0, (int) resultDataAgBuffer.size);
+            Configuration configuration = Configuration.Parser.ParseFrom(resultDataBytes);
+            return configuration;
         }
 
         internal static IntPtr InitFLM(Configuration configuration)
@@ -34,7 +27,9 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
             {
                 pData = Marshal.AllocHGlobal(data.Length);
                 Marshal.Copy(data, 0, pData, data.Length);
-                return ProtobufInterop.flm_init_protobuf(pData, (ulong)data.Length);
+                MarshalUtils.ag_buffer resultDataAgBuffer = GetNativeResult(
+                    () => ProtobufInterop.flm_init_protobuf(pData, (ulong)data.Length));
+                return resultDataAgBuffer.data;
             }
             finally
             {
@@ -44,38 +39,58 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
 
         internal static byte[] CallRust(IntPtr flmHandle, FFIMethod method, byte[] args)
         {
-            IntPtr pData = IntPtr.Zero;
-            IntPtr pResponse = IntPtr.Zero;
+            IntPtr pArgs = IntPtr.Zero;
             try
             {
-                pData = Marshal.AllocHGlobal(args.Length);
-                Marshal.Copy(args, 0, pData, args.Length);
-                pResponse = ProtobufInterop.flm_call_protobuf(flmHandle, method, pData, (ulong)args.Length);
-                RustResponse response = MarshalUtils.PtrToStructure<RustResponse>(pResponse);
-                byte[] data = new byte[response.ResultDataLen];
-                Marshal.Copy(pResponse, data, 0, (int) response.ResultDataLen);
-                if (!response.FfiError)
+                pArgs = Marshal.AllocHGlobal(args.Length);
+                Marshal.Copy(args, 0, pArgs, args.Length);
+                MarshalUtils.ag_buffer resultDataAgBuffer = GetNativeResult(
+                    () => ProtobufInterop.flm_call_protobuf(flmHandle, method, pArgs, (ulong)args.Length));
+                byte[] resultDataBytes = new byte[resultDataAgBuffer.size];
+                Marshal.Copy(resultDataAgBuffer.data, resultDataBytes, 0, (int) resultDataAgBuffer.size);
+                return resultDataBytes;
+            }
+            finally
+            {
+                MarshalUtils.SafeFreeHGlobal(pArgs);
+            }
+        }
+        
+        internal static void FreeFLMHandle(IntPtr handle)
+        {
+            ProtobufInterop.flm_free_handle(handle);
+        }
+        
+        private static MarshalUtils.ag_buffer GetNativeResult(Func<IntPtr> nativeFunc)
+        {
+            IntPtr pRustResponse = IntPtr.Zero;
+            try
+            {
+                pRustResponse = nativeFunc();
+                RustResponse rustResponse = MarshalUtils.PtrToStructure<RustResponse>(pRustResponse);
+                uint resultDataLen = rustResponse.ResultDataLen.ToUInt32();
+                if (!rustResponse.FfiError)
                 {
-                    return data;
+                    MarshalUtils.ag_buffer resultDataAgBuffer = new MarshalUtils.ag_buffer
+                    {
+                        data = rustResponse.ResultData,
+                        size = resultDataLen
+                    };
+                    return resultDataAgBuffer;
                 }
                 
-                AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(data);
+                byte[] resultDataBytes = new byte[resultDataLen];
+                Marshal.Copy(rustResponse.ResultData, resultDataBytes, 0, (int)resultDataLen);
+                AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(resultDataBytes);
                 throw new AGOuterException(error);
             }
             finally
             {
-                if (pResponse != IntPtr.Zero)
+                if (pRustResponse != IntPtr.Zero)
                 {
-                    ProtobufInterop.flm_free_response(pResponse);
+                    ProtobufInterop.flm_free_response(pRustResponse);
                 }
-                
-                MarshalUtils.SafeFreeHGlobal(pData);
             }
-        }
-
-        internal static void FreeFLMHandle(IntPtr handle)
-        {
-            ProtobufInterop.flm_free_handle(handle);
         }
     }
 }

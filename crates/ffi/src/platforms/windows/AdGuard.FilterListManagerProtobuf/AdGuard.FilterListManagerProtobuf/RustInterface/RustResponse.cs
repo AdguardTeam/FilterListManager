@@ -4,12 +4,37 @@ using System.Runtime.InteropServices;
 namespace AdGuard.FilterListManagerProtobuf.RustInterface
 {
     [StructLayout(LayoutKind.Sequential)]
-    struct RustResponse
+    internal struct RustResponse
     {
-        public ulong ResultDataLen { get; set; }
-        public IntPtr ResultData { get; set; }
-        public bool FfiError { get; set; }
-        public RustResponseType Discriminant { get; set; }
+        /**
+         * Bytes count
+         * UNSAFE: You should put here the real data length, even for pointers
+         */
+        internal UIntPtr ResultDataLen;
+        
+        /**
+        * The real allocated data length
+        * UNSAFE: You should put here the real data length, even for pointers
+        */
+        internal UIntPtr ResultDataCapacity;
+        
+        /**
+         * UNSAFE: There can be many different pointer types
+         */
+        internal IntPtr ResultData;
+        
+        /**
+         * Special response case:
+         * If request or response have failed, try to send [`AGOuterError::Other`] error with the explanation
+         * See: [`build_rust_response_error`]
+         */
+        [MarshalAs(UnmanagedType.I1)]
+        internal bool FfiError;
+        
+        /**
+         * Data type discriminant
+         */
+        internal RustResponseType Discriminant;
     }
 }
 
