@@ -1,6 +1,6 @@
 ﻿namespace AdGuard.FilterListManager.MarshalLogic
 {
-    internal class FfiConverterTypeFilterListManagerConstants
+    public class FfiConverterTypeFilterListManagerConstants
         : FfiConverterRustBuffer<FilterListManagerConstants>
     {
         public static FfiConverterTypeFilterListManagerConstants Instance =
@@ -18,18 +18,18 @@
 
         public override int AllocationSize(FilterListManagerConstants value)
         {
-            return FfiConverterInt64.Instance.AllocationSize(value.userRulesId)
-                   + FfiConverterInt32.Instance.AllocationSize(value.customGroupId)
-                   + FfiConverterInt32.Instance.AllocationSize(value.specialGroupId)
-                   + FfiConverterInt64.Instance.AllocationSize(value.smallestFilterId);
+            return FfiConverterInt64.Instance.AllocationSize(value.UserRulesId)
+                   + FfiConverterInt32.Instance.AllocationSize(value.CustomGroupId)
+                   + FfiConverterInt32.Instance.AllocationSize(value.SpecialGroupId)
+                   + FfiConverterInt64.Instance.AllocationSize(value.SmallestFilterId);
         }
 
         public override void Write(FilterListManagerConstants value, BigEndianStream stream)
         {
-            FfiConverterInt64.Instance.Write(value.userRulesId, stream);
-            FfiConverterInt32.Instance.Write(value.customGroupId, stream);
-            FfiConverterInt32.Instance.Write(value.specialGroupId, stream);
-            FfiConverterInt64.Instance.Write(value.smallestFilterId, stream);
+            FfiConverterInt64.Instance.Write(value.UserRulesId, stream);
+            FfiConverterInt32.Instance.Write(value.CustomGroupId, stream);
+            FfiConverterInt32.Instance.Write(value.SpecialGroupId, stream);
+            FfiConverterInt64.Instance.Write(value.SmallestFilterId, stream);
         }
     }
 }

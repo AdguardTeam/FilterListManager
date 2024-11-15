@@ -64,6 +64,8 @@ namespace AdGuard.FilterListManager.Test
             manager.GetDisabledRules(rulesIds);
             Assert.IsTrue(rulesRaw.Count > 0);
 
+            FilterListManagerConstants constants = Constants.GetConstantsStructure();
+            Assert.IsTrue(constants.UserRulesId < 0);
         }
     }
 }
