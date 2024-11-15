@@ -19,11 +19,13 @@ use crate::protobuf_generated::filter_list_manager::{
     UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse, UpdateFiltersRequest,
     UpdateFiltersResponse,
 };
+use enum_stringify::EnumStringify;
 use prost::Message;
 use std::ffi::c_void;
 
 /// Representation of method handle for [`flm_call_protobuf`]
 #[repr(C)]
+#[derive(EnumStringify)]
 pub enum FFIMethod {
     InstallCustomFilterList,
     EnableFilterLists,
@@ -86,7 +88,10 @@ pub unsafe extern "C" fn flm_call_protobuf(
                 return build_rust_response_error(
                     Box::new(decode_result.err().unwrap()),
                     rust_response,
-                    &format!("Cannot decode output data for method '{}'", "todo: method"), // TODO:
+                    &format!(
+                        "Cannot decode output data for method '{}'",
+                        method.to_string()
+                    ),
                 );
             };
 
@@ -438,7 +443,10 @@ pub unsafe extern "C" fn flm_call_protobuf(
         return build_rust_response_error(
             Box::new(encode_error),
             rust_response,
-            &format!("Cannot encode output data for method '{}'", "todo: method"), // TODO:
+            &format!(
+                "Cannot encode output data for method '{}'",
+                method.to_string()
+            ),
         );
     }
 
