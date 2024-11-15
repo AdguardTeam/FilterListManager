@@ -1,29 +1,39 @@
 ﻿namespace AdGuard.FilterListManager.MarshalLogic
 {
-   internal class FilterListManagerConstants
+    /// <summary>
+    /// Constants holder form the Rust
+    /// </summary>
+    public class FilterListManagerConstants
     {
         public FilterListManagerConstants(long userRulesId,
             int customGroupId,
             int specialGroupId,
             long smallestFilterId)
         {
-            this.userRulesId = userRulesId;
-            this.customGroupId = customGroupId;
-            this.specialGroupId = specialGroupId;
-            this.smallestFilterId = smallestFilterId;
+            UserRulesId = userRulesId;
+            CustomGroupId = customGroupId;
+            SpecialGroupId = specialGroupId;
+            SmallestFilterId = smallestFilterId;
         }
 
-        public long userRulesId { get; }
-        public int customGroupId { get; }
-        public int specialGroupId { get; }
-        public long smallestFilterId { get; }
+        /// <summary>
+        /// Gets the user rules identifier.
+        /// </summary>
+        public long UserRulesId { get; }
 
-        public void Deconstruct(out long userRulesId, out int customGroupId, out int specialGroupId, out long smallestFilterId)
-        {
-            userRulesId = this.userRulesId;
-            customGroupId = this.customGroupId;
-            specialGroupId = this.specialGroupId;
-            smallestFilterId = this.smallestFilterId;
-        }
+        /// <summary>
+        /// Gets the custom group identifier.
+        /// </summary>
+        public int CustomGroupId { get; }
+
+        /// <summary>
+        /// Gets the special group identifier.
+        /// </summary>
+        public int SpecialGroupId { get; }
+
+        /// <summary>
+        /// Gets the smallest filter identifier.
+        /// </summary>
+        public long SmallestFilterId { get; }
     }
 }

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -exf
 
 BUILD_ROOT_PATH="platform/apple/build"
@@ -32,17 +33,11 @@ build_framework() {
     ;;
     esac
 
-    cargo run -p uniffi-bindgen generate \
-      crates/ffi/src/flm_ffi.udl \
-      -l swift \
-      -o "${CARGO_TARGET_DIR}/${ARCH}/release" \
-      --no-format
-
     FRAMEWORK_PATH=${OUTPUT_DIR}/${FRAMEWORK_NAME}
     FRAMEWORK_VERSIONED_PATH=${OUTPUT_DIR}/${FRAMEWORK_NAME}${VERSION_SUFFIX}
 
     mkdir -p ${FRAMEWORK_PATH}
-    mkdir -p ${FRAMEWORK_VERSIONED_PATH}/Modules/AdguardFLM.swiftmodule
+    mkdir -p ${FRAMEWORK_VERSIONED_PATH}/Modules
     mkdir -p ${FRAMEWORK_VERSIONED_PATH}/Headers
     mkdir -p ${FRAMEWORK_VERSIONED_PATH}/Resources
     if [ -n "${VERSION_SUFFIX}" ]; then
@@ -52,27 +47,14 @@ build_framework() {
       ln -shf Versions/Current/Resources ${FRAMEWORK_PATH}/Resources
       ln -shf Versions/Current/AdGuardFLM ${FRAMEWORK_PATH}/AdGuardFLM
     fi
-    cp "${CARGO_TARGET_DIR}/${ARCH}/release/AdguardFLMFFI.h" ${FRAMEWORK_PATH}/Headers
+    cp "crates/ffi/src/platforms/flm_native_interface.h" ${FRAMEWORK_PATH}/Headers
     cp ${BUILD_ROOT_PATH}/../module.modulemap ${FRAMEWORK_PATH}/Modules
     cp ${BUILD_ROOT_PATH}/../AdGuardFLM.h ${FRAMEWORK_PATH}/Headers
     cp ${BUILD_ROOT_PATH}/../${INFO_PLIST} ${FRAMEWORK_PATH}/Resources/Info.plist
 
     mkdir -p "${CARGO_TARGET_DIR}/${ARCH}/release/deps"
-    xcrun -sdk $SWIFT_SDK swiftc -target ${SWIFT_TARGET}${MACOSX_DEPLOYMENT_TARGET}${TARGET_SUFFIX} -emit-library -static -module-name AdGuardFLM \
-        -emit-module-path ${FRAMEWORK_PATH}/Modules/AdguardFLM.swiftmodule/${SWIFT_TARGET}${TARGET_SUFFIX}.swiftmodule \
-        -emit-module-interface-path ${FRAMEWORK_PATH}/Modules/AdguardFLM.swiftmodule/${SWIFT_TARGET}${TARGET_SUFFIX}.swiftinterface \
-        -enable-library-evolution \
-        -import-underlying-module \
-        ${CARGO_TARGET_DIR}/${ARCH}/release/FilterListManager.swift \
-        -Xcc -fmodule-map-file="${FRAMEWORK_PATH}/Modules/module.modulemap" \
-        -I "${CARGO_TARGET_DIR}/${ARCH}/release" \
-        -no-verify-emitted-module-interface \
-        -o "${CARGO_TARGET_DIR}/${ARCH}/release/deps/libAdGuardFLM.a"
-    nm -gU "${CARGO_TARGET_DIR}/${ARCH}/release/deps/libAdGuardFLM.a" | awk '/ (T|D|S) /{$1=$3; $2=$4; $3=$5; $4=$6; $5=$7; $6=$8; $7=$9; NF=NF-2; print}' \
-            > "${CARGO_TARGET_DIR}/${ARCH}/release"/deps/libAdGuardFLM.syms
 
-    export SWIFT_LIB_DIR=$(xcrun -sdk $SWIFT_SDK swiftc -target ${SWIFT_TARGET}${MACOSX_DEPLOYMENT_TARGET}${TARGET_SUFFIX} -print-target-info | jq -r '.paths.runtimeLibraryImportPaths[0]')
-    RUSTFLAGS="--cfg swift_lib_dir=\"$SWIFT_LIB_DIR\"" cargo build --release --package adguard-flm-ffi --target $ARCH
+    cargo build --release --lib --package adguard-flm-ffi --target $ARCH
 
     cp "${CARGO_TARGET_DIR}/${ARCH}/release/${LIBRARY_ARTIFACT_NAME}" ${FRAMEWORK_VERSIONED_PATH}/AdGuardFLM
     install_name_tool -id @rpath/${FRAMEWORK_NAME}${VERSION_SUFFIX}/AdGuardFLM ${FRAMEWORK_VERSIONED_PATH}/AdGuardFLM

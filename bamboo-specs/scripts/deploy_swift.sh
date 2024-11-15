@@ -17,6 +17,8 @@ SUFFIX="" # Always release build
 VER="$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)"
 VER="${VER}${SUFFIX}"
 
+SWIFT_PROTOBUF_VERSION=1.28.2
+
 ARCH_NAME="AdGuardFLM-${VER}.zip"
 
 PODSPEC=$(cat << EOF
@@ -42,21 +44,27 @@ PODSPEC=$(cat << EOF
   "source": {
     "http": "${ARTIFACTORY_PATH}/${ARCH_NAME}"
   },
+  "source_files": "Sources/**/*",
   "preserve_paths": ["AdGuardFLM.xcframework"],
   "vendored_frameworks": "AdGuardFLM.xcframework",
   "xcconfig": {
     "LD_RUNPATH_SEARCH_PATHS": "@loader_path/../Frameworks"
   },
-  "requires_arc": true
+  "requires_arc": true,
+  "dependencies": {
+    "SwiftProtobuf": "~> 1.0"
+  }
 }
 EOF
 )
 
 cd platform/apple/build/framework
 
+cp -r ../../AdGuardFLM/Sources/AdGuardFLMLib Sources
+
 echo "#${VER}" > CHANGELOG
 echo "Confidential. Property of Adguard Software Ltd. https://adguard.com" > LICENSE
-zip -4yr "${ARCH_NAME}" AdGuardFLM.xcframework CHANGELOG LICENSE
+zip -4yr "${ARCH_NAME}" Sources AdGuardFLM.xcframework CHANGELOG LICENSE
 curl -u"${ARTIFACTORY_USER}:${ARTIFACTORY_PASS}" -XPUT "${ARTIFACTORY_PATH}/${ARCH_NAME}" -T "${ARCH_NAME}"
 
 git checkout --detach && git branch -D swiftpm || true
@@ -65,7 +73,7 @@ git reset
 
 SPM_TAG="v${VER}@swift-5"
 : > Package.swift # Crutch for `swift package compute-checksum`
-echo '// swift-tools-version:5.3
+echo '// swift-tools-version: 5.4
 import PackageDescription
 
 let package = Package(
@@ -74,9 +82,19 @@ let package = Package(
     .iOS("11.2"), .macOS("10.15")
   ],
   products: [
-    .library(name: "AdGuardFLM", targets: ["AdGuardFLM"]),
+    .library(name: "AdGuardFLMLib", targets: ["AdGuardFLMLib"])
+  ],
+  dependencies: [
+    .package(url: "https://github.com/apple/swift-protobuf.git", from: "'${SWIFT_PROTOBUF_VERSION}'")
   ],
   targets: [
+    .target(
+      name: "AdGuardFLMLib",
+      dependencies: [
+        .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+        .target(name: "AdGuardFLM")
+      ]
+    ),
     .binaryTarget(
       name: "AdGuardFLM",
       url: "https://github.com/AdguardTeam/FilterListManager/releases/download/'${SPM_TAG}/${ARCH_NAME}'",
@@ -86,7 +104,10 @@ let package = Package(
 )
 ' > ../../../../Package.swift
 
+cp -r ../../AdGuardFLM/Sources ../../../../Sources
+
 git add ../../../../Package.swift
+git add ../../../../Sources
 git commit -m "AdGuardFLM for SwiftPM ${VER}"
 git tag -d "${SPM_TAG}" || true
 git tag "${SPM_TAG}"

@@ -122,11 +122,17 @@ pub unsafe extern "C" fn flm_init_protobuf(bytes: *const u8, size: usize) -> *mu
 
     let factory_result = FLMHandle::new(conf.into());
     let Ok(flm_handle) = factory_result else {
-        return build_rust_response_error(
-            Box::new(factory_result.err().unwrap()),
-            rust_response,
-            "Cannot encode new FLM Instance",
-        );
+        let mut data = vec![];
+        let error = filter_list_manager::AgOuterError::from(factory_result.err().unwrap());
+        error
+            .encode(&mut data)
+            .expect(&format!("[Cannot encode error message]: {}", error.message));
+
+        rust_response.result_data_capacity = data.capacity();
+        rust_response.result_data_len = data.len();
+        rust_response.result_data = Box::into_raw(data.into_boxed_slice()) as *mut c_void;
+
+        return Box::into_raw(rust_response);
     };
 
     rust_response.result_data = Box::into_raw(Box::new(flm_handle)) as *mut c_void;
