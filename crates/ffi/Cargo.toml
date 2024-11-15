@@ -11,6 +11,12 @@ description = "Foreign function interface crate for filter list manager library"
 crate-type = ["cdylib", "staticlib", "rlib"]
 name = "filter_list_manager_ffi"
 
+[[bin]]
+name = "build-native-ffi-assets"
+path = "src/build_native_ffi_assets.rs"
+test = false
+doc = false
+
 [dependencies]
 adguard-flm = { path = "../filter-list-manager", version = ">=0.8.11,<1.0.0", default-features = false }
 thiserror.workspace = true
@@ -18,13 +24,16 @@ uniffi.workspace = true
 protobuf = "3.5.1"
 prost = "0.13.2"
 prost-types = "0.13.2"
+prost-build = { version = "0.13.2", optional = true }
+cbindgen = { version = "0.27.0", optional = true }
+
+[dev-dependencies]
 
 [features]
 default = ["adguard-flm/default"]
 rusqlite-bundled = ["adguard-flm/rusqlite-bundled"]
 rustls-tls = ["adguard-flm/rustls-tls"]
+dev-build-native-assets=["prost-build", "cbindgen"]
 
 [build-dependencies]
 uniffi.workspace = true
-prost-build = "0.13.2"
-cbindgen = "0.27.0"

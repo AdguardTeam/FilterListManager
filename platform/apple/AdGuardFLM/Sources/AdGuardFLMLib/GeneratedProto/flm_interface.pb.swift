@@ -20,840 +20,840 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-struct FilterListManager_InstallCustomFilterListRequest {
+public struct FilterListManager_InstallCustomFilterListRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var downloadURL: String = String()
+  public var downloadURL: String = String()
 
-  var isTrusted: Bool = false
+  public var isTrusted: Bool = false
 
-  var title: String {
+  public var title: String {
     get {return _title ?? String()}
     set {_title = newValue}
   }
   /// Returns true if `title` has been explicitly set.
-  var hasTitle: Bool {return self._title != nil}
+  public var hasTitle: Bool {return self._title != nil}
   /// Clears the value of `title`. Subsequent reads from it will return its default value.
-  mutating func clearTitle() {self._title = nil}
+  public mutating func clearTitle() {self._title = nil}
 
-  var description_p: String {
+  public var description_p: String {
     get {return _description_p ?? String()}
     set {_description_p = newValue}
   }
   /// Returns true if `description_p` has been explicitly set.
-  var hasDescription_p: Bool {return self._description_p != nil}
+  public var hasDescription_p: Bool {return self._description_p != nil}
   /// Clears the value of `description_p`. Subsequent reads from it will return its default value.
-  mutating func clearDescription_p() {self._description_p = nil}
+  public mutating func clearDescription_p() {self._description_p = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _title: String? = nil
   fileprivate var _description_p: String? = nil
 }
 
-struct FilterListManager_InstallCustomFilterFromStringRequest {
+public struct FilterListManager_InstallCustomFilterFromStringRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var downloadURL: String = String()
+  public var downloadURL: String = String()
 
-  var lastDownloadTime: Int64 = 0
+  public var lastDownloadTime: Int64 = 0
 
-  var isEnabled: Bool = false
+  public var isEnabled: Bool = false
 
-  var isTrusted: Bool = false
+  public var isTrusted: Bool = false
 
-  var filterBody: String = String()
+  public var filterBody: String = String()
 
-  var customTitle: String {
+  public var customTitle: String {
     get {return _customTitle ?? String()}
     set {_customTitle = newValue}
   }
   /// Returns true if `customTitle` has been explicitly set.
-  var hasCustomTitle: Bool {return self._customTitle != nil}
+  public var hasCustomTitle: Bool {return self._customTitle != nil}
   /// Clears the value of `customTitle`. Subsequent reads from it will return its default value.
-  mutating func clearCustomTitle() {self._customTitle = nil}
+  public mutating func clearCustomTitle() {self._customTitle = nil}
 
-  var customDescription: String {
+  public var customDescription: String {
     get {return _customDescription ?? String()}
     set {_customDescription = newValue}
   }
   /// Returns true if `customDescription` has been explicitly set.
-  var hasCustomDescription: Bool {return self._customDescription != nil}
+  public var hasCustomDescription: Bool {return self._customDescription != nil}
   /// Clears the value of `customDescription`. Subsequent reads from it will return its default value.
-  mutating func clearCustomDescription() {self._customDescription = nil}
+  public mutating func clearCustomDescription() {self._customDescription = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _customTitle: String? = nil
   fileprivate var _customDescription: String? = nil
 }
 
-struct FilterListManager_EnableFilterListsRequest {
+public struct FilterListManager_EnableFilterListsRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var ids: [Int64] = []
+  public var ids: [Int64] = []
 
-  var isEnabled: Bool = false
+  public var isEnabled: Bool = false
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_InstallFilterListsRequest {
+public struct FilterListManager_InstallFilterListsRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var ids: [Int64] = []
+  public var ids: [Int64] = []
 
-  var isInstalled: Bool = false
+  public var isInstalled: Bool = false
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_DeleteCustomFilterListsRequest {
+public struct FilterListManager_DeleteCustomFilterListsRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var ids: [Int64] = []
+  public var ids: [Int64] = []
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_GetFullFilterListByIdRequest {
+public struct FilterListManager_GetFullFilterListByIdRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var id: Int64 = 0
+  public var id: Int64 = 0
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_GetStoredFiltersMetadataByIdRequest {
+public struct FilterListManager_GetStoredFiltersMetadataByIdRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var id: Int64 = 0
+  public var id: Int64 = 0
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_SaveCustomFilterRulesRequest {
+public struct FilterListManager_SaveCustomFilterRulesRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var rules: FilterListManager_FilterListRules {
+  public var rules: FilterListManager_FilterListRules {
     get {return _rules ?? FilterListManager_FilterListRules()}
     set {_rules = newValue}
   }
   /// Returns true if `rules` has been explicitly set.
-  var hasRules: Bool {return self._rules != nil}
+  public var hasRules: Bool {return self._rules != nil}
   /// Clears the value of `rules`. Subsequent reads from it will return its default value.
-  mutating func clearRules() {self._rules = nil}
+  public mutating func clearRules() {self._rules = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _rules: FilterListManager_FilterListRules? = nil
 }
 
-struct FilterListManager_SaveDisabledRulesRequest {
+public struct FilterListManager_SaveDisabledRulesRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterID: Int64 = 0
+  public var filterID: Int64 = 0
 
-  var disabledRules: [String] = []
+  public var disabledRules: [String] = []
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_UpdateFiltersRequest {
+public struct FilterListManager_UpdateFiltersRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var ignoreFiltersExpiration: Bool = false
+  public var ignoreFiltersExpiration: Bool = false
 
-  var looseTimeout: Int32 = 0
+  public var looseTimeout: Int32 = 0
 
-  var ignoreFiltersStatus: Bool = false
+  public var ignoreFiltersStatus: Bool = false
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_ForceUpdateFiltersByIdsRequest {
+public struct FilterListManager_ForceUpdateFiltersByIdsRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var ids: [Int64] = []
+  public var ids: [Int64] = []
 
-  var looseTimeout: Int32 = 0
+  public var looseTimeout: Int32 = 0
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_FetchFilterListMetadataRequest {
+public struct FilterListManager_FetchFilterListMetadataRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var url: String = String()
+  public var url: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_ChangeLocaleRequest {
+public struct FilterListManager_ChangeLocaleRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var suggestedLocale: String = String()
+  public var suggestedLocale: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_UpdateCustomFilterMetadataRequest {
+public struct FilterListManager_UpdateCustomFilterMetadataRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterID: Int64 = 0
+  public var filterID: Int64 = 0
 
-  var title: String = String()
+  public var title: String = String()
 
-  var isTrusted: Bool = false
+  public var isTrusted: Bool = false
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_GetFilterRulesAsStringsRequest {
+public struct FilterListManager_GetFilterRulesAsStringsRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var ids: [Int64] = []
+  public var ids: [Int64] = []
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_SaveRulesToFileBlobRequest {
+public struct FilterListManager_SaveRulesToFileBlobRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterID: Int64 = 0
+  public var filterID: Int64 = 0
 
-  var filePath: String = String()
+  public var filePath: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_GetDisabledRulesRequest {
+public struct FilterListManager_GetDisabledRulesRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var ids: [Int64] = []
+  public var ids: [Int64] = []
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_EmptyRequest {
+public struct FilterListManager_EmptyRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 }
 
-struct FilterListManager_InstallCustomFilterListResponse {
+public struct FilterListManager_InstallCustomFilterListResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterList: FilterListManager_FullFilterList {
+  public var filterList: FilterListManager_FullFilterList {
     get {return _filterList ?? FilterListManager_FullFilterList()}
     set {_filterList = newValue}
   }
   /// Returns true if `filterList` has been explicitly set.
-  var hasFilterList: Bool {return self._filterList != nil}
+  public var hasFilterList: Bool {return self._filterList != nil}
   /// Clears the value of `filterList`. Subsequent reads from it will return its default value.
-  mutating func clearFilterList() {self._filterList = nil}
+  public mutating func clearFilterList() {self._filterList = nil}
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _filterList: FilterListManager_FullFilterList? = nil
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_EnableFilterListsResponse {
+public struct FilterListManager_EnableFilterListsResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var count: Int64 = 0
+  public var count: Int64 = 0
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_InstallFilterListsResponse {
+public struct FilterListManager_InstallFilterListsResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var count: Int64 = 0
+  public var count: Int64 = 0
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_DeleteCustomFilterListsResponse {
+public struct FilterListManager_DeleteCustomFilterListsResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var count: Int64 = 0
+  public var count: Int64 = 0
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetStoredFiltersMetadataResponse {
+public struct FilterListManager_GetStoredFiltersMetadataResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterLists: [FilterListManager_StoredFilterMetadata] = []
+  public var filterLists: [FilterListManager_StoredFilterMetadata] = []
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetStoredFilterMetadataByIdResponse {
+public struct FilterListManager_GetStoredFilterMetadataByIdResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterList: FilterListManager_StoredFilterMetadata {
+  public var filterList: FilterListManager_StoredFilterMetadata {
     get {return _filterList ?? FilterListManager_StoredFilterMetadata()}
     set {_filterList = newValue}
   }
   /// Returns true if `filterList` has been explicitly set.
-  var hasFilterList: Bool {return self._filterList != nil}
+  public var hasFilterList: Bool {return self._filterList != nil}
   /// Clears the value of `filterList`. Subsequent reads from it will return its default value.
-  mutating func clearFilterList() {self._filterList = nil}
+  public mutating func clearFilterList() {self._filterList = nil}
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _filterList: FilterListManager_StoredFilterMetadata? = nil
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetFullFilterListByIdResponse {
+public struct FilterListManager_GetFullFilterListByIdResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterList: FilterListManager_FullFilterList {
+  public var filterList: FilterListManager_FullFilterList {
     get {return _filterList ?? FilterListManager_FullFilterList()}
     set {_filterList = newValue}
   }
   /// Returns true if `filterList` has been explicitly set.
-  var hasFilterList: Bool {return self._filterList != nil}
+  public var hasFilterList: Bool {return self._filterList != nil}
   /// Clears the value of `filterList`. Subsequent reads from it will return its default value.
-  mutating func clearFilterList() {self._filterList = nil}
+  public mutating func clearFilterList() {self._filterList = nil}
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _filterList: FilterListManager_FullFilterList? = nil
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_UpdateFiltersResponse {
+public struct FilterListManager_UpdateFiltersResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var result: FilterListManager_UpdateResult {
+  public var result: FilterListManager_UpdateResult {
     get {return _result ?? FilterListManager_UpdateResult()}
     set {_result = newValue}
   }
   /// Returns true if `result` has been explicitly set.
-  var hasResult: Bool {return self._result != nil}
+  public var hasResult: Bool {return self._result != nil}
   /// Clears the value of `result`. Subsequent reads from it will return its default value.
-  mutating func clearResult() {self._result = nil}
+  public mutating func clearResult() {self._result = nil}
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _result: FilterListManager_UpdateResult? = nil
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_ForceUpdateFiltersByIdsResponse {
+public struct FilterListManager_ForceUpdateFiltersByIdsResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var result: FilterListManager_UpdateResult {
+  public var result: FilterListManager_UpdateResult {
     get {return _result ?? FilterListManager_UpdateResult()}
     set {_result = newValue}
   }
   /// Returns true if `result` has been explicitly set.
-  var hasResult: Bool {return self._result != nil}
+  public var hasResult: Bool {return self._result != nil}
   /// Clears the value of `result`. Subsequent reads from it will return its default value.
-  mutating func clearResult() {self._result = nil}
+  public mutating func clearResult() {self._result = nil}
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _result: FilterListManager_UpdateResult? = nil
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_FetchFilterListMetadataResponse {
+public struct FilterListManager_FetchFilterListMetadataResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var metadata: FilterListManager_FilterListMetadata {
+  public var metadata: FilterListManager_FilterListMetadata {
     get {return _metadata ?? FilterListManager_FilterListMetadata()}
     set {_metadata = newValue}
   }
   /// Returns true if `metadata` has been explicitly set.
-  var hasMetadata: Bool {return self._metadata != nil}
+  public var hasMetadata: Bool {return self._metadata != nil}
   /// Clears the value of `metadata`. Subsequent reads from it will return its default value.
-  mutating func clearMetadata() {self._metadata = nil}
+  public mutating func clearMetadata() {self._metadata = nil}
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _metadata: FilterListManager_FilterListMetadata? = nil
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetAllTagsResponse {
+public struct FilterListManager_GetAllTagsResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var tags: [FilterListManager_FilterTag] = []
+  public var tags: [FilterListManager_FilterTag] = []
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetAllGroupsResponse {
+public struct FilterListManager_GetAllGroupsResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var groups: [FilterListManager_FilterGroup] = []
+  public var groups: [FilterListManager_FilterGroup] = []
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_ChangeLocaleResponse {
+public struct FilterListManager_ChangeLocaleResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var success: Bool = false
+  public var success: Bool = false
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_UpdateCustomFilterMetadataResponse {
+public struct FilterListManager_UpdateCustomFilterMetadataResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var success: Bool = false
+  public var success: Bool = false
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetDatabasePathResponse {
+public struct FilterListManager_GetDatabasePathResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var path: String = String()
+  public var path: String = String()
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetDatabaseVersionResponse {
+public struct FilterListManager_GetDatabaseVersionResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var version: Int32 {
+  public var version: Int32 {
     get {return _version ?? 0}
     set {_version = newValue}
   }
   /// Returns true if `version` has been explicitly set.
-  var hasVersion: Bool {return self._version != nil}
+  public var hasVersion: Bool {return self._version != nil}
   /// Clears the value of `version`. Subsequent reads from it will return its default value.
-  mutating func clearVersion() {self._version = nil}
+  public mutating func clearVersion() {self._version = nil}
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _version: Int32? = nil
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_InstallCustomFilterFromStringResponse {
+public struct FilterListManager_InstallCustomFilterFromStringResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var filterList: FilterListManager_FullFilterList {
+  public var filterList: FilterListManager_FullFilterList {
     get {return _filterList ?? FilterListManager_FullFilterList()}
     set {_filterList = newValue}
   }
   /// Returns true if `filterList` has been explicitly set.
-  var hasFilterList: Bool {return self._filterList != nil}
+  public var hasFilterList: Bool {return self._filterList != nil}
   /// Clears the value of `filterList`. Subsequent reads from it will return its default value.
-  mutating func clearFilterList() {self._filterList = nil}
+  public mutating func clearFilterList() {self._filterList = nil}
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _filterList: FilterListManager_FullFilterList? = nil
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetActiveRulesResponse {
+public struct FilterListManager_GetActiveRulesResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var rules: [FilterListManager_ActiveRulesInfo] = []
+  public var rules: [FilterListManager_ActiveRulesInfo] = []
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetFilterRulesAsStringsResponse {
+public struct FilterListManager_GetFilterRulesAsStringsResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var rulesList: [FilterListManager_FilterListRulesRaw] = []
+  public var rulesList: [FilterListManager_FilterListRulesRaw] = []
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_GetDisabledRulesResponse {
+public struct FilterListManager_GetDisabledRulesResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var rulesRaw: [FilterListManager_DisabledRulesRaw] = []
+  public var rulesRaw: [FilterListManager_DisabledRulesRaw] = []
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
 
-struct FilterListManager_EmptyResponse {
+public struct FilterListManager_EmptyResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var error: FilterListManager_AGOuterError {
+  public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
     set {_error = newValue}
   }
   /// Returns true if `error` has been explicitly set.
-  var hasError: Bool {return self._error != nil}
+  public var hasError: Bool {return self._error != nil}
   /// Clears the value of `error`. Subsequent reads from it will return its default value.
-  mutating func clearError() {self._error = nil}
+  public mutating func clearError() {self._error = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+  public init() {}
 
   fileprivate var _error: FilterListManager_AGOuterError? = nil
 }
@@ -905,15 +905,15 @@ extension FilterListManager_EmptyResponse: @unchecked Sendable {}
 fileprivate let _protobuf_package = "filter_list_manager"
 
 extension FilterListManager_InstallCustomFilterListRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".InstallCustomFilterListRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".InstallCustomFilterListRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "download_url"),
     2: .standard(proto: "is_trusted"),
     3: .same(proto: "title"),
     4: .same(proto: "description"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -928,7 +928,7 @@ extension FilterListManager_InstallCustomFilterListRequest: SwiftProtobuf.Messag
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -948,7 +948,7 @@ extension FilterListManager_InstallCustomFilterListRequest: SwiftProtobuf.Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_InstallCustomFilterListRequest, rhs: FilterListManager_InstallCustomFilterListRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_InstallCustomFilterListRequest, rhs: FilterListManager_InstallCustomFilterListRequest) -> Bool {
     if lhs.downloadURL != rhs.downloadURL {return false}
     if lhs.isTrusted != rhs.isTrusted {return false}
     if lhs._title != rhs._title {return false}
@@ -959,8 +959,8 @@ extension FilterListManager_InstallCustomFilterListRequest: SwiftProtobuf.Messag
 }
 
 extension FilterListManager_InstallCustomFilterFromStringRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".InstallCustomFilterFromStringRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".InstallCustomFilterFromStringRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "download_url"),
     2: .standard(proto: "last_download_time"),
     3: .standard(proto: "is_enabled"),
@@ -970,7 +970,7 @@ extension FilterListManager_InstallCustomFilterFromStringRequest: SwiftProtobuf.
     7: .standard(proto: "custom_description"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -988,7 +988,7 @@ extension FilterListManager_InstallCustomFilterFromStringRequest: SwiftProtobuf.
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1017,7 +1017,7 @@ extension FilterListManager_InstallCustomFilterFromStringRequest: SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_InstallCustomFilterFromStringRequest, rhs: FilterListManager_InstallCustomFilterFromStringRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_InstallCustomFilterFromStringRequest, rhs: FilterListManager_InstallCustomFilterFromStringRequest) -> Bool {
     if lhs.downloadURL != rhs.downloadURL {return false}
     if lhs.lastDownloadTime != rhs.lastDownloadTime {return false}
     if lhs.isEnabled != rhs.isEnabled {return false}
@@ -1031,13 +1031,13 @@ extension FilterListManager_InstallCustomFilterFromStringRequest: SwiftProtobuf.
 }
 
 extension FilterListManager_EnableFilterListsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".EnableFilterListsRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".EnableFilterListsRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "ids"),
     2: .standard(proto: "is_enabled"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1050,7 +1050,7 @@ extension FilterListManager_EnableFilterListsRequest: SwiftProtobuf.Message, Swi
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
       try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
     }
@@ -1060,7 +1060,7 @@ extension FilterListManager_EnableFilterListsRequest: SwiftProtobuf.Message, Swi
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_EnableFilterListsRequest, rhs: FilterListManager_EnableFilterListsRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_EnableFilterListsRequest, rhs: FilterListManager_EnableFilterListsRequest) -> Bool {
     if lhs.ids != rhs.ids {return false}
     if lhs.isEnabled != rhs.isEnabled {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1069,13 +1069,13 @@ extension FilterListManager_EnableFilterListsRequest: SwiftProtobuf.Message, Swi
 }
 
 extension FilterListManager_InstallFilterListsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".InstallFilterListsRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".InstallFilterListsRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "ids"),
     2: .standard(proto: "is_installed"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1088,7 +1088,7 @@ extension FilterListManager_InstallFilterListsRequest: SwiftProtobuf.Message, Sw
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
       try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
     }
@@ -1098,7 +1098,7 @@ extension FilterListManager_InstallFilterListsRequest: SwiftProtobuf.Message, Sw
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_InstallFilterListsRequest, rhs: FilterListManager_InstallFilterListsRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_InstallFilterListsRequest, rhs: FilterListManager_InstallFilterListsRequest) -> Bool {
     if lhs.ids != rhs.ids {return false}
     if lhs.isInstalled != rhs.isInstalled {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1107,12 +1107,12 @@ extension FilterListManager_InstallFilterListsRequest: SwiftProtobuf.Message, Sw
 }
 
 extension FilterListManager_DeleteCustomFilterListsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".DeleteCustomFilterListsRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".DeleteCustomFilterListsRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "ids"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1124,14 +1124,14 @@ extension FilterListManager_DeleteCustomFilterListsRequest: SwiftProtobuf.Messag
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
       try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_DeleteCustomFilterListsRequest, rhs: FilterListManager_DeleteCustomFilterListsRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_DeleteCustomFilterListsRequest, rhs: FilterListManager_DeleteCustomFilterListsRequest) -> Bool {
     if lhs.ids != rhs.ids {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1139,12 +1139,12 @@ extension FilterListManager_DeleteCustomFilterListsRequest: SwiftProtobuf.Messag
 }
 
 extension FilterListManager_GetFullFilterListByIdRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetFullFilterListByIdRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetFullFilterListByIdRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1156,14 +1156,14 @@ extension FilterListManager_GetFullFilterListByIdRequest: SwiftProtobuf.Message,
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.id != 0 {
       try visitor.visitSingularInt64Field(value: self.id, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetFullFilterListByIdRequest, rhs: FilterListManager_GetFullFilterListByIdRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_GetFullFilterListByIdRequest, rhs: FilterListManager_GetFullFilterListByIdRequest) -> Bool {
     if lhs.id != rhs.id {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1171,12 +1171,12 @@ extension FilterListManager_GetFullFilterListByIdRequest: SwiftProtobuf.Message,
 }
 
 extension FilterListManager_GetStoredFiltersMetadataByIdRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetStoredFiltersMetadataByIdRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetStoredFiltersMetadataByIdRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1188,14 +1188,14 @@ extension FilterListManager_GetStoredFiltersMetadataByIdRequest: SwiftProtobuf.M
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.id != 0 {
       try visitor.visitSingularInt64Field(value: self.id, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetStoredFiltersMetadataByIdRequest, rhs: FilterListManager_GetStoredFiltersMetadataByIdRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_GetStoredFiltersMetadataByIdRequest, rhs: FilterListManager_GetStoredFiltersMetadataByIdRequest) -> Bool {
     if lhs.id != rhs.id {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1203,12 +1203,12 @@ extension FilterListManager_GetStoredFiltersMetadataByIdRequest: SwiftProtobuf.M
 }
 
 extension FilterListManager_SaveCustomFilterRulesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".SaveCustomFilterRulesRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".SaveCustomFilterRulesRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "rules"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1220,7 +1220,7 @@ extension FilterListManager_SaveCustomFilterRulesRequest: SwiftProtobuf.Message,
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1231,7 +1231,7 @@ extension FilterListManager_SaveCustomFilterRulesRequest: SwiftProtobuf.Message,
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_SaveCustomFilterRulesRequest, rhs: FilterListManager_SaveCustomFilterRulesRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_SaveCustomFilterRulesRequest, rhs: FilterListManager_SaveCustomFilterRulesRequest) -> Bool {
     if lhs._rules != rhs._rules {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1239,13 +1239,13 @@ extension FilterListManager_SaveCustomFilterRulesRequest: SwiftProtobuf.Message,
 }
 
 extension FilterListManager_SaveDisabledRulesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".SaveDisabledRulesRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".SaveDisabledRulesRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_id"),
     2: .standard(proto: "disabled_rules"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1258,7 +1258,7 @@ extension FilterListManager_SaveDisabledRulesRequest: SwiftProtobuf.Message, Swi
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
       try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
     }
@@ -1268,7 +1268,7 @@ extension FilterListManager_SaveDisabledRulesRequest: SwiftProtobuf.Message, Swi
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_SaveDisabledRulesRequest, rhs: FilterListManager_SaveDisabledRulesRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_SaveDisabledRulesRequest, rhs: FilterListManager_SaveDisabledRulesRequest) -> Bool {
     if lhs.filterID != rhs.filterID {return false}
     if lhs.disabledRules != rhs.disabledRules {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1277,14 +1277,14 @@ extension FilterListManager_SaveDisabledRulesRequest: SwiftProtobuf.Message, Swi
 }
 
 extension FilterListManager_UpdateFiltersRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".UpdateFiltersRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".UpdateFiltersRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "ignore_filters_expiration"),
     2: .standard(proto: "loose_timeout"),
     3: .standard(proto: "ignore_filters_status"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1298,7 +1298,7 @@ extension FilterListManager_UpdateFiltersRequest: SwiftProtobuf.Message, SwiftPr
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.ignoreFiltersExpiration != false {
       try visitor.visitSingularBoolField(value: self.ignoreFiltersExpiration, fieldNumber: 1)
     }
@@ -1311,7 +1311,7 @@ extension FilterListManager_UpdateFiltersRequest: SwiftProtobuf.Message, SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_UpdateFiltersRequest, rhs: FilterListManager_UpdateFiltersRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_UpdateFiltersRequest, rhs: FilterListManager_UpdateFiltersRequest) -> Bool {
     if lhs.ignoreFiltersExpiration != rhs.ignoreFiltersExpiration {return false}
     if lhs.looseTimeout != rhs.looseTimeout {return false}
     if lhs.ignoreFiltersStatus != rhs.ignoreFiltersStatus {return false}
@@ -1321,13 +1321,13 @@ extension FilterListManager_UpdateFiltersRequest: SwiftProtobuf.Message, SwiftPr
 }
 
 extension FilterListManager_ForceUpdateFiltersByIdsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".ForceUpdateFiltersByIdsRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".ForceUpdateFiltersByIdsRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "ids"),
     2: .standard(proto: "loose_timeout"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1340,7 +1340,7 @@ extension FilterListManager_ForceUpdateFiltersByIdsRequest: SwiftProtobuf.Messag
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
       try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
     }
@@ -1350,7 +1350,7 @@ extension FilterListManager_ForceUpdateFiltersByIdsRequest: SwiftProtobuf.Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_ForceUpdateFiltersByIdsRequest, rhs: FilterListManager_ForceUpdateFiltersByIdsRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_ForceUpdateFiltersByIdsRequest, rhs: FilterListManager_ForceUpdateFiltersByIdsRequest) -> Bool {
     if lhs.ids != rhs.ids {return false}
     if lhs.looseTimeout != rhs.looseTimeout {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1359,12 +1359,12 @@ extension FilterListManager_ForceUpdateFiltersByIdsRequest: SwiftProtobuf.Messag
 }
 
 extension FilterListManager_FetchFilterListMetadataRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FetchFilterListMetadataRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FetchFilterListMetadataRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "url"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1376,14 +1376,14 @@ extension FilterListManager_FetchFilterListMetadataRequest: SwiftProtobuf.Messag
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.url.isEmpty {
       try visitor.visitSingularStringField(value: self.url, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FetchFilterListMetadataRequest, rhs: FilterListManager_FetchFilterListMetadataRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_FetchFilterListMetadataRequest, rhs: FilterListManager_FetchFilterListMetadataRequest) -> Bool {
     if lhs.url != rhs.url {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1391,12 +1391,12 @@ extension FilterListManager_FetchFilterListMetadataRequest: SwiftProtobuf.Messag
 }
 
 extension FilterListManager_ChangeLocaleRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".ChangeLocaleRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".ChangeLocaleRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "suggested_locale"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1408,14 +1408,14 @@ extension FilterListManager_ChangeLocaleRequest: SwiftProtobuf.Message, SwiftPro
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.suggestedLocale.isEmpty {
       try visitor.visitSingularStringField(value: self.suggestedLocale, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_ChangeLocaleRequest, rhs: FilterListManager_ChangeLocaleRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_ChangeLocaleRequest, rhs: FilterListManager_ChangeLocaleRequest) -> Bool {
     if lhs.suggestedLocale != rhs.suggestedLocale {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1423,14 +1423,14 @@ extension FilterListManager_ChangeLocaleRequest: SwiftProtobuf.Message, SwiftPro
 }
 
 extension FilterListManager_UpdateCustomFilterMetadataRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".UpdateCustomFilterMetadataRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".UpdateCustomFilterMetadataRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_id"),
     2: .same(proto: "title"),
     3: .standard(proto: "is_trusted"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1444,7 +1444,7 @@ extension FilterListManager_UpdateCustomFilterMetadataRequest: SwiftProtobuf.Mes
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
       try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
     }
@@ -1457,7 +1457,7 @@ extension FilterListManager_UpdateCustomFilterMetadataRequest: SwiftProtobuf.Mes
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_UpdateCustomFilterMetadataRequest, rhs: FilterListManager_UpdateCustomFilterMetadataRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_UpdateCustomFilterMetadataRequest, rhs: FilterListManager_UpdateCustomFilterMetadataRequest) -> Bool {
     if lhs.filterID != rhs.filterID {return false}
     if lhs.title != rhs.title {return false}
     if lhs.isTrusted != rhs.isTrusted {return false}
@@ -1467,12 +1467,12 @@ extension FilterListManager_UpdateCustomFilterMetadataRequest: SwiftProtobuf.Mes
 }
 
 extension FilterListManager_GetFilterRulesAsStringsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetFilterRulesAsStringsRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetFilterRulesAsStringsRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "ids"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1484,14 +1484,14 @@ extension FilterListManager_GetFilterRulesAsStringsRequest: SwiftProtobuf.Messag
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
       try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetFilterRulesAsStringsRequest, rhs: FilterListManager_GetFilterRulesAsStringsRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_GetFilterRulesAsStringsRequest, rhs: FilterListManager_GetFilterRulesAsStringsRequest) -> Bool {
     if lhs.ids != rhs.ids {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1499,13 +1499,13 @@ extension FilterListManager_GetFilterRulesAsStringsRequest: SwiftProtobuf.Messag
 }
 
 extension FilterListManager_SaveRulesToFileBlobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".SaveRulesToFileBlobRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".SaveRulesToFileBlobRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_id"),
     2: .standard(proto: "file_path"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1518,7 +1518,7 @@ extension FilterListManager_SaveRulesToFileBlobRequest: SwiftProtobuf.Message, S
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
       try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
     }
@@ -1528,7 +1528,7 @@ extension FilterListManager_SaveRulesToFileBlobRequest: SwiftProtobuf.Message, S
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_SaveRulesToFileBlobRequest, rhs: FilterListManager_SaveRulesToFileBlobRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_SaveRulesToFileBlobRequest, rhs: FilterListManager_SaveRulesToFileBlobRequest) -> Bool {
     if lhs.filterID != rhs.filterID {return false}
     if lhs.filePath != rhs.filePath {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1537,12 +1537,12 @@ extension FilterListManager_SaveRulesToFileBlobRequest: SwiftProtobuf.Message, S
 }
 
 extension FilterListManager_GetDisabledRulesRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetDisabledRulesRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetDisabledRulesRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "ids"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1554,14 +1554,14 @@ extension FilterListManager_GetDisabledRulesRequest: SwiftProtobuf.Message, Swif
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
       try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetDisabledRulesRequest, rhs: FilterListManager_GetDisabledRulesRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_GetDisabledRulesRequest, rhs: FilterListManager_GetDisabledRulesRequest) -> Bool {
     if lhs.ids != rhs.ids {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1569,32 +1569,32 @@ extension FilterListManager_GetDisabledRulesRequest: SwiftProtobuf.Message, Swif
 }
 
 extension FilterListManager_EmptyRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".EmptyRequest"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let protoMessageName: String = _protobuf_package + ".EmptyRequest"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let _ = try decoder.nextFieldNumber() {
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_EmptyRequest, rhs: FilterListManager_EmptyRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_EmptyRequest, rhs: FilterListManager_EmptyRequest) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
 extension FilterListManager_InstallCustomFilterListResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".InstallCustomFilterListResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".InstallCustomFilterListResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_list"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1607,7 +1607,7 @@ extension FilterListManager_InstallCustomFilterListResponse: SwiftProtobuf.Messa
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1621,7 +1621,7 @@ extension FilterListManager_InstallCustomFilterListResponse: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_InstallCustomFilterListResponse, rhs: FilterListManager_InstallCustomFilterListResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_InstallCustomFilterListResponse, rhs: FilterListManager_InstallCustomFilterListResponse) -> Bool {
     if lhs._filterList != rhs._filterList {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1630,13 +1630,13 @@ extension FilterListManager_InstallCustomFilterListResponse: SwiftProtobuf.Messa
 }
 
 extension FilterListManager_EnableFilterListsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".EnableFilterListsResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".EnableFilterListsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "count"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1649,7 +1649,7 @@ extension FilterListManager_EnableFilterListsResponse: SwiftProtobuf.Message, Sw
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1663,7 +1663,7 @@ extension FilterListManager_EnableFilterListsResponse: SwiftProtobuf.Message, Sw
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_EnableFilterListsResponse, rhs: FilterListManager_EnableFilterListsResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_EnableFilterListsResponse, rhs: FilterListManager_EnableFilterListsResponse) -> Bool {
     if lhs.count != rhs.count {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1672,13 +1672,13 @@ extension FilterListManager_EnableFilterListsResponse: SwiftProtobuf.Message, Sw
 }
 
 extension FilterListManager_InstallFilterListsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".InstallFilterListsResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".InstallFilterListsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "count"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1691,7 +1691,7 @@ extension FilterListManager_InstallFilterListsResponse: SwiftProtobuf.Message, S
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1705,7 +1705,7 @@ extension FilterListManager_InstallFilterListsResponse: SwiftProtobuf.Message, S
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_InstallFilterListsResponse, rhs: FilterListManager_InstallFilterListsResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_InstallFilterListsResponse, rhs: FilterListManager_InstallFilterListsResponse) -> Bool {
     if lhs.count != rhs.count {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1714,13 +1714,13 @@ extension FilterListManager_InstallFilterListsResponse: SwiftProtobuf.Message, S
 }
 
 extension FilterListManager_DeleteCustomFilterListsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".DeleteCustomFilterListsResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".DeleteCustomFilterListsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "count"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1733,7 +1733,7 @@ extension FilterListManager_DeleteCustomFilterListsResponse: SwiftProtobuf.Messa
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1747,7 +1747,7 @@ extension FilterListManager_DeleteCustomFilterListsResponse: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_DeleteCustomFilterListsResponse, rhs: FilterListManager_DeleteCustomFilterListsResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_DeleteCustomFilterListsResponse, rhs: FilterListManager_DeleteCustomFilterListsResponse) -> Bool {
     if lhs.count != rhs.count {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1756,13 +1756,13 @@ extension FilterListManager_DeleteCustomFilterListsResponse: SwiftProtobuf.Messa
 }
 
 extension FilterListManager_GetStoredFiltersMetadataResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetStoredFiltersMetadataResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetStoredFiltersMetadataResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_lists"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1775,7 +1775,7 @@ extension FilterListManager_GetStoredFiltersMetadataResponse: SwiftProtobuf.Mess
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1789,7 +1789,7 @@ extension FilterListManager_GetStoredFiltersMetadataResponse: SwiftProtobuf.Mess
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetStoredFiltersMetadataResponse, rhs: FilterListManager_GetStoredFiltersMetadataResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetStoredFiltersMetadataResponse, rhs: FilterListManager_GetStoredFiltersMetadataResponse) -> Bool {
     if lhs.filterLists != rhs.filterLists {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1798,13 +1798,13 @@ extension FilterListManager_GetStoredFiltersMetadataResponse: SwiftProtobuf.Mess
 }
 
 extension FilterListManager_GetStoredFilterMetadataByIdResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetStoredFilterMetadataByIdResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetStoredFilterMetadataByIdResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_list"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1817,7 +1817,7 @@ extension FilterListManager_GetStoredFilterMetadataByIdResponse: SwiftProtobuf.M
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1831,7 +1831,7 @@ extension FilterListManager_GetStoredFilterMetadataByIdResponse: SwiftProtobuf.M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetStoredFilterMetadataByIdResponse, rhs: FilterListManager_GetStoredFilterMetadataByIdResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetStoredFilterMetadataByIdResponse, rhs: FilterListManager_GetStoredFilterMetadataByIdResponse) -> Bool {
     if lhs._filterList != rhs._filterList {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1840,13 +1840,13 @@ extension FilterListManager_GetStoredFilterMetadataByIdResponse: SwiftProtobuf.M
 }
 
 extension FilterListManager_GetFullFilterListByIdResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetFullFilterListByIdResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetFullFilterListByIdResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_list"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1859,7 +1859,7 @@ extension FilterListManager_GetFullFilterListByIdResponse: SwiftProtobuf.Message
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1873,7 +1873,7 @@ extension FilterListManager_GetFullFilterListByIdResponse: SwiftProtobuf.Message
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetFullFilterListByIdResponse, rhs: FilterListManager_GetFullFilterListByIdResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetFullFilterListByIdResponse, rhs: FilterListManager_GetFullFilterListByIdResponse) -> Bool {
     if lhs._filterList != rhs._filterList {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1882,13 +1882,13 @@ extension FilterListManager_GetFullFilterListByIdResponse: SwiftProtobuf.Message
 }
 
 extension FilterListManager_UpdateFiltersResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".UpdateFiltersResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".UpdateFiltersResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "result"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1901,7 +1901,7 @@ extension FilterListManager_UpdateFiltersResponse: SwiftProtobuf.Message, SwiftP
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1915,7 +1915,7 @@ extension FilterListManager_UpdateFiltersResponse: SwiftProtobuf.Message, SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_UpdateFiltersResponse, rhs: FilterListManager_UpdateFiltersResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_UpdateFiltersResponse, rhs: FilterListManager_UpdateFiltersResponse) -> Bool {
     if lhs._result != rhs._result {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1924,13 +1924,13 @@ extension FilterListManager_UpdateFiltersResponse: SwiftProtobuf.Message, SwiftP
 }
 
 extension FilterListManager_ForceUpdateFiltersByIdsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".ForceUpdateFiltersByIdsResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".ForceUpdateFiltersByIdsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "result"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1943,7 +1943,7 @@ extension FilterListManager_ForceUpdateFiltersByIdsResponse: SwiftProtobuf.Messa
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1957,7 +1957,7 @@ extension FilterListManager_ForceUpdateFiltersByIdsResponse: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_ForceUpdateFiltersByIdsResponse, rhs: FilterListManager_ForceUpdateFiltersByIdsResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_ForceUpdateFiltersByIdsResponse, rhs: FilterListManager_ForceUpdateFiltersByIdsResponse) -> Bool {
     if lhs._result != rhs._result {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1966,13 +1966,13 @@ extension FilterListManager_ForceUpdateFiltersByIdsResponse: SwiftProtobuf.Messa
 }
 
 extension FilterListManager_FetchFilterListMetadataResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".FetchFilterListMetadataResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".FetchFilterListMetadataResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "metadata"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1985,7 +1985,7 @@ extension FilterListManager_FetchFilterListMetadataResponse: SwiftProtobuf.Messa
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -1999,7 +1999,7 @@ extension FilterListManager_FetchFilterListMetadataResponse: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_FetchFilterListMetadataResponse, rhs: FilterListManager_FetchFilterListMetadataResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_FetchFilterListMetadataResponse, rhs: FilterListManager_FetchFilterListMetadataResponse) -> Bool {
     if lhs._metadata != rhs._metadata {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2008,13 +2008,13 @@ extension FilterListManager_FetchFilterListMetadataResponse: SwiftProtobuf.Messa
 }
 
 extension FilterListManager_GetAllTagsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetAllTagsResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetAllTagsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "tags"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2027,7 +2027,7 @@ extension FilterListManager_GetAllTagsResponse: SwiftProtobuf.Message, SwiftProt
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2041,7 +2041,7 @@ extension FilterListManager_GetAllTagsResponse: SwiftProtobuf.Message, SwiftProt
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetAllTagsResponse, rhs: FilterListManager_GetAllTagsResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetAllTagsResponse, rhs: FilterListManager_GetAllTagsResponse) -> Bool {
     if lhs.tags != rhs.tags {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2050,13 +2050,13 @@ extension FilterListManager_GetAllTagsResponse: SwiftProtobuf.Message, SwiftProt
 }
 
 extension FilterListManager_GetAllGroupsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetAllGroupsResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetAllGroupsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "groups"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2069,7 +2069,7 @@ extension FilterListManager_GetAllGroupsResponse: SwiftProtobuf.Message, SwiftPr
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2083,7 +2083,7 @@ extension FilterListManager_GetAllGroupsResponse: SwiftProtobuf.Message, SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetAllGroupsResponse, rhs: FilterListManager_GetAllGroupsResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetAllGroupsResponse, rhs: FilterListManager_GetAllGroupsResponse) -> Bool {
     if lhs.groups != rhs.groups {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2092,13 +2092,13 @@ extension FilterListManager_GetAllGroupsResponse: SwiftProtobuf.Message, SwiftPr
 }
 
 extension FilterListManager_ChangeLocaleResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".ChangeLocaleResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".ChangeLocaleResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "success"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2111,7 +2111,7 @@ extension FilterListManager_ChangeLocaleResponse: SwiftProtobuf.Message, SwiftPr
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2125,7 +2125,7 @@ extension FilterListManager_ChangeLocaleResponse: SwiftProtobuf.Message, SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_ChangeLocaleResponse, rhs: FilterListManager_ChangeLocaleResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_ChangeLocaleResponse, rhs: FilterListManager_ChangeLocaleResponse) -> Bool {
     if lhs.success != rhs.success {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2134,13 +2134,13 @@ extension FilterListManager_ChangeLocaleResponse: SwiftProtobuf.Message, SwiftPr
 }
 
 extension FilterListManager_UpdateCustomFilterMetadataResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".UpdateCustomFilterMetadataResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".UpdateCustomFilterMetadataResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "success"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2153,7 +2153,7 @@ extension FilterListManager_UpdateCustomFilterMetadataResponse: SwiftProtobuf.Me
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2167,7 +2167,7 @@ extension FilterListManager_UpdateCustomFilterMetadataResponse: SwiftProtobuf.Me
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_UpdateCustomFilterMetadataResponse, rhs: FilterListManager_UpdateCustomFilterMetadataResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_UpdateCustomFilterMetadataResponse, rhs: FilterListManager_UpdateCustomFilterMetadataResponse) -> Bool {
     if lhs.success != rhs.success {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2176,13 +2176,13 @@ extension FilterListManager_UpdateCustomFilterMetadataResponse: SwiftProtobuf.Me
 }
 
 extension FilterListManager_GetDatabasePathResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetDatabasePathResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetDatabasePathResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "path"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2195,7 +2195,7 @@ extension FilterListManager_GetDatabasePathResponse: SwiftProtobuf.Message, Swif
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2209,7 +2209,7 @@ extension FilterListManager_GetDatabasePathResponse: SwiftProtobuf.Message, Swif
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetDatabasePathResponse, rhs: FilterListManager_GetDatabasePathResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetDatabasePathResponse, rhs: FilterListManager_GetDatabasePathResponse) -> Bool {
     if lhs.path != rhs.path {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2218,13 +2218,13 @@ extension FilterListManager_GetDatabasePathResponse: SwiftProtobuf.Message, Swif
 }
 
 extension FilterListManager_GetDatabaseVersionResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetDatabaseVersionResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetDatabaseVersionResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "version"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2237,7 +2237,7 @@ extension FilterListManager_GetDatabaseVersionResponse: SwiftProtobuf.Message, S
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2251,7 +2251,7 @@ extension FilterListManager_GetDatabaseVersionResponse: SwiftProtobuf.Message, S
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetDatabaseVersionResponse, rhs: FilterListManager_GetDatabaseVersionResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetDatabaseVersionResponse, rhs: FilterListManager_GetDatabaseVersionResponse) -> Bool {
     if lhs._version != rhs._version {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2260,13 +2260,13 @@ extension FilterListManager_GetDatabaseVersionResponse: SwiftProtobuf.Message, S
 }
 
 extension FilterListManager_InstallCustomFilterFromStringResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".InstallCustomFilterFromStringResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".InstallCustomFilterFromStringResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_list"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2279,7 +2279,7 @@ extension FilterListManager_InstallCustomFilterFromStringResponse: SwiftProtobuf
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2293,7 +2293,7 @@ extension FilterListManager_InstallCustomFilterFromStringResponse: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_InstallCustomFilterFromStringResponse, rhs: FilterListManager_InstallCustomFilterFromStringResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_InstallCustomFilterFromStringResponse, rhs: FilterListManager_InstallCustomFilterFromStringResponse) -> Bool {
     if lhs._filterList != rhs._filterList {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2302,13 +2302,13 @@ extension FilterListManager_InstallCustomFilterFromStringResponse: SwiftProtobuf
 }
 
 extension FilterListManager_GetActiveRulesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetActiveRulesResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetActiveRulesResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "rules"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2321,7 +2321,7 @@ extension FilterListManager_GetActiveRulesResponse: SwiftProtobuf.Message, Swift
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2335,7 +2335,7 @@ extension FilterListManager_GetActiveRulesResponse: SwiftProtobuf.Message, Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetActiveRulesResponse, rhs: FilterListManager_GetActiveRulesResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetActiveRulesResponse, rhs: FilterListManager_GetActiveRulesResponse) -> Bool {
     if lhs.rules != rhs.rules {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2344,13 +2344,13 @@ extension FilterListManager_GetActiveRulesResponse: SwiftProtobuf.Message, Swift
 }
 
 extension FilterListManager_GetFilterRulesAsStringsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetFilterRulesAsStringsResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetFilterRulesAsStringsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "rules_list"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2363,7 +2363,7 @@ extension FilterListManager_GetFilterRulesAsStringsResponse: SwiftProtobuf.Messa
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2377,7 +2377,7 @@ extension FilterListManager_GetFilterRulesAsStringsResponse: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetFilterRulesAsStringsResponse, rhs: FilterListManager_GetFilterRulesAsStringsResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetFilterRulesAsStringsResponse, rhs: FilterListManager_GetFilterRulesAsStringsResponse) -> Bool {
     if lhs.rulesList != rhs.rulesList {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2386,13 +2386,13 @@ extension FilterListManager_GetFilterRulesAsStringsResponse: SwiftProtobuf.Messa
 }
 
 extension FilterListManager_GetDisabledRulesResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".GetDisabledRulesResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".GetDisabledRulesResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "rules_raw"),
     2: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2405,7 +2405,7 @@ extension FilterListManager_GetDisabledRulesResponse: SwiftProtobuf.Message, Swi
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2419,7 +2419,7 @@ extension FilterListManager_GetDisabledRulesResponse: SwiftProtobuf.Message, Swi
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_GetDisabledRulesResponse, rhs: FilterListManager_GetDisabledRulesResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_GetDisabledRulesResponse, rhs: FilterListManager_GetDisabledRulesResponse) -> Bool {
     if lhs.rulesRaw != rhs.rulesRaw {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2428,12 +2428,12 @@ extension FilterListManager_GetDisabledRulesResponse: SwiftProtobuf.Message, Swi
 }
 
 extension FilterListManager_EmptyResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".EmptyResponse"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+  public static let protoMessageName: String = _protobuf_package + ".EmptyResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "error"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -2445,7 +2445,7 @@ extension FilterListManager_EmptyResponse: SwiftProtobuf.Message, SwiftProtobuf.
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
@@ -2456,7 +2456,7 @@ extension FilterListManager_EmptyResponse: SwiftProtobuf.Message, SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: FilterListManager_EmptyResponse, rhs: FilterListManager_EmptyResponse) -> Bool {
+  public static func ==(lhs: FilterListManager_EmptyResponse, rhs: FilterListManager_EmptyResponse) -> Bool {
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

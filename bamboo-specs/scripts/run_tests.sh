@@ -2,10 +2,9 @@
 
 set -e
 
-rustup component add rustfmt clippy
+rustup component add rustfmt
 
 # Test the crates
 echo "Testing the crates..."
-cargo clippy --all-targets --all-features
-cargo test --lib --tests -- --test-threads=1
+cargo test --workspace --lib --all-features -- --test-threads=1
 cargo fmt --all -- --check

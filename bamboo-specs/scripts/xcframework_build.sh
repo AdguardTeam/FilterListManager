@@ -2,6 +2,6 @@
 
 set -e
 
-arch -arm64 ./platform/apple/configure.sh
+arch -arm64 ./platform/apple/Scripts/configure.sh
 
-arch -arm64 ./platform/apple/build.sh
+arch -arm64 ./platform/apple/Scripts/build.sh
