@@ -290,7 +290,11 @@ namespace AdGuard.FilterListManagerProtobuf
 
         public void SaveRulesToFileBlob(long filterId, string filePath)
         {
-            SaveRulesToFileBlobRequest request = new SaveRulesToFileBlobRequest();
+            SaveRulesToFileBlobRequest request = new SaveRulesToFileBlobRequest
+            {
+                FilterId = filterId,
+                FilePath = filePath
+            };
             CallRust<EmptyResponse>(request);
         }
 

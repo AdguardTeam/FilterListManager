@@ -21,10 +21,12 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
             FlmDllProvider.SetVpnLibsDllName(Constants.FLM_DLL_NAME);
             FlmDllProvider _ = (FlmDllProvider)FlmDllProvider.Instance;
             Configuration configuration = FilterListManager.SpawnDefaultConfiguration();
+            configuration.MetadataUrl = "https://filters.adtidy.org/extension/safari/filters.json";
+            configuration.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
             ISerializer<byte[]> serializer = new ProtobufSerializer();
             using (IFilterListManager flm = new FilterListManager(configuration, serializer))
             {
-                // flm.PullMetadata();
+                flm.PullMetadata();
                 flm.UpdateFilters(false, 0, false);
                 
                 flm.EnableFilterLists(new long[] {1, 2, 255}, true);
@@ -37,9 +39,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                     "custom title",
                     "Desc");
                 bool localeResult = flm.ChangeLocale("ru_RU");
-                Logger.Info("Locale successfully changed");
                 flm.LiftUpDatabase();
-                Logger.Info("DB lifted");
                 flm.EnableFilterLists(new long[] {1, 2, 255}, true);
                 flm.InstallFilterLists(new long[] {1, 2, 255}, true);
 
@@ -58,21 +58,20 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 StoredFilterMetadata filterMetadata = flm.GetStoredFilterMetadataById(customFilter.Id);
                 
                 flm.GetFilterRulesAsStrings(new[] { customFilter.Id });
-                // string blobPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "flmtest_2.txt");
-                // FileUtils.Touch(blobPath);
-                // flm.SaveRulesToFileBlob(customFilter.Id, 
-                //     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, blobPath));
+                string blobPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "flmtest_2.txt");
+                FileUtils.Touch(blobPath);
+                flm.SaveRulesToFileBlob(customFilter.Id, blobPath);
                 flm.GetFullFilterListById(customFilter.Id);
                 flm.ForceUpdateFiltersByIds(new long[] { 1, 2 }, 0);
-                // customFilter = flm.InstallCustomFilterList(
-                //     "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt",
-                //     true,
-                //     "title",
-                //     "description");
+                customFilter = flm.InstallCustomFilterList(
+                    "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt",
+                    true,
+                    "title",
+                    "description");
                 flm.UpdateCustomFilterMetadata(
                     customFilter.Id,
                     "new title",
-                    true);
+                       true);
                 FilterListMetadata filterListMetadata =
                     flm.FetchFilterListMetadata("https://filters.adtidy.org/extension/safari/filters/101.txt");
                 flm.GetActiveRules();

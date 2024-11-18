@@ -11,10 +11,7 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
     {
         internal static Configuration MakeDefaultConfiguration()
         {
-            MarshalUtils.ag_buffer resultDataAgBuffer = GetNativeResult(
-                ProtobufInterop.flm_default_configuration_protobuf);
-            byte[] resultDataBytes = new byte[resultDataAgBuffer.size];
-            Marshal.Copy(resultDataAgBuffer.data, resultDataBytes, 0, (int) resultDataAgBuffer.size);
+            byte[] resultDataBytes = GetResultData(ProtobufInterop.flm_default_configuration_protobuf, out IntPtr _);
             Configuration configuration = Configuration.Parser.ParseFrom(resultDataBytes);
             return configuration;
         }
@@ -27,9 +24,9 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
             {
                 pData = Marshal.AllocHGlobal(data.Length);
                 Marshal.Copy(data, 0, pData, data.Length);
-                MarshalUtils.ag_buffer resultDataAgBuffer = GetNativeResult(
-                    () => ProtobufInterop.flm_init_protobuf(pData, (ulong)data.Length));
-                return resultDataAgBuffer.data;
+                byte [] _ = GetResultData(
+                    () => ProtobufInterop.flm_init_protobuf(pData, (ulong)data.Length), out IntPtr pResultData);
+                return pResultData;
             }
             finally
             {
@@ -44,10 +41,8 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
             {
                 pArgs = Marshal.AllocHGlobal(args.Length);
                 Marshal.Copy(args, 0, pArgs, args.Length);
-                MarshalUtils.ag_buffer resultDataAgBuffer = GetNativeResult(
-                    () => ProtobufInterop.flm_call_protobuf(flmHandle, method, pArgs, (ulong)args.Length));
-                byte[] resultDataBytes = new byte[resultDataAgBuffer.size];
-                Marshal.Copy(resultDataAgBuffer.data, resultDataBytes, 0, (int) resultDataAgBuffer.size);
+                byte[] resultDataBytes = GetResultData(
+                    () => ProtobufInterop.flm_call_protobuf(flmHandle, method, pArgs, (ulong)args.Length), out IntPtr _);
                 return resultDataBytes;
             }
             finally
@@ -61,7 +56,7 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
             ProtobufInterop.flm_free_handle(handle);
         }
         
-        private static MarshalUtils.ag_buffer GetNativeResult(Func<IntPtr> nativeFunc)
+        private static byte[] GetResultData(Func<IntPtr> nativeFunc, out IntPtr pResultData)
         {
             IntPtr pRustResponse = IntPtr.Zero;
             try
@@ -69,18 +64,14 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
                 pRustResponse = nativeFunc();
                 RustResponse rustResponse = MarshalUtils.PtrToStructure<RustResponse>(pRustResponse);
                 uint resultDataLen = rustResponse.ResultDataLen.ToUInt32();
-                if (!rustResponse.FfiError)
-                {
-                    MarshalUtils.ag_buffer resultDataAgBuffer = new MarshalUtils.ag_buffer
-                    {
-                        data = rustResponse.ResultData,
-                        size = resultDataLen
-                    };
-                    return resultDataAgBuffer;
-                }
-                
                 byte[] resultDataBytes = new byte[resultDataLen];
                 Marshal.Copy(rustResponse.ResultData, resultDataBytes, 0, (int)resultDataLen);
+                if (!rustResponse.FfiError)
+                {
+                    pResultData = rustResponse.ResultData;
+                    return resultDataBytes;
+                }
+                
                 AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(resultDataBytes);
                 throw new AGOuterException(error);
             }
