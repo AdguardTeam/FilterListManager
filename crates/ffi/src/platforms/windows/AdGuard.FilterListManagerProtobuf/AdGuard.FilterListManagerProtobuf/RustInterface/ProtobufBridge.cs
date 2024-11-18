@@ -66,10 +66,10 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
                 RustResponse rustResponse = MarshalUtils.PtrToStructure<RustResponse>(pRustResponse);
                 uint resultDataLen = rustResponse.ResultDataLen.ToUInt32();
                 byte[] resultDataBytes = new byte[resultDataLen];
-                Marshal.Copy(rustResponse.ResultData, resultDataBytes, 0, (int)resultDataLen);
+                Marshal.Copy(rustResponse.PResultData, resultDataBytes, 0, (int)resultDataLen);
                 if (!rustResponse.FfiError)
                 {
-                    pResultData = rustResponse.ResultData;
+                    pResultData = rustResponse.PResultData;
                     return resultDataBytes;
                 }
                 

@@ -21,7 +21,6 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
         [DllImport(Constants.FLM_DLL_NAME)]
         internal static extern IntPtr flm_init_protobuf(IntPtr configuration, ulong configLength);
         
-        
         /// <summary>
         /// Calls FLM method described as [`FFIMethod`] for object behind [`FLMHandle`]
         /// </summary>
