@@ -31,7 +31,8 @@ platform/apple/Scripts/build.sh
 
 ### Windows
 
-See [windows platform reade on GitHub](https://github.com/AdguardTeam/FilterListManager/blob/master/platform/windows/README_WIN.md)
+See readme for uniffi-based build [on GitHub](https://github.com/AdguardTeam/FilterListManager/blob/master/platform/windows/README_WIN.md)
+or protobuf-based [here](./src/platforms/windows/README_WIN.md)
 
 ## FFI-specific symbols
 
