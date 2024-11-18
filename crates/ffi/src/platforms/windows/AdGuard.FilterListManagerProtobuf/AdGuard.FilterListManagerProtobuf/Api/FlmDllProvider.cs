@@ -24,7 +24,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         {
             if (string.IsNullOrEmpty(flmDllName))
             {
-                throw new ArgumentNullException(nameof(flmDllName), "VPN libs dll name must be specified");
+                throw new ArgumentNullException(nameof(flmDllName), "Flm dll name must be specified");
             }
 
             m_Win32FlmDllName = $@"x86\{flmDllName}.dll";
