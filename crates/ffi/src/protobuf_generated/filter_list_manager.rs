@@ -134,8 +134,8 @@ pub struct FilterGroup {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterListRules {
     /// Associated filter id.
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
     /// List of all rules in the filter list.
     #[prost(string, repeated, tag = "2")]
     pub rules: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
@@ -146,8 +146,8 @@ pub struct FilterListRules {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterListRulesRaw {
     /// Associated filter id.
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
     /// List of all rules in the filter list as string.
     #[prost(string, tag = "2")]
     pub rules: ::prost::alloc::string::String,
@@ -158,8 +158,8 @@ pub struct FilterListRulesRaw {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DisabledRulesRaw {
     /// Associated filter id.
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
     /// List of only disabled rules as string.
     #[prost(string, tag = "2")]
     pub text: ::prost::alloc::string::String,
@@ -197,8 +197,8 @@ pub struct FilterListMetadata {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct StoredFilterMetadata {
     /// Filter list unique ID
-    #[prost(int64, tag = "1")]
-    pub id: i64,
+    #[prost(int32, tag = "1")]
+    pub id: i32,
     /// Group ID this filter list belongs to
     #[prost(int32, tag = "2")]
     pub group_id: i32,
@@ -260,8 +260,8 @@ pub struct StoredFilterMetadata {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FullFilterList {
     /// Filter list unique ID
-    #[prost(int64, tag = "1")]
-    pub id: i64,
+    #[prost(int32, tag = "1")]
+    pub id: i32,
     /// Group ID this filter list belongs to
     #[prost(int32, tag = "2")]
     pub group_id: i32,
@@ -327,8 +327,8 @@ pub struct FullFilterList {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ActiveRulesInfo {
     /// Filter id for these rules
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
     /// Group id of the filter
     #[prost(int32, tag = "2")]
     pub group_id: i32,
@@ -356,8 +356,8 @@ pub struct UpdateResult {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateFilterError {
     /// ID of that filter that couldn't be updated
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
     /// Filter error converted to a string. For debugging purposes
     #[prost(string, tag = "2")]
     pub message: ::prost::alloc::string::String,
@@ -392,32 +392,32 @@ pub struct InstallCustomFilterFromStringRequest {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EnableFilterListsRequest {
-    #[prost(int64, repeated, tag = "1")]
-    pub ids: ::prost::alloc::vec::Vec<i64>,
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
     #[prost(bool, tag = "2")]
     pub is_enabled: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InstallFilterListsRequest {
-    #[prost(int64, repeated, tag = "1")]
-    pub ids: ::prost::alloc::vec::Vec<i64>,
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
     #[prost(bool, tag = "2")]
     pub is_installed: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteCustomFilterListsRequest {
-    #[prost(int64, repeated, tag = "1")]
-    pub ids: ::prost::alloc::vec::Vec<i64>,
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct GetFullFilterListByIdRequest {
-    #[prost(int64, tag = "1")]
-    pub id: i64,
+    #[prost(int32, tag = "1")]
+    pub id: i32,
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct GetStoredFiltersMetadataByIdRequest {
-    #[prost(int64, tag = "1")]
-    pub id: i64,
+    #[prost(int32, tag = "1")]
+    pub id: i32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SaveCustomFilterRulesRequest {
@@ -426,8 +426,8 @@ pub struct SaveCustomFilterRulesRequest {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SaveDisabledRulesRequest {
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
     #[prost(string, repeated, tag = "2")]
     pub disabled_rules: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
@@ -442,8 +442,8 @@ pub struct UpdateFiltersRequest {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ForceUpdateFiltersByIdsRequest {
-    #[prost(int64, repeated, tag = "1")]
-    pub ids: ::prost::alloc::vec::Vec<i64>,
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
     #[prost(int32, tag = "2")]
     pub loose_timeout: i32,
 }
@@ -459,8 +459,8 @@ pub struct ChangeLocaleRequest {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateCustomFilterMetadataRequest {
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
     #[prost(string, tag = "2")]
     pub title: ::prost::alloc::string::String,
     #[prost(bool, tag = "3")]
@@ -468,20 +468,20 @@ pub struct UpdateCustomFilterMetadataRequest {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetFilterRulesAsStringsRequest {
-    #[prost(int64, repeated, tag = "1")]
-    pub ids: ::prost::alloc::vec::Vec<i64>,
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SaveRulesToFileBlobRequest {
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
     #[prost(string, tag = "2")]
     pub file_path: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDisabledRulesRequest {
-    #[prost(int64, repeated, tag = "1")]
-    pub ids: ::prost::alloc::vec::Vec<i64>,
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct EmptyRequest {}

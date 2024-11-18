@@ -7,7 +7,7 @@ import "filters.proto";
 // ActiveRulesInfo
 message ActiveRulesInfo {
   // Filter id for these rules
-  int64 filter_id = 1;
+  int32 filter_id = 1;
 
   // Group id of the filter
   int32 group_id = 2;
@@ -34,7 +34,7 @@ message UpdateResult {
 // UpdateFilterError
 message UpdateFilterError {
   // ID of that filter that couldn't be updated
-  int64 filter_id = 1;
+  int32 filter_id = 1;
 
   // Filter error converted to a string. For debugging purposes
   string message = 2;

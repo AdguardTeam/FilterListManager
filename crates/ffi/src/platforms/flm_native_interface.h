@@ -102,7 +102,7 @@ typedef struct FilterListManagerConstants {
     /**
      * Filter ID for *User rules* filter
      */
-    int64_t user_rules_id;
+    int32_t user_rules_id;
     /**
      * Group ID for special *custom filters group*
      */
@@ -115,7 +115,7 @@ typedef struct FilterListManagerConstants {
      * Smallest possible filter_id. You can safely occupy any filter with an id lower than this number.
      * The library is guaranteed to never create a filter with this id
      */
-    int64_t smallest_filter_id;
+    int32_t smallest_filter_id;
 } FilterListManagerConstants;
 
 #ifdef __cplusplus

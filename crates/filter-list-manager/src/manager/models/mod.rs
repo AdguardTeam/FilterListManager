@@ -20,4 +20,4 @@ pub use self::full_filter_list::FullFilterList;
 pub use self::update_result::UpdateResult;
 
 /// Filter list id type alias
-pub type FilterId = i64;
+pub type FilterId = i32;

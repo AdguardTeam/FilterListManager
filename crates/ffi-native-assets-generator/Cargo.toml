@@ -1,0 +1,11 @@
+[package]
+name = "ffi-native-assets-generator"
+version = "0.1.0"
+edition = "2021"
+homepage.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[dependencies]
+prost-build = "0.13.3"
+cbindgen = "0.27.0"

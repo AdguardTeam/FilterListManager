@@ -4,10 +4,10 @@ namespace flm_ffi {
 };
 
 dictionary FilterListManagerConstants {
-    i64 user_rules_id;
+    i32 user_rules_id;
     i32 custom_group_id;
     i32 special_group_id;
-    i64 smallest_filter_id;
+    i32 smallest_filter_id;
 };
 
 dictionary FilterGroup {
@@ -17,7 +17,7 @@ dictionary FilterGroup {
 };
 
 dictionary DisabledRulesRaw {
-    i64 filter_id;
+    i32 filter_id;
     string text;
 };
 
@@ -34,7 +34,7 @@ dictionary FilterListMetadata {
 };
 
 dictionary FilterListRules {
-    i64 filter_id;
+    i32 filter_id;
     sequence<string> rules;
     sequence<string> disabled_rules;
 };
@@ -45,7 +45,7 @@ dictionary FilterTag {
 };
 
 dictionary FullFilterList {
-    i64 id;
+    i32 id;
     i32 group_id;
     i64 time_updated;
     i64 last_download_time;
@@ -69,7 +69,7 @@ dictionary FullFilterList {
 };
 
 dictionary StoredFilterMetadata {
-    i64 id;
+    i32 id;
     i32 group_id;
     i64 time_updated;
     i64 last_download_time;
@@ -92,20 +92,20 @@ dictionary StoredFilterMetadata {
 };
 
 dictionary ActiveRulesInfo {
-    i64 filter_id;
+    i32 filter_id;
     i32 group_id;
     boolean is_trusted;
     sequence<string> rules;
 };
 
 dictionary FilterListRulesRaw {
-    i64 filter_id;
+    i32 filter_id;
     string rules;
     string disabled_rules;
 };
 
 dictionary UpdateFilterError {
-    i64 filter_id;
+    i32 filter_id;
     string message;
 };
 
@@ -161,34 +161,34 @@ interface FilterListManager {
     FullFilterList install_custom_filter_list(string download_url, boolean is_trusted, string? title, string? description);
 
     [Throws=AGOuterError]
-    i64 enable_filter_lists(sequence<i64> ids, boolean is_enabled);
+    i64 enable_filter_lists(sequence<i32> ids, boolean is_enabled);
 
     [Throws=AGOuterError]
-    i64 install_filter_lists(sequence<i64> ids, boolean is_installed);
+    i64 install_filter_lists(sequence<i32> ids, boolean is_installed);
 
     [Throws=AGOuterError]
-    i64 delete_custom_filter_lists(sequence<i64> ids);
+    i64 delete_custom_filter_lists(sequence<i32> ids);
 
     [Throws=AGOuterError]
-    FullFilterList? get_full_filter_list_by_id(i64 id);
+    FullFilterList? get_full_filter_list_by_id(i32 id);
 
     [Throws=AGOuterError]
     sequence<StoredFilterMetadata> get_stored_filters_metadata();
 
     [Throws=AGOuterError]
-    StoredFilterMetadata? get_stored_filters_metadata_by_id(i64 id);
+    StoredFilterMetadata? get_stored_filters_metadata_by_id(i32 id);
 
     [Throws=AGOuterError]
     void save_custom_filter_rules(FilterListRules rules);
 
     [Throws=AGOuterError]
-    void save_disabled_rules(i64 filter_id, sequence<string> disabled_rules);
+    void save_disabled_rules(i32 filter_id, sequence<string> disabled_rules);
 
     [Throws=AGOuterError]
     UpdateResult? update_filters(boolean ignore_filters_expiration, i32 loose_timeout, boolean ignore_filters_status);
 
     [Throws=AGOuterError]
-    UpdateResult? force_update_filters_by_ids(sequence<i64> ids, i32 loose_timeout);
+    UpdateResult? force_update_filters_by_ids(sequence<i32> ids, i32 loose_timeout);
 
     [Throws=AGOuterError]
     FilterListMetadata fetch_filter_list_metadata(string url);
@@ -209,7 +209,7 @@ interface FilterListManager {
     void pull_metadata();
 
     [Throws=AGOuterError]
-    boolean update_custom_filter_metadata(i64 filter_id, string title, boolean is_trusted);
+    boolean update_custom_filter_metadata(i32 filter_id, string title, boolean is_trusted);
 
     [Throws=AGOuterError]
     string get_database_path();
@@ -224,11 +224,11 @@ interface FilterListManager {
     sequence<ActiveRulesInfo> get_active_rules();
 
     [Throws=AGOuterError]
-    sequence<FilterListRulesRaw> get_filter_rules_as_strings(sequence<i64> ids);
+    sequence<FilterListRulesRaw> get_filter_rules_as_strings(sequence<i32> ids);
 
     [Throws=AGOuterError]
-    void save_rules_to_file_blob(i64 filter_id, string file_path);
+    void save_rules_to_file_blob(i32 filter_id, string file_path);
 
     [Throws=AGOuterError]
-    sequence<DisabledRulesRaw> get_disabled_rules(sequence<i64> ids);
+    sequence<DisabledRulesRaw> get_disabled_rules(sequence<i32> ids);
 };

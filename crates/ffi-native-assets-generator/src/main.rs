@@ -73,9 +73,8 @@ fn run_cbindgen(crate_path: PathBuf) {
 
 fn main() {
     let mut crate_path = env::current_dir().unwrap();
-    crate_path.push(file!());
-    crate_path.pop();
-    crate_path.pop();
+    crate_path.push("crates");
+    crate_path.push("ffi");
 
     run_cbindgen(crate_path.clone());
 

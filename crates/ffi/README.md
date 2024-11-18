@@ -13,7 +13,7 @@ There are currently two *POSSIBLE* ways to work with this library:
 ## How to build
 
 You may need regenerate protobuf files for rust and `flm_native_interface.h` header:\
-`cargo run -p adguard-flm-ffi --bin build-native-ffi-assets --features dev-build-native-assets`.\
+`cargo run -p ffi-native-assets-generator`.\
 It's better run this operation from the workspace root.
 
 ### Apple platforms

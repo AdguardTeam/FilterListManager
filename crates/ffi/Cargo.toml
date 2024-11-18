@@ -11,12 +11,6 @@ description = "Foreign function interface crate for filter list manager library"
 crate-type = ["cdylib", "staticlib", "rlib"]
 name = "filter_list_manager_ffi"
 
-[[bin]]
-name = "build-native-ffi-assets"
-path = "src/build_native_ffi_assets.rs"
-test = false
-doc = false
-
 [dependencies]
 adguard-flm = { path = "../filter-list-manager", version = ">=0.8.11,<1.0.0", default-features = false }
 thiserror.workspace = true

@@ -2,7 +2,7 @@
 use crate::FilterId;
 
 /// Filter ID for special filter for user rules
-pub const USER_RULES_FILTER_LIST_ID: FilterId = i32::MIN as i64;
+pub const USER_RULES_FILTER_LIST_ID: FilterId = i32::MIN;
 
 /// Group ID for custom filters
 pub const CUSTOM_FILTERS_GROUP_ID: i32 = i32::MIN;
@@ -19,7 +19,7 @@ pub const MINIMUM_CUSTOM_FILTER_ID: FilterId = -1_000_000_000;
 /// Smallest possible filter id value. -2^53
 /// You can safely occupy any filter with an id lower than this number.
 /// The library is guaranteed to never create a filter with this id.
-pub const SMALLEST_POSSIBLE_FILTER_ID: FilterId = -9007199254740992;
+pub const SMALLEST_POSSIBLE_FILTER_ID: FilterId = -2_000_000_000;
 
 /// Database filename for [`crate::FilterListType::STANDARD`]
 pub const STANDARD_FILTERS_DATABASE_FILENAME: &str = "agflm_standard.db";
