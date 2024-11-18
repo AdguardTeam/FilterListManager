@@ -26,25 +26,25 @@ message InstallCustomFilterFromStringRequest {
 }
 
 message EnableFilterListsRequest {
-  repeated int64 ids = 1;
+  repeated int32 ids = 1;
   bool is_enabled = 2;
 }
 
 message InstallFilterListsRequest {
-  repeated int64 ids = 1;
+  repeated int32 ids = 1;
   bool is_installed = 2;
 }
 
 message DeleteCustomFilterListsRequest {
-  repeated int64 ids = 1;
+  repeated int32 ids = 1;
 }
 
 message GetFullFilterListByIdRequest {
-  int64 id = 1;
+  int32 id = 1;
 }
 
 message GetStoredFiltersMetadataByIdRequest {
-  int64 id = 1;
+  int32 id = 1;
 }
 
 message SaveCustomFilterRulesRequest {
@@ -52,7 +52,7 @@ message SaveCustomFilterRulesRequest {
 }
 
 message SaveDisabledRulesRequest {
-  int64 filter_id = 1;
+  int32 filter_id = 1;
   repeated string disabled_rules = 2;
 }
 
@@ -63,7 +63,7 @@ message UpdateFiltersRequest {
 }
 
 message ForceUpdateFiltersByIdsRequest {
-  repeated int64 ids = 1;
+  repeated int32 ids = 1;
   int32 loose_timeout = 2;
 }
 
@@ -76,22 +76,22 @@ message ChangeLocaleRequest {
 }
 
 message UpdateCustomFilterMetadataRequest {
-  int64 filter_id = 1;
+  int32 filter_id = 1;
   string title = 2;
   bool is_trusted = 3;
 }
 
 message GetFilterRulesAsStringsRequest {
-  repeated int64 ids = 1;
+  repeated int32 ids = 1;
 }
 
 message SaveRulesToFileBlobRequest {
-  int64 filter_id = 1;
+  int32 filter_id = 1;
   string file_path = 2;
 }
 
 message GetDisabledRulesRequest {
-  repeated int64 ids = 1;
+  repeated int32 ids = 1;
 }
 
 message EmptyRequest {}

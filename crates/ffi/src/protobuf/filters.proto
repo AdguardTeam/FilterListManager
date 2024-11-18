@@ -23,7 +23,7 @@ message FilterGroup {
 
 message FilterListRules {
   // Associated filter id.
-  int64 filter_id = 1;
+  int32 filter_id = 1;
 
   // List of all rules in the filter list.
   repeated string rules = 2;
@@ -34,7 +34,7 @@ message FilterListRules {
 
 message FilterListRulesRaw {
   // Associated filter id.
-  int64 filter_id = 1;
+  int32 filter_id = 1;
 
   // List of all rules in the filter list as string.
   string rules = 2;
@@ -45,7 +45,7 @@ message FilterListRulesRaw {
 
 message DisabledRulesRaw {
   // Associated filter id.
-  int64 filter_id = 1;
+  int32 filter_id = 1;
 
   // List of only disabled rules as string.
   string text = 2;
@@ -82,7 +82,7 @@ message FilterListMetadata {
 
 message StoredFilterMetadata {
   // Filter list unique ID
-  int64 id = 1;
+  int32 id = 1;
 
   // Group ID this filter list belongs to
   int32 group_id = 2;
@@ -144,7 +144,7 @@ message StoredFilterMetadata {
 
 message FullFilterList {
   // Filter list unique ID
-  int64 id = 1;
+  int32 id = 1;
 
   // Group ID this filter list belongs to
   int32 group_id = 2;

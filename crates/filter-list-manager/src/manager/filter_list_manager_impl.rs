@@ -774,7 +774,7 @@ impl FilterListManager for FilterListManagerImpl {
                 let (disabled_rules, blob) = rules_repository
                     .get_blob_handle_and_disabled_rules(&connection, filter_id)
                     .map_err(|why| match why {
-                        Error::QueryReturnedNoRows => FLMError::EntityNotFound(filter_id),
+                        Error::QueryReturnedNoRows => FLMError::EntityNotFound(filter_id as i64),
                         err => FLMError::from_database(err),
                     })?;
 
@@ -1318,7 +1318,7 @@ mod tests {
     #[test]
     fn test_get_filter_rules_as_strings() {
         const TEST_FILTERS_AMOUNT: usize = 3;
-        const NONEXISTENT_ID: FilterId = 9_450_000_123_456;
+        const NONEXISTENT_ID: FilterId = 450_123_456;
 
         do_with_tests_helper(|mut helper| {
             helper.increment_postfix();
