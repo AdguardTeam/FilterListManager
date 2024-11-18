@@ -3,6 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace AdGuard.FilterListManagerProtobuf.RustInterface
 {
+    /// <summary>
+    /// Container for rust-formed responses into external world
+    /// UNSAFE: You must manually control the release of any types folded into the “response”
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     internal struct RustResponse
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using AdGuard.FilterListManagerProtobuf.Api;
 using AdGuard.Utils.Base.Interop;
 using FilterListManager;
 using Google.Protobuf;
@@ -34,7 +35,7 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
             }
         }
 
-        internal static byte[] CallRust(IntPtr flmHandle, FFIMethod method, byte[] args)
+        internal static byte[] CallRust(IntPtr flmHandle, FfiMethod method, byte[] args)
         {
             IntPtr pArgs = IntPtr.Zero;
             try
@@ -73,7 +74,7 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
                 }
                 
                 AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(resultDataBytes);
-                throw new AGOuterException(error);
+                throw new AgOuterException(error);
             }
             finally
             {

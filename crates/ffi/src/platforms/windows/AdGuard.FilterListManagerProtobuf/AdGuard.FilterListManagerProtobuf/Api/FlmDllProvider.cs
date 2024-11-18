@@ -4,7 +4,7 @@ using System.IO;
 using AdGuard.Utils.Base.DllProvider;
 using AdGuard.Utils.Base.DriverInstaller;
 
-namespace AdGuard.FilterListManagerProtobuf
+namespace AdGuard.FilterListManagerProtobuf.Api
 {
     /// <summary>
     /// Class for defining the required FLM libs dll

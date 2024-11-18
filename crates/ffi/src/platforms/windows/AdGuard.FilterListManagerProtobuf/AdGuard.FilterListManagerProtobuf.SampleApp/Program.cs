@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AdGuard.FilterListManagerProtobuf.Api;
 using AdGuard.FilterListManagerProtobuf.Utils;
 using AdGuard.Utils.Base.Files;
 using AdGuard.Utils.Base.Logging;
@@ -20,11 +21,11 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
             Logger.Level = LogLevel.Trace;
             FlmDllProvider.SetVpnLibsDllName(Constants.FLM_DLL_NAME);
             FlmDllProvider _ = (FlmDllProvider)FlmDllProvider.Instance;
-            Configuration configuration = FilterListManager.SpawnDefaultConfiguration();
+            Configuration configuration = Api.FilterListManager.SpawnDefaultConfiguration();
             configuration.MetadataUrl = "https://filters.adtidy.org/extension/safari/filters.json";
             configuration.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
             ISerializer<byte[]> serializer = new ProtobufSerializer();
-            using (IFilterListManager flm = new FilterListManager(configuration, serializer))
+            using (IFilterListManager flm = new Api.FilterListManager(configuration, serializer))
             {
                 flm.PullMetadata();
                 flm.UpdateFilters(false, 0, false);

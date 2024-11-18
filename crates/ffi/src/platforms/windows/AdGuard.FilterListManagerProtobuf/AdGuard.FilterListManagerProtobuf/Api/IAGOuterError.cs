@@ -1,6 +1,6 @@
 using FilterListManager;
 
-namespace AdGuard.FilterListManagerProtobuf.ProtobufGeneratedImpl
+namespace AdGuard.FilterListManagerProtobuf.Api
 {
     /// <summary>
     /// Interface for proto-object contained <see cref="Error"/>

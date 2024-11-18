@@ -1,10 +1,15 @@
 // ReSharper disable CheckNamespace
 
-using AdGuard.FilterListManagerProtobuf.ProtobufGeneratedImpl;
+using AdGuard.FilterListManagerProtobuf.Api;
+
+// ReSharper disable ClassNeverInstantiated.Global
 
 
 namespace FilterListManager
 {
+    // Partial classed below have the only purpose to allow inheritance from IAGOuterError
+    // in order to gentle handle in generic manner in CallRust method
+
     public partial class InstallCustomFilterListResponse : IAGOuterError
     {
     }

@@ -1,15 +1,14 @@
 ﻿using System;
-using FilterListManager;
-using AdGuard.FilterListManagerProtobuf.RustInterface;
-using Google.Protobuf;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using AdGuard.FilterListManagerProtobuf.ProtobufGeneratedImpl;
+using AdGuard.FilterListManagerProtobuf.RustInterface;
 using AdGuard.Utils.Base.Logging;
 using AdGuard.Utils.Serializers;
+using FilterListManager;
+using Google.Protobuf;
 
-namespace AdGuard.FilterListManagerProtobuf
+namespace AdGuard.FilterListManagerProtobuf.Api
 {
     public class FilterListManager : IFilterListManager
     {
@@ -34,7 +33,10 @@ namespace AdGuard.FilterListManagerProtobuf
         }
 
         #region IFilterListManager members
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public FullFilterList InstallCustomFilterList(
             string downloadUrl,
             bool isTrusted,
@@ -55,7 +57,10 @@ namespace AdGuard.FilterListManagerProtobuf
                 CallRust<InstallCustomFilterListResponse>(request);
             return response.FilterList;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public long EnableFilterLists(IEnumerable<long> ids, bool isEnabled) 
         {
             EnableFilterListsRequest request = new EnableFilterListsRequest
@@ -67,7 +72,10 @@ namespace AdGuard.FilterListManagerProtobuf
             EnableFilterListsResponse response = CallRust<EnableFilterListsResponse>(request);
             return response.Count;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public long InstallFilterLists(IEnumerable<long> ids, bool isInstalled)
         {
             InstallFilterListsRequest request = new InstallFilterListsRequest
@@ -80,7 +88,10 @@ namespace AdGuard.FilterListManagerProtobuf
                 CallRust<InstallFilterListsResponse>(request);
             return response.Count;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public long DeleteCustomFilterLists(IEnumerable<long> ids)
         {
             DeleteCustomFilterListsRequest request = new DeleteCustomFilterListsRequest();
@@ -89,7 +100,10 @@ namespace AdGuard.FilterListManagerProtobuf
                 CallRust<DeleteCustomFilterListsResponse>(request);
             return response.Count;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public FullFilterList GetFullFilterListById(long filterId)
         {
             GetFullFilterListByIdRequest request = new GetFullFilterListByIdRequest
@@ -100,7 +114,10 @@ namespace AdGuard.FilterListManagerProtobuf
             GetFullFilterListByIdResponse response = CallRust<GetFullFilterListByIdResponse>(request);
             return response.FilterList;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public IEnumerable<StoredFilterMetadata> GetStoredFiltersMetadata()
         {
             EmptyRequest request = new EmptyRequest();
@@ -108,7 +125,10 @@ namespace AdGuard.FilterListManagerProtobuf
                 CallRust<GetStoredFiltersMetadataResponse>(request);
             return response.FilterLists;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public StoredFilterMetadata GetStoredFilterMetadataById(long filterId)
         {
             GetStoredFiltersMetadataByIdRequest request = new GetStoredFiltersMetadataByIdRequest
@@ -120,7 +140,10 @@ namespace AdGuard.FilterListManagerProtobuf
                 CallRust<GetStoredFilterMetadataByIdResponse>(request);
             return response.FilterList;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void SaveCustomFilterRules(FilterListRules rules)
         {
             SaveCustomFilterRulesRequest request = new SaveCustomFilterRulesRequest
@@ -130,7 +153,10 @@ namespace AdGuard.FilterListManagerProtobuf
 
             CallRust<EmptyResponse>(request);
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void SaveDisabledRules(long filterId, IEnumerable<string> disabledRules)
         {
             SaveDisabledRulesRequest request = new SaveDisabledRulesRequest
@@ -141,7 +167,10 @@ namespace AdGuard.FilterListManagerProtobuf
             request.DisabledRules.AddRange(disabledRules);
             CallRust<EmptyResponse>(request);
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public UpdateResult UpdateFilters(
             bool ignoreFiltersExpiration,
             int looseTimeout,
@@ -157,7 +186,10 @@ namespace AdGuard.FilterListManagerProtobuf
             UpdateFiltersResponse response = CallRust<UpdateFiltersResponse>(request);
             return response.Result;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public UpdateResult ForceUpdateFiltersByIds(IEnumerable<long> filterIds, int looseTimeout)
         {
             ForceUpdateFiltersByIdsRequest request = new ForceUpdateFiltersByIdsRequest
@@ -170,7 +202,10 @@ namespace AdGuard.FilterListManagerProtobuf
                 CallRust<ForceUpdateFiltersByIdsResponse>(request);
             return response.Result;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public FilterListMetadata FetchFilterListMetadata(string url)
         {
             FetchFilterListMetadataRequest request = new FetchFilterListMetadataRequest
@@ -182,27 +217,39 @@ namespace AdGuard.FilterListManagerProtobuf
                 CallRust<FetchFilterListMetadataResponse>(request);
             return response.Metadata;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void LiftUpDatabase()
         {
             EmptyRequest request = new EmptyRequest();
             CallRust<EmptyResponse>(request);
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public IEnumerable<FilterTag> GetAllTags()
         {
             EmptyRequest request = new EmptyRequest();
             GetAllTagsResponse response = CallRust<GetAllTagsResponse>(request);
             return response.Tags;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public IEnumerable<FilterGroup> GetAllGroups()
         {
             EmptyRequest request = new EmptyRequest();
             GetAllGroupsResponse response = CallRust<GetAllGroupsResponse>(request);
             return response.Groups;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public bool ChangeLocale(string suggestedLocale)
         {
             ChangeLocaleRequest request = new ChangeLocaleRequest
@@ -213,13 +260,19 @@ namespace AdGuard.FilterListManagerProtobuf
             ChangeLocaleResponse response = CallRust<ChangeLocaleResponse>(request);
             return response.Success;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void PullMetadata()
         {
             EmptyRequest request = new EmptyRequest();
             CallRust<EmptyResponse>(request);
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public bool UpdateCustomFilterMetadata(long filterId, string title, bool isTrusted)
         {
             UpdateCustomFilterMetadataRequest request = new UpdateCustomFilterMetadataRequest
@@ -232,21 +285,30 @@ namespace AdGuard.FilterListManagerProtobuf
             UpdateCustomFilterMetadataResponse response = CallRust<UpdateCustomFilterMetadataResponse>(request);
             return response.Success;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public string GetDatabasePath()
         {
             EmptyRequest request = new EmptyRequest();
             GetDatabasePathResponse response = CallRust<GetDatabasePathResponse>(request);
             return response.Path;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public int GetDatabaseVersion()
         {
             EmptyRequest request = new EmptyRequest();
             GetDatabaseVersionResponse response = CallRust<GetDatabaseVersionResponse>(request);
             return response.Version;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public FullFilterList InstallCustomFilterFromString(
             string downloadUrl, 
             long lastDownloadTime, 
@@ -272,14 +334,20 @@ namespace AdGuard.FilterListManagerProtobuf
             InstallCustomFilterFromStringResponse response = CallRust<InstallCustomFilterFromStringResponse>(request);
             return response.FilterList;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public IEnumerable<ActiveRulesInfo> GetActiveRules()
         {
             EmptyRequest request = new EmptyRequest();
             GetActiveRulesResponse response = CallRust<GetActiveRulesResponse>(request);
             return response.Rules;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public IEnumerable<FilterListRulesRaw> GetFilterRulesAsStrings(IEnumerable<long> filterIds)
         {
             GetFilterRulesAsStringsRequest request = new GetFilterRulesAsStringsRequest();
@@ -287,7 +355,10 @@ namespace AdGuard.FilterListManagerProtobuf
             GetFilterRulesAsStringsResponse response = CallRust<GetFilterRulesAsStringsResponse>(request);
             return response.RulesList;
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void SaveRulesToFileBlob(long filterId, string filePath)
         {
             SaveRulesToFileBlobRequest request = new SaveRulesToFileBlobRequest
@@ -297,7 +368,10 @@ namespace AdGuard.FilterListManagerProtobuf
             };
             CallRust<EmptyResponse>(request);
         }
-
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public IEnumerable<DisabledRulesRaw> GetDisabledRules(IEnumerable<long> filterIds)
         {
             GetDisabledRulesRequest request = new GetDisabledRulesRequest();
@@ -316,21 +390,21 @@ namespace AdGuard.FilterListManagerProtobuf
             [CallerMemberName] string methodName = null) 
             where TMessage : IMessage, IAGOuterError
         {
-            FFIMethod method = GetMethod(methodName);
+            FfiMethod method = GetMethod(methodName);
             byte[] args = message.ToByteArray();
             byte[] data = ProtobufBridge.CallRust(m_FLMHandle, method, args);
             TMessage response = m_Serializer.DeserializeObject<TMessage>(data);
             if (response.Error != null)
             {
-                throw new AGOuterException(response.Error);
+                throw new AgOuterException(response.Error);
             }
 
             return response;
         }
 
-        private FFIMethod GetMethod(string methodName)
+        private FfiMethod GetMethod(string methodName)
         {
-            if (Enum.TryParse(methodName, out FFIMethod method))
+            if (Enum.TryParse(methodName, out FfiMethod method))
             {
                 Logger.Verbose("Parsed method: {0}->{1}", 
                     methodName,

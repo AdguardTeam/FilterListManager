@@ -74,12 +74,13 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="AGOuterException.cs" />
-    <Compile Include="FilterListManager.cs" />
-    <Compile Include="IFilterListManager.cs" />
+    <Compile Include="Api\AGOuterException.cs" />
+    <Compile Include="Api\FilterListManager.cs" />
+    <Compile Include="Api\FlmDllProvider.cs" />
+    <Compile Include="Api\IAGOuterError.cs" />
+    <Compile Include="Api\IFilterListManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProtobufGeneratedImpl\FlmInterface.cs" />
-    <Compile Include="ProtobufGeneratedImpl\IAGOuterError.cs" />
     <Compile Include="ProtobufGenerated\Configuration.cs" />
     <Compile Include="ProtobufGenerated\Filters.cs" />
     <Compile Include="ProtobufGenerated\FlmInterface.cs" />
@@ -91,7 +92,6 @@
     <Compile Include="RustInterface\RustResponse.cs" />
     <Compile Include="RustInterface\RustResponseType.cs" />
     <Compile Include="Utils\Constants.cs" />
-    <Compile Include="FlmDllProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

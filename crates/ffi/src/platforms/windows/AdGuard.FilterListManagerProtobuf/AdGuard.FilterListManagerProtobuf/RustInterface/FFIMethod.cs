@@ -1,6 +1,6 @@
 ﻿namespace AdGuard.FilterListManagerProtobuf.RustInterface
 {
-    public enum FFIMethod
+    internal enum FfiMethod
     {
         InstallCustomFilterList,
         EnableFilterLists,
