@@ -25,7 +25,7 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
         /**
          * UNSAFE: There can be many different pointer types
          */
-        internal IntPtr ResultData;
+        internal IntPtr PResultData;
         
         /**
          * Special response case:
@@ -38,6 +38,7 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
         /**
          * Data type discriminant
          */
+        [MarshalAs(UnmanagedType.I4)]
         internal RustResponseType Discriminant;
     }
 }
