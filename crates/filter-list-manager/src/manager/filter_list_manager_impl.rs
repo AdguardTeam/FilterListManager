@@ -294,10 +294,6 @@ impl FilterListManager for FilterListManagerImpl {
         })
     }
 
-    fn get_full_filter_lists(&self) -> FLMResult<Vec<FullFilterList>> {
-        self.get_full_filter_lists_internal(None)
-    }
-
     fn get_full_filter_list_by_id(&self, filter_id: FilterId) -> FLMResult<Option<FullFilterList>> {
         let mut vec = self.get_full_filter_lists_internal(Some(SQLOperator::FieldEqualValue(
             "filter_id",
@@ -1196,7 +1192,7 @@ mod tests {
 
         let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
         let list_ids = flm
-            .get_full_filter_lists()
+            .get_full_filter_lists_internal(None)
             .unwrap()
             .into_iter()
             .map(|f| f.id)
@@ -1310,7 +1306,7 @@ mod tests {
 
         let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
-        let lists = flm.get_full_filter_lists().unwrap();
+        let lists = flm.get_full_filter_lists_internal(None).unwrap();
 
         assert!(lists.len() > 0);
     }

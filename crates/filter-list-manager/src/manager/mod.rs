@@ -83,10 +83,6 @@ pub trait FilterListManager {
     /// Gets all groups from DB.
     fn get_all_groups(&self) -> FLMResult<Vec<FilterGroup>>;
 
-    /// Returns all filters data including its rules. Fields [`title`, `description`] will be
-    /// localised with selected [`Locale`].
-    fn get_full_filter_lists(&self) -> FLMResult<Vec<FullFilterList>>;
-
     /// Returns all filter data including its rules by [`FilterId`]. Fields [`title`, `description`] will be
     /// localised with selected [`Locale`].
     fn get_full_filter_list_by_id(&self, filter_id: FilterId) -> FLMResult<Option<FullFilterList>>;

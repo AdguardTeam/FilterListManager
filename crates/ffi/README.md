@@ -40,6 +40,7 @@ Look at these symbols for better understanding FFI interface.
 ### Protobuf interface
 
 [Native interface source](./src/native_interface/mod.rs)
+[C Header source](./src/platforms/flm_native_interface.h)
 
 ### Functions
 

@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- `FilterId` type changed from `i64` to `i32`
+
+### Fixed
+- `get_database_path` returns the absolute path to the database, even if a relative path was specified in the configuration
+
+### Removed
+- `Configuration.encryption_key` key removed
+- `get_full_filter_lists` method
+
 ## [0.8.11] - 2024-11-07
 
 ### Added
