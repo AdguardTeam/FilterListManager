@@ -52,7 +52,7 @@ public enum FilterListManager_FilterListType: SwiftProtobuf.Enum {
 
 extension FilterListManager_FilterListType: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
-  public static let allCases: [FilterListManager_FilterListType] = [
+  public static var allCases: [FilterListManager_FilterListType] = [
     .standard,
     .dns,
   ]

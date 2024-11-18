@@ -27,7 +27,7 @@ public struct FilterListManager_ActiveRulesInfo {
   // methods supported on all messages.
 
   /// Filter id for these rules
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   /// Group id of the filter
   public var groupID: Int32 = 0
@@ -70,7 +70,7 @@ public struct FilterListManager_UpdateFilterError {
   // methods supported on all messages.
 
   /// ID of that filter that couldn't be updated
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   /// Filter error converted to a string. For debugging purposes
   public var message: String = String()
@@ -105,7 +105,7 @@ extension FilterListManager_ActiveRulesInfo: SwiftProtobuf.Message, SwiftProtobu
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeSingularInt32Field(value: &self.groupID) }()
       case 3: try { try decoder.decodeSingularBoolField(value: &self.isTrusted) }()
       case 4: try { try decoder.decodeRepeatedStringField(value: &self.rules) }()
@@ -116,7 +116,7 @@ extension FilterListManager_ActiveRulesInfo: SwiftProtobuf.Message, SwiftProtobu
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if self.groupID != 0 {
       try visitor.visitSingularInt32Field(value: self.groupID, fieldNumber: 2)
@@ -197,7 +197,7 @@ extension FilterListManager_UpdateFilterError: SwiftProtobuf.Message, SwiftProto
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.message) }()
       default: break
       }
@@ -206,7 +206,7 @@ extension FilterListManager_UpdateFilterError: SwiftProtobuf.Message, SwiftProto
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if !self.message.isEmpty {
       try visitor.visitSingularStringField(value: self.message, fieldNumber: 2)
