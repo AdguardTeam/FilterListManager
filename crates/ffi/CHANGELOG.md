@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [Unreleased]
+## [1.1.2] - 2024-11-18
 
 ### Added
 - Protobuf-based ffi
@@ -26,6 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Removed
 - `Configuration.encryption_key` key removed
 - `get_full_filter_lists` method
+
+[1.1.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.17...ffi-1.1.2
 
 ## [0.8.17] - 2024-11-07
 
