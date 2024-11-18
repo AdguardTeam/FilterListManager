@@ -61,7 +61,7 @@ public struct FilterListManager_FilterListRules {
   // methods supported on all messages.
 
   /// Associated filter id.
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   /// List of all rules in the filter list.
   public var rules: [String] = []
@@ -80,7 +80,7 @@ public struct FilterListManager_FilterListRulesRaw {
   // methods supported on all messages.
 
   /// Associated filter id.
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   /// List of all rules in the filter list as string.
   public var rules: String = String()
@@ -99,7 +99,7 @@ public struct FilterListManager_DisabledRulesRaw {
   // methods supported on all messages.
 
   /// Associated filter id.
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   /// List of only disabled rules as string.
   public var text: String = String()
@@ -152,7 +152,7 @@ public struct FilterListManager_StoredFilterMetadata {
   // methods supported on all messages.
 
   /// Filter list unique ID
-  public var id: Int64 {
+  public var id: Int32 {
     get {return _storage._id}
     set {_uniqueStorage()._id = newValue}
   }
@@ -284,7 +284,7 @@ public struct FilterListManager_FullFilterList {
   // methods supported on all messages.
 
   /// Filter list unique ID
-  public var id: Int64 {
+  public var id: Int32 {
     get {return _storage._id}
     set {_uniqueStorage()._id = newValue}
   }
@@ -531,7 +531,7 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeRepeatedStringField(value: &self.rules) }()
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.disabledRules) }()
       default: break
@@ -541,7 +541,7 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if !self.rules.isEmpty {
       try visitor.visitRepeatedStringField(value: self.rules, fieldNumber: 2)
@@ -575,7 +575,7 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.rules) }()
       case 3: try { try decoder.decodeSingularStringField(value: &self.disabledRules) }()
       default: break
@@ -585,7 +585,7 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if !self.rules.isEmpty {
       try visitor.visitSingularStringField(value: self.rules, fieldNumber: 2)
@@ -618,7 +618,7 @@ extension FilterListManager_DisabledRulesRaw: SwiftProtobuf.Message, SwiftProtob
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.text) }()
       default: break
       }
@@ -627,7 +627,7 @@ extension FilterListManager_DisabledRulesRaw: SwiftProtobuf.Message, SwiftProtob
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if !self.text.isEmpty {
       try visitor.visitSingularStringField(value: self.text, fieldNumber: 2)
@@ -749,7 +749,7 @@ extension FilterListManager_StoredFilterMetadata: SwiftProtobuf.Message, SwiftPr
   ]
 
   fileprivate class _StorageClass {
-    var _id: Int64 = 0
+    var _id: Int32 = 0
     var _groupID: Int32 = 0
     var _timeUpdated: Int64 = 0
     var _lastDownloadTime: Int64 = 0
@@ -813,7 +813,7 @@ extension FilterListManager_StoredFilterMetadata: SwiftProtobuf.Message, SwiftPr
         // allocates stack space for every case branch when no optimizations are
         // enabled. https://github.com/apple/swift-protobuf/issues/1034
         switch fieldNumber {
-        case 1: try { try decoder.decodeSingularInt64Field(value: &_storage._id) }()
+        case 1: try { try decoder.decodeSingularInt32Field(value: &_storage._id) }()
         case 2: try { try decoder.decodeSingularInt32Field(value: &_storage._groupID) }()
         case 3: try { try decoder.decodeSingularInt64Field(value: &_storage._timeUpdated) }()
         case 4: try { try decoder.decodeSingularInt64Field(value: &_storage._lastDownloadTime) }()
@@ -842,7 +842,7 @@ extension FilterListManager_StoredFilterMetadata: SwiftProtobuf.Message, SwiftPr
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       if _storage._id != 0 {
-        try visitor.visitSingularInt64Field(value: _storage._id, fieldNumber: 1)
+        try visitor.visitSingularInt32Field(value: _storage._id, fieldNumber: 1)
       }
       if _storage._groupID != 0 {
         try visitor.visitSingularInt32Field(value: _storage._groupID, fieldNumber: 2)
@@ -966,7 +966,7 @@ extension FilterListManager_FullFilterList: SwiftProtobuf.Message, SwiftProtobuf
   ]
 
   fileprivate class _StorageClass {
-    var _id: Int64 = 0
+    var _id: Int32 = 0
     var _groupID: Int32 = 0
     var _timeUpdated: Int64 = 0
     var _lastDownloadTime: Int64 = 0
@@ -1032,7 +1032,7 @@ extension FilterListManager_FullFilterList: SwiftProtobuf.Message, SwiftProtobuf
         // allocates stack space for every case branch when no optimizations are
         // enabled. https://github.com/apple/swift-protobuf/issues/1034
         switch fieldNumber {
-        case 1: try { try decoder.decodeSingularInt64Field(value: &_storage._id) }()
+        case 1: try { try decoder.decodeSingularInt32Field(value: &_storage._id) }()
         case 2: try { try decoder.decodeSingularInt32Field(value: &_storage._groupID) }()
         case 3: try { try decoder.decodeSingularInt64Field(value: &_storage._timeUpdated) }()
         case 4: try { try decoder.decodeSingularInt64Field(value: &_storage._lastDownloadTime) }()
@@ -1066,7 +1066,7 @@ extension FilterListManager_FullFilterList: SwiftProtobuf.Message, SwiftProtobuf
       // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
       // https://github.com/apple/swift-protobuf/issues/1182
       if _storage._id != 0 {
-        try visitor.visitSingularInt64Field(value: _storage._id, fieldNumber: 1)
+        try visitor.visitSingularInt32Field(value: _storage._id, fieldNumber: 1)
       }
       if _storage._groupID != 0 {
         try visitor.visitSingularInt32Field(value: _storage._groupID, fieldNumber: 2)

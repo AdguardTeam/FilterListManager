@@ -18,15 +18,12 @@ uniffi.workspace = true
 protobuf = "3.5.1"
 prost = "0.13.2"
 prost-types = "0.13.2"
-prost-build = { version = "0.13.2", optional = true }
-cbindgen = { version = "0.27.0", optional = true }
 enum_stringify = "0.6.0"
 
 [features]
 default = ["adguard-flm/default"]
 rusqlite-bundled = ["adguard-flm/rusqlite-bundled"]
 rustls-tls = ["adguard-flm/rustls-tls"]
-dev-build-native-assets=["prost-build", "cbindgen"]
 
 [build-dependencies]
 uniffi.workspace = true

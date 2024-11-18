@@ -33,21 +33,21 @@ public protocol FLMFacadeProtocol {
         description: String?
     ) throws -> FilterListManager_FullFilterList
 
-    func enableFilterLists(ids: [Int64], isEnabled: Bool) throws -> Int64
+    func enableFilterLists(ids: [Int32], isEnabled: Bool) throws -> Int64
 
-    func installFilterLists(ids: [Int64], isInstalled: Bool) throws -> Int64
+    func installFilterLists(ids: [Int32], isInstalled: Bool) throws -> Int64
 
-    func deleteCustomFilterLists(ids: [Int64]) throws -> Int64
+    func deleteCustomFilterLists(ids: [Int32]) throws -> Int64
 
-    func getFullFilterListsById(id: Int64) throws -> FilterListManager_FullFilterList
+    func getFullFilterListsById(id: Int32) throws -> FilterListManager_FullFilterList
 
     func getStoredFiltersMetadata() throws -> [FilterListManager_StoredFilterMetadata]
 
-    func getStoredFiltersMetadataById(id: Int64) throws -> FilterListManager_StoredFilterMetadata
+    func getStoredFiltersMetadataById(id: Int32) throws -> FilterListManager_StoredFilterMetadata
 
     func saveCustomFilterRules(rules: FilterListManager_FilterListRules) throws
 
-    func saveDisabledRules(id: Int64, disabledRules: [String]) throws
+    func saveDisabledRules(id: Int32, disabledRules: [String]) throws
 
     func updateFilters(
         ignoreFiltersExpiration: Bool,
@@ -55,7 +55,7 @@ public protocol FLMFacadeProtocol {
         ignoreFiltersStatus: Bool
     ) throws -> FilterListManager_UpdateResult
 
-    func forceUpdateFiltersByIds(ids: [Int64], looseTimeout: Int32) throws -> FilterListManager_UpdateResult
+    func forceUpdateFiltersByIds(ids: [Int32], looseTimeout: Int32) throws -> FilterListManager_UpdateResult
 
     func fetchFiltersListMetadata(url: String) throws -> FilterListManager_FilterListMetadata
 
@@ -69,7 +69,7 @@ public protocol FLMFacadeProtocol {
 
     func pullMetadata() throws
 
-    func updateCustomFilterMetadata(id: Int64, title: String, isTrusted: Bool) throws -> Bool
+    func updateCustomFilterMetadata(id: Int32, title: String, isTrusted: Bool) throws -> Bool
 
     func getDatabasePath() throws -> String
 
@@ -85,11 +85,11 @@ public protocol FLMFacadeProtocol {
         customDescription: String?
     ) throws -> FilterListManager_FullFilterList
 
-    func getFilterRulesAsStrings(ids: [Int64]) throws -> [FilterListManager_FilterListRulesRaw]
+    func getFilterRulesAsStrings(ids: [Int32]) throws -> [FilterListManager_FilterListRulesRaw]
 
-    func saveRulesToFileBlob(id: Int64, filePath: String) throws
+    func saveRulesToFileBlob(id: Int32, filePath: String) throws
 
-    func getDisabledRules(ids: [Int64]) throws -> [FilterListManager_DisabledRulesRaw]
+    func getDisabledRules(ids: [Int32]) throws -> [FilterListManager_DisabledRulesRaw]
 }
 
 /// Main FLM  facade.
@@ -183,7 +183,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.filterList
     }
 
-    public func enableFilterLists(ids: [Int64], isEnabled: Bool) throws -> Int64 {
+    public func enableFilterLists(ids: [Int32], isEnabled: Bool) throws -> Int64 {
         var message = FilterListManager_EnableFilterListsRequest()
         message.ids = ids
         message.isEnabled = isEnabled
@@ -198,7 +198,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.count
     }
 
-    public func installFilterLists(ids: [Int64], isInstalled: Bool) throws -> Int64 {
+    public func installFilterLists(ids: [Int32], isInstalled: Bool) throws -> Int64 {
         var message = FilterListManager_InstallFilterListsRequest()
         message.ids = ids
         message.isInstalled = isInstalled
@@ -213,7 +213,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.count
     }
 
-    public func deleteCustomFilterLists(ids: [Int64]) throws -> Int64 {
+    public func deleteCustomFilterLists(ids: [Int32]) throws -> Int64 {
         var message = FilterListManager_DeleteCustomFilterListsRequest()
         message.ids = ids
 
@@ -227,7 +227,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.count
     }
 
-    public func getFullFilterListsById(id: Int64) throws -> FilterListManager_FullFilterList {
+    public func getFullFilterListsById(id: Int32) throws -> FilterListManager_FullFilterList {
         var message = FilterListManager_GetFullFilterListByIdRequest()
         message.id = id
 
@@ -254,7 +254,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.filterLists
     }
 
-    public func getStoredFiltersMetadataById(id: Int64) throws -> FilterListManager_StoredFilterMetadata {
+    public func getStoredFiltersMetadataById(id: Int32) throws -> FilterListManager_StoredFilterMetadata {
         var message = FilterListManager_GetStoredFiltersMetadataByIdRequest()
         message.id = id
 
@@ -280,7 +280,7 @@ public class FLMFacade: FLMFacadeProtocol {
         }
     }
 
-    public func saveDisabledRules(id: Int64, disabledRules: [String]) throws {
+    public func saveDisabledRules(id: Int32, disabledRules: [String]) throws {
         var message = FilterListManager_SaveDisabledRulesRequest()
         message.disabledRules = disabledRules
         message.filterID = id
@@ -309,7 +309,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.result
     }
 
-    public func forceUpdateFiltersByIds(ids: [Int64], looseTimeout: Int32) throws -> FilterListManager_UpdateResult {
+    public func forceUpdateFiltersByIds(ids: [Int32], looseTimeout: Int32) throws -> FilterListManager_UpdateResult {
         var message = FilterListManager_ForceUpdateFiltersByIdsRequest()
         message.ids = ids
         message.looseTimeout = looseTimeout
@@ -400,7 +400,7 @@ public class FLMFacade: FLMFacadeProtocol {
         }
     }
 
-    public func updateCustomFilterMetadata(id: Int64, title: String, isTrusted: Bool) throws -> Bool {
+    public func updateCustomFilterMetadata(id: Int32, title: String, isTrusted: Bool) throws -> Bool {
         var message = FilterListManager_UpdateCustomFilterMetadataRequest()
         message.filterID = id
         message.title = title
@@ -475,7 +475,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.filterList
     }
 
-    public func getFilterRulesAsStrings(ids: [Int64]) throws -> [FilterListManager_FilterListRulesRaw] {
+    public func getFilterRulesAsStrings(ids: [Int32]) throws -> [FilterListManager_FilterListRulesRaw] {
         var message = FilterListManager_GetFilterRulesAsStringsRequest()
         message.ids = ids
 
@@ -489,7 +489,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.rulesList
     }
 
-    public func saveRulesToFileBlob(id: Int64, filePath: String) throws {
+    public func saveRulesToFileBlob(id: Int32, filePath: String) throws {
         var message = FilterListManager_SaveRulesToFileBlobRequest()
         message.filterID = id
         message.filePath = filePath
@@ -502,7 +502,7 @@ public class FLMFacade: FLMFacadeProtocol {
         }
     }
 
-    public func getDisabledRules(ids: [Int64]) throws -> [FilterListManager_DisabledRulesRaw] {
+    public func getDisabledRules(ids: [Int32]) throws -> [FilterListManager_DisabledRulesRaw] {
         var message = FilterListManager_GetDisabledRulesRequest()
         message.ids = ids
 

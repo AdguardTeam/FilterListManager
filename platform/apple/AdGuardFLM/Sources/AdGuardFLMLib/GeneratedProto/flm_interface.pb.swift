@@ -101,7 +101,7 @@ public struct FilterListManager_EnableFilterListsRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var ids: [Int64] = []
+  public var ids: [Int32] = []
 
   public var isEnabled: Bool = false
 
@@ -115,7 +115,7 @@ public struct FilterListManager_InstallFilterListsRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var ids: [Int64] = []
+  public var ids: [Int32] = []
 
   public var isInstalled: Bool = false
 
@@ -129,7 +129,7 @@ public struct FilterListManager_DeleteCustomFilterListsRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var ids: [Int64] = []
+  public var ids: [Int32] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -141,7 +141,7 @@ public struct FilterListManager_GetFullFilterListByIdRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var id: Int64 = 0
+  public var id: Int32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -153,7 +153,7 @@ public struct FilterListManager_GetStoredFiltersMetadataByIdRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var id: Int64 = 0
+  public var id: Int32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -186,7 +186,7 @@ public struct FilterListManager_SaveDisabledRulesRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   public var disabledRules: [String] = []
 
@@ -216,7 +216,7 @@ public struct FilterListManager_ForceUpdateFiltersByIdsRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var ids: [Int64] = []
+  public var ids: [Int32] = []
 
   public var looseTimeout: Int32 = 0
 
@@ -254,7 +254,7 @@ public struct FilterListManager_UpdateCustomFilterMetadataRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   public var title: String = String()
 
@@ -270,7 +270,7 @@ public struct FilterListManager_GetFilterRulesAsStringsRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var ids: [Int64] = []
+  public var ids: [Int32] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -282,7 +282,7 @@ public struct FilterListManager_SaveRulesToFileBlobRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   public var filePath: String = String()
 
@@ -296,7 +296,7 @@ public struct FilterListManager_GetDisabledRulesRequest {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var ids: [Int64] = []
+  public var ids: [Int32] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1043,7 +1043,7 @@ extension FilterListManager_EnableFilterListsRequest: SwiftProtobuf.Message, Swi
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedInt64Field(value: &self.ids) }()
+      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.ids) }()
       case 2: try { try decoder.decodeSingularBoolField(value: &self.isEnabled) }()
       default: break
       }
@@ -1052,7 +1052,7 @@ extension FilterListManager_EnableFilterListsRequest: SwiftProtobuf.Message, Swi
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
-      try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
+      try visitor.visitPackedInt32Field(value: self.ids, fieldNumber: 1)
     }
     if self.isEnabled != false {
       try visitor.visitSingularBoolField(value: self.isEnabled, fieldNumber: 2)
@@ -1081,7 +1081,7 @@ extension FilterListManager_InstallFilterListsRequest: SwiftProtobuf.Message, Sw
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedInt64Field(value: &self.ids) }()
+      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.ids) }()
       case 2: try { try decoder.decodeSingularBoolField(value: &self.isInstalled) }()
       default: break
       }
@@ -1090,7 +1090,7 @@ extension FilterListManager_InstallFilterListsRequest: SwiftProtobuf.Message, Sw
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
-      try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
+      try visitor.visitPackedInt32Field(value: self.ids, fieldNumber: 1)
     }
     if self.isInstalled != false {
       try visitor.visitSingularBoolField(value: self.isInstalled, fieldNumber: 2)
@@ -1118,7 +1118,7 @@ extension FilterListManager_DeleteCustomFilterListsRequest: SwiftProtobuf.Messag
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedInt64Field(value: &self.ids) }()
+      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.ids) }()
       default: break
       }
     }
@@ -1126,7 +1126,7 @@ extension FilterListManager_DeleteCustomFilterListsRequest: SwiftProtobuf.Messag
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
-      try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
+      try visitor.visitPackedInt32Field(value: self.ids, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1150,7 +1150,7 @@ extension FilterListManager_GetFullFilterListByIdRequest: SwiftProtobuf.Message,
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.id) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.id) }()
       default: break
       }
     }
@@ -1158,7 +1158,7 @@ extension FilterListManager_GetFullFilterListByIdRequest: SwiftProtobuf.Message,
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.id != 0 {
-      try visitor.visitSingularInt64Field(value: self.id, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.id, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1182,7 +1182,7 @@ extension FilterListManager_GetStoredFiltersMetadataByIdRequest: SwiftProtobuf.M
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.id) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.id) }()
       default: break
       }
     }
@@ -1190,7 +1190,7 @@ extension FilterListManager_GetStoredFiltersMetadataByIdRequest: SwiftProtobuf.M
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.id != 0 {
-      try visitor.visitSingularInt64Field(value: self.id, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.id, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1251,7 +1251,7 @@ extension FilterListManager_SaveDisabledRulesRequest: SwiftProtobuf.Message, Swi
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeRepeatedStringField(value: &self.disabledRules) }()
       default: break
       }
@@ -1260,7 +1260,7 @@ extension FilterListManager_SaveDisabledRulesRequest: SwiftProtobuf.Message, Swi
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if !self.disabledRules.isEmpty {
       try visitor.visitRepeatedStringField(value: self.disabledRules, fieldNumber: 2)
@@ -1333,7 +1333,7 @@ extension FilterListManager_ForceUpdateFiltersByIdsRequest: SwiftProtobuf.Messag
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedInt64Field(value: &self.ids) }()
+      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.ids) }()
       case 2: try { try decoder.decodeSingularInt32Field(value: &self.looseTimeout) }()
       default: break
       }
@@ -1342,7 +1342,7 @@ extension FilterListManager_ForceUpdateFiltersByIdsRequest: SwiftProtobuf.Messag
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
-      try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
+      try visitor.visitPackedInt32Field(value: self.ids, fieldNumber: 1)
     }
     if self.looseTimeout != 0 {
       try visitor.visitSingularInt32Field(value: self.looseTimeout, fieldNumber: 2)
@@ -1436,7 +1436,7 @@ extension FilterListManager_UpdateCustomFilterMetadataRequest: SwiftProtobuf.Mes
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.title) }()
       case 3: try { try decoder.decodeSingularBoolField(value: &self.isTrusted) }()
       default: break
@@ -1446,7 +1446,7 @@ extension FilterListManager_UpdateCustomFilterMetadataRequest: SwiftProtobuf.Mes
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if !self.title.isEmpty {
       try visitor.visitSingularStringField(value: self.title, fieldNumber: 2)
@@ -1478,7 +1478,7 @@ extension FilterListManager_GetFilterRulesAsStringsRequest: SwiftProtobuf.Messag
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedInt64Field(value: &self.ids) }()
+      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.ids) }()
       default: break
       }
     }
@@ -1486,7 +1486,7 @@ extension FilterListManager_GetFilterRulesAsStringsRequest: SwiftProtobuf.Messag
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
-      try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
+      try visitor.visitPackedInt32Field(value: self.ids, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1511,7 +1511,7 @@ extension FilterListManager_SaveRulesToFileBlobRequest: SwiftProtobuf.Message, S
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.filePath) }()
       default: break
       }
@@ -1520,7 +1520,7 @@ extension FilterListManager_SaveRulesToFileBlobRequest: SwiftProtobuf.Message, S
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if !self.filePath.isEmpty {
       try visitor.visitSingularStringField(value: self.filePath, fieldNumber: 2)
@@ -1548,7 +1548,7 @@ extension FilterListManager_GetDisabledRulesRequest: SwiftProtobuf.Message, Swif
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedInt64Field(value: &self.ids) }()
+      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.ids) }()
       default: break
       }
     }
@@ -1556,7 +1556,7 @@ extension FilterListManager_GetDisabledRulesRequest: SwiftProtobuf.Message, Swif
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.ids.isEmpty {
-      try visitor.visitPackedInt64Field(value: self.ids, fieldNumber: 1)
+      try visitor.visitPackedInt32Field(value: self.ids, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }

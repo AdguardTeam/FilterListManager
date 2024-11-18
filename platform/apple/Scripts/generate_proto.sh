@@ -2,7 +2,7 @@
 
 set -exf
 
-PROTO_GENERATED_PATH="platform/apple/FLMLocalPackage/Sources/AdGuardFLMLib/GeneratedProto"
+PROTO_GENERATED_PATH="platform/apple/AdGuardFLM/Sources/AdGuardFLMLib/GeneratedProto"
 
 mkdir -p $PROTO_GENERATED_PATH
 

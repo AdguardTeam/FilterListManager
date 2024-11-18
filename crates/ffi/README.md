@@ -18,7 +18,7 @@ It's better run this operation from the workspace root.
 
 ### Apple platforms
 
-If u need generate proto
+If you need to generate protobuf *.swift files:
 ```shell
 platform/apple/Scripts/generate_proto.sh
 ```
