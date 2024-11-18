@@ -19,7 +19,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
             Logger.SetCustomListener(traceListener);
             Logger.Info("Hello, I'm filter list manager");
             Logger.Level = LogLevel.Trace;
-            FlmDllProvider.SetVpnLibsDllName(Constants.FLM_DLL_NAME);
+            FlmDllProvider.SetFlmDllName(Constants.FLM_DLL_NAME);
             FlmDllProvider _ = (FlmDllProvider)FlmDllProvider.Instance;
             Configuration configuration = Api.FilterListManager.SpawnDefaultConfiguration();
             configuration.MetadataUrl = "https://filters.adtidy.org/extension/safari/filters.json";

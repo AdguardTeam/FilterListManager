@@ -20,7 +20,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// Sets the main FLM dll name
         /// </summary>
         /// <param name="flmDllName">FLM dll name</param>
-        public static void SetVpnLibsDllName(string flmDllName)
+        public static void SetFlmDllName(string flmDllName)
         {
             if (string.IsNullOrEmpty(flmDllName))
             {
