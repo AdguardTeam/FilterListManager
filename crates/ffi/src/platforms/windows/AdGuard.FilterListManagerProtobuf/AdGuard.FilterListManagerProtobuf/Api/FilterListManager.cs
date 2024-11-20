@@ -61,7 +61,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public long EnableFilterLists(IEnumerable<long> ids, bool isEnabled) 
+        public long EnableFilterLists(IEnumerable<int> ids, bool isEnabled) 
         {
             EnableFilterListsRequest request = new EnableFilterListsRequest
             {
@@ -76,7 +76,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public long InstallFilterLists(IEnumerable<long> ids, bool isInstalled)
+        public long InstallFilterLists(IEnumerable<int> ids, bool isInstalled)
         {
             InstallFilterListsRequest request = new InstallFilterListsRequest
             {
@@ -92,7 +92,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public long DeleteCustomFilterLists(IEnumerable<long> ids)
+        public long DeleteCustomFilterLists(IEnumerable<int> ids)
         {
             DeleteCustomFilterListsRequest request = new DeleteCustomFilterListsRequest();
             request.Ids.AddRange(ids);
@@ -104,7 +104,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public FullFilterList GetFullFilterListById(long filterId)
+        public FullFilterList GetFullFilterListById(int filterId)
         {
             GetFullFilterListByIdRequest request = new GetFullFilterListByIdRequest
             {
@@ -129,7 +129,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public StoredFilterMetadata GetStoredFilterMetadataById(long filterId)
+        public StoredFilterMetadata GetStoredFilterMetadataById(int filterId)
         {
             GetStoredFiltersMetadataByIdRequest request = new GetStoredFiltersMetadataByIdRequest
             {
@@ -157,7 +157,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void SaveDisabledRules(long filterId, IEnumerable<string> disabledRules)
+        public void SaveDisabledRules(int filterId, IEnumerable<string> disabledRules)
         {
             SaveDisabledRulesRequest request = new SaveDisabledRulesRequest
             {
@@ -190,7 +190,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public UpdateResult ForceUpdateFiltersByIds(IEnumerable<long> filterIds, int looseTimeout)
+        public UpdateResult ForceUpdateFiltersByIds(IEnumerable<int> filterIds, int looseTimeout)
         {
             ForceUpdateFiltersByIdsRequest request = new ForceUpdateFiltersByIdsRequest
             {
@@ -273,7 +273,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public bool UpdateCustomFilterMetadata(long filterId, string title, bool isTrusted)
+        public bool UpdateCustomFilterMetadata(int filterId, string title, bool isTrusted)
         {
             UpdateCustomFilterMetadataRequest request = new UpdateCustomFilterMetadataRequest
             {
@@ -348,7 +348,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public IEnumerable<FilterListRulesRaw> GetFilterRulesAsStrings(IEnumerable<long> filterIds)
+        public IEnumerable<FilterListRulesRaw> GetFilterRulesAsStrings(IEnumerable<int> filterIds)
         {
             GetFilterRulesAsStringsRequest request = new GetFilterRulesAsStringsRequest();
             request.Ids.AddRange(filterIds);
@@ -359,7 +359,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void SaveRulesToFileBlob(long filterId, string filePath)
+        public void SaveRulesToFileBlob(int filterId, string filePath)
         {
             SaveRulesToFileBlobRequest request = new SaveRulesToFileBlobRequest
             {
@@ -372,7 +372,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public IEnumerable<DisabledRulesRaw> GetDisabledRules(IEnumerable<long> filterIds)
+        public IEnumerable<DisabledRulesRaw> GetDisabledRules(IEnumerable<int> filterIds)
         {
             GetDisabledRulesRequest request = new GetDisabledRulesRequest();
             request.Ids.AddRange(filterIds);

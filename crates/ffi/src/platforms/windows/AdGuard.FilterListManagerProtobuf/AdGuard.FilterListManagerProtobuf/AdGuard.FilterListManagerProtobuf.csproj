@@ -81,11 +81,7 @@
     <Compile Include="Api\IFilterListManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProtobufGeneratedImpl\FlmInterface.cs" />
-    <Compile Include="ProtobufGenerated\Configuration.cs" />
-    <Compile Include="ProtobufGenerated\Filters.cs" />
-    <Compile Include="ProtobufGenerated\FlmInterface.cs" />
-    <Compile Include="ProtobufGenerated\MiscModels.cs" />
-    <Compile Include="ProtobufGenerated\OuterError.cs" />
+    <Compile Include="ProtobufGenerated\*.cs" />
     <Compile Include="RustInterface\FFIMethod.cs" />
     <Compile Include="RustInterface\ProtobufBridge.cs" />
     <Compile Include="RustInterface\ProtobufInterop.cs" />

@@ -26,12 +26,12 @@ namespace FilterListManager {
           string.Concat(
             "ChFtaXNjX21vZGVscy5wcm90bxITZmlsdGVyX2xpc3RfbWFuYWdlchoNZmls",
             "dGVycy5wcm90byJZCg9BY3RpdmVSdWxlc0luZm8SEQoJZmlsdGVyX2lkGAEg",
-            "ASgDEhAKCGdyb3VwX2lkGAIgASgFEhIKCmlzX3RydXN0ZWQYAyABKAgSDQoF",
+            "ASgFEhAKCGdyb3VwX2lkGAIgASgFEhIKCmlzX3RydXN0ZWQYAyABKAgSDQoF",
             "cnVsZXMYBCADKAkiqgEKDFVwZGF0ZVJlc3VsdBI5Cgx1cGRhdGVkX2xpc3QY",
             "ASADKAsyIy5maWx0ZXJfbGlzdF9tYW5hZ2VyLkZ1bGxGaWx0ZXJMaXN0Eh8K",
             "F3JlbWFpbmluZ19maWx0ZXJzX2NvdW50GAIgASgFEj4KDmZpbHRlcnNfZXJy",
             "b3JzGAMgAygLMiYuZmlsdGVyX2xpc3RfbWFuYWdlci5VcGRhdGVGaWx0ZXJF",
-            "cnJvciI3ChFVcGRhdGVGaWx0ZXJFcnJvchIRCglmaWx0ZXJfaWQYASABKAMS",
+            "cnJvciI3ChFVcGRhdGVGaWx0ZXJFcnJvchIRCglmaWx0ZXJfaWQYASABKAUS",
             "DwoHbWVzc2FnZRgCIAEoCWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::FilterListManager.FiltersReflection.Descriptor, },
@@ -98,13 +98,13 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "filter_id" field.</summary>
     public const int FilterIdFieldNumber = 1;
-    private long filterId_;
+    private int filterId_;
     /// <summary>
     /// Filter id for these rules
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public long FilterId {
+    public int FilterId {
       get { return filterId_; }
       set {
         filterId_ = value;
@@ -181,7 +181,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (FilterId != 0L) hash ^= FilterId.GetHashCode();
+      if (FilterId != 0) hash ^= FilterId.GetHashCode();
       if (GroupId != 0) hash ^= GroupId.GetHashCode();
       if (IsTrusted != false) hash ^= IsTrusted.GetHashCode();
       hash ^= rules_.GetHashCode();
@@ -203,9 +203,9 @@ namespace FilterListManager {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       if (GroupId != 0) {
         output.WriteRawTag(16);
@@ -226,9 +226,9 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       if (GroupId != 0) {
         output.WriteRawTag(16);
@@ -249,8 +249,8 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (FilterId != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(FilterId);
+      if (FilterId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilterId);
       }
       if (GroupId != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(GroupId);
@@ -271,7 +271,7 @@ namespace FilterListManager {
       if (other == null) {
         return;
       }
-      if (other.FilterId != 0L) {
+      if (other.FilterId != 0) {
         FilterId = other.FilterId;
       }
       if (other.GroupId != 0) {
@@ -301,7 +301,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 16: {
@@ -336,7 +336,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 16: {
@@ -671,13 +671,13 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "filter_id" field.</summary>
     public const int FilterIdFieldNumber = 1;
-    private long filterId_;
+    private int filterId_;
     /// <summary>
     /// ID of that filter that couldn't be updated
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public long FilterId {
+    public int FilterId {
       get { return filterId_; }
       set {
         filterId_ = value;
@@ -723,7 +723,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (FilterId != 0L) hash ^= FilterId.GetHashCode();
+      if (FilterId != 0) hash ^= FilterId.GetHashCode();
       if (Message.Length != 0) hash ^= Message.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -743,9 +743,9 @@ namespace FilterListManager {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       if (Message.Length != 0) {
         output.WriteRawTag(18);
@@ -761,9 +761,9 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       if (Message.Length != 0) {
         output.WriteRawTag(18);
@@ -779,8 +779,8 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (FilterId != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(FilterId);
+      if (FilterId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilterId);
       }
       if (Message.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
@@ -797,7 +797,7 @@ namespace FilterListManager {
       if (other == null) {
         return;
       }
-      if (other.FilterId != 0L) {
+      if (other.FilterId != 0) {
         FilterId = other.FilterId;
       }
       if (other.Message.Length != 0) {
@@ -823,7 +823,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 18: {
@@ -850,7 +850,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 18: {

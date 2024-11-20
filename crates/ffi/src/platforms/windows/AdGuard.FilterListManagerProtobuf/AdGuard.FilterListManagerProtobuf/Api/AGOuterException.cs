@@ -5,7 +5,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
 {
     /// <summary>
     /// Main general exception, based on
-    /// https://bit.int.agrd.dev/projects/ADGUARD-CORE-LIBS/repos/filter-list-manager/browse/crates/ffi/src/protobuf/outer_error.proto 
+    /// ../filter-list-manager/browse/crates/ffi/src/protobuf/outer_error.proto 
     /// </summary>
     public class AgOuterException: Exception
     {

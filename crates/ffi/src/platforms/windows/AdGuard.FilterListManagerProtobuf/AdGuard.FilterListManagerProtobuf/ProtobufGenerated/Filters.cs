@@ -28,15 +28,15 @@ namespace FilterListManager {
             "clRhZxIKCgJpZBgBIAEoBRIPCgdrZXl3b3JkGAIgASgJIj8KC0ZpbHRlckdy",
             "b3VwEgoKAmlkGAEgASgFEgwKBG5hbWUYAiABKAkSFgoOZGlzcGxheV9udW1i",
             "ZXIYAyABKAUiSwoPRmlsdGVyTGlzdFJ1bGVzEhEKCWZpbHRlcl9pZBgBIAEo",
-            "AxINCgVydWxlcxgCIAMoCRIWCg5kaXNhYmxlZF9ydWxlcxgDIAMoCSJOChJG",
-            "aWx0ZXJMaXN0UnVsZXNSYXcSEQoJZmlsdGVyX2lkGAEgASgDEg0KBXJ1bGVz",
+            "BRINCgVydWxlcxgCIAMoCRIWCg5kaXNhYmxlZF9ydWxlcxgDIAMoCSJOChJG",
+            "aWx0ZXJMaXN0UnVsZXNSYXcSEQoJZmlsdGVyX2lkGAEgASgFEg0KBXJ1bGVz",
             "GAIgASgJEhYKDmRpc2FibGVkX3J1bGVzGAMgASgJIjMKEERpc2FibGVkUnVs",
-            "ZXNSYXcSEQoJZmlsdGVyX2lkGAEgASgDEgwKBHRleHQYAiABKAkitgEKEkZp",
+            "ZXNSYXcSEQoJZmlsdGVyX2lkGAEgASgFEgwKBHRleHQYAiABKAkitgEKEkZp",
             "bHRlckxpc3RNZXRhZGF0YRINCgV0aXRsZRgBIAEoCRITCgtkZXNjcmlwdGlv",
             "bhgCIAEoCRIUCgx0aW1lX3VwZGF0ZWQYAyABKAkSDwoHdmVyc2lvbhgEIAEo",
             "CRIQCghob21lcGFnZRgFIAEoCRIPCgdsaWNlbnNlGAYgASgJEhAKCGNoZWNr",
             "c3VtGAcgASgJEgsKA3VybBgIIAEoCRITCgtydWxlc19jb3VudBgJIAEoBSK7",
-            "AwoUU3RvcmVkRmlsdGVyTWV0YWRhdGESCgoCaWQYASABKAMSEAoIZ3JvdXBf",
+            "AwoUU3RvcmVkRmlsdGVyTWV0YWRhdGESCgoCaWQYASABKAUSEAoIZ3JvdXBf",
             "aWQYAiABKAUSFAoMdGltZV91cGRhdGVkGAMgASgDEhoKEmxhc3RfZG93bmxv",
             "YWRfdGltZRgEIAEoAxINCgV0aXRsZRgFIAEoCRITCgtkZXNjcmlwdGlvbhgG",
             "IAEoCRIPCgd2ZXJzaW9uGAcgASgJEhYKDmRpc3BsYXlfbnVtYmVyGAggASgF",
@@ -46,7 +46,7 @@ namespace FilterListManager {
             "aXNfY3VzdG9tGA4gASgIEhIKCmlzX2VuYWJsZWQYDyABKAgSFAoMaXNfaW5z",
             "dGFsbGVkGBAgASgIEhAKCGhvbWVwYWdlGBEgASgJEg8KB2xpY2Vuc2UYEiAB",
             "KAkSEAoIY2hlY2tzdW0YEyABKAkSEQoJbGFuZ3VhZ2VzGBQgAygJIvkDCg5G",
-            "dWxsRmlsdGVyTGlzdBIKCgJpZBgBIAEoAxIQCghncm91cF9pZBgCIAEoBRIU",
+            "dWxsRmlsdGVyTGlzdBIKCgJpZBgBIAEoBRIQCghncm91cF9pZBgCIAEoBRIU",
             "Cgx0aW1lX3VwZGF0ZWQYAyABKAMSGgoSbGFzdF9kb3dubG9hZF90aW1lGAQg",
             "ASgDEg0KBXRpdGxlGAUgASgJEhMKC2Rlc2NyaXB0aW9uGAYgASgJEg8KB3Zl",
             "cnNpb24YByABKAkSFgoOZGlzcGxheV9udW1iZXIYCCABKAUSFAoMZG93bmxv",
@@ -646,13 +646,13 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "filter_id" field.</summary>
     public const int FilterIdFieldNumber = 1;
-    private long filterId_;
+    private int filterId_;
     /// <summary>
     /// Associated filter id.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public long FilterId {
+    public int FilterId {
       get { return filterId_; }
       set {
         filterId_ = value;
@@ -712,7 +712,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (FilterId != 0L) hash ^= FilterId.GetHashCode();
+      if (FilterId != 0) hash ^= FilterId.GetHashCode();
       hash ^= rules_.GetHashCode();
       hash ^= disabledRules_.GetHashCode();
       if (_unknownFields != null) {
@@ -733,9 +733,9 @@ namespace FilterListManager {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       rules_.WriteTo(output, _repeated_rules_codec);
       disabledRules_.WriteTo(output, _repeated_disabledRules_codec);
@@ -749,9 +749,9 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       rules_.WriteTo(ref output, _repeated_rules_codec);
       disabledRules_.WriteTo(ref output, _repeated_disabledRules_codec);
@@ -765,8 +765,8 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (FilterId != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(FilterId);
+      if (FilterId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilterId);
       }
       size += rules_.CalculateSize(_repeated_rules_codec);
       size += disabledRules_.CalculateSize(_repeated_disabledRules_codec);
@@ -782,7 +782,7 @@ namespace FilterListManager {
       if (other == null) {
         return;
       }
-      if (other.FilterId != 0L) {
+      if (other.FilterId != 0) {
         FilterId = other.FilterId;
       }
       rules_.Add(other.rules_);
@@ -807,7 +807,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 18: {
@@ -838,7 +838,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 18: {
@@ -905,13 +905,13 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "filter_id" field.</summary>
     public const int FilterIdFieldNumber = 1;
-    private long filterId_;
+    private int filterId_;
     /// <summary>
     /// Associated filter id.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public long FilterId {
+    public int FilterId {
       get { return filterId_; }
       set {
         filterId_ = value;
@@ -973,7 +973,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (FilterId != 0L) hash ^= FilterId.GetHashCode();
+      if (FilterId != 0) hash ^= FilterId.GetHashCode();
       if (Rules.Length != 0) hash ^= Rules.GetHashCode();
       if (DisabledRules.Length != 0) hash ^= DisabledRules.GetHashCode();
       if (_unknownFields != null) {
@@ -994,9 +994,9 @@ namespace FilterListManager {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       if (Rules.Length != 0) {
         output.WriteRawTag(18);
@@ -1016,9 +1016,9 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       if (Rules.Length != 0) {
         output.WriteRawTag(18);
@@ -1038,8 +1038,8 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (FilterId != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(FilterId);
+      if (FilterId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilterId);
       }
       if (Rules.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Rules);
@@ -1059,7 +1059,7 @@ namespace FilterListManager {
       if (other == null) {
         return;
       }
-      if (other.FilterId != 0L) {
+      if (other.FilterId != 0) {
         FilterId = other.FilterId;
       }
       if (other.Rules.Length != 0) {
@@ -1088,7 +1088,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 18: {
@@ -1119,7 +1119,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 18: {
@@ -1185,13 +1185,13 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "filter_id" field.</summary>
     public const int FilterIdFieldNumber = 1;
-    private long filterId_;
+    private int filterId_;
     /// <summary>
     /// Associated filter id.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public long FilterId {
+    public int FilterId {
       get { return filterId_; }
       set {
         filterId_ = value;
@@ -1237,7 +1237,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (FilterId != 0L) hash ^= FilterId.GetHashCode();
+      if (FilterId != 0) hash ^= FilterId.GetHashCode();
       if (Text.Length != 0) hash ^= Text.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -1257,9 +1257,9 @@ namespace FilterListManager {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       if (Text.Length != 0) {
         output.WriteRawTag(18);
@@ -1275,9 +1275,9 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (FilterId != 0L) {
+      if (FilterId != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(FilterId);
+        output.WriteInt32(FilterId);
       }
       if (Text.Length != 0) {
         output.WriteRawTag(18);
@@ -1293,8 +1293,8 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (FilterId != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(FilterId);
+      if (FilterId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilterId);
       }
       if (Text.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Text);
@@ -1311,7 +1311,7 @@ namespace FilterListManager {
       if (other == null) {
         return;
       }
-      if (other.FilterId != 0L) {
+      if (other.FilterId != 0) {
         FilterId = other.FilterId;
       }
       if (other.Text.Length != 0) {
@@ -1337,7 +1337,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 18: {
@@ -1364,7 +1364,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            FilterId = input.ReadInt64();
+            FilterId = input.ReadInt32();
             break;
           }
           case 18: {
@@ -1965,13 +1965,13 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "id" field.</summary>
     public const int IdFieldNumber = 1;
-    private long id_;
+    private int id_;
     /// <summary>
     /// Filter list unique ID
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public long Id {
+    public int Id {
       get { return id_; }
       set {
         id_ = value;
@@ -2303,7 +2303,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Id != 0L) hash ^= Id.GetHashCode();
+      if (Id != 0) hash ^= Id.GetHashCode();
       if (GroupId != 0) hash ^= GroupId.GetHashCode();
       if (TimeUpdated != 0L) hash ^= TimeUpdated.GetHashCode();
       if (LastDownloadTime != 0L) hash ^= LastDownloadTime.GetHashCode();
@@ -2341,9 +2341,9 @@ namespace FilterListManager {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Id != 0L) {
+      if (Id != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(Id);
+        output.WriteInt32(Id);
       }
       if (GroupId != 0) {
         output.WriteRawTag(16);
@@ -2425,9 +2425,9 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Id != 0L) {
+      if (Id != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(Id);
+        output.WriteInt32(Id);
       }
       if (GroupId != 0) {
         output.WriteRawTag(16);
@@ -2509,8 +2509,8 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Id != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Id);
+      if (Id != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
       }
       if (GroupId != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(GroupId);
@@ -2577,7 +2577,7 @@ namespace FilterListManager {
       if (other == null) {
         return;
       }
-      if (other.Id != 0L) {
+      if (other.Id != 0) {
         Id = other.Id;
       }
       if (other.GroupId != 0) {
@@ -2653,7 +2653,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Id = input.ReadInt64();
+            Id = input.ReadInt32();
             break;
           }
           case 16: {
@@ -2752,7 +2752,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Id = input.ReadInt64();
+            Id = input.ReadInt32();
             break;
           }
           case 16: {
@@ -2905,13 +2905,13 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "id" field.</summary>
     public const int IdFieldNumber = 1;
-    private long id_;
+    private int id_;
     /// <summary>
     /// Filter list unique ID
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public long Id {
+    public int Id {
       get { return id_; }
       set {
         id_ = value;
@@ -3259,7 +3259,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Id != 0L) hash ^= Id.GetHashCode();
+      if (Id != 0) hash ^= Id.GetHashCode();
       if (GroupId != 0) hash ^= GroupId.GetHashCode();
       if (TimeUpdated != 0L) hash ^= TimeUpdated.GetHashCode();
       if (LastDownloadTime != 0L) hash ^= LastDownloadTime.GetHashCode();
@@ -3298,9 +3298,9 @@ namespace FilterListManager {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Id != 0L) {
+      if (Id != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(Id);
+        output.WriteInt32(Id);
       }
       if (GroupId != 0) {
         output.WriteRawTag(16);
@@ -3386,9 +3386,9 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Id != 0L) {
+      if (Id != 0) {
         output.WriteRawTag(8);
-        output.WriteInt64(Id);
+        output.WriteInt32(Id);
       }
       if (GroupId != 0) {
         output.WriteRawTag(16);
@@ -3474,8 +3474,8 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Id != 0L) {
-        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Id);
+      if (Id != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
       }
       if (GroupId != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(GroupId);
@@ -3545,7 +3545,7 @@ namespace FilterListManager {
       if (other == null) {
         return;
       }
-      if (other.Id != 0L) {
+      if (other.Id != 0) {
         Id = other.Id;
       }
       if (other.GroupId != 0) {
@@ -3627,7 +3627,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Id = input.ReadInt64();
+            Id = input.ReadInt32();
             break;
           }
           case 16: {
@@ -3733,7 +3733,7 @@ namespace FilterListManager {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Id = input.ReadInt64();
+            Id = input.ReadInt32();
             break;
           }
           case 16: {

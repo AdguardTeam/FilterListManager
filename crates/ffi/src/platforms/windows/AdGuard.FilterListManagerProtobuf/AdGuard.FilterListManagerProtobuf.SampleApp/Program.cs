@@ -30,7 +30,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 flm.PullMetadata();
                 flm.UpdateFilters(false, 0, false);
                 
-                flm.EnableFilterLists(new long[] {1, 2, 255}, true);
+                flm.EnableFilterLists(new int[] {1, 2, 255}, true);
                 FullFilterList customFilter = flm.InstallCustomFilterFromString(
                     string.Empty,
                     1000000000,
@@ -41,8 +41,8 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                     "Desc");
                 bool localeResult = flm.ChangeLocale("ru_RU");
                 flm.LiftUpDatabase();
-                flm.EnableFilterLists(new long[] {1, 2, 255}, true);
-                flm.InstallFilterLists(new long[] {1, 2, 255}, true);
+                flm.EnableFilterLists(new int[] {1, 2, 255}, true);
+                flm.InstallFilterLists(new int[] {1, 2, 255}, true);
 
                 FilterListRules rules1 = new FilterListRules
                 {
@@ -63,7 +63,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 FileUtils.Touch(blobPath);
                 flm.SaveRulesToFileBlob(customFilter.Id, blobPath);
                 flm.GetFullFilterListById(customFilter.Id);
-                flm.ForceUpdateFiltersByIds(new long[] { 1, 2 }, 0);
+                flm.ForceUpdateFiltersByIds(new int[] { 1, 2 }, 0);
                 customFilter = flm.InstallCustomFilterList(
                     "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt",
                     true,

@@ -37,7 +37,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         ///
         /// Returns SQL's affected rows count.
         /// </summary>
-        long EnableFilterLists(IEnumerable<long> ids, bool isEnabled);
+        long EnableFilterLists(IEnumerable<int> ids, bool isEnabled);
         
         /// <summary>
         /// Toggles `is_installed` property of filter list.
@@ -47,7 +47,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         ///
         /// Returns SQL's affected rows count.
         /// </summary>
-        long InstallFilterLists(IEnumerable<long> ids, bool isInstalled);
+        long InstallFilterLists(IEnumerable<int> ids, bool isInstalled);
         
         /// <summary>
         /// Deletes custom filter lists, using their filter_id.
@@ -56,13 +56,13 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         ///
         /// Returns SQL's affected rows count.
         /// </summary>
-        long DeleteCustomFilterLists(IEnumerable<long> ids);
+        long DeleteCustomFilterLists(IEnumerable<int> ids);
         
         /// <summary>
         /// Returns all filter data including its rules by [`FilterId`]. Fields [`title`, `description`] will be
         /// localised with selected [`Locale`].
         /// </summary>
-        FullFilterList GetFullFilterListById(long filterId);
+        FullFilterList GetFullFilterListById(int filterId);
         
         /// <summary>
         /// Returns all stored filters metadata. This is the lightweight counterpart of `.get_full_filter_lists()`
@@ -74,7 +74,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// Returns stored filter metadata by  [`FilterId`]. This is the lightweight counterpart of `.get_full_filter_list_by_id(filter_id)`
         /// Fields [`title`, `description`] will be localised with selected [`Locale`].
         /// </summary>
-        StoredFilterMetadata GetStoredFilterMetadataById(long filterId);
+        StoredFilterMetadata GetStoredFilterMetadataById(int filterId);
         
         /// <summary>
         /// Save custom filter list rules. Note that `filter.time_updated` will be updated too.
@@ -95,7 +95,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// This because if you want to keep disabled filters, you should already
         /// have a `rules_list` entity.
         /// </summary>
-        void SaveDisabledRules(long filterId, IEnumerable<string> disabledRules);
+        void SaveDisabledRules(int filterId, IEnumerable<string> disabledRules);
         
         /// <summary>
         /// Filters updates is conducted in the multiple steps:
@@ -137,7 +137,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// * `loose_timeout` - See [`FilterListManager::update_filters`]
         ///   `loose_timeout` parameter for explanation.
         /// </summary>
-        UpdateResult ForceUpdateFiltersByIds(IEnumerable<long> filterIds, int looseTimeout);
+        UpdateResult ForceUpdateFiltersByIds(IEnumerable<int> filterIds, int looseTimeout);
         
         /// <summary>
         /// Fetches filter list by url and returns its raw metadata.
@@ -247,7 +247,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// Fails if manager couldn't find a filter by `filter_id` or if `filter_id`
         /// is not from a custom filter. Fails if title is empty.
         /// </summary>
-        bool UpdateCustomFilterMetadata(long filterId, string title, bool isTrusted);
+        bool UpdateCustomFilterMetadata(int filterId, string title, bool isTrusted);
         
         /// <summary>
         /// Gets absolute path for current database.
@@ -307,7 +307,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         ///
         /// This method acts in the same way as the `IN` database operator. Only found entities will be returned
         /// </summary>
-        IEnumerable<FilterListRulesRaw> GetFilterRulesAsStrings(IEnumerable<long> filterIds);
+        IEnumerable<FilterListRulesRaw> GetFilterRulesAsStrings(IEnumerable<int> filterIds);
         
         /// <summary>
         /// Reads the rule list for a specific filter in chunks, applying exceptions from the disabled_rules list on the fly.
@@ -318,11 +318,11 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         ///
         /// May return [`crate::FLMError::EntityNotFound()`] with [`FilterId`] if rule list is not found for such id
         /// </summary>
-        void SaveRulesToFileBlob(long filterId, string filePath);
+        void SaveRulesToFileBlob(int filterId, string filePath);
         
         /// <summary>
         /// Returns lists of disabled rules by list of filter IDs
         /// </summary>
-        IEnumerable<DisabledRulesRaw> GetDisabledRules(IEnumerable<long> filterIds);
+        IEnumerable<DisabledRulesRaw> GetDisabledRules(IEnumerable<int> filterIds);
     }
 }
