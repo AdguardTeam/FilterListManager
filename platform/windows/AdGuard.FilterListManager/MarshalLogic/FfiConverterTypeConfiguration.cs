@@ -14,7 +14,6 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 compilerConditionalConstants: FfiConverterOptionalSequenceString.Instance.Read(stream),
                 metadataUrl: FfiConverterString.Instance.Read(stream),
                 metadataLocalesUrl: FfiConverterString.Instance.Read(stream),
-                encryptionKey: FfiConverterOptionalString.Instance.Read(stream),
                 requestTimeoutMs: FfiConverterInt32.Instance.Read(stream),
                 autoLiftUpDatabase: FfiConverterBoolean.Instance.Read(stream)
             );
@@ -31,7 +30,6 @@ namespace AdGuard.FilterListManager.MarshalLogic
                    )
                    + FfiConverterString.Instance.AllocationSize(value.MetadataUrl)
                    + FfiConverterString.Instance.AllocationSize(value.MetadataLocalesUrl)
-                   + FfiConverterOptionalString.Instance.AllocationSize(value.EncryptionKey)
                    + FfiConverterInt32.Instance.AllocationSize(value.RequestTimeoutMs) +
                    FfiConverterBoolean.Instance.AllocationSize(value.AutoLiftUpDatabase);
         }
@@ -48,7 +46,6 @@ namespace AdGuard.FilterListManager.MarshalLogic
             );
             FfiConverterString.Instance.Write(value.MetadataUrl, stream);
             FfiConverterString.Instance.Write(value.MetadataLocalesUrl, stream);
-            FfiConverterOptionalString.Instance.Write(value.EncryptionKey, stream);
             FfiConverterInt32.Instance.Write(value.RequestTimeoutMs, stream);
             FfiConverterBoolean.Instance.Write(value.AutoLiftUpDatabase, stream);
         }

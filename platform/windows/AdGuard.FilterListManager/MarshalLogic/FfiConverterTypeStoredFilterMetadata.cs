@@ -7,7 +7,7 @@
         public override StoredFilterMetadata Read(BigEndianStream stream)
         {
             return new StoredFilterMetadata(
-                id: FfiConverterInt64.Instance.Read(stream),
+                id: FfiConverterInt32.Instance.Read(stream),
                 groupId: FfiConverterInt32.Instance.Read(stream),
                 timeUpdated: FfiConverterInt64.Instance.Read(stream),
                 lastDownloadTime: FfiConverterInt64.Instance.Read(stream),
@@ -33,7 +33,7 @@
         public override int AllocationSize(StoredFilterMetadata value)
         {
             return
-                FfiConverterInt64.Instance.AllocationSize(value.Id) +
+                FfiConverterInt32.Instance.AllocationSize(value.Id) +
                 FfiConverterInt32.Instance.AllocationSize(value.GroupId) +
                 FfiConverterInt64.Instance.AllocationSize(value.TimeUpdated) +
                 FfiConverterInt64.Instance.AllocationSize(value.LastDownloadTime) +
@@ -57,7 +57,7 @@
 
         public override void Write(StoredFilterMetadata value, BigEndianStream stream)
         {
-            FfiConverterInt64.Instance.Write(value.Id, stream);
+            FfiConverterInt32.Instance.Write(value.Id, stream);
             FfiConverterInt32.Instance.Write(value.GroupId, stream);
             FfiConverterInt64.Instance.Write(value.TimeUpdated, stream);
             FfiConverterInt64.Instance.Write(value.LastDownloadTime, stream);

@@ -10,7 +10,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <summary>
         /// Gets the filter identifier.
         /// </summary>
-        public long FilterId { get; }
+        public int FilterId { get; }
 
         /// <summary>
         /// Gets the group identifier.
@@ -37,7 +37,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <param name="groupId">The group identifier.</param>
         /// <param name="isTrusted">if set to <c>true</c> this filter is trusted.</param>
         /// <param name="rules">The rules of the filter.</param>
-        public ActiveRulesInfo(long filterId, int groupId, bool isTrusted, List<string> rules)
+        public ActiveRulesInfo(int filterId, int groupId, bool isTrusted, List<string> rules)
         {
             FilterId = filterId;
             GroupId = groupId;

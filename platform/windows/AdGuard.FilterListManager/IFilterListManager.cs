@@ -25,7 +25,7 @@ namespace AdGuard.FilterListManager
         /// <param name="ids">List of [`FilterId`]</param>
         /// <returns>Returns SQL's affected rows count</returns>
         /// <exception cref="AgOuterException" />
-        long DeleteCustomFilterLists(List<long> ids);
+        long DeleteCustomFilterLists(List<int> ids);
         
         /// <summary>
         /// Toggles filter lists, using their filter_id
@@ -34,7 +34,7 @@ namespace AdGuard.FilterListManager
         /// <param name="isEnabled">Does this filter list enabled</param>
         /// <returns>Returns SQL's affected rows count</returns>
         /// <exception cref="AgOuterException" />
-        long EnableFilterLists(List<long> ids, bool isEnabled);
+        long EnableFilterLists(List<int> ids, bool isEnabled);
 
         /// <summary>
         /// Fetches filter list by url and returns its raw metadata
@@ -55,7 +55,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         /// <param name="ids">List of [`FilterId`]</param>
         /// <param name="looseTimeout">See [`FilterListManager::update_filters`] `loose_timeout` parameter for explanation</param>
-        UpdateResult ForceUpdateFiltersByIds(List<long> ids, int looseTimeout);
+        UpdateResult ForceUpdateFiltersByIds(List<int> ids, int looseTimeout);
 
         /// <summary>
         /// Gets a list of <see cref="ActiveRulesInfo"/> from filters with `filter.is_enabled=true` flag.
@@ -94,20 +94,20 @@ namespace AdGuard.FilterListManager
         /// Returns lists of disabled rules by list of filter IDs as List(DisabledRulesRaw)
         /// </summary>
         /// <param name="ids">The filter ids.</param>
-        List<DisabledRulesRaw> GetDisabledRules(List<long> ids);
+        List<DisabledRulesRaw> GetDisabledRules(List<int> ids);
 
         /// <summary>
         /// Gets the filter rules as raw <see cref="FilterListRulesRaw"/> objects.
         /// </summary>
         /// <param name="ids">The ids.</param>
-        List<FilterListRulesRaw> GetFilterRulesAsStrings(List<long> ids);
+        List<FilterListRulesRaw> GetFilterRulesAsStrings(List<int> ids);
 
         /// <summary>
         /// Returns all filter data by [`FilterId`]. Filter metadata will be localised
         /// </summary>
         /// <param name="id">The filter identifier.</param>
         /// <exception cref="AgOuterException" />
-        FullFilterList GetFullFilterListById(long id);
+        FullFilterList GetFullFilterListById(int id);
         
         /// <summary>
         /// Gets the stored filters metadata.
@@ -120,13 +120,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <exception cref="AgOuterException" />
-        StoredFilterMetadata GetStoredFiltersMetadataById(long id);
-
-        /// <summary>
-        /// Returns all filters with all their data. Filter metadata will be localised
-        /// </summary>
-        /// <exception cref="AgOuterException" />
-        List<FullFilterList> GetFullFilterLists();
+        StoredFilterMetadata GetStoredFiltersMetadataById(int id);
 
         /// <summary>
         /// Installs custom filter from string
@@ -180,7 +174,7 @@ namespace AdGuard.FilterListManager
         /// <param name="isInstalled">new flag value</param>
         /// <returns>Returns SQL's affected rows count</returns>
         /// <exception cref="AgOuterException" />
-        long InstallFilterLists(List<long> ids, bool isInstalled);
+        long InstallFilterLists(List<int> ids, bool isInstalled);
 
         /// <summary>
         /// The method is used for creating a database and downloading filters.
@@ -205,7 +199,7 @@ namespace AdGuard.FilterListManager
         /// <param name="disabledRules">The disabled rules.</param>
         /// <exception cref="AgOuterException">Throws if rules_list entity does not exist for passed `filter_id`.
         /// This because if you want to keep disabled filters, you should already have a `rules_list` entity</exception>
-        void SaveDisabledRules(long filterId, List<string> disabledRules);
+        void SaveDisabledRules(int filterId, List<string> disabledRules);
 
         /// <summary>
         /// Reads the rule list for a specific filter in chunks, applying exceptions from the disabled_rules list on the fly.
@@ -215,7 +209,7 @@ namespace AdGuard.FilterListManager
         /// <param name="filterId">The filter identifier.</param>
         /// <param name="filePath">The file path.</param>
         /// <exception cref="AgOuterException"></exception>
-        void SaveRulesToFileBlob(long filterId, string filePath);
+        void SaveRulesToFileBlob(int filterId, string filePath);
 
         /// <summary>
         /// Updates custom filter data.
@@ -225,7 +219,7 @@ namespace AdGuard.FilterListManager
         /// <param name="isTrusted">New `is_trusted` status for filter</param>
         /// <returns>TODO ?</returns>
         /// <exception cref="AgOuterException">Throws if manager couldn't find a filter by `filter_id` or if `filter_id` is not from a custom filter. Throws if title is empty</exception>
-        bool UpdateCustomFilterMetadata(long filterId, string title, bool isTrusted);
+        bool UpdateCustomFilterMetadata(int filterId, string title, bool isTrusted);
 
         /// <summary>
         /// Filters updates occur in several steps:

@@ -10,7 +10,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// </summary>
         /// <param name="filterId">The filter identifier.</param>
         /// <param name="text">The rule text.</param>
-        public DisabledRulesRaw(long filterId, string text)
+        public DisabledRulesRaw(int filterId, string text)
         {
             FilterId = filterId;
             Text = text;
@@ -19,7 +19,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <summary>
         /// Gets the filter identifier.
         /// </summary>
-        public long FilterId { get; }
+        public int FilterId { get; }
 
         /// <summary>
         /// Gets the rule text.

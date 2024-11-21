@@ -11,7 +11,7 @@
         public override FilterListRulesRaw Read(BigEndianStream stream)
         {
             return new FilterListRulesRaw(
-                filterId: FfiConverterInt64.Instance.Read(stream),
+                filterId: FfiConverterInt32.Instance.Read(stream),
                 rules: FfiConverterString.Instance.Read(stream),
                 disabledRules: FfiConverterString.Instance.Read(stream)
             );
@@ -21,7 +21,7 @@
         public override int AllocationSize(FilterListRulesRaw value)
         {
             return
-                FfiConverterInt64.Instance.AllocationSize(value.FilterId) +
+                FfiConverterInt32.Instance.AllocationSize(value.FilterId) +
                 FfiConverterString.Instance.AllocationSize(value.Rules) +
                 FfiConverterString.Instance.AllocationSize(value.DisabledRules);
         }
@@ -29,7 +29,7 @@
         ///  <inheritdoc/>
         public override void Write(FilterListRulesRaw value, BigEndianStream stream)
         {
-            FfiConverterInt64.Instance.Write(value.FilterId, stream);
+            FfiConverterInt32.Instance.Write(value.FilterId, stream);
             FfiConverterString.Instance.Write(value.Rules, stream);
             FfiConverterString.Instance.Write(value.DisabledRules, stream);
         }

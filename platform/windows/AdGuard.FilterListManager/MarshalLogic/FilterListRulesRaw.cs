@@ -11,7 +11,7 @@
         /// <param name="filterId">The filter identifier.</param>
         /// <param name="rules">The rules.</param>
         /// <param name="disabledRules">The disabled rules.</param>
-        public FilterListRulesRaw(long filterId, string rules, string disabledRules)
+        public FilterListRulesRaw(int filterId, string rules, string disabledRules)
         {
             FilterId = filterId;
             Rules = rules;
@@ -21,7 +21,7 @@
         /// <summary>
         /// Gets or sets the filter identifier.
         /// </summary>
-        public long FilterId { get; }
+        public int FilterId { get; }
         
         /// <summary>
         /// Gets or sets the rules of the filter.

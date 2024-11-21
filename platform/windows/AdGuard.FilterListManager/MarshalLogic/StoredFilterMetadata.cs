@@ -30,7 +30,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <param name="license">The license.</param>
         /// <param name="checksum">The checksum.</param>
         /// <param name="languages">The languages.</param>
-        public StoredFilterMetadata(long id,
+        public StoredFilterMetadata(int id,
             int groupId,
             long timeUpdated,
             long lastDownloadTime,
@@ -76,7 +76,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <summary>
         /// Gets or sets the filter identifier.
         /// </summary>
-        public long Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Gets or sets the group identifier.

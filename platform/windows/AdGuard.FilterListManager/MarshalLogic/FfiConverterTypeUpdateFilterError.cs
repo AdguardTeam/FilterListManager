@@ -8,20 +8,20 @@ namespace AdGuard.FilterListManager.MarshalLogic
         public override UpdateFilterError Read(BigEndianStream stream)
         {
             return new UpdateFilterError(
-                filterId: FfiConverterInt64.Instance.Read(stream),
+                filterId: FfiConverterInt32.Instance.Read(stream),
                 message: FfiConverterString.Instance.Read(stream)
             );
         }
 
         public override int AllocationSize(UpdateFilterError value)
         {
-            return FfiConverterInt64.Instance.AllocationSize(value.filterId)
+            return FfiConverterInt32.Instance.AllocationSize(value.filterId)
                    + FfiConverterString.Instance.AllocationSize(value.message);
         }
 
         public override void Write(UpdateFilterError value, BigEndianStream stream)
         {
-            FfiConverterInt64.Instance.Write(value.filterId, stream);
+            FfiConverterInt32.Instance.Write(value.filterId, stream);
             FfiConverterString.Instance.Write(value.message, stream);
         }
     }

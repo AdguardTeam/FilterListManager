@@ -7,7 +7,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         public override FullFilterList Read(BigEndianStream stream)
         {
             return new FullFilterList(
-                id: FfiConverterInt64.Instance.Read(stream),
+                id: FfiConverterInt32.Instance.Read(stream),
                 groupId: FfiConverterInt32.Instance.Read(stream),
                 timeUpdated: FfiConverterInt64.Instance.Read(stream),
                 lastDownloadTime: FfiConverterInt64.Instance.Read(stream),
@@ -33,7 +33,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         public override int AllocationSize(FullFilterList value)
         {
-            return FfiConverterInt64.Instance.AllocationSize(value.id)
+            return FfiConverterInt32.Instance.AllocationSize(value.id)
                    + FfiConverterInt32.Instance.AllocationSize(value.groupId)
                    + FfiConverterInt64.Instance.AllocationSize(value.timeUpdated)
                    + FfiConverterInt64.Instance.AllocationSize(value.lastDownloadTime)
@@ -58,7 +58,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         public override void Write(FullFilterList value, BigEndianStream stream)
         {
-            FfiConverterInt64.Instance.Write(value.id, stream);
+            FfiConverterInt32.Instance.Write(value.id, stream);
             FfiConverterInt32.Instance.Write(value.groupId, stream);
             FfiConverterInt64.Instance.Write(value.timeUpdated, stream);
             FfiConverterInt64.Instance.Write(value.lastDownloadTime, stream);

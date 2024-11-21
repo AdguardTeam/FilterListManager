@@ -1,16 +1,16 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace AdGuard.FilterListManager.MarshalLogic
 {
-    class FfiConverterSequenceInt64 : FfiConverterRustBuffer<List<long>>
+    class FfiConverterSequenceInt32 : FfiConverterRustBuffer<List<int>>
     {
-        public static FfiConverterSequenceInt64 Instance = new FfiConverterSequenceInt64();
+        public static FfiConverterSequenceInt32 Instance = new FfiConverterSequenceInt32();
 
-        public override List<long> Read(BigEndianStream stream)
+        public override List<int> Read(BigEndianStream stream)
         {
             var length = stream.ReadInt();
-            var result = new List<long>(length);
+            var result = new List<int>(length);
             for (int i = 0; i < length; i++)
             {
                 result.Add(FfiConverterInt32.Instance.Read(stream));
@@ -18,7 +18,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             return result;
         }
 
-        public override int AllocationSize(List<long> value)
+        public override int AllocationSize(List<int> value)
         {
             var sizeForLength = 4;
 
@@ -28,13 +28,11 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 return sizeForLength;
             }
 
-            var sizeForItems = value
-                .Select(item => FfiConverterInt64.Instance.AllocationSize(item))
-                .Sum();
+            var sizeForItems = value.Select(item => FfiConverterInt32.Instance.AllocationSize(item)).Sum();
             return sizeForLength + sizeForItems;
         }
 
-        public override void Write(List<long> value, BigEndianStream stream)
+        public override void Write(List<int> value, BigEndianStream stream)
         {
             // details/1-empty-list-as-default-method-parameter.md
             if (value == null)
@@ -44,7 +42,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             }
 
             stream.WriteInt(value.Count);
-            value.ForEach(item => FfiConverterInt64.Instance.Write(item, stream));
+            value.ForEach(item => FfiConverterInt32.Instance.Write(item, stream));
         }
     }
 }

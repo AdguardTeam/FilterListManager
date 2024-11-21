@@ -17,7 +17,6 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <param name="compilerConditionalConstants">The compiler conditional constants.</param>
         /// <param name="metadataUrl">The metadata URL.</param>
         /// <param name="metadataLocalesUrl">The metadata locales URL.</param>
-        /// <param name="encryptionKey">The encryption key.</param>
         /// <param name="requestTimeoutMs">The request timeout ms.</param>
         /// <param name="autoLiftUpDatabase">if set to <c>true</c> the database will be lifted (up version) automatically.</param>
         public Configuration(FilterListType filterListType,
@@ -27,7 +26,6 @@ namespace AdGuard.FilterListManager.MarshalLogic
             List<string> compilerConditionalConstants,
             string metadataUrl,
             string metadataLocalesUrl,
-            string encryptionKey,
             int requestTimeoutMs,
             bool autoLiftUpDatabase)
         {
@@ -38,7 +36,6 @@ namespace AdGuard.FilterListManager.MarshalLogic
             CompilerConditionalConstants = compilerConditionalConstants;
             MetadataUrl = metadataUrl;
             MetadataLocalesUrl = metadataLocalesUrl;
-            EncryptionKey = encryptionKey;
             RequestTimeoutMs = requestTimeoutMs;
             AutoLiftUpDatabase = autoLiftUpDatabase;
         }
@@ -77,11 +74,6 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// Gets or sets the metadata URL for locales.
         /// </summary>
         public string MetadataLocalesUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the encryption key for the filter DB.
-        /// </summary>
-        public string EncryptionKey { get; set; }
 
         /// <summary>
         /// Gets or sets the request timeout in milliseconds.

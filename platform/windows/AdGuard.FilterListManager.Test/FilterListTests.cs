@@ -39,7 +39,6 @@ namespace AdGuard.FilterListManager.Test
                 new List<string>(),
                 "https://filters.adtidy.org/windows/filters.json",
                 "https://filters.adtidy.org/windows/filters_i18n.json", 
-                "", 
                 0,
                 true));
             manager.PullMetadata();
@@ -55,7 +54,7 @@ namespace AdGuard.FilterListManager.Test
             List<ActiveRulesInfo> rules = manager.GetActiveRules();
             Assert.IsTrue(rules.Count > 0);
             
-            var rulesIds = new List<long> { firstFilter.Id };
+            var rulesIds = new List<int> { firstFilter.Id };
             manager.InstallFilterLists(rulesIds, true);
             manager.UpdateFilters(true, REQUEST_TIMEOUT_MS, true);
             List<FilterListRulesRaw> rulesRaw = manager.GetFilterRulesAsStrings(rulesIds);

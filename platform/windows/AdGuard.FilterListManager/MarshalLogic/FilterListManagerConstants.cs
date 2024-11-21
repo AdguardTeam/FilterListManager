@@ -5,10 +5,10 @@
     /// </summary>
     public class FilterListManagerConstants
     {
-        public FilterListManagerConstants(long userRulesId,
+        public FilterListManagerConstants(int userRulesId,
             int customGroupId,
             int specialGroupId,
-            long smallestFilterId)
+            int smallestFilterId)
         {
             UserRulesId = userRulesId;
             CustomGroupId = customGroupId;
@@ -19,7 +19,7 @@
         /// <summary>
         /// Gets the user rules identifier.
         /// </summary>
-        public long UserRulesId { get; }
+        public int UserRulesId { get; }
 
         /// <summary>
         /// Gets the custom group identifier.
@@ -34,6 +34,6 @@
         /// <summary>
         /// Gets the smallest filter identifier.
         /// </summary>
-        public long SmallestFilterId { get; }
+        public int SmallestFilterId { get; }
     }
 }

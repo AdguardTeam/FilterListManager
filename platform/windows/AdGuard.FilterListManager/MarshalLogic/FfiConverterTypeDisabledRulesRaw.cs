@@ -11,7 +11,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         public override DisabledRulesRaw Read(BigEndianStream stream)
         {
             return new DisabledRulesRaw(
-                filterId: FfiConverterInt64.Instance.Read(stream),
+                filterId: FfiConverterInt32.Instance.Read(stream),
                 text: FfiConverterString.Instance.Read(stream)
             );
         }
@@ -20,14 +20,14 @@ namespace AdGuard.FilterListManager.MarshalLogic
         public override int AllocationSize(DisabledRulesRaw value)
         {
             return
-                FfiConverterInt64.Instance.AllocationSize(value.FilterId) +
+                FfiConverterInt32.Instance.AllocationSize(value.FilterId) +
                 FfiConverterString.Instance.AllocationSize(value.Text);
         }
 
         /// <inheritdoc/>
         public override void Write(DisabledRulesRaw value, BigEndianStream stream)
         {
-            FfiConverterInt64.Instance.Write(value.FilterId, stream);
+            FfiConverterInt32.Instance.Write(value.FilterId, stream);
             FfiConverterString.Instance.Write(value.Text, stream);
         }
     }

@@ -31,7 +31,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <param name="checksum">The checksum.</param>
         /// <param name="languages">The languages.</param>
         /// <param name="rules">The rules.</param>
-        public FullFilterList(long id,
+        public FullFilterList(int id,
             int groupId,
             long timeUpdated,
             long lastDownloadTime,
@@ -79,7 +79,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <summary>
         /// Gets or sets the filter identifier.
         /// </summary>
-        public long id { get; set; }
+        public int id { get; set; }
 
         /// <summary>
         /// Gets or sets the group identifier.
