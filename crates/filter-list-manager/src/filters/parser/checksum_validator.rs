@@ -1,12 +1,11 @@
 use crate::FilterParserError;
-use base64::prelude::BASE64_STANDARD_NO_PAD;
 use base64::Engine;
 use nom::bytes::complete::{tag_no_case, take_while};
 use nom::bytes::streaming::tag;
 use nom::character::complete::space0;
 use nom::combinator::opt;
 use nom::sequence::{pair, preceded, separated_pair};
-use nom::{AsBytes, IResult};
+use nom::IResult;
 
 /// How much lines we must scan to possible get Checksum
 const HOW_MUCH_FAR_CHECKSUM_MIGHT_BE: usize = 50;
@@ -67,12 +66,23 @@ pub(super) fn validate_checksum(contents: &str) -> Result<bool, FilterParserErro
     if checksum.is_empty() {
         return Ok(false);
     }
+    let decoded_checksum = match base64::engine::general_purpose::STANDARD
+        .decode(checksum)
+        .or_else(|_| base64::engine::general_purpose::STANDARD_NO_PAD.decode(checksum))
+        .or_else(|_| base64::engine::general_purpose::URL_SAFE.decode(checksum))
+        .or_else(|_| base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(checksum))
+    {
+        Ok(result) => result,
+        Err(_) => return Ok(false),
+    };
 
     let digest = md5::compute(new_str);
-    let encoded_digest = BASE64_STANDARD_NO_PAD.encode(digest.as_bytes());
 
-    if encoded_digest.as_str() != checksum {
-        return FilterParserError::invalid_checksum(encoded_digest, checksum.to_string());
+    if digest.as_slice() != decoded_checksum.as_slice() {
+        return FilterParserError::invalid_checksum(
+            hex::encode(digest.as_slice()),
+            hex::encode(decoded_checksum),
+        );
     }
 
     Ok(true)
