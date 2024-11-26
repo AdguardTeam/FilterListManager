@@ -4,7 +4,7 @@ set -e
 set -x
 
 # Check that we are on the master branch
-if [ "${bamboo_repository_branch_name}" != "master" ]; then
+if [ "${bamboo_repository_branch_name}" != "0.8.x" ]; then
   echo "Not on the master branch. Exiting..."
   exit 0
 fi
