@@ -87,6 +87,15 @@ pub(crate) fn apply_patch(
         }
     }
 
+    // Add the remaining base filter lines
+    if base_filter_cursor < base_filter_lines.len() {
+        slices.push(
+            base_filter_lines[base_filter_cursor..base_filter_lines.len()]
+                .iter()
+                .as_slice(),
+        );
+    }
+
     let slices_last_index = slices.len() - 1;
     let mut slices_index = 0usize;
 
@@ -94,6 +103,10 @@ pub(crate) fn apply_patch(
     let patch_result = slices.into_iter().fold(
         String::with_capacity(base_filter.len()),
         |mut acc, sub_slice| {
+            if sub_slice.is_empty() {
+                return acc;
+            }
+
             let subs_slice_last_index = sub_slice.len() - 1;
             let mut subslice_index = 0;
 
@@ -137,6 +150,47 @@ fn make_line_out_of_bounds_error<R>(
 #[cfg(test)]
 mod tests {
     use super::apply_patch;
+
+    #[test]
+    fn test_no_truncated_remainder() {
+        const INPUT: &str = r#"! Checksum: LLmLOdAgjVJdHO1kvbeGPw
+! Diff-Path: ../patches/1/1-s-1731418725-3600.patch
+! Title: AdGuard Russian filter
+! Description: Filter that enables ad blocking on websites in Russian language.
+! Version: 2.0.95.29
+! TimeUpdated: 2024-11-12T13:31:12+00:00
+! Expires: 12 hours (update frequency)
+! Homepage: https://github.com/AdguardTeam/AdGuardFilters
+! License: https://github.com/AdguardTeam/AdguardFilters/blob/master/LICENSE
+!
+!-------------------------------------------------------------------------------!
+!------------------ General JS API ---------------------------------------------!
+!-------------------------------------------------------------------------------!
+"#;
+
+        const PATCH: &str = r#"d1 2
+a2 2
+! Checksum: qEw5hogMcYduk4X9z5Gq0g
+! Diff-Path: ../patches/1/1-s-1731422306-3600.patch
+d3 2
+d5 2
+a6 2
+! Version: 2.0.95.30
+! TimeUpdated: 2024-11-12T14:31:14+00:00
+d7 4
+"#;
+        const OUTPUT: &str = r#"! Checksum: qEw5hogMcYduk4X9z5Gq0g
+! Diff-Path: ../patches/1/1-s-1731422306-3600.patch
+! Version: 2.0.95.30
+! TimeUpdated: 2024-11-12T14:31:14+00:00
+!-------------------------------------------------------------------------------!
+!------------------ General JS API ---------------------------------------------!
+!-------------------------------------------------------------------------------!
+"#;
+        let patched = apply_patch(INPUT, PATCH.lines().collect()).unwrap();
+
+        assert_eq!(patched, OUTPUT);
+    }
 
     #[test]
     fn test_apply_patch() {
