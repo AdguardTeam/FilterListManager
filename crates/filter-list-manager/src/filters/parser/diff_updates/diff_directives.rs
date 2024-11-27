@@ -24,7 +24,7 @@ pub(crate) struct RecognizedDiffDirective<'a> {
     pub(crate) name: Option<String>,
     /// Compiled patch checksum
     pub(crate) checksum: &'a str,
-    /// Newlines(!) count
+    /// Line count
     pub(crate) lines: usize,
 }
 

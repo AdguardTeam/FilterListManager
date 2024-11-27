@@ -13,8 +13,7 @@ pub(crate) fn validate_patch(
     patch_result_lines_count: usize,
     patch_result: &str,
 ) -> Result<(), FilterParserError> {
-    // Actually lines is *line feeds*, not lines
-    if patch_result_lines_count - 1 != recognize_diff_directive.lines {
+    if patch_result_lines_count != recognize_diff_directive.lines {
         return FilterParserError::other_err_from_to_string(
             "The number of lines in the patch differs from the number in the patch header",
         );
