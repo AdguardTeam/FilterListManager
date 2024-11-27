@@ -117,3 +117,52 @@ impl FilterContentsProvider for DiffPathProvider {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::filters::parser::diff_updates::batch_patches_container::BatchPatchesContainer;
+    use crate::filters::parser::filter_contents_provider::diff_path_provider::DiffPathProvider;
+    use crate::filters::parser::filter_contents_provider::FilterContentsProvider;
+
+    #[test]
+    fn test_diff_path_provider() {
+        let list1_v100 = include_str!("../../../../tests/fixtures/batch/list1_v1.0.0.txt");
+        let list1_v101 = include_str!("../../../../tests/fixtures/batch/list1_v1.0.1.txt");
+        let list2_v100 = include_str!("../../../../tests/fixtures/batch/list2_v1.0.0.txt");
+        let list2_v101 = include_str!("../../../../tests/fixtures/batch/list2_v1.0.1.txt");
+        let batch_patch =
+            include_str!("../../../../tests/fixtures/batch/batch_v1.0.0-s-1700045842-3600.patch");
+
+        let container = BatchPatchesContainer::factory();
+        container.borrow_mut().insert(
+            "https://example.org/patches/batch_v1.0.0-s-1700045842-3600.patch".to_string(),
+            batch_patch.to_string(),
+        );
+
+        let provider1 = DiffPathProvider::new(
+            "../patches/batch_v1.0.0-s-1700045842-3600.patch#list1".to_string(),
+            list1_v100.to_string(),
+            container.clone(),
+        );
+        assert_eq!(
+            list1_v101.trim(),
+            provider1
+                .get_filter_contents("https://example.org/lists/list1.txt")
+                .unwrap()
+                .trim()
+        );
+
+        let provider2 = DiffPathProvider::new(
+            "../patches/batch_v1.0.0-s-1700045842-3600.patch#list2".to_string(),
+            list2_v100.to_string(),
+            container.clone(),
+        );
+        assert_eq!(
+            list2_v101.trim(),
+            provider2
+                .get_filter_contents("https://example.org/lists/list2.txt")
+                .unwrap()
+                .trim()
+        );
+    }
+}
