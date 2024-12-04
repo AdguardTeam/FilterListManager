@@ -25,6 +25,7 @@ faster-hex = "0.10.0"
 regex.workspace = true
 uniffi.workspace = true
 thiserror.workspace = true
+cargo-platform.workspace = true
 
 [features]
 default = ["reqwest/default"]
