@@ -1,3 +1,4 @@
+use crate::utils::iterators::lines_with_terminator::lines_with_terminator;
 use crate::FilterParserError;
 use nom::{
     branch::alt,
@@ -9,6 +10,11 @@ use nom::{
     Err::Error,
     IResult,
 };
+
+/// Max length of directive "name"
+///
+/// See <https://github.com/ameshkov/diffupdates?tab=readme-ov-file#changes-to-filter-lists-metadata> for details
+const MAX_DIRECTIVE_NAME_LENGTH: usize = 64;
 
 const DIFF_DIRECTIVE: &str = "diff";
 const DIFF_DIRECTIVE_NAME: &str = "name";
@@ -40,7 +46,7 @@ pub(crate) fn extract_patch(
     patch_str: &str,
     resource_name_option: Option<String>,
 ) -> Result<(Option<RecognizedDiffDirective>, Vec<&str>), FilterParserError> {
-    let mut diff_lines_raw = patch_str.lines().peekable();
+    let mut diff_lines_raw = lines_with_terminator(patch_str).peekable();
     let mut recognized_directive: RecognizedDiffDirective;
 
     // Early return for patches without diff directive
@@ -175,7 +181,7 @@ fn map_diff_directive<'a>(
     let final_name = name.map(|list| list.join(""));
 
     for value in final_name.iter() {
-        if value.len() > 64 {
+        if value.len() > MAX_DIRECTIVE_NAME_LENGTH {
             return Err(Error(
                 "The length of the \"name\" field must not exceed 64 characters",
             ));

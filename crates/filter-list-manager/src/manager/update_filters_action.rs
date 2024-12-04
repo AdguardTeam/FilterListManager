@@ -74,7 +74,6 @@ pub(super) fn update_filters_action(
 
             Ok((diff_updates_map, rules_map, disabled_rules_map))
         })?;
-    // endregion
 
     // Parsers with successful filter downloads
     let mut successful_parsers_with_result: Vec<(FilterId, FilterParser)> =
