@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.1.10] - 2024-12-04
+
+### Fixed
+- Diffupdates now respects trailing newlines + fix checksum validator
+
+[1.1.10]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.1.2...flm-1.1.10
+
 ## [1.1.2] - 2024-11-18
 
 ### Added
@@ -27,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - `Configuration.encryption_key` key removed
 - `get_full_filter_lists` method
 
-[1.1.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.17...ffi-1.1.2
+[1.1.2]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.17...ffi-1.1.2
 
 ## [0.8.17] - 2024-11-07
 

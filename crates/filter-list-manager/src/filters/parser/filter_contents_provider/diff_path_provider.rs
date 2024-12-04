@@ -165,4 +165,85 @@ mod tests {
                 .trim()
         );
     }
+
+    #[test]
+    fn test_diff_path_add_newlines() {
+        let v1 = "! Title: Batch-Updatable List 1
+! Diff-Path: ../patches/batch_v1.0.0-s-1700045842-3600.patch#list1
+||example.org^";
+
+        let v2 = "! Title: Batch-Updatable List 1
+! Diff-Path: ../patches/batch_v1.0.1-s-1700049442-3600.patch#list1
+
+
+
+||example.com^
+";
+
+        let patch = "diff name:list1 checksum:b473858bee9887c7711032513e15b7fc9d1b367e lines:8
+d2 2
+a3 6
+! Diff-Path: ../patches/batch_v1.0.1-s-1700049442-3600.patch#list1
+
+
+
+||example.com^
+";
+        let container = BatchPatchesContainer::factory();
+        container.borrow_mut().insert(
+            "https://example.org/patches/batch_v1.0.0-s-1700045842-3600.patch".to_string(),
+            patch.to_string(),
+        );
+
+        let provider1 = DiffPathProvider::new(
+            "../patches/batch_v1.0.0-s-1700045842-3600.patch#list1".to_string(),
+            v1.to_string(),
+            container.clone(),
+        );
+
+        let final_filter = provider1
+            .get_filter_contents("https://example.org/lists/list1.txt")
+            .unwrap();
+
+        assert_eq!(v2, final_filter)
+    }
+
+    #[test]
+    fn test_diff_path_remove_newlines() {
+        let v1 = "
+! Title: Batch-Updatable List 1
+! Diff-Path: ../patches/batch_v1.0.1-s-1700049442-3600.patch#list1
+
+
+
+||example.com^
+";
+        let v2 = "! Title: Batch-Updatable List 1
+! Diff-Path: ../patches/batch_v1.0.0-s-1700045842-3600.patch#list1
+||example.org^";
+
+        let patch = "d1 1
+d3 6
+a8 2
+! Diff-Path: ../patches/batch_v1.0.0-s-1700045842-3600.patch#list1
+||example.org^";
+
+        let container = BatchPatchesContainer::factory();
+        container.borrow_mut().insert(
+            "https://example.org/patches/batch_v1.0.0-s-1700045842-3600.patch".to_string(),
+            patch.to_string(),
+        );
+
+        let provider1 = DiffPathProvider::new(
+            "../patches/batch_v1.0.0-s-1700045842-3600.patch#list1".to_string(),
+            v1.to_string(),
+            container.clone(),
+        );
+
+        let final_filter = provider1
+            .get_filter_contents("https://example.org/lists/list1.txt")
+            .unwrap();
+
+        assert_eq!(v2, final_filter)
+    }
 }

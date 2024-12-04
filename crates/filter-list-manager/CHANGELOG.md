@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2024-12-04
+
+### Fixed
+- Diffupdates now respects trailing newlines + fix checksum validator
+
+[1.1.5]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.1.2...flm-1.1.5
+
 ## [1.1.2] - 2024-11-18
 
 ### Changed
@@ -17,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Configuration.encryption_key` key removed
 - `get_full_filter_lists` method
 
-[1.1.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.8.11...flm-1.1.2
+[1.1.2]: https://github.com/AdguardTeam/FilterListManager/compare/flm-0.8.11...flm-1.1.2
 
 ## [0.8.11] - 2024-11-07
 

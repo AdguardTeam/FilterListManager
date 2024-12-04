@@ -1,6 +1,7 @@
 mod recognize_rcs;
 
 use self::recognize_rcs::{recognize_rcs, RCSOperations};
+use crate::utils::iterators::lines_with_terminator::lines_with_terminator;
 use crate::FilterParserError;
 
 /// Applies `diff` to `base_filter`
@@ -11,7 +12,7 @@ pub(crate) fn apply_patch(
     diff_lines: Vec<&str>,
 ) -> Result<String, FilterParserError> {
     let mut diff_iter = diff_lines.iter().enumerate();
-    let base_filter_lines: Vec<&str> = base_filter.lines().collect();
+    let base_filter_lines: Vec<&str> = lines_with_terminator(base_filter).collect();
 
     let mut slices: Vec<&[&str]> = vec![];
     let mut base_filter_cursor = 0usize;
@@ -96,34 +97,26 @@ pub(crate) fn apply_patch(
         );
     }
 
-    let slices_last_index = slices.len() - 1;
-    let mut slices_index = 0usize;
-
     // I think, base_filter.len() initial capacity will be better than nothing
-    let patch_result = slices.into_iter().fold(
-        String::with_capacity(base_filter.len()),
-        |mut acc, sub_slice| {
-            if sub_slice.is_empty() {
-                return acc;
-            }
+    let mut patch_result = slices
+        .into_iter()
+        .filter(|sub_slice| !sub_slice.is_empty())
+        .fold(
+            String::with_capacity(base_filter.len()),
+            |mut acc, sub_slice| {
+                sub_slice.into_iter().for_each(|line| {
+                    acc.push_str(line);
+                    acc.push('\n');
+                });
 
-            let subs_slice_last_index = sub_slice.len() - 1;
-            let mut subslice_index = 0;
+                acc
+            },
+        );
 
-            sub_slice.into_iter().for_each(|line| {
-                acc.push_str(line);
-                if !(slices_last_index == slices_index && subs_slice_last_index == subslice_index) {
-                    acc.push_str("\n");
-                }
-
-                subslice_index += 1;
-            });
-
-            slices_index += 1;
-
-            acc
-        },
-    );
+    // Remove trailing \n
+    if !patch_result.is_empty() {
+        patch_result.pop();
+    }
 
     return Ok(patch_result);
 }
@@ -150,6 +143,7 @@ fn make_line_out_of_bounds_error<R>(
 #[cfg(test)]
 mod tests {
     use super::apply_patch;
+    use crate::utils::iterators::lines_with_terminator::lines_with_terminator;
 
     #[test]
     fn test_no_truncated_remainder() {
@@ -187,7 +181,8 @@ d7 4
 !------------------ General JS API ---------------------------------------------!
 !-------------------------------------------------------------------------------!
 "#;
-        let patched = apply_patch(INPUT, PATCH.lines().collect()).unwrap();
+        let patch_list = lines_with_terminator(PATCH).collect();
+        let patched = apply_patch(INPUT, patch_list).unwrap();
 
         assert_eq!(patched, OUTPUT);
     }
