@@ -24,6 +24,7 @@ include_dir = "0.7.4"
 regex.workspace = true
 uniffi.workspace = true
 thiserror.workspace = true
+cargo-platform.workspace = true
 
 [features]
 default = ["reqwest/default"]
