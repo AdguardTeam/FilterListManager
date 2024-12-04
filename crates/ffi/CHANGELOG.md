@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.8.24] - 2024-12-04
+
+### Fixed
+- Diffupdates now respects trailing newlines + fix checksum validator
+
+[0.8.24]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.17...ffi-0.8.24
+
 ## [0.8.17] - 2024-11-07
 
 ### Fixed
