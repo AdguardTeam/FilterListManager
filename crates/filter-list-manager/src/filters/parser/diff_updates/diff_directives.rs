@@ -41,11 +41,11 @@ pub(crate) struct RecognizedDiffDirective<'a> {
 /// - Patch file has directive without `name`. Here we will return file contents without directive + directive as [`RecognizedDiffDirective`]
 /// - Patch file has directive with `name`. Thus, the file may be batch file, and we must find a chunk for resource `resource_name_option`
 ///
-/// Returns [`Option<RecognizedDiffDirective>`] if it in file and lines of concrete diff as [Vec<&str>]
+/// Returns [`Option<RecognizedDiffDirective>`] if it in file, lines of concrete diff as [Vec<&str>] and an indicator that the end of this diff is the end of the file
 pub(crate) fn extract_patch(
     patch_str: &str,
     resource_name_option: Option<String>,
-) -> Result<(Option<RecognizedDiffDirective>, Vec<&str>), FilterParserError> {
+) -> Result<(Option<RecognizedDiffDirective>, Vec<&str>, bool), FilterParserError> {
     let mut diff_lines_raw = lines_with_terminator(patch_str).peekable();
     let mut recognized_directive: RecognizedDiffDirective;
 
@@ -63,7 +63,7 @@ pub(crate) fn extract_patch(
                         // First string is not diff directive.
                         // Looks like this file does not contain them,
                         // so we should return all patch
-                        return Ok((None, diff_lines_raw.collect()));
+                        return Ok((None, diff_lines_raw.collect(), true));
                     };
 
                     recognized_directive = recognized;
@@ -80,7 +80,7 @@ pub(crate) fn extract_patch(
         // Skip directive line
         diff_lines_raw.next();
 
-        return Ok((Some(recognized_directive), diff_lines_raw.collect()));
+        return Ok((Some(recognized_directive), diff_lines_raw.collect(), true));
     }
 
     // Resource name must be defined here
@@ -94,6 +94,11 @@ pub(crate) fn extract_patch(
     let mut out: Vec<&str> = vec![];
     let mut lower_bound_found = false;
     let mut upper_bound_found = false;
+
+    // If ‘break’ is encountered, it means that we had to interrupt the recording of the patch piece,
+    // it means that this patch piece is not the last one in the file.
+    // Otherwise, we would simply exit the loop when it is finished
+    let mut break_encountered = false;
 
     for line in diff_lines_raw {
         if !lower_bound_found {
@@ -128,11 +133,12 @@ So patch is broken",
                 _ => out.push(line),
             }
         } else {
+            break_encountered = true;
             break;
         }
     }
 
-    return Ok((Some(recognized_directive), out));
+    return Ok((Some(recognized_directive), out, !break_encountered));
 }
 
 /// Recognizes diff directive
@@ -251,7 +257,7 @@ They both may be called deep and profound.
 Deeper and more profound,
 The door of all subtleties!";
 
-        let (directive_list_2, strings_list_2) = extract_patch(SIMPLE_PATCH, None).unwrap();
+        let (directive_list_2, strings_list_2, _) = extract_patch(SIMPLE_PATCH, None).unwrap();
 
         let joined = strings_list_2.join("\n");
 
@@ -279,7 +285,7 @@ d1 5
 ||adguard.com^";
 
         {
-            let (directive_list_2, strings_list_2) =
+            let (directive_list_2, strings_list_2, _) =
                 extract_patch(BATCH_PATCH, Some(String::from("list2"))).unwrap();
 
             let actual = directive_list_2.unwrap();
@@ -299,7 +305,7 @@ d1 5
         }
 
         {
-            let (directive_list_1, strings_list_1) =
+            let (directive_list_1, strings_list_1, _) =
                 extract_patch(BATCH_PATCH, Some(String::from("list1"))).unwrap();
 
             let actual = directive_list_1.unwrap();
@@ -319,7 +325,7 @@ d1 5
         }
 
         {
-            let (directive_list_3, strings_list_3) =
+            let (directive_list_3, strings_list_3, _) =
                 extract_patch(BATCH_PATCH, Some(String::from("list3"))).unwrap();
 
             let actual = directive_list_3.unwrap();

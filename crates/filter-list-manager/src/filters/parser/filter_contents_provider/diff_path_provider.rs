@@ -48,9 +48,14 @@ impl DiffPathProvider {
             return Err(FilterParserError::NoContent);
         }
 
-        let (diff_directive_option, prepared_patch) =
+        let (diff_directive_option, prepared_patch, end_of_chunk_is_eof) =
             extract_patch(patch_file_contents, resource_name)?;
-        let patch_lines_count = prepared_patch.len();
+        let mut patch_lines_count = prepared_patch.len();
+
+        // If this chunk contains eof, we are truly knows
+        if end_of_chunk_is_eof {
+            patch_lines_count -= 1;
+        }
 
         match apply_patch(self.base_filter_contents.as_str(), prepared_patch) {
             Ok(patch_result) if patch_result.is_empty() => {
@@ -120,18 +125,29 @@ impl FilterContentsProvider for DiffPathProvider {
 
 #[cfg(test)]
 mod tests {
+    use crate::filters::parser::checksum_validator::validate_checksum;
     use crate::filters::parser::diff_updates::batch_patches_container::BatchPatchesContainer;
     use crate::filters::parser::filter_contents_provider::diff_path_provider::DiffPathProvider;
     use crate::filters::parser::filter_contents_provider::FilterContentsProvider;
+    use crate::test_utils::tests_path;
+    use url::Url;
 
     #[test]
-    fn test_diff_path_provider() {
-        let list1_v100 = include_str!("../../../../tests/fixtures/batch/list1_v1.0.0.txt");
-        let list1_v101 = include_str!("../../../../tests/fixtures/batch/list1_v1.0.1.txt");
-        let list2_v100 = include_str!("../../../../tests/fixtures/batch/list2_v1.0.0.txt");
-        let list2_v101 = include_str!("../../../../tests/fixtures/batch/list2_v1.0.1.txt");
+    fn test_batch_validation() {
+        let list1_v100 = include_str!(
+            "../../../../tests/fixtures/diffupdates/examples/03_batch/list1/list1_v1.0.0.txt"
+        );
+        let list1_v101 = include_str!(
+            "../../../../tests/fixtures/diffupdates/examples/03_batch/list1/list1_v1.0.1.txt"
+        );
+        let list2_v100 = include_str!(
+            "../../../../tests/fixtures/diffupdates/examples/03_batch/list2/list2_v1.0.0.txt"
+        );
+        let list2_v101 = include_str!(
+            "../../../../tests/fixtures/diffupdates/examples/03_batch/list2/list2_v1.0.1.txt"
+        );
         let batch_patch =
-            include_str!("../../../../tests/fixtures/batch/batch_v1.0.0-s-1700045842-3600.patch");
+            include_str!("../../../../tests/fixtures/diffupdates/examples/03_batch/patches/batch_v1.0.0-s-1700045842-3600.patch");
 
         let container = BatchPatchesContainer::factory();
         container.borrow_mut().insert(
@@ -145,11 +161,10 @@ mod tests {
             container.clone(),
         );
         assert_eq!(
-            list1_v101.trim(),
+            list1_v101,
             provider1
                 .get_filter_contents("https://example.org/lists/list1.txt")
                 .unwrap()
-                .trim()
         );
 
         let provider2 = DiffPathProvider::new(
@@ -158,11 +173,10 @@ mod tests {
             container.clone(),
         );
         assert_eq!(
-            list2_v101.trim(),
+            list2_v101,
             provider2
                 .get_filter_contents("https://example.org/lists/list2.txt")
                 .unwrap()
-                .trim()
         );
     }
 
@@ -180,7 +194,7 @@ mod tests {
 ||example.com^
 ";
 
-        let patch = "diff name:list1 checksum:b473858bee9887c7711032513e15b7fc9d1b367e lines:8
+        let patch = "diff name:list1 checksum:b473858bee9887c7711032513e15b7fc9d1b367e lines:7
 d2 2
 a3 6
 ! Diff-Path: ../patches/batch_v1.0.1-s-1700049442-3600.patch#list1
@@ -245,5 +259,57 @@ a8 2
             .unwrap();
 
         assert_eq!(v2, final_filter)
+    }
+
+    #[test]
+    fn test_validation_without_newline() {
+        let base_filter_contents = include_str!(
+            "../../../../tests/fixtures/diffupdates/examples/02_validation/filter_v1.0.0.txt"
+        );
+        let expected_filter = include_str!(
+            "../../../../tests/fixtures/diffupdates/examples/02_validation/filter_v1.0.1.txt"
+        );
+        let base_filter_path =
+            tests_path("fixtures/diffupdates/examples/02_validation/filter_v1.0.0.txt");
+
+        let provider1 = DiffPathProvider::new(
+            "patches/v1.0.0-m-28334060-60.patch".to_string(),
+            String::from(base_filter_contents),
+            BatchPatchesContainer::factory(),
+        );
+
+        let base_filter_url = Url::from_file_path(base_filter_path).unwrap();
+
+        let actual_filter = provider1
+            .get_filter_contents(base_filter_url.to_string().as_str())
+            .unwrap();
+
+        assert_eq!(actual_filter, expected_filter);
+    }
+
+    #[test]
+    fn test_with_checksum() {
+        let base_filter_contents = include_str!(
+            "../../../../tests/fixtures/diffupdates/examples/04_checksum/filter_v1.0.0.txt"
+        );
+        let expected_filter =
+            include_str!("../../../../tests/fixtures/diffupdates/examples/04_checksum/filter.txt");
+        let base_filter_path =
+            tests_path("fixtures/diffupdates/examples/04_checksum/filter_v1.0.0.txt");
+
+        let provider = DiffPathProvider::new(
+            "patches/v1.0.0-472234-1.patch".to_string(),
+            String::from(base_filter_contents),
+            BatchPatchesContainer::factory(),
+        );
+
+        let base_filter_url = Url::from_file_path(base_filter_path).unwrap();
+        let patched_contents = provider
+            .get_filter_contents(base_filter_url.to_string().as_str())
+            .unwrap();
+
+        validate_checksum(patched_contents.as_str()).unwrap();
+
+        assert_eq!(patched_contents, expected_filter);
     }
 }

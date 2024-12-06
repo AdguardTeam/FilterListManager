@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.8.25] - 2024-12-06
+
+### Fixed
+- Fix diffupdates lines count for files without "\n" on end
+
+[0.8.25]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.24...ffi-0.8.25
+
 ## [0.8.24] - 2024-12-04
 
 ### Fixed
