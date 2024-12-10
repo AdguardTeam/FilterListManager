@@ -35,8 +35,8 @@ Default Job:
             ./bamboo-specs/scripts/deploy_swift.sh
         description: Deploy Swift package and CocoaPod
   requirements:
-    - macOS 11.0 or later
-    - Rust
+    - ephemeral
+    - image: registry.int.agrd.dev/macos/sequoia-build-agent-xcode16.1:latest
   artifact-subscriptions: [ ]
 
 repositories:
