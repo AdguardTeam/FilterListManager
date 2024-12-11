@@ -148,6 +148,7 @@ impl FilterListManager for FilterListManagerImpl {
         entity.title = new_title;
         entity.description = new_description;
         entity.last_update_time = time_updated;
+        entity.last_download_time = Utc::now().timestamp();
         entity.download_url = normalized_url;
         entity.is_enabled = true;
         entity.version = parser.get_metadata(KnownMetadataProperty::Version);
@@ -846,6 +847,8 @@ mod tests {
         let description =
             String::from("Filter that enables ad blocking on websites in Russian language.");
 
+        let current_time = Utc::now().timestamp();
+
         let full_filter_list = flm
             .install_custom_filter_list(
                 first_filter_url.to_string(),
@@ -860,6 +863,8 @@ mod tests {
 
         assert_eq!(full_filter_list.title, title);
         assert_eq!(full_filter_list.description, description);
+
+        assert!(full_filter_list.last_download_time >= current_time);
 
         assert!(full_filter_list.is_enabled);
     }
