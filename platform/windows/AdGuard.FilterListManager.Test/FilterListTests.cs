@@ -42,6 +42,13 @@ namespace AdGuard.FilterListManager.Test
                 0,
                 true));
             manager.PullMetadata();
+            var list = manager.InstallCustomFilterList(
+                "http://127.0.0.1:8080/examples/01_simple/filter_v1.0.0.txt", true, "test1",
+                "test2");
+            manager.PullMetadata();
+
+            manager.UpdateFilters(false, 60000, false);
+
             List<StoredFilterMetadata> metas = manager.GetStoredFiltersMetadata();
             Assert.IsTrue(metas.Count > 0);
 
