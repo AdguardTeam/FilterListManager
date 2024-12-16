@@ -15,7 +15,7 @@ stages:
 Run tests:
   key: JOB1
   docker:
-    image: rust:1.75
+    image: rust:1.83
     volumes:
       ${bamboo.working.directory}: ${bamboo.working.directory}
       ${bamboo.tmp.directory}: ${bamboo.tmp.directory}

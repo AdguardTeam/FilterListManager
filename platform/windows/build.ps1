@@ -6,12 +6,6 @@ Function RenameOutFile {
 
 
 Function RustBuild {
-    $rust_version = (& cargo -V);
-    if (!$rust_version.StartsWith("cargo 1.75")){
-        Write-Output "Only Rust 1.75 supported! Versions 1.76+ don't support Windows 7. Current version is $rust_version";
-        exit 1;
-    }
-
     Write-Output "Start executing method RustBuild";
     & cargo build --release --lib --package adguard-flm-ffi --target i686-pc-windows-msvc --features rusqlite-bundled
     RenameOutFile "i686-pc-windows-msvc"

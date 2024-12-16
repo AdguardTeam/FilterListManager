@@ -3,7 +3,7 @@
 ### Requirements
 
 - `Rust` - [See how to install](https://www.rust-lang.org/tools/install)
-- `cargo` 1.75. Versions 1.76+ don't support Windows 7. [See for more info](https://blog.rust-lang.org/2023/08/24/Rust-1.72.0.html#future-windows-compatibility)
+- `cargo` 1.83.
 - `uniffi-bindgen-cs` - [See how to install](https://github.com/NordSecurity/uniffi-bindgen-cs)
 
 First run
