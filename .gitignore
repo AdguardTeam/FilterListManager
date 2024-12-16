@@ -28,4 +28,3 @@ build/
 obj/
 project_to_update.txt
 *.user
-.vscode/

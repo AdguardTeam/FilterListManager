@@ -20,7 +20,7 @@ stages:
 Test:
   key: TST
   docker:
-    image: rust:1.75
+    image: rust:1.83
     volumes:
       ${bamboo.working.directory}: ${bamboo.working.directory}
       ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
@@ -45,7 +45,7 @@ Test:
 Publish:
   key: PUB
   docker:
-    image: rust:1.75
+    image: rust:83
     volumes:
       ${bamboo.working.directory}: ${bamboo.working.directory}
       ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
