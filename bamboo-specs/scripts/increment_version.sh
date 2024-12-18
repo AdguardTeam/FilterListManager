@@ -85,8 +85,7 @@ git config user.name "Bamboo"
 git config user.email "Bamboo"
 
 # Update the remote repository
-git remote set-url origin ${bamboo_planRepository_repositoryUrl}
-git pull
+./git-scripts/git_kit.sh pull ${bamboo_planRepository_repositoryUrl}
 git reset
 
 # Add the updated Cargo.toml files to the git index
