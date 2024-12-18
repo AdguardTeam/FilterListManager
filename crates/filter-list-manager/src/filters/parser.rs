@@ -40,6 +40,7 @@ type ConditionalNestingLevel = i16;
 
 /// Downloads filter by given url, compiles using directives, and returns metadata and rules lists
 /// This parser can recursively include another filters placed with [`DIRECTIVE_INCLUDE`] directive.
+/// By default, filter checksum validation will be skipped.
 pub(crate) struct FilterParser {
     conditional_nesting_level: ConditionalNestingLevel,
     condition_disabled_at_nesting: ConditionalNestingLevel,
@@ -49,6 +50,7 @@ pub(crate) struct FilterParser {
     rule_lines_collector: RuleLinesCollector,
     filter_downloader: Box<dyn FilterContentsProvider>,
     filters_cursor: Vec<FilterCursor>,
+    should_skip_checksum_validation: bool,
 }
 
 impl FilterParser {
@@ -67,6 +69,7 @@ impl FilterParser {
             rule_lines_collector,
             filter_downloader,
             filters_cursor: vec![],
+            should_skip_checksum_validation: true,
         }
     }
 
@@ -96,6 +99,11 @@ impl FilterParser {
             RuleLinesCollector::new(),
             filter_downloader,
         )
+    }
+
+    /// This parser should skip checksum validation
+    pub(crate) fn should_skip_checksum_validation(&mut self, value: bool) {
+        self.should_skip_checksum_validation = value;
     }
 
     /// Parses filter from root url
@@ -171,8 +179,10 @@ impl FilterParser {
                             .pre_check_filter_contents(contents.as_str())
                             .or_else(|why| self.build_error_with_context(why))?;
 
-                        validate_checksum(contents.as_str())
-                            .or_else(|why| self.build_error_with_context(why))?;
+                        if !self.should_skip_checksum_validation {
+                            validate_checksum(contents.as_str())
+                                .or_else(|why| self.build_error_with_context(why))?;
+                        }
 
                         cursor = FilterCursor::new(absolute_url, contents);
                     }
@@ -200,8 +210,10 @@ impl FilterParser {
                     .pre_check_filter_contents(contents.as_str())
                     .or_else(|why| self.build_error_with_context(why))?;
 
-                validate_checksum(contents.as_str())
-                    .or_else(|why| self.build_error_with_context(why))?;
+                if !self.should_skip_checksum_validation {
+                    validate_checksum(contents.as_str())
+                        .or_else(|why| self.build_error_with_context(why))?;
+                }
 
                 cursor = FilterCursor::new(absolute_url.to_owned(), contents);
             } else {

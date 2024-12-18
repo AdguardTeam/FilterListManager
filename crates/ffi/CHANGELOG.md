@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.8.27] - 2024-12-18
+
+### Fixed
+- File checksum should respect file newline
+- Checksums will be checked only for index filters
+
+[0.8.25]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-0.8.25...ffi-0.8.27
+
 ## [0.8.25] - 2024-12-06
 
 ### Fixed
