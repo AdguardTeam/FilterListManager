@@ -19,7 +19,6 @@ protobuf = "3.5.1"
 prost = "0.13.2"
 prost-types = "0.13.2"
 enum_stringify = "0.6.0"
-windres = "0.2"
 
 [features]
 default = ["adguard-flm/default"]
@@ -28,6 +27,7 @@ rustls-tls = ["adguard-flm/rustls-tls"]
 
 [build-dependencies]
 uniffi.workspace = true
+windres = "0.2"
 
 [target.i686-pc-windows-msvc]
 rustflags = ["-Ctarget-feature=+crt-static"]

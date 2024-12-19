@@ -1,4 +1,5 @@
 use uniffi;
+use windres;
 
 fn main() {
     // Build uniffi
