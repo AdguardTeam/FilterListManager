@@ -40,6 +40,3 @@ rand = "0.8.5"
 rusty-hook = "^0.11.2"
 # I'm tired of falling tests on windows
 adguard-flm = { path = ".", features = ["rusqlite-bundled"] }
-
-[target.'cfg(windows)'.build-dependencies]
-windres = "0.2"
