@@ -135,6 +135,10 @@ pub(super) fn update_filters_action(
             }
         };
 
+        if !filter.is_custom() {
+            parser.should_skip_checksum_validation(false);
+        }
+
         if let Err(err) = parser.parse_from_url(&filter.download_url) {
             // NoContent means update just unavailable yet
             if err.error != FilterParserError::NoContent {

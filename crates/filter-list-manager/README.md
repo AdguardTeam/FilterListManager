@@ -24,7 +24,7 @@ This library can:
 - `! Last modified` - Alias for `TimeUpdated`. Format: `2024-08-13T12:01:26.703Z`. You can choose one format for both fields.
 - `! Diff-Path` - [Differential updates](https://github.com/ameshkov/diffupdates?tab=readme-ov-file#-diff-path) information
 - `! License` - Link to filter license.
-- `! Checksum` - Filter's base64(md5-checksum). Before update/install filter, checksum will be calculated and compared. See the source [here](./src/filters/parser/checksum_validator.rs)
+- `! Checksum` - Filter's base64(md5-checksum). This checksum will be calculated and compared **only** for index filters. See the source [here](./src/filters/parser/checksum_validator.rs)
 
 ### List of filter preprocessor directives supported by the library
 
@@ -128,7 +128,7 @@ To override this behavior you need to disable it in the configuration: `configur
 **Database lifting**\
 If you have disabled automatic lifting, you must invoke it yourself after each library update if you don't want to miss a migration.
 
-**`SQLITE_BUSY` Error**\
+`SQLITE_BUSY` Error\
 The library ensures that when using a single [FLM](./src/manager/filter_list_manager_impl.rs) instance for a single database file (also, by default, a [database type](./src/manager/models/configuration/filter_list_type.rs)) in a multithreaded environment, database queries will not return [SQLITE_BUSY](https://www.sqlite.org/rescode.html#busy) errors.
 ---
 

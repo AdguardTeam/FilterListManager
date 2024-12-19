@@ -3,7 +3,7 @@ version: 2
 plan:
   project-key: CL
   key: FLMBFM
-  name: Filter List Manager - build for macOS
+  name: Filter List Manager - Build for macOS
 
 stages:
   - Default Stage:
