@@ -40,3 +40,10 @@ rand = "0.8.5"
 rusty-hook = "^0.11.2"
 # I'm tired of falling tests on windows
 adguard-flm = { path = ".", features = ["rusqlite-bundled"] }
+
+[target.i686-pc-windows-msvc]
+rustflags = ["-Ctarget-feature=+crt-static"]
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-Ctarget-feature=+crt-static"]
+[target.aarch64-pc-windows-msvc]
+rustflags = ["-Ctarget-feature=+crt-static"]
