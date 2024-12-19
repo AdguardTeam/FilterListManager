@@ -27,3 +27,10 @@ rustls-tls = ["adguard-flm/rustls-tls"]
 
 [build-dependencies]
 uniffi.workspace = true
+
+[target.i686-pc-windows-msvc]
+rustflags = ["-Ctarget-feature=+crt-static"]
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-Ctarget-feature=+crt-static"]
+[target.aarch64-pc-windows-msvc]
+rustflags = ["-Ctarget-feature=+crt-static"]
