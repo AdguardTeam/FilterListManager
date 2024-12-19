@@ -35,6 +35,3 @@ rustflags = ["-Ctarget-feature=+crt-static"]
 rustflags = ["-Ctarget-feature=+crt-static"]
 [target.aarch64-pc-windows-msvc]
 rustflags = ["-Ctarget-feature=+crt-static"]
-
-[target.'cfg(windows)'.build-dependencies]
-windres = "0.2"
