@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - File checksum should respect file newline
 - Checksums will be checked only for index filters
 - Install custom list is not setting last download time
+- Static CRT link in windows libraries
 
 [1.1.19]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.1.13...ffi-1.1.19
 
