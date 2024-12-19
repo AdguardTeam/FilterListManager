@@ -1,3 +1,4 @@
+use crate::utils::iterators::lines_with_terminator::lines_with_terminator;
 use crate::FilterParserError;
 use base64::prelude::BASE64_STANDARD_NO_PAD;
 use base64::Engine;
@@ -33,12 +34,8 @@ pub(super) fn validate_checksum(contents: &str) -> Result<bool, FilterParserErro
     let mut checksum: &str = "";
     let mut is_checksum_found: bool = false;
 
-    for (index, line) in contents.lines().enumerate() {
+    for (index, line) in lines_with_terminator(contents).enumerate() {
         let trimmed = line.trim();
-
-        if trimmed.is_empty() {
-            continue;
-        }
 
         if !is_checksum_found {
             // Do not search checksum anymore
@@ -46,15 +43,17 @@ pub(super) fn validate_checksum(contents: &str) -> Result<bool, FilterParserErro
                 return Ok(false);
             }
 
-            match parse_checksum(trimmed) {
-                Ok((_, Some(result))) => {
-                    checksum = result;
-                    is_checksum_found = true;
+            if !trimmed.is_empty() {
+                match parse_checksum(trimmed) {
+                    Ok((_, Some(result))) => {
+                        checksum = result;
+                        is_checksum_found = true;
 
-                    continue;
+                        continue;
+                    }
+                    Err(err) => return FilterParserError::other_err_from_to_string(err),
+                    _ => {}
                 }
-                Err(err) => return FilterParserError::other_err_from_to_string(err),
-                _ => {}
             }
         }
 
@@ -108,6 +107,15 @@ mod tests {
         // In this file extra empty lines was added, because checksum must ignore "\r" and "\n"
         // Also, checksum string moved to 40-th line
         let filter = include_str!("../../../tests/fixtures/test_checksum.txt");
+
+        let found_and_validate = validate_checksum(filter).unwrap();
+
+        assert!(found_and_validate)
+    }
+
+    #[test]
+    fn test_validate_checksum_w_newline_on_end() {
+        let filter = include_str!("../../../tests/fixtures/test-checksum-nl.txt");
 
         let found_and_validate = validate_checksum(filter).unwrap();
 
