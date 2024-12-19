@@ -2,7 +2,7 @@ use uniffi;
 
 fn main() {
     // Build uniffi
-    uniffi::generate_scaffolding("src/flm_ffi.udl").unwrap();    
+    uniffi::generate_scaffolding("src/flm_ffi.udl").unwrap();
     compile_windows_resources();
 }
 
