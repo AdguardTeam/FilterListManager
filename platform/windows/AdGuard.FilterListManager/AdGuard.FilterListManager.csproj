@@ -5,7 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net4.5</TargetFramework>
     <EnableDefaultItems>False</EnableDefaultItems>
-    <Version>1.0.0</Version>
+    <Version>1.1.20</Version>
     <Authors>Adguard Software Ltd</Authors>
     <Copyright>© Adguard Software Ltd 2009-2024</Copyright>
     <Product>AdGuard Filter List Manager for Windows</Product>

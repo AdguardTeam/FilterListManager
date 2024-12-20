@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.1.20] - 2024-12-19
+
+### Added
+- Static CRT link in windows libraries
+- Windows .rc file
+
+[1.1.20]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.1.19...ffi-1.1.20
+
 ## [1.1.19] - 2024-12-19
 
 ### Fixed
