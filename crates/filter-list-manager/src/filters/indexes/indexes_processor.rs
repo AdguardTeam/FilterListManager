@@ -1,5 +1,7 @@
 use super::entities::{IndexEntity, IndexI18NEntity};
 use crate::filters::indexes::index_consistency_checker::check_consistency;
+use crate::io::url_schemes::UrlSchemes;
+use crate::io::{get_scheme, read_file_by_url};
 use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::entities::filter_filter_tag_entity::FilterFilterTagEntity;
 use crate::storage::entities::filter_locale_entity::FilterLocaleEntity;
@@ -21,6 +23,7 @@ use crate::{
     FLMError, FLMResult, FilterId, CUSTOM_FILTERS_GROUP_ID,
 };
 use rusqlite::{Connection, Transaction};
+use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 use std::mem::take;
 
@@ -276,8 +279,8 @@ impl IndexesProcessor<'_> {
         index_locales_url: &String,
     ) -> FLMResult<()> {
         let (index_result, index_localisations_result) = tokio::join!(
-            self.load_main_index(index_url),
-            self.load_index_localisations(index_locales_url)
+            self.load_data::<IndexEntity>(index_url),
+            self.load_data::<IndexI18NEntity>(index_locales_url)
         );
 
         let index = match index_result {
@@ -298,16 +301,25 @@ impl IndexesProcessor<'_> {
         Ok(())
     }
 
-    async fn load_main_index(&self, url: &String) -> FLMResult<IndexEntity> {
-        HttpClient::get_json::<IndexEntity>(url, self.connect_timeout)
-            .await
-            .map_err(FLMError::Network)
-    }
+    /// Loads indices data
+    async fn load_data<I>(&self, url: &str) -> FLMResult<I>
+    where
+        I: DeserializeOwned,
+    {
+        let scheme: UrlSchemes = get_scheme(url).into();
 
-    async fn load_index_localisations(&self, url: &String) -> FLMResult<IndexI18NEntity> {
-        HttpClient::get_json::<IndexI18NEntity>(url, self.connect_timeout)
-            .await
-            .map_err(FLMError::Network)
+        match scheme {
+            UrlSchemes::File => {
+                let contents = read_file_by_url(url).map_err::<FLMError, _>(Into::into)?;
+                serde_json::from_str::<I>(&contents).map_err(FLMError::from_display)
+            }
+            UrlSchemes::Https | UrlSchemes::Http => {
+                HttpClient::get_json::<I>(url, self.connect_timeout)
+                    .await
+                    .map_err(FLMError::Network)
+            }
+            _ => FLMError::make_err(format!("Unknown scheme for url: {}", url)),
+        }
     }
 }
 
@@ -386,8 +398,8 @@ mod tests {
     use crate::storage::sql_generators::operator::SQLOperator::*;
     use crate::storage::with_transaction;
     use crate::storage::DbConnectionManager;
-    use crate::test_utils::do_with_tests_helper;
     use crate::test_utils::indexes_fixtures::build_filters_indices_fixtures;
+    use crate::test_utils::{do_with_tests_helper, tests_path};
     use crate::utils::memory::heap;
     use crate::{
         FLMError, FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID,
@@ -398,6 +410,7 @@ mod tests {
     use rusqlite::Connection;
     use std::cell::RefCell;
     use std::rc::Rc;
+    use url::Url;
 
     const DEPRECATED_FILTER_ID: FilterId = 1;
 
@@ -694,5 +707,25 @@ mod tests {
                 Ok(())
             })
             .unwrap();
+    }
+
+    #[test]
+    fn test_load_indexes_from_local_paths() {
+        do_with_tests_helper(|mut helper| helper.increment_postfix());
+
+        let index_path = tests_path("fixtures/filters.json");
+        let index_i18n_path = tests_path("fixtures/filters_i18n.json");
+
+        let index_url = Url::from_file_path(index_path).unwrap().to_string();
+        let index_i18_url = Url::from_file_path(index_i18n_path).unwrap().to_string();
+
+        let connection_manager = DbConnectionManager::factory_test().unwrap();
+
+        unsafe {
+            connection_manager.lift_up_database().unwrap();
+        };
+        let mut processor = IndexesProcessor::factory(&connection_manager, 60);
+
+        processor.sync_metadata(&index_url, &index_i18_url).unwrap();
     }
 }

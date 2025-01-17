@@ -58,6 +58,51 @@ impl RulesListRepository {
             .and_then(|_| transaction.commit())
     }
 
+    /// Updates just `disabled_rules_text` column
+    pub(crate) fn set_disabled_rules(
+        &self,
+        tx: &Transaction<'_>,
+        filter_id: FilterId,
+        disabled_rules: String,
+    ) -> Result<usize> {
+        let sql: &str = r"
+            UPDATE
+                [rules_list]
+            SET
+                disabled_rules_text = :disabled_rules_text
+            WHERE
+                filter_id = :filter_id
+        ";
+
+        let mut statement = tx.prepare(sql)?;
+
+        statement.execute(named_params! {
+            ":disabled_rules_text": disabled_rules,
+            ":filter_id": filter_id
+        })
+    }
+
+    /// Counts results by `where_clause`
+    pub(crate) fn count(
+        &self,
+        connection: &Connection,
+        where_clause: Option<SQLOperator>,
+    ) -> Result<i32> {
+        let mut sql = String::from(
+            r"
+            SELECT
+                COUNT(1)
+            FROM
+                [rules_list]
+        ",
+        );
+
+        let params = process_where_clause(&mut sql, where_clause)?;
+        let mut statement = connection.prepare(sql.as_str())?;
+
+        statement.query_row(params, |row: &Row| row.get(0))
+    }
+
     /// Gets entities mapped by [`FilterId`]
     pub(crate) fn select_mapped(
         &self,

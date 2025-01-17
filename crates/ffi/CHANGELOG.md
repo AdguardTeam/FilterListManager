@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.1.21] - 2025-01-17
+
+### Fixed
+- Unnecessary filter rules selection in `save_disabled_rules`
+- `file:///` urls support in `IndexesParser`
+
+[1.1.21]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.1.20...ffi-1.1.21
+
 ## [1.1.20] - 2024-12-19
 
 ### Added

@@ -96,6 +96,7 @@ impl Drop for RAIIFile {
     }
 }
 
+/// Builds [`PathBuf`] from string path, relative to tests folder
 pub(crate) fn tests_path(relative_path: &'static str) -> PathBuf {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push("tests");

@@ -368,23 +368,22 @@ impl FilterListManager for FilterListManagerImpl {
             .execute_db(move |mut conn: Connection| {
                 let rules_list_repository = RulesListRepository::new();
 
-                let rules_lists = rules_list_repository
-                    .select(
+                let rules_lists_count = rules_list_repository
+                    .count(
                         &conn,
                         Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
                     )
                     .map_err(FLMError::from_database)?;
 
-                let mut rules_list_entity = match rules_lists {
-                    None => return Err(FLMError::EntityNotFound(filter_id as i64)),
-                    Some(mut vec) => vec.swap_remove(0),
-                };
+                if rules_lists_count == 0 {
+                    return Err(FLMError::EntityNotFound(filter_id as i64));
+                }
 
-                rules_list_entity.disabled_text = disabled_rules.join("\n");
-
-                rules_list_repository
-                    .insert_row(&mut conn, rules_list_entity)
-                    .map_err(FLMError::from_database)
+                with_transaction(&mut conn, |transaction: &Transaction| {
+                    rules_list_repository
+                        .set_disabled_rules(&transaction, filter_id, disabled_rules.join("\n"))
+                        .map(|_| ())
+                })
             })
     }
 

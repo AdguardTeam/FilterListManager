@@ -1,4 +1,5 @@
 use crate::io::error::IOError;
+use crate::FLMError;
 use reqwest::Url;
 use std::fs;
 use std::path::PathBuf;
@@ -39,7 +40,7 @@ pub(crate) fn get_authority(url: &str) -> Option<&str> {
     None
 }
 
-/// [`read_filter_file`] error type
+/// [`read_file_by_url`] error type
 #[cfg_attr(test, derive(Debug))]
 pub(crate) enum ReadFilterFileError {
     Io(IOError),
@@ -52,7 +53,16 @@ impl From<std::io::Error> for ReadFilterFileError {
     }
 }
 
-/// For test purposes only
+impl Into<FLMError> for ReadFilterFileError {
+    fn into(self) -> FLMError {
+        match self {
+            ReadFilterFileError::Io(io) => FLMError::Io(io),
+            ReadFilterFileError::Other(other) => FLMError::Other(other),
+        }
+    }
+}
+
+/// Converts URL to path
 #[inline]
 fn convert_file_url_to_path(url: &str) -> Result<PathBuf, ReadFilterFileError> {
     let url = Url::parse(url).map_err(|why| ReadFilterFileError::Other(why.to_string()))?;
@@ -62,7 +72,7 @@ fn convert_file_url_to_path(url: &str) -> Result<PathBuf, ReadFilterFileError> {
 }
 
 /// Tries to read filter file by url
-pub(crate) fn read_filter_file(url: &str) -> Result<String, ReadFilterFileError> {
+pub(crate) fn read_file_by_url(url: &str) -> Result<String, ReadFilterFileError> {
     let path = convert_file_url_to_path(url)?;
 
     fs::read_to_string(path).map_err(ReadFilterFileError::from)
