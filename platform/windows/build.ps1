@@ -19,7 +19,21 @@ Function GetVersionFromToml {
     throw "Version not found in $FilePath"
 }
 
-Function ReplaceVersion {
+Function ReplaceJsonVersion {
+    param (
+        [string]$Line,
+        [string]$Pattern,
+        [string]$PatternSubstitution
+    )
+
+    if ($Line -match $Pattern) {
+        return $Line -replace $Pattern, "$PatternSubstitution"
+    }
+
+    return $Line
+}
+
+Function ReplaceRcVersion {
     param (
         [string]$Line,
         [string]$Pattern,
@@ -33,7 +47,28 @@ Function ReplaceVersion {
     return $Line
 }
 
-function SetVersion {
+function SetAdapterVersion {
+    
+    $jsonFilePath = "platform\windows\AdGuard.FilterListManager\AdGuard.FilterListManager.schema.json";
+
+    $jsonFileContent = Get-Content -Path $jsonFilePath -Raw
+    $jsonFileJsonObject = ConvertFrom-Json -InputObject $jsonFileContent
+
+    $jsonVersion = $jsonFileJsonObject.version.TrimEnd(".0");
+
+    $csprojFilePath = "platform\windows\AdGuard.FilterListManager\AdGuard.FilterListManager.csproj";
+    $csprojContent = Get-Content -Path $csprojFilePath;
+
+    $updatedCsprojContent = $csprojContent | ForEach-Object {
+        $_ = ReplaceJsonVersion -Line $_ -Pattern '^([\s|\t]*<Version>)(.+)(<\/Version>)' -PatternSubstitution "`${1}$jsonVersion`${3}"
+        return $_;
+    }
+
+    Set-Content -Path $csprojFilePath -Value $updatedCsprojContent;
+    Write-Host "Adapter version $jsonVersion is updated";
+}
+
+function SetNativeVersion {
     
     $versionFromToml = GetVersionFromToml -FilePath "crates\ffi\Cargo.toml";
     $rcVersion = $versionFromToml -replace '\.', ',' -replace '$', ',0';
@@ -42,26 +77,27 @@ function SetVersion {
     $rcContent = Get-Content -Path $rcFilePath;
 
     $updatedRcContent = $rcContent | ForEach-Object {
-        $_ = ReplaceVersion -Line $_ -Pattern '^(.*FILEVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $rcVersion
-        $_ = ReplaceVersion -Line $_ -Pattern '^(.*PRODUCTVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $rcVersion
-        $_ = ReplaceVersion -Line $_ -Pattern '(.*"FileVersion",\s*")(\d+.\d+.\d+)' -NewVersion $versionFromToml
-        $_ = ReplaceVersion -Line $_ -Pattern '(.*"ProductVersion",\s*")(\d+.\d+.\d+)' -NewVersion $versionFromToml
+        $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*FILEVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $rcVersion
+        $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*PRODUCTVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $rcVersion
+        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"FileVersion",\s*")(\d+.\d+.\d+)' -NewVersion $versionFromToml
+        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"ProductVersion",\s*")(\d+.\d+.\d+)' -NewVersion $versionFromToml
         return $_;
     }
-    Set-Content -Path $rcFilePath -Value $updatedRcContent;
 
-    Write-Host "Version $rcVersion is updated";
+    Set-Content -Path $rcFilePath -Value $updatedRcContent;
+    Write-Host "Native version $rcVersion is updated";
 }
 
 Function RustBuild {
     $rust_version = (& cargo -V);
     if (!$rust_version.StartsWith("cargo 1.75")) {
-        Write-Output "Only Rust 1.75 supported! Versions 1.76+ don't support Windows 7. Current version is $rust_version";
+        Write-Output "Only Rust 1.75 supported for now! Current version is $rust_version";
         exit 1;
     }
 
     try {
-        SetVersion;
+        SetNativeVersion;
+        SetAdapterVersion;
     }
     catch {
         Write-Host $_
