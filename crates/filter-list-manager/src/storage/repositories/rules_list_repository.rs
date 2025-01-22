@@ -51,13 +51,6 @@ impl RulesListRepository {
         )
     }
 
-    pub(crate) fn insert_row(&self, conn: &mut Connection, entity: RulesListEntity) -> Result<()> {
-        let transaction = conn.transaction()?;
-
-        self.insert(&transaction, &[entity])
-            .and_then(|_| transaction.commit())
-    }
-
     /// Updates just `disabled_rules_text` column
     pub(crate) fn set_disabled_rules(
         &self,

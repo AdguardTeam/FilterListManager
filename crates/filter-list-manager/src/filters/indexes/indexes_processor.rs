@@ -1,5 +1,6 @@
 use super::entities::{IndexEntity, IndexI18NEntity};
 use crate::filters::indexes::index_consistency_checker::check_consistency;
+use crate::io::http::async_client::AsyncHTTPClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_scheme, read_file_by_url};
 use crate::storage::entities::filter_entity::FilterEntity;
@@ -10,7 +11,6 @@ use crate::storage::repositories::BulkDeleteRepository;
 use crate::storage::spawn_transaction;
 use crate::storage::DbConnectionManager;
 use crate::{
-    io::http::HttpClient,
     storage::repositories::filter_filter_tag_repository::FilterFilterTagRepository,
     storage::repositories::filter_locale_repository::FilterLocaleRepository,
     storage::repositories::{
@@ -32,19 +32,22 @@ pub struct IndexesProcessor<'a> {
     connection_source: &'a DbConnectionManager,
     loaded_index: Option<IndexEntity>,
     loaded_index_i18n: Option<IndexI18NEntity>,
-    connect_timeout: i32,
+    http_client: AsyncHTTPClient,
 }
 
 /// Public methods
 impl<'a> IndexesProcessor<'a> {
     /// Default ctor
-    pub fn factory(connection_source: &'a DbConnectionManager, connect_timeout: i32) -> Self {
-        Self {
+    pub fn factory(
+        connection_source: &'a DbConnectionManager,
+        connect_timeout: i32,
+    ) -> FLMResult<Self> {
+        Ok(Self {
             connection_source,
-            connect_timeout,
             loaded_index: None,
             loaded_index_i18n: None,
-        }
+            http_client: AsyncHTTPClient::new(connect_timeout)?,
+        })
     }
 
     /// Synchronizes filters metadata (with groups, locales, etc...) with remote server
@@ -313,11 +316,11 @@ impl IndexesProcessor<'_> {
                 let contents = read_file_by_url(url).map_err::<FLMError, _>(Into::into)?;
                 serde_json::from_str::<I>(&contents).map_err(FLMError::from_display)
             }
-            UrlSchemes::Https | UrlSchemes::Http => {
-                HttpClient::get_json::<I>(url, self.connect_timeout)
-                    .await
-                    .map_err(FLMError::Network)
-            }
+            UrlSchemes::Https | UrlSchemes::Http => self
+                .http_client
+                .get_json::<I>(url)
+                .await
+                .map_err(FLMError::Network),
             _ => FLMError::make_err(format!("Unknown scheme for url: {}", url)),
         }
     }
@@ -368,16 +371,16 @@ impl IndexesProcessor<'_> {
 #[cfg(test)]
 impl<'a> IndexesProcessor<'a> {
     /// Ctor for tests
-    pub(crate) const fn factory_test(
+    pub(crate) fn factory_test(
         connection_source: &'a DbConnectionManager,
         loaded_index: IndexEntity,
         loaded_index_i18n: IndexI18NEntity,
     ) -> Self {
         Self {
             connection_source,
-            connect_timeout: 0,
             loaded_index: Some(loaded_index),
             loaded_index_i18n: Some(loaded_index_i18n),
+            http_client: AsyncHTTPClient::new(60000).unwrap(),
         }
     }
 
@@ -517,7 +520,7 @@ mod tests {
         let groups_repository = FilterGroupRepository::new();
 
         let connection_manager = DbConnectionManager::factory_test().unwrap();
-        let mut indexes = IndexesProcessor::factory(&connection_manager, 0);
+        let mut indexes = IndexesProcessor::factory(&connection_manager, 0).unwrap();
 
         let mut rng = thread_rng();
         let (mut index, index_localisation) = build_filters_indices_fixtures().unwrap();
@@ -633,7 +636,7 @@ mod tests {
 
         // region second update
         {
-            let mut second_indexes = IndexesProcessor::factory(&connection_manager, 0);
+            let mut second_indexes = IndexesProcessor::factory(&connection_manager, 0).unwrap();
 
             let (index_second, index_localisation_second) =
                 build_filters_indices_fixtures().unwrap();
@@ -724,7 +727,7 @@ mod tests {
         unsafe {
             connection_manager.lift_up_database().unwrap();
         };
-        let mut processor = IndexesProcessor::factory(&connection_manager, 60);
+        let mut processor = IndexesProcessor::factory(&connection_manager, 60).unwrap();
 
         processor.sync_metadata(&index_url, &index_i18_url).unwrap();
     }

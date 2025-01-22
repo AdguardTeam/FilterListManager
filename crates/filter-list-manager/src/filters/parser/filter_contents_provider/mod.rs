@@ -6,6 +6,7 @@ mod check_contents_is_filter_contents;
 pub(crate) mod diff_path_provider;
 pub(super) mod io_provider;
 pub(crate) mod string_provider;
+use crate::io::http::blocking_client::BlockingClient;
 use check_contents_is_filter_contents::check_contents_is_filter_contents;
 
 /// Provides filters contents.
@@ -21,14 +22,11 @@ pub(crate) trait FilterContentsProvider {
         absolute_url: &str,
         scheme: UrlSchemes,
     ) -> Result<String, FilterParserError> {
-        fetch_by_scheme(absolute_url, scheme, self.get_request_timeout())
+        fetch_by_scheme(absolute_url, scheme, self.get_http_client())
     }
 
-    /// Value getter
-    fn get_request_timeout(&self) -> i32;
-
-    /// Sets request timeout if it is not set
-    fn set_request_timeout_once(&mut self, request_timeout: i32);
+    /// Gets blocking client. Every provider needs it
+    fn get_http_client(&self) -> &BlockingClient;
 
     /// Tries to check the filter data to see if it is a filter or something else, using some heuristics
     fn pre_check_filter_contents(&self, filter_contents: &str) -> Result<(), FilterParserError> {

@@ -10,6 +10,7 @@ use crate::filters::parser::filter_contents_provider::io_provider::IOProvider;
 use crate::filters::parser::filter_contents_provider::FilterContentsProvider;
 use crate::filters::parser::parser_error::FilterParserError;
 use crate::filters::parser::paths::resolve_absolute_uri;
+use crate::io::http::blocking_client::BlockingClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_authority, get_scheme};
 use crate::manager::models::FilterId;
@@ -41,32 +42,30 @@ type ConditionalNestingLevel = i16;
 /// Downloads filter by given url, compiles using directives, and returns metadata and rules lists
 /// This parser can recursively include another filters placed with [`DIRECTIVE_INCLUDE`] directive.
 /// By default, filter checksum validation will be skipped.
-pub(crate) struct FilterParser {
+pub(crate) struct FilterParser<'a> {
     conditional_nesting_level: ConditionalNestingLevel,
     condition_disabled_at_nesting: ConditionalNestingLevel,
     nesting_stack: Vec<ConditionalNestingLevel>,
     boolean_expression_parser: BooleanExpressionParser,
     metadata_collector: MetadataCollector,
     rule_lines_collector: RuleLinesCollector,
-    filter_downloader: Box<dyn FilterContentsProvider>,
+    filter_downloader: Box<dyn FilterContentsProvider + 'a>,
     filters_cursor: Vec<FilterCursor>,
     should_skip_checksum_validation: bool,
 }
 
-impl FilterParser {
-    pub(crate) const fn new(
+impl<'a> FilterParser<'a> {
+    pub(crate) fn new(
         boolean_expression_parser: BooleanExpressionParser,
-        metadata_collector: MetadataCollector,
-        rule_lines_collector: RuleLinesCollector,
-        filter_downloader: Box<dyn FilterContentsProvider>,
+        filter_downloader: Box<dyn FilterContentsProvider + 'a>,
     ) -> Self {
         Self {
             conditional_nesting_level: 0,
             condition_disabled_at_nesting: 0,
             nesting_stack: vec![],
             boolean_expression_parser,
-            metadata_collector,
-            rule_lines_collector,
+            metadata_collector: MetadataCollector::new(),
+            rule_lines_collector: RuleLinesCollector::new(),
             filter_downloader,
             filters_cursor: vec![],
             should_skip_checksum_validation: true,
@@ -74,29 +73,23 @@ impl FilterParser {
     }
 
     /// Basic factory
-    pub(crate) fn factory(configuration: &Configuration) -> Self {
-        let mut provider = IOProvider::new();
-        provider.set_request_timeout_once(configuration.request_timeout_ms);
-
+    pub(crate) fn factory(
+        configuration: &Configuration,
+        shared_http_client: &'a BlockingClient,
+    ) -> Self {
         Self::new(
             BooleanExpressionParser::new(configuration.compiler_conditional_constants.clone()),
-            MetadataCollector::new(),
-            RuleLinesCollector::new(),
-            Box::new(provider),
+            Box::new(IOProvider::new(shared_http_client)),
         )
     }
 
     /// Constructor for custom [`FilterContentsProvider`]
     pub(crate) fn with_custom_provider(
-        mut filter_downloader: Box<dyn FilterContentsProvider>,
+        filter_downloader: Box<dyn FilterContentsProvider + 'a>,
         configuration: &Configuration,
     ) -> Self {
-        filter_downloader.set_request_timeout_once(configuration.request_timeout_ms);
-
         Self::new(
             BooleanExpressionParser::new(configuration.compiler_conditional_constants.clone()),
-            MetadataCollector::new(),
-            RuleLinesCollector::new(),
             filter_downloader,
         )
     }
@@ -368,7 +361,7 @@ impl FilterParser {
 }
 
 /// Internal objects getters
-impl FilterParser {
+impl FilterParser<'_> {
     /// Gets raw value by metadata property
     pub fn get_metadata(&self, prop: KnownMetadataProperty) -> String {
         self.metadata_collector.get(prop)
@@ -384,7 +377,7 @@ impl FilterParser {
 }
 
 /// Utility methods
-impl FilterParser {
+impl FilterParser<'_> {
     /// Tries to resolve included path from parent [`FilterCursor`] and passed `include_path`
     ///
     /// # Failure
@@ -493,22 +486,22 @@ impl FilterParser {
 }
 
 #[cfg(test)]
-impl FilterParser {
-    pub(crate) fn test_factory() -> Self {
-        let conf = Configuration::default();
-
-        Self::factory(&conf)
-    }
-}
-
-#[cfg(test)]
 mod tests {
     use super::{
         filter_contents_provider::string_provider::StringProvider, filter_cursor::FilterCursor,
         metadata::KnownMetadataProperty, parser_error::FilterParserError, FilterParser,
     };
+    use crate::test_utils::SHARED_TEST_BLOCKING_HTTP_CLIENT;
     use crate::utils::memory::heap;
     use crate::Configuration;
+
+    impl FilterParser<'_> {
+        pub(crate) fn test_factory() -> Self {
+            let conf = Configuration::default();
+
+            Self::factory(&conf, &SHARED_TEST_BLOCKING_HTTP_CLIENT)
+        }
+    }
 
     #[test]
     fn test_process_conditional_directives() {
@@ -728,7 +721,7 @@ abc
     #[test]
     fn test_rules_count() {
         let filter = include_str!("../../tests/fixtures/small_pseudo_custom_filter.txt");
-        let provider = StringProvider::new(filter.into());
+        let provider = StringProvider::factory_test(filter.into());
         let url = "we don't care".to_string();
 
         let conf = Configuration::default();
@@ -741,7 +734,7 @@ abc
     #[test]
     fn test_metadata_fields_must_be_grabbed_only_first_time() {
         let filter = include_str!("../../tests/fixtures/small_pseudo_custom_filter.txt");
-        let provider = StringProvider::new(filter.into());
+        let provider = StringProvider::factory_test(filter.into());
         let url = "we don't care".to_string();
 
         let conf = Configuration::default();
@@ -795,7 +788,7 @@ abc
     fn test_metadata_fields_aliases() {
         let filter =
             include_str!("../../tests/fixtures/small_pseudo_custom_filter_with_aliases.txt");
-        let provider = StringProvider::new(filter.into());
+        let provider = StringProvider::factory_test(filter.into());
         let url = "we don't care".to_string();
 
         let conf = Configuration::default();
@@ -861,8 +854,10 @@ abc
         ]
         .into_iter()
         .for_each(|(base_url, url_like_string, expected_result)| {
-            let mut parser =
-                FilterParser::with_custom_provider(heap(StringProvider::new(String::new())), &conf);
+            let mut parser = FilterParser::with_custom_provider(
+                heap(StringProvider::factory_test(String::new())),
+                &conf,
+            );
 
             parser
                 .filters_cursor

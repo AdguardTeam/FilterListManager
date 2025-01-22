@@ -1,7 +1,7 @@
 use adguard_flm::manager::filter_list_manager_impl::FilterListManagerImpl;
 use adguard_flm::manager::FilterListManager;
 use adguard_flm::Configuration;
-use std::time::SystemTime;
+use std::time::{Instant, SystemTime};
 
 #[allow(dead_code)]
 fn install_lists() {
@@ -54,18 +54,16 @@ fn gets_filter_list() {
 
 #[allow(dead_code)]
 fn update_filters() {
+    let start = Instant::now();
     let updated = FilterListManagerImpl::new(Configuration::default())
         .unwrap()
-        .update_filters(false, 0, false)
+        .update_filters(true, 0, true)
         .unwrap()
         .unwrap();
 
     println!("Updated filters count: {}", updated.updated_list.len());
     println!("{}", "=".repeat(30));
-
-    updated.updated_list.iter().for_each(|f| {
-        println!("Updated filter {}", f.id);
-    });
+    println!("Time elapsed: {:.2}", start.elapsed().as_secs_f32())
 }
 
 pub(crate) fn test() {

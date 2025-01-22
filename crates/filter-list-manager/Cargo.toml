@@ -35,6 +35,7 @@ rustls-tls = ["reqwest/rustls-tls"]
 
 [dev-dependencies]
 libc = "0.2.153"
+lazy_static = "1.5.0"
 once_cell = "1.19.0"
 rand = "0.8.5"
 rusty-hook = "^0.11.2"

@@ -5,6 +5,7 @@ use crate::filters::parser::{
     paths::resolve_absolute_uri, rcs_diff::apply_patch,
 };
 use crate::io::fetch_by_schemes::fetch_by_scheme;
+use crate::io::http::blocking_client::BlockingClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_hash_from_url, get_scheme};
 use crate::FilterParserError;
@@ -12,28 +13,29 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 /// This provider is used to download and process incremental filter updates
-pub(crate) struct DiffPathProvider {
-    /// Request timeout, in milliseconds
-    request_timeout: Option<i32>,
+pub(crate) struct DiffPathProvider<'a> {
     /// Relative path from Diff-Path
     patch_relative_path: String,
     /// Contents of saved filter
     base_filter_contents: String,
     /// Container for shared patch files
     batch_patches_container: Rc<RefCell<BatchPatchesContainer>>,
+    /// Shared sync http client
+    shared_http_client: &'a BlockingClient,
 }
 
-impl DiffPathProvider {
+impl<'a> DiffPathProvider<'a> {
     pub(crate) fn new(
         patch_relative_path: String,
         base_filter_contents: String,
         batch_patches_container: Rc<RefCell<BatchPatchesContainer>>,
+        shared_http_client: &'a BlockingClient,
     ) -> Self {
         Self {
             patch_relative_path,
-            request_timeout: None,
             base_filter_contents,
             batch_patches_container,
+            shared_http_client,
         }
     }
 
@@ -73,7 +75,7 @@ impl DiffPathProvider {
     }
 }
 
-impl FilterContentsProvider for DiffPathProvider {
+impl FilterContentsProvider for DiffPathProvider<'_> {
     fn get_filter_contents(&self, root_filter_url: &str) -> Result<String, FilterParserError> {
         let scheme = UrlSchemes::from(get_scheme(root_filter_url));
 
@@ -89,8 +91,7 @@ impl FilterContentsProvider for DiffPathProvider {
 
                 let diff_contents = match pinned_container.get_a_copy(&patch_path) {
                     None => {
-                        let body =
-                            fetch_by_scheme(&patch_path, scheme, self.get_request_timeout())?;
+                        let body = fetch_by_scheme(&patch_path, scheme, self.get_http_client())?;
 
                         pinned_container.insert(patch_path, body.clone());
 
@@ -103,7 +104,7 @@ impl FilterContentsProvider for DiffPathProvider {
             }
             None => {
                 let diff_contents =
-                    fetch_by_scheme(&patch_file_absolute_uri, scheme, self.get_request_timeout())?;
+                    fetch_by_scheme(&patch_file_absolute_uri, scheme, self.get_http_client())?;
 
                 (None, diff_contents)
             }
@@ -112,14 +113,8 @@ impl FilterContentsProvider for DiffPathProvider {
         self.do_patch(file_contents.as_str(), resource_name)
     }
 
-    fn get_request_timeout(&self) -> i32 {
-        self.request_timeout.clone().unwrap_or_default()
-    }
-
-    fn set_request_timeout_once(&mut self, request_timeout: i32) {
-        if self.request_timeout.is_none() {
-            self.request_timeout = Some(request_timeout);
-        }
+    fn get_http_client(&self) -> &BlockingClient {
+        self.shared_http_client
     }
 }
 
@@ -129,7 +124,7 @@ mod tests {
     use crate::filters::parser::diff_updates::batch_patches_container::BatchPatchesContainer;
     use crate::filters::parser::filter_contents_provider::diff_path_provider::DiffPathProvider;
     use crate::filters::parser::filter_contents_provider::FilterContentsProvider;
-    use crate::test_utils::tests_path;
+    use crate::test_utils::{tests_path, SHARED_TEST_BLOCKING_HTTP_CLIENT};
     use url::Url;
 
     #[test]
@@ -159,6 +154,7 @@ mod tests {
             "../patches/batch_v1.0.0-s-1700045842-3600.patch#list1".to_string(),
             list1_v100.to_string(),
             container.clone(),
+            &SHARED_TEST_BLOCKING_HTTP_CLIENT,
         );
         assert_eq!(
             list1_v101,
@@ -171,6 +167,7 @@ mod tests {
             "../patches/batch_v1.0.0-s-1700045842-3600.patch#list2".to_string(),
             list2_v100.to_string(),
             container.clone(),
+            &SHARED_TEST_BLOCKING_HTTP_CLIENT,
         );
         assert_eq!(
             list2_v101,
@@ -213,6 +210,7 @@ a3 6
             "../patches/batch_v1.0.0-s-1700045842-3600.patch#list1".to_string(),
             v1.to_string(),
             container.clone(),
+            &SHARED_TEST_BLOCKING_HTTP_CLIENT,
         );
 
         let final_filter = provider1
@@ -252,6 +250,7 @@ a8 2
             "../patches/batch_v1.0.0-s-1700045842-3600.patch#list1".to_string(),
             v1.to_string(),
             container.clone(),
+            &SHARED_TEST_BLOCKING_HTTP_CLIENT,
         );
 
         let final_filter = provider1
@@ -276,6 +275,7 @@ a8 2
             "patches/v1.0.0-m-28334060-60.patch".to_string(),
             String::from(base_filter_contents),
             BatchPatchesContainer::factory(),
+            &SHARED_TEST_BLOCKING_HTTP_CLIENT,
         );
 
         let base_filter_url = Url::from_file_path(base_filter_path).unwrap();
@@ -301,6 +301,7 @@ a8 2
             "patches/v1.0.0-472234-1.patch".to_string(),
             String::from(base_filter_contents),
             BatchPatchesContainer::factory(),
+            &SHARED_TEST_BLOCKING_HTTP_CLIENT,
         );
 
         let base_filter_url = Url::from_file_path(base_filter_path).unwrap();

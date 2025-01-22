@@ -1,14 +1,15 @@
 pub(crate) mod indexes_fixtures;
 pub(crate) mod tests_db;
 
+use lazy_static::lazy_static;
 use once_cell::sync::Lazy;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::{Mutex, MutexGuard, Once};
-
 use tests_db::TestsDb;
 
 use crate::filters::indexes::indexes_processor::IndexesProcessor;
+use crate::io::http::blocking_client::BlockingClient;
 use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::DbConnectionManager;
@@ -103,4 +104,9 @@ pub(crate) fn tests_path(relative_path: &'static str) -> PathBuf {
     path.push(relative_path);
 
     path
+}
+
+lazy_static! {
+    /// Default blocking http client for testing purposes
+    pub(crate) static ref SHARED_TEST_BLOCKING_HTTP_CLIENT: BlockingClient = BlockingClient::new(60000).unwrap();
 }

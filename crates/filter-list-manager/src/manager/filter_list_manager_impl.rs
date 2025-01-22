@@ -6,6 +6,7 @@ use super::models::{
 use crate::filters::indexes::indexes_processor::IndexesProcessor;
 use crate::filters::parser::diff_updates::process_diff_path::process_diff_path;
 use crate::filters::parser::filter_contents_provider::string_provider::StringProvider;
+use crate::io::http::blocking_client::BlockingClient;
 use crate::manager::models::active_rules_info::ActiveRulesInfo;
 use crate::manager::models::configuration::{Locale, LOCALES_DELIMITER};
 use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
@@ -110,7 +111,8 @@ impl FilterListManager for FilterListManagerImpl {
         title: Option<String>,
         description: Option<String>,
     ) -> FLMResult<FullFilterList> {
-        let mut parser = FilterParser::factory(&self.configuration);
+        let client = BlockingClient::new(self.configuration.request_timeout_ms)?;
+        let mut parser = FilterParser::factory(&self.configuration, &client);
 
         let normalized_url = if download_url.is_empty() {
             String::new()
@@ -211,7 +213,9 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn fetch_filter_list_metadata(&self, url: String) -> FLMResult<FilterListMetadata> {
-        let mut parser = FilterParser::factory(&self.configuration);
+        let client = BlockingClient::new(self.configuration.request_timeout_ms)?;
+        let mut parser = FilterParser::factory(&self.configuration, &client);
+
         let download_url = parser
             .parse_from_url(&url)
             .map_err(FLMError::from_parser_error)?;
@@ -490,7 +494,7 @@ impl FilterListManager for FilterListManagerImpl {
         let mut processor = IndexesProcessor::factory(
             &self.connection_manager,
             self.configuration.request_timeout_ms,
-        );
+        )?;
 
         processor.sync_metadata(
             &self.configuration.metadata_url,
@@ -570,7 +574,8 @@ impl FilterListManager for FilterListManagerImpl {
         custom_title: Option<String>,
         custom_description: Option<String>,
     ) -> FLMResult<FullFilterList> {
-        let provider = StringProvider::new(filter_body);
+        let client = BlockingClient::new(self.configuration.request_timeout_ms)?;
+        let provider = StringProvider::new(filter_body, &client);
 
         let mut parser = FilterParser::with_custom_provider(heap(provider), &self.configuration);
 

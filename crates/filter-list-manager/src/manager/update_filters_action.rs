@@ -4,6 +4,7 @@ use crate::filters::parser::filter_contents_provider::diff_path_provider::DiffPa
 use crate::filters::parser::metadata::parsers::expires::process_expires;
 use crate::filters::parser::metadata::KnownMetadataProperty;
 use crate::filters::parser::FilterParser;
+use crate::io::http::blocking_client::BlockingClient;
 use crate::manager::filter_lists_builder::FullFilterListBuilder;
 use crate::manager::models::update_result::UpdateFilterError;
 use crate::manager::models::UpdateResult;
@@ -75,6 +76,8 @@ pub(super) fn update_filters_action(
             Ok((diff_updates_map, rules_map, disabled_rules_map))
         })?;
 
+    let shared_http_client = BlockingClient::new(configuration.request_timeout_ms)?;
+
     // Parsers with successful filter downloads
     let mut successful_parsers_with_result: Vec<(FilterId, FilterParser)> =
         Vec::with_capacity(filter_entities.len() / 2);
@@ -116,6 +119,7 @@ pub(super) fn update_filters_action(
             &mut rules_map,
             &batch_patches_container,
             &filter,
+            &shared_http_client,
         );
 
         let mut parser = match build_parser_result {
@@ -277,7 +281,7 @@ pub(super) fn update_filters_action(
 
 /// Parsers factory logic
 #[inline]
-fn build_parser(
+fn build_parser<'h: 'p, 'p>(
     ignore_filters_expiration: bool,
     filter_id: FilterId,
     configuration: &Configuration,
@@ -286,14 +290,18 @@ fn build_parser(
     rules_map: &mut MapFilterIdOnRulesString,
     batch_patches_container: &Rc<RefCell<BatchPatchesContainer>>,
     filter: &FilterEntity,
-) -> FLMResult<Option<FilterParser>> {
+    shared_http_client: &'h BlockingClient,
+) -> FLMResult<Option<FilterParser<'p>>> {
     let expires_duration = configuration.resolve_right_expires_value(filter.expires) as i64;
 
     let ready_for_full_update = current_time > filter.last_download_time + expires_duration;
 
     // We force full filter update through http or filter is ready for full update
     if ignore_filters_expiration || ready_for_full_update {
-        return Ok(Some(FilterParser::factory(configuration)));
+        return Ok(Some(FilterParser::factory(
+            configuration,
+            shared_http_client,
+        )));
     }
 
     if let Some(diff_update_info) = diff_updates_map.remove(&filter_id) {
@@ -306,6 +314,7 @@ fn build_parser(
                         diff_update_info.next_path,
                         rules,
                         Rc::clone(batch_patches_container),
+                        shared_http_client,
                     );
 
                     Ok(Some(FilterParser::with_custom_provider(

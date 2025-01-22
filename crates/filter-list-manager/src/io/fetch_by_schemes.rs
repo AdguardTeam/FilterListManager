@@ -1,18 +1,18 @@
 use crate::filters::parser::parser_error::FilterParserError;
-use crate::io::{http::HttpClient, read_file_by_url, url_schemes::UrlSchemes};
+use crate::io::http::blocking_client::BlockingClient;
+use crate::io::{read_file_by_url, url_schemes::UrlSchemes};
 
 /// Synchronously fetch contents from absolute url
 pub(crate) fn fetch_by_scheme(
     absolute_url: &str,
     scheme: UrlSchemes,
-    request_timeout: i32,
+    shared_http_client: &BlockingClient,
 ) -> Result<String, FilterParserError> {
     match scheme {
         UrlSchemes::File => read_file_by_url(absolute_url).map_err(Into::into),
-        UrlSchemes::Https | UrlSchemes::Http => {
-            HttpClient::sync_get_file_contents(absolute_url, request_timeout)
-                .map_err(FilterParserError::Network)
-        }
+        UrlSchemes::Https | UrlSchemes::Http => shared_http_client
+            .get_filter(absolute_url)
+            .map_err(FilterParserError::Network),
         _ => Err(FilterParserError::SchemeIsIncorrect(format!(
             "Got unknown scheme from {}",
             absolute_url
