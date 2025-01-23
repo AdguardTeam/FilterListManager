@@ -8,7 +8,7 @@ namespace AdGuard.FilterListManager
     /// </summary>
     /// <seealso cref="FfiObject{THandle}" />
     /// <seealso cref="IFilterListManager" />
-    public class FilterListManager : FfiObject<FilterListManagerSafeHandle>, IFilterListManager
+    public class FilterListManager : FfiObject<FilterListManagerSafeHandle>, IFil-terListManager
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterListManager"/> class.

@@ -366,6 +366,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 FilterId = filterId,
                 FilePath = filePath
             };
+            
             CallRust<EmptyResponse>(request);
         }
         
@@ -378,6 +379,20 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             request.Ids.AddRange(filterIds);
             GetDisabledRulesResponse response = CallRust<GetDisabledRulesResponse>(request);
             return response.RulesRaw;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public void SetProxyMode(string customProxyAddr,  RawRequestProxyMode proxyMode)
+        {
+            SetProxyModeRequest request = new SetProxyModeRequest
+            {
+                CustomProxyAddr = customProxyAddr,
+                Mode = proxyMode
+            };
+            
+            CallRust<EmptyResponse>(request);
         }
 
         #endregion
@@ -404,19 +419,19 @@ namespace AdGuard.FilterListManagerProtobuf.Api
 
         private FfiMethod GetMethod(string methodName)
         {
-            if (Enum.TryParse(methodName, out FfiMethod method))
+            if (!Enum.TryParse(methodName, out FfiMethod method))
             {
-                Logger.Verbose("Parsed method: {0}->{1}", 
-                    methodName,
-                    method);
-                return method;
+                throw new InvalidCastException($"Failed to parse {methodName}");
             }
+            
+            Logger.Verbose("Parsed method: {0}->{1}", 
+                methodName,
+                method);
+            return method;
 
-            throw new InvalidCastException($"Failed to parse {methodName}");
         }
 
         #endregion
-
 
         #region IDisposable members
 
@@ -451,7 +466,5 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         }
 
         #endregion
-
-        
     }
 }
