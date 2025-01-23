@@ -18,6 +18,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <param name="metadataUrl">The metadata URL.</param>
         /// <param name="metadataLocalesUrl">The metadata locales URL.</param>
         /// <param name="requestTimeoutMs">The request timeout ms.</param>
+        /// <param name="requestProxyMode">The proxy settings</param>
         /// <param name="autoLiftUpDatabase">if set to <c>true</c> the database will be lifted (up version) automatically.</param>
         public Configuration(FilterListType filterListType,
             string workingDirectory,
@@ -27,6 +28,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             string metadataUrl,
             string metadataLocalesUrl,
             int requestTimeoutMs,
+            RequestProxyMode requestProxyMode,
             bool autoLiftUpDatabase)
         {
             FilterListType = filterListType;
@@ -37,6 +39,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             MetadataUrl = metadataUrl;
             MetadataLocalesUrl = metadataLocalesUrl;
             RequestTimeoutMs = requestTimeoutMs;
+            RequestProxyMode = requestProxyMode;
             AutoLiftUpDatabase = autoLiftUpDatabase;
         }
 
@@ -79,6 +82,11 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// Gets or sets the request timeout in milliseconds.
         /// </summary>
         public int RequestTimeoutMs { get; set; }
+
+        /// <summary>
+        /// Gets the request proxy settings.
+        /// </summary>
+        public RequestProxyMode RequestProxyMode { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the database will be lifted (up version) automatically.

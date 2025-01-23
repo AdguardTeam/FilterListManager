@@ -15,6 +15,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 metadataUrl: FfiConverterString.Instance.Read(stream),
                 metadataLocalesUrl: FfiConverterString.Instance.Read(stream),
                 requestTimeoutMs: FfiConverterInt32.Instance.Read(stream),
+                requestProxyMode: FfiConverterTypeRequestProxyMode.Instance.Read(stream),
                 autoLiftUpDatabase: FfiConverterBoolean.Instance.Read(stream)
             );
         }
@@ -31,6 +32,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
                    + FfiConverterString.Instance.AllocationSize(value.MetadataUrl)
                    + FfiConverterString.Instance.AllocationSize(value.MetadataLocalesUrl)
                    + FfiConverterInt32.Instance.AllocationSize(value.RequestTimeoutMs) +
+                   FfiConverterTypeRequestProxyMode.Instance.AllocationSize(value.RequestProxyMode) +
                    FfiConverterBoolean.Instance.AllocationSize(value.AutoLiftUpDatabase);
         }
 
@@ -47,6 +49,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             FfiConverterString.Instance.Write(value.MetadataUrl, stream);
             FfiConverterString.Instance.Write(value.MetadataLocalesUrl, stream);
             FfiConverterInt32.Instance.Write(value.RequestTimeoutMs, stream);
+            FfiConverterTypeRequestProxyMode.Instance.Write(value.RequestProxyMode, stream);
             FfiConverterBoolean.Instance.Write(value.AutoLiftUpDatabase, stream);
         }
     }
