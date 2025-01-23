@@ -116,6 +116,10 @@ final class AdGuardFLMLibTests: XCTestCase {
         NSLog("Custom filter successfully removed")
 
         NSLog("Current database path: '\(try flm.getDatabasePath())' and version: '\(try flm.getDatabaseVersion())'")
+
+        XCTAssertNoThrow(try flm.setProxyMode(mode: FilterListManager_RawRequestProxyMode.useCustomProxy, custom_addr: "http://localhost:8080"))
+
+        XCTAssertNoThrow(try flm.setProxyMode(mode: FilterListManager_RawRequestProxyMode.noProxy, custom_addr: nil))
     }
 }
 
