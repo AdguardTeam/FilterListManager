@@ -303,6 +303,20 @@ public struct FilterListManager_GetDisabledRulesRequest {
   public init() {}
 }
 
+public struct FilterListManager_SetProxyModeRequest {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var mode: FilterListManager_RawRequestProxyMode = .useSystemProxy
+
+  public var customProxyAddr: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct FilterListManager_EmptyRequest {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -876,6 +890,7 @@ extension FilterListManager_UpdateCustomFilterMetadataRequest: @unchecked Sendab
 extension FilterListManager_GetFilterRulesAsStringsRequest: @unchecked Sendable {}
 extension FilterListManager_SaveRulesToFileBlobRequest: @unchecked Sendable {}
 extension FilterListManager_GetDisabledRulesRequest: @unchecked Sendable {}
+extension FilterListManager_SetProxyModeRequest: @unchecked Sendable {}
 extension FilterListManager_EmptyRequest: @unchecked Sendable {}
 extension FilterListManager_InstallCustomFilterListResponse: @unchecked Sendable {}
 extension FilterListManager_EnableFilterListsResponse: @unchecked Sendable {}
@@ -1563,6 +1578,44 @@ extension FilterListManager_GetDisabledRulesRequest: SwiftProtobuf.Message, Swif
 
   public static func ==(lhs: FilterListManager_GetDisabledRulesRequest, rhs: FilterListManager_GetDisabledRulesRequest) -> Bool {
     if lhs.ids != rhs.ids {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension FilterListManager_SetProxyModeRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".SetProxyModeRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "mode"),
+    2: .standard(proto: "custom_proxy_addr"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularEnumField(value: &self.mode) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.customProxyAddr) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.mode != .useSystemProxy {
+      try visitor.visitSingularEnumField(value: self.mode, fieldNumber: 1)
+    }
+    if !self.customProxyAddr.isEmpty {
+      try visitor.visitSingularStringField(value: self.customProxyAddr, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: FilterListManager_SetProxyModeRequest, rhs: FilterListManager_SetProxyModeRequest) -> Bool {
+    if lhs.mode != rhs.mode {return false}
+    if lhs.customProxyAddr != rhs.customProxyAddr {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

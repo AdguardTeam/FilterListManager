@@ -90,6 +90,8 @@ public protocol FLMFacadeProtocol {
     func saveRulesToFileBlob(id: Int32, filePath: String) throws
 
     func getDisabledRules(ids: [Int32]) throws -> [FilterListManager_DisabledRulesRaw]
+
+    func setProxyMode(mode: FilterListManager_RawRequestProxyMode, custom_addr: String?) throws
 }
 
 /// Main FLM  facade.
@@ -514,6 +516,19 @@ public class FLMFacade: FLMFacadeProtocol {
         }
 
         return response.rulesRaw
+    }
+
+    public func setProxyMode(mode: FilterListManager_RawRequestProxyMode, custom_addr: String?) throws {
+        var message = FilterListManager_SetProxyModeRequest()
+        message.mode = mode
+        message.customProxyAddr = custom_addr ?? ""
+
+        let bytes = try callRust(method: SetProxyMode, message: message)
+        let response = try FilterListManager_EmptyResponse(serializedBytes: bytes)
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
     }
 
     deinit {
