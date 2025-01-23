@@ -24,6 +24,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
             return method.Name;
         }
 
+        const int VERSION_TO_CHECK = 26;
+
         /// <summary>
         /// The API checksum map. We are provided with Rust-backed checksums functions (*_checksum_*). This map is to call and check using these checksums.
         /// </summary>
@@ -70,6 +72,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_disabled_rules),
                 new KeyValuePair<ushort, Func<ushort>>(49193,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_rules_to_file_blob),
+                new KeyValuePair<ushort, Func<ushort>>(26774,
+                    uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_set_proxy_mode),
                 new KeyValuePair<ushort, Func<ushort>>(31826,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_custom_filter_metadata),
                 new KeyValuePair<ushort, Func<ushort>>(2861,
@@ -86,8 +90,6 @@ namespace AdGuard.FilterListManager.MarshalLogic
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_stored_filters_metadata_by_id),
                 new KeyValuePair<ushort, Func<ushort>>(58893,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings),
-                new KeyValuePair<ushort, Func<ushort>>(29147,
-                    uniffi_filter_list_manager_ffi_checksum_func_make_constants_structure),
                 new KeyValuePair<ushort, Func<ushort>>(58681,
                     uniffi_filter_list_manager_ffi_checksum_func_make_default_configuration)
             };
@@ -200,6 +202,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_rules_to_file_blob(FilterListManagerSafeHandle ptr, long filterId, RustBuffer filePath, ref RustCallStatus uniffiOutErr
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_set_proxy_mode(FilterListManagerSafeHandle ptr, RustBuffer requestProxyMode, ref RustCallStatus uniffiOutErr
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
@@ -547,6 +553,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_set_proxy_mode(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_custom_filter_metadata(
         );
 
@@ -588,10 +598,11 @@ namespace AdGuard.FilterListManager.MarshalLogic
         {
             uint scaffoldingContractVersion =
                 ffi_filter_list_manager_ffi_uniffi_contract_version();
-            if (24 != scaffoldingContractVersion)
+
+            if (VERSION_TO_CHECK != scaffoldingContractVersion)
             {
                 throw new UniffiContractVersionException(
-                    $"com.adguard.flm: uniffi bindings expected version `24`, library returned `{scaffoldingContractVersion}`"
+                    $"com.adguard.flm: uniffi bindings expected version `{VERSION_TO_CHECK}`, library returned `{scaffoldingContractVersion}`"
                 );
             }
         }
