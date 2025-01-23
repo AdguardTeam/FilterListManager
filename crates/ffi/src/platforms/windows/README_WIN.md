@@ -29,6 +29,8 @@ The result files will be in `target\[x86_64-pc-windows-msvc|i686-pc-windows-msvc
 
 ### Build C# adapter
 
+Run `\crates\ffi\src\platforms\windows\Scripts\generate_protobuf_files.ps1` to generate protobuf C# classes
+
 Go to `crates\ffi\src\platforms\windows` and build `AdGuard.FilterListManagerProtobuf\AdGuard.FilterListManagerProtobuf.csproj`. 
 
 ### Sample application 
