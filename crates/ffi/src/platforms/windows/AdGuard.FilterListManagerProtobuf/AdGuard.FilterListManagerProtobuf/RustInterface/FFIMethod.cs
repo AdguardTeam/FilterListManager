@@ -26,6 +26,7 @@
         GetActiveRules,
         GetFilterRulesAsStrings,
         SaveRulesToFileBlob,
-        GetDisabledRules
+        GetDisabledRules,
+        SetProxyMode
     }
 }
