@@ -5,6 +5,7 @@ pub mod models;
 mod update_filters_action;
 
 use crate::manager::models::active_rules_info::ActiveRulesInfo;
+use crate::manager::models::configuration::request_proxy_mode::RequestProxyMode;
 use crate::manager::models::configuration::Locale;
 use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
 use crate::manager::models::filter_group::FilterGroup;
@@ -318,4 +319,7 @@ pub trait FilterListManager {
 
     /// Returns lists of disabled rules by list of filter IDs
     fn get_disabled_rules(&self, ids: Vec<FilterId>) -> FLMResult<Vec<DisabledRulesRaw>>;
+
+    /// Sets a new proxy mode. Value will be applied on next method call
+    fn set_proxy_mode(&mut self, mode: RequestProxyMode);
 }

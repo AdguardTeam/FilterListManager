@@ -5,11 +5,23 @@ use crate::protobuf_generated::filter_list_manager;
 use adguard_flm::{
     ActiveRulesInfo, Configuration, DisabledRulesRaw, FilterGroup, FilterListMetadata,
     FilterListRules, FilterListRulesRaw, FilterListType, FilterTag, FullFilterList,
-    StoredFilterMetadata, UpdateFilterError, UpdateResult,
+    RequestProxyMode, StoredFilterMetadata, UpdateFilterError, UpdateResult,
 };
 
 impl From<Configuration> for filter_list_manager::Configuration {
     fn from(value: Configuration) -> Self {
+        let mut proxy_addr = String::new();
+
+        let proxy_mode = match value.request_proxy_mode {
+            RequestProxyMode::UseSystemProxy => 0,
+            RequestProxyMode::NoProxy => 1,
+            RequestProxyMode::UseCustomProxy { addr } => {
+                proxy_addr = addr;
+
+                2
+            }
+        };
+
         Self {
             filter_list_type: match value.filter_list_type {
                 FilterListType::STANDARD => filter_list_manager::FilterListType::Standard as i32,
@@ -25,6 +37,8 @@ impl From<Configuration> for filter_list_manager::Configuration {
             metadata_locales_url: value.metadata_locales_url,
             request_timeout_ms: value.request_timeout_ms,
             auto_lift_up_database: value.auto_lift_up_database,
+            request_proxy_mode: proxy_mode,
+            request_custom_proxy_addr: proxy_addr,
         }
     }
 }
@@ -56,6 +70,13 @@ impl Into<Configuration> for filter_list_manager::Configuration {
             metadata_url: self.metadata_url,
             metadata_locales_url: self.metadata_locales_url,
             request_timeout_ms: self.request_timeout_ms,
+            request_proxy_mode: match self.request_proxy_mode {
+                1 => RequestProxyMode::NoProxy,
+                2 => RequestProxyMode::UseCustomProxy {
+                    addr: self.request_custom_proxy_addr,
+                },
+                _ => RequestProxyMode::UseSystemProxy,
+            },
             auto_lift_up_database: self.auto_lift_up_database,
         }
     }

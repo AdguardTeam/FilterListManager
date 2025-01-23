@@ -8,6 +8,7 @@ use crate::filters::parser::diff_updates::process_diff_path::process_diff_path;
 use crate::filters::parser::filter_contents_provider::string_provider::StringProvider;
 use crate::io::http::blocking_client::BlockingClient;
 use crate::manager::models::active_rules_info::ActiveRulesInfo;
+use crate::manager::models::configuration::request_proxy_mode::RequestProxyMode;
 use crate::manager::models::configuration::{Locale, LOCALES_DELIMITER};
 use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
 use crate::manager::models::filter_group::FilterGroup;
@@ -111,7 +112,7 @@ impl FilterListManager for FilterListManagerImpl {
         title: Option<String>,
         description: Option<String>,
     ) -> FLMResult<FullFilterList> {
-        let client = BlockingClient::new(self.configuration.request_timeout_ms)?;
+        let client = BlockingClient::new(&self.configuration)?;
         let mut parser = FilterParser::factory(&self.configuration, &client);
 
         let normalized_url = if download_url.is_empty() {
@@ -213,7 +214,7 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn fetch_filter_list_metadata(&self, url: String) -> FLMResult<FilterListMetadata> {
-        let client = BlockingClient::new(self.configuration.request_timeout_ms)?;
+        let client = BlockingClient::new(&self.configuration)?;
         let mut parser = FilterParser::factory(&self.configuration, &client);
 
         let download_url = parser
@@ -491,10 +492,8 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn pull_metadata(&self) -> FLMResult<()> {
-        let mut processor = IndexesProcessor::factory(
-            &self.connection_manager,
-            self.configuration.request_timeout_ms,
-        )?;
+        let mut processor =
+            IndexesProcessor::factory(&self.connection_manager, &self.configuration)?;
 
         processor.sync_metadata(
             &self.configuration.metadata_url,
@@ -574,7 +573,7 @@ impl FilterListManager for FilterListManagerImpl {
         custom_title: Option<String>,
         custom_description: Option<String>,
     ) -> FLMResult<FullFilterList> {
-        let client = BlockingClient::new(self.configuration.request_timeout_ms)?;
+        let client = BlockingClient::new(&self.configuration)?;
         let provider = StringProvider::new(filter_body, &client);
 
         let mut parser = FilterParser::with_custom_provider(heap(provider), &self.configuration);
@@ -805,6 +804,10 @@ impl FilterListManager for FilterListManagerImpl {
                     .get_disabled_rules_by_ids(&connection, &ids)
                     .map_err(FLMError::from_database)
             })
+    }
+
+    fn set_proxy_mode(&mut self, mode: RequestProxyMode) {
+        self.configuration.request_proxy_mode = mode;
     }
 }
 

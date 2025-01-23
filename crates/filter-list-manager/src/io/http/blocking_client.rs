@@ -1,6 +1,7 @@
-use crate::{FLMError, FLMResult, HttpClientError};
+use crate::manager::models::configuration::request_proxy_mode::RequestProxyMode;
+use crate::{Configuration, FLMError, FLMResult, HttpClientError};
 use reqwest::blocking::{Client, ClientBuilder};
-use reqwest::StatusCode;
+use reqwest::{Proxy, StatusCode};
 use std::time::Duration;
 
 /// Standard blocking client wrapper
@@ -11,14 +12,25 @@ pub(crate) struct BlockingClient {
 impl BlockingClient {
     /// Blocking clients factory
     ///
-    /// * `timeout_ms` - Requests timeout value in milliseconds
-    pub(crate) fn new(timeout_ms: i32) -> FLMResult<Self> {
-        Ok(Self {
-            inner: ClientBuilder::new()
-                .timeout(Duration::from_millis(timeout_ms as u64))
-                .build()
-                .map_err(FLMError::from_display)?,
-        })
+    /// * `configuration` - FLM [`Configuration`]
+    pub(crate) fn new(configuration: &Configuration) -> FLMResult<Self> {
+        let mut builder = ClientBuilder::new().timeout(Duration::from_millis(
+            configuration.request_timeout_ms as u64,
+        ));
+
+        match configuration.request_proxy_mode {
+            RequestProxyMode::UseSystemProxy => {}
+            RequestProxyMode::NoProxy => {
+                builder = builder.no_proxy();
+            }
+            RequestProxyMode::UseCustomProxy { ref addr } => {
+                builder = builder.proxy(Proxy::all(addr).map_err(FLMError::from_display)?)
+            }
+        }
+
+        let client = builder.build().map_err(FLMError::from_display)?;
+
+        Ok(Self { inner: client })
     }
 
     /// Gets filter with special rules processing:

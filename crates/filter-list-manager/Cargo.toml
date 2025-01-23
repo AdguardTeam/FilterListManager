@@ -10,7 +10,7 @@ description = "This crate represents a library for managing AdGuard filter lists
 
 [dependencies]
 tokio = { version = "1.34.0", features = ["full"] }
-reqwest = { version = "0.11", features = ["json", "blocking"], default-features = false }
+reqwest = { version = "0.12.12", features = ["json", "blocking", "socks", "gzip", "deflate"], default-features = false }
 serde = { version = "1.0.193", features = ["derive"] }
 chrono = { version = "0.4.31", features = ["serde"] }
 chrono-tz = "0.8.4"

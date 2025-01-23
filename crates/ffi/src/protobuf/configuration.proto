@@ -7,6 +7,16 @@ enum FilterListType {
   DNS = 1;
 }
 
+// FLM Requests proxy mode
+enum RawRequestProxyMode {
+  // System proxy will be used
+  USE_SYSTEM_PROXY = 0;
+  // All proxies disabled
+  NO_PROXY = 1;
+  // Use custom proxy
+  USE_CUSTOM_PROXY = 2;
+}
+
 message Configuration {
   FilterListType filter_list_type = 1;
 
@@ -39,4 +49,10 @@ message Configuration {
 
   // “Uplifting” a database is a set of measures that brings the database up to date:
   bool auto_lift_up_database = 9;
+
+  // Proxy mode
+  RawRequestProxyMode request_proxy_mode = 10;
+
+  // Custom proxy addr for requests
+  string request_custom_proxy_addr = 11;
 }

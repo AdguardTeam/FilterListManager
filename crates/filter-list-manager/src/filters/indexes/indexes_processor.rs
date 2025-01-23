@@ -20,7 +20,7 @@ use crate::{
         localisation::filter_tag_localisation_repository::FilterTagLocalisationRepository,
         localisation::group_localisation_repository::GroupLocalisationRepository, Repository,
     },
-    FLMError, FLMResult, FilterId, CUSTOM_FILTERS_GROUP_ID,
+    Configuration, FLMError, FLMResult, FilterId, CUSTOM_FILTERS_GROUP_ID,
 };
 use rusqlite::{Connection, Transaction};
 use serde::de::DeserializeOwned;
@@ -40,13 +40,13 @@ impl<'a> IndexesProcessor<'a> {
     /// Default ctor
     pub fn factory(
         connection_source: &'a DbConnectionManager,
-        connect_timeout: i32,
+        configuration: &Configuration,
     ) -> FLMResult<Self> {
         Ok(Self {
             connection_source,
             loaded_index: None,
             loaded_index_i18n: None,
-            http_client: AsyncHTTPClient::new(connect_timeout)?,
+            http_client: AsyncHTTPClient::new(configuration)?,
         })
     }
 
@@ -380,7 +380,7 @@ impl<'a> IndexesProcessor<'a> {
             connection_source,
             loaded_index: Some(loaded_index),
             loaded_index_i18n: Some(loaded_index_i18n),
-            http_client: AsyncHTTPClient::new(60000).unwrap(),
+            http_client: AsyncHTTPClient::new(&Configuration::default()).unwrap(),
         }
     }
 
@@ -405,7 +405,7 @@ mod tests {
     use crate::test_utils::{do_with_tests_helper, tests_path};
     use crate::utils::memory::heap;
     use crate::{
-        FLMError, FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID,
+        Configuration, FLMError, FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID,
         MINIMUM_CUSTOM_FILTER_ID,
     };
     use rand::seq::SliceRandom;
@@ -520,7 +520,8 @@ mod tests {
         let groups_repository = FilterGroupRepository::new();
 
         let connection_manager = DbConnectionManager::factory_test().unwrap();
-        let mut indexes = IndexesProcessor::factory(&connection_manager, 0).unwrap();
+        let mut indexes =
+            IndexesProcessor::factory(&connection_manager, &Configuration::default()).unwrap();
 
         let mut rng = thread_rng();
         let (mut index, index_localisation) = build_filters_indices_fixtures().unwrap();
@@ -636,7 +637,8 @@ mod tests {
 
         // region second update
         {
-            let mut second_indexes = IndexesProcessor::factory(&connection_manager, 0).unwrap();
+            let mut second_indexes =
+                IndexesProcessor::factory(&connection_manager, &Configuration::default()).unwrap();
 
             let (index_second, index_localisation_second) =
                 build_filters_indices_fixtures().unwrap();
@@ -727,7 +729,8 @@ mod tests {
         unsafe {
             connection_manager.lift_up_database().unwrap();
         };
-        let mut processor = IndexesProcessor::factory(&connection_manager, 60).unwrap();
+        let mut processor =
+            IndexesProcessor::factory(&connection_manager, &Configuration::default()).unwrap();
 
         processor.sync_metadata(&index_url, &index_i18_url).unwrap();
     }

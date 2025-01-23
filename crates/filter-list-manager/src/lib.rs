@@ -253,6 +253,7 @@ pub use crate::manager::models::active_rules_info::ActiveRulesInfo;
 pub use crate::manager::models::configuration::Configuration;
 pub use crate::manager::models::configuration::FilterListType;
 pub use crate::manager::models::configuration::Locale;
+pub use crate::manager::models::configuration::RequestProxyMode;
 pub use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
 pub use crate::manager::models::filter_group::FilterGroup;
 pub use crate::manager::models::filter_list_rules::FilterListRules;

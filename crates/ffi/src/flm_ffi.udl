@@ -120,6 +120,13 @@ enum FilterListType {
     "DNS"
 };
 
+[Enum]
+interface RequestProxyMode {
+    UseSystemProxy();
+    NoProxy();
+    UseCustomProxy(string addr);
+};
+
 dictionary Configuration {
     FilterListType filter_list_type;
     string? working_directory;
@@ -129,6 +136,7 @@ dictionary Configuration {
     string metadata_url;
     string metadata_locales_url;
     i32 request_timeout_ms;
+    RequestProxyMode request_proxy_mode;
     boolean auto_lift_up_database;
 };
 

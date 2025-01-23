@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package filter_list_manager;
 
+import "configuration.proto";
 import "outer_error.proto";
 import "filters.proto";
 import "misc_models.proto";
@@ -92,6 +93,11 @@ message SaveRulesToFileBlobRequest {
 
 message GetDisabledRulesRequest {
   repeated int32 ids = 1;
+}
+
+message SetProxyModeRequest {
+  RawRequestProxyMode mode = 1;
+  string custom_proxy_addr = 2;
 }
 
 message EmptyRequest {}

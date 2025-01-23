@@ -187,6 +187,13 @@ impl FilterListManager {
     pub fn get_disabled_rules(&self, ids: Vec<FilterId>) -> AGResult<Vec<DisabledRulesRaw>> {
         self.wrap(move |flm| flm.get_disabled_rules(ids))
     }
+
+    pub fn set_proxy_mode(&mut self, request_proxy_mode: RequestProxyMode) -> AGResult<()> {
+        self.wrap_mut(move |mut flm| {
+            flm.set_proxy_mode(request_proxy_mode);
+            Ok(())
+        })
+    }
 }
 
 impl FilterListManager {

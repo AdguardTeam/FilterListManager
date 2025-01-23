@@ -1,9 +1,11 @@
 //! Configuration-related objects for [`crate::FilterListManager`]
 pub mod filter_list_type;
 pub mod locale;
+pub mod request_proxy_mode;
 
 pub use self::filter_list_type::FilterListType;
 pub use self::locale::Locale;
+pub use self::request_proxy_mode::RequestProxyMode;
 use std::cmp::max;
 
 /// Expires value shouldn't be less than this constant. In seconds
@@ -41,6 +43,8 @@ pub struct Configuration {
     pub metadata_locales_url: String,
     /// Requests timeouts in milliseconds. Default value 60000
     pub request_timeout_ms: i32,
+    /// Requests proxy mode
+    pub request_proxy_mode: RequestProxyMode,
     /// “Uplifting” a database is a set of measures that brings the database up to date:
     /// * Database creation
     /// * Filling with schema
@@ -90,6 +94,7 @@ impl Default for Configuration {
             default_filter_list_expires_period_sec: DEFAULT_EXPIRES_VALUE_FOR_FILTERS,
             compiler_conditional_constants: None,
             metadata_url: String::new(),
+            request_proxy_mode: RequestProxyMode::UseSystemProxy,
             metadata_locales_url: String::new(),
             request_timeout_ms: DEFAULT_REQUEST_TIMEOUT_MS,
             auto_lift_up_database: true,

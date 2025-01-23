@@ -16,9 +16,10 @@ use crate::protobuf_generated::filter_list_manager::{
     InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
     InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
     SaveCustomFilterRulesRequest, SaveDisabledRulesRequest, SaveRulesToFileBlobRequest,
-    UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse, UpdateFiltersRequest,
-    UpdateFiltersResponse,
+    SetProxyModeRequest, UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse,
+    UpdateFiltersRequest, UpdateFiltersResponse,
 };
+use adguard_flm::RequestProxyMode;
 use enum_stringify::EnumStringify;
 use prost::Message;
 use std::ffi::c_void;
@@ -52,6 +53,7 @@ pub enum FFIMethod {
     GetFilterRulesAsStrings,
     SaveRulesToFileBlob,
     GetDisabledRules,
+    SetProxyMode,
 }
 
 /// Calls FLM method described as [`FFIMethod`] for object behind [`FLMHandle`]
@@ -434,6 +436,22 @@ pub unsafe extern "C" fn flm_call_protobuf(
                     rules_raw: vec![],
                     error: Some(why.into()),
                 },
+            }
+        }
+        .encode(&mut out_bytes_buffer),
+        FFIMethod::SetProxyMode => {
+            let request = decode_input_request!(SetProxyModeRequest);
+
+            let inner = match request.mode {
+                1 => RequestProxyMode::NoProxy,
+                2 => RequestProxyMode::UseCustomProxy {
+                    addr: request.custom_proxy_addr,
+                },
+                _ => RequestProxyMode::UseSystemProxy,
+            };
+
+            EmptyResponse {
+                error: flm_handle.flm.set_proxy_mode(inner).err().map(Into::into),
             }
         }
         .encode(&mut out_bytes_buffer),

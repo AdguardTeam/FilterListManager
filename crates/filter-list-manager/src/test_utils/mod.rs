@@ -13,7 +13,7 @@ use crate::io::http::blocking_client::BlockingClient;
 use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::DbConnectionManager;
-use crate::FLMError;
+use crate::{Configuration, FLMError};
 use libc::atexit;
 use rusqlite::Connection;
 
@@ -108,5 +108,5 @@ pub(crate) fn tests_path(relative_path: &'static str) -> PathBuf {
 
 lazy_static! {
     /// Default blocking http client for testing purposes
-    pub(crate) static ref SHARED_TEST_BLOCKING_HTTP_CLIENT: BlockingClient = BlockingClient::new(60000).unwrap();
+    pub(crate) static ref SHARED_TEST_BLOCKING_HTTP_CLIENT: BlockingClient = BlockingClient::new(&Configuration::default()).unwrap();
 }

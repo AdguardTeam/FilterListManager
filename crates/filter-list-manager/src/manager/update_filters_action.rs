@@ -76,7 +76,7 @@ pub(super) fn update_filters_action(
             Ok((diff_updates_map, rules_map, disabled_rules_map))
         })?;
 
-    let shared_http_client = BlockingClient::new(configuration.request_timeout_ms)?;
+    let shared_http_client = BlockingClient::new(configuration)?;
 
     // Parsers with successful filter downloads
     let mut successful_parsers_with_result: Vec<(FilterId, FilterParser)> =
@@ -240,7 +240,7 @@ pub(super) fn update_filters_action(
                 // when filter metadata.version is provided, it is up-to-date, BUT empty rules object is saved
                 rules_map.get(&filter_id).map(|old_rules| !old_rules.is_empty()).unwrap_or_default()
             {
-                continue;
+                //continue;
             }
 
             filter.version = new_version;
