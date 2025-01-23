@@ -324,5 +324,10 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// Returns lists of disabled rules by list of filter IDs
         /// </summary>
         IEnumerable<DisabledRulesRaw> GetDisabledRules(IEnumerable<int> filterIds);
+
+        /// <summary>
+        /// Sets the proxy mode request
+        /// </summary>
+        void SetProxyMode(string customProxyAddr, RawRequestProxyMode proxyMode);
     }
 }

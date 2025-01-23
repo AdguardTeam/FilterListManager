@@ -530,6 +530,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern void uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_set_proxy_mode(FilterListManagerSafeHandle @ptr,RustBuffer @requestProxyMode,ref RustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("adguard-flm")]
     public static extern sbyte uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_custom_filter_metadata(FilterListManagerSafeHandle @ptr,int @filterId,RustBuffer @title,sbyte @isTrusted,ref RustCallStatus _uniffi_out_err
     );
 
@@ -874,6 +878,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_set_proxy_mode(
+    );
+
+    [DllImport("adguard-flm")]
     public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_update_custom_filter_metadata(
     );
 
@@ -1047,6 +1055,12 @@ static class _UniFFILib {
             var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_rules_to_file_blob();
             if (checksum != 49193) {
                 throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_save_rules_to_file_blob` checksum `49193`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_set_proxy_mode();
+            if (checksum != 26774) {
+                throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_set_proxy_mode` checksum `26774`, library returned `{checksum}`");
             }
         }
         {
@@ -1359,6 +1373,9 @@ internal interface IFilterListManager {
     void SaveRulesToFileBlob(int @filterId, String @filePath);
     
     /// <exception cref="AgOuterException"></exception>
+    void SetProxyMode(RequestProxyMode @requestProxyMode);
+    
+    /// <exception cref="AgOuterException"></exception>
     bool UpdateCustomFilterMetadata(int @filterId, String @title, bool @isTrusted);
     
     /// <exception cref="AgOuterException"></exception>
@@ -1572,6 +1589,14 @@ internal class FilterListManager: FFIObject<FilterListManagerSafeHandle>, IFilte
     
     
     /// <exception cref="AgOuterException"></exception>
+    public void SetProxyMode(RequestProxyMode @requestProxyMode) {
+    _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
+    _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_set_proxy_mode(this.GetHandle(), FfiConverterTypeRequestProxyMode.INSTANCE.Lower(@requestProxyMode), ref _status)
+);
+    }
+    
+    
+    /// <exception cref="AgOuterException"></exception>
     public bool UpdateCustomFilterMetadata(int @filterId, String @title, bool @isTrusted) {
         return FfiConverterBoolean.INSTANCE.Lift(
     _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
@@ -1664,6 +1689,7 @@ internal record Configuration (
     String @metadataUrl, 
     String @metadataLocalesUrl, 
     int @requestTimeoutMs, 
+    RequestProxyMode @requestProxyMode, 
     bool @autoLiftUpDatabase
 ) {
 }
@@ -1681,6 +1707,7 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             @metadataUrl: FfiConverterString.INSTANCE.Read(stream),
             @metadataLocalesUrl: FfiConverterString.INSTANCE.Read(stream),
             @requestTimeoutMs: FfiConverterInt32.INSTANCE.Read(stream),
+            @requestProxyMode: FfiConverterTypeRequestProxyMode.INSTANCE.Read(stream),
             @autoLiftUpDatabase: FfiConverterBoolean.INSTANCE.Read(stream)
         );
     }
@@ -1695,6 +1722,7 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterString.INSTANCE.AllocationSize(value.@metadataUrl) +
             FfiConverterString.INSTANCE.AllocationSize(value.@metadataLocalesUrl) +
             FfiConverterInt32.INSTANCE.AllocationSize(value.@requestTimeoutMs) +
+            FfiConverterTypeRequestProxyMode.INSTANCE.AllocationSize(value.@requestProxyMode) +
             FfiConverterBoolean.INSTANCE.AllocationSize(value.@autoLiftUpDatabase);
     }
 
@@ -1707,6 +1735,7 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterString.INSTANCE.Write(value.@metadataUrl, stream);
             FfiConverterString.INSTANCE.Write(value.@metadataLocalesUrl, stream);
             FfiConverterInt32.INSTANCE.Write(value.@requestTimeoutMs, stream);
+            FfiConverterTypeRequestProxyMode.INSTANCE.Write(value.@requestProxyMode, stream);
             FfiConverterBoolean.INSTANCE.Write(value.@autoLiftUpDatabase, stream);
     }
 }
@@ -2440,6 +2469,81 @@ class FfiConverterTypeFilterListType: FfiConverterRustBuffer<FilterListType> {
 
     public override void Write(FilterListType value, BigEndianStream stream) {
         stream.WriteInt((int)value + 1);
+    }
+}
+
+
+
+
+
+
+
+internal record RequestProxyMode {
+    
+    public record UseSystemProxy: RequestProxyMode {}
+    
+    
+    public record NoProxy: RequestProxyMode {}
+    
+    
+    public record UseCustomProxy (
+        String @addr
+    ) : RequestProxyMode {}
+    
+
+    
+}
+
+class FfiConverterTypeRequestProxyMode : FfiConverterRustBuffer<RequestProxyMode>{
+    public static FfiConverterRustBuffer<RequestProxyMode> INSTANCE = new FfiConverterTypeRequestProxyMode();
+
+    public override RequestProxyMode Read(BigEndianStream stream) {
+        var value = stream.ReadInt();
+        switch (value) {
+            case 1:
+                return new RequestProxyMode.UseSystemProxy(
+                );
+            case 2:
+                return new RequestProxyMode.NoProxy(
+                );
+            case 3:
+                return new RequestProxyMode.UseCustomProxy(
+                    FfiConverterString.INSTANCE.Read(stream)
+                );
+            default:
+                throw new InternalException(String.Format("invalid enum value '{0}' in FfiConverterTypeRequestProxyMode.Read()", value));
+        }
+    }
+
+    public override int AllocationSize(RequestProxyMode value) {
+        switch (value) {
+            case RequestProxyMode.UseSystemProxy variant_value:
+                return 4;
+            case RequestProxyMode.NoProxy variant_value:
+                return 4;
+            case RequestProxyMode.UseCustomProxy variant_value:
+                return 4
+                    + FfiConverterString.INSTANCE.AllocationSize(variant_value.@addr);
+            default:
+                throw new InternalException(String.Format("invalid enum value '{0}' in FfiConverterTypeRequestProxyMode.AllocationSize()", value));
+        }
+    }
+
+    public override void Write(RequestProxyMode value, BigEndianStream stream) {
+        switch (value) {
+            case RequestProxyMode.UseSystemProxy variant_value:
+                stream.WriteInt(1);
+                break;
+            case RequestProxyMode.NoProxy variant_value:
+                stream.WriteInt(2);
+                break;
+            case RequestProxyMode.UseCustomProxy variant_value:
+                stream.WriteInt(3);
+                FfiConverterString.INSTANCE.Write(variant_value.@addr, stream);
+                break;
+            default:
+                throw new InternalException(String.Format("invalid enum value '{0}' in FfiConverterTypeRequestProxyMode.Write()", value));
+        }
     }
 }
 

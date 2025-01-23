@@ -79,6 +79,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 flm.DeleteCustomFilterLists(new[] { customFilter.Id });
                 string path = flm.GetDatabasePath();
                 int version = flm.GetDatabaseVersion();
+                flm.SetProxyMode("https://127.0.0.1:8080", RawRequestProxyMode.NoProxy);
             }
         }
     }

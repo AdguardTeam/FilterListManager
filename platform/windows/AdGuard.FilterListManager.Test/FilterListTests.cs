@@ -39,7 +39,8 @@ namespace AdGuard.FilterListManager.Test
                 new List<string>(),
                 "https://filters.adtidy.org/windows/filters.json",
                 "https://filters.adtidy.org/windows/filters_i18n.json", 
-                0,
+                0, 
+                new RequestProxyMode.NoProxy(),
                 true));
             manager.PullMetadata();
             List<StoredFilterMetadata> metas = manager.GetStoredFiltersMetadata();

@@ -8,7 +8,7 @@ namespace AdGuard.FilterListManager
     /// </summary>
     /// <seealso cref="FfiObject{THandle}" />
     /// <seealso cref="IFilterListManager" />
-    public class FilterListManager : FfiObject<FilterListManagerSafeHandle>, IFilterListManager
+    public class FilterListManager : FfiObject<FilterListManagerSafeHandle>, IFil-terListManager
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterListManager"/> class.
@@ -473,6 +473,15 @@ namespace AdGuard.FilterListManager
                 UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_lift_up_database(
                     GetHandle(),
                     ref status)
+            );
+        }
+
+        /// <exception cref="AgOuterException"></exception>
+        public void SetProxyMode(RequestProxyMode requestProxyMode)
+        {
+            UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance, (ref RustCallStatus status) =>
+                UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_set_proxy_mode(GetHandle(),
+                    FfiConverterTypeRequestProxyMode.Instance.Lower(requestProxyMode), ref status)
             );
         }
     }

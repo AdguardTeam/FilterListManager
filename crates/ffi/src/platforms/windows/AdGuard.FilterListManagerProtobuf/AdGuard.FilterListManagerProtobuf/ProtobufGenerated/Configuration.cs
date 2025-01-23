@@ -24,7 +24,7 @@ namespace FilterListManager {
     static ConfigurationReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChNjb25maWd1cmF0aW9uLnByb3RvEhNmaWx0ZXJfbGlzdF9tYW5hZ2VyIsAC",
+            "ChNjb25maWd1cmF0aW9uLnByb3RvEhNmaWx0ZXJfbGlzdF9tYW5hZ2VyIqkD",
             "Cg1Db25maWd1cmF0aW9uEj0KEGZpbHRlcl9saXN0X3R5cGUYASABKA4yIy5m",
             "aWx0ZXJfbGlzdF9tYW5hZ2VyLkZpbHRlckxpc3RUeXBlEhkKEXdvcmtpbmdf",
             "ZGlyZWN0b3J5GAIgASgJEg4KBmxvY2FsZRgDIAEoCRIuCiZkZWZhdWx0X2Zp",
@@ -32,12 +32,16 @@ namespace FilterListManager {
             "cl9jb25kaXRpb25hbF9jb25zdGFudHMYBSADKAkSFAoMbWV0YWRhdGFfdXJs",
             "GAYgASgJEhwKFG1ldGFkYXRhX2xvY2FsZXNfdXJsGAcgASgJEhoKEnJlcXVl",
             "c3RfdGltZW91dF9tcxgIIAEoBRIdChVhdXRvX2xpZnRfdXBfZGF0YWJhc2UY",
-            "CSABKAgqJwoORmlsdGVyTGlzdFR5cGUSDAoIU1RBTkRBUkQQABIHCgNETlMQ",
-            "AWIGcHJvdG8z"));
+            "CSABKAgSRAoScmVxdWVzdF9wcm94eV9tb2RlGAogASgOMiguZmlsdGVyX2xp",
+            "c3RfbWFuYWdlci5SYXdSZXF1ZXN0UHJveHlNb2RlEiEKGXJlcXVlc3RfY3Vz",
+            "dG9tX3Byb3h5X2FkZHIYCyABKAkqJwoORmlsdGVyTGlzdFR5cGUSDAoIU1RB",
+            "TkRBUkQQABIHCgNETlMQASpPChNSYXdSZXF1ZXN0UHJveHlNb2RlEhQKEFVT",
+            "RV9TWVNURU1fUFJPWFkQABIMCghOT19QUk9YWRABEhQKEFVTRV9DVVNUT01f",
+            "UFJPWFkQAmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "CompilerConditionalConstants", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), typeof(global::FilterListManager.RawRequestProxyMode), }, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "CompilerConditionalConstants", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr" }, null, null, null, null)
           }));
     }
     #endregion
@@ -47,6 +51,24 @@ namespace FilterListManager {
   public enum FilterListType {
     [pbr::OriginalName("STANDARD")] Standard = 0,
     [pbr::OriginalName("DNS")] Dns = 1,
+  }
+
+  /// <summary>
+  /// FLM Requests proxy mode
+  /// </summary>
+  public enum RawRequestProxyMode {
+    /// <summary>
+    /// System proxy will be used
+    /// </summary>
+    [pbr::OriginalName("USE_SYSTEM_PROXY")] UseSystemProxy = 0,
+    /// <summary>
+    /// All proxies disabled
+    /// </summary>
+    [pbr::OriginalName("NO_PROXY")] NoProxy = 1,
+    /// <summary>
+    /// Use custom proxy
+    /// </summary>
+    [pbr::OriginalName("USE_CUSTOM_PROXY")] UseCustomProxy = 2,
   }
 
   #endregion
@@ -96,6 +118,8 @@ namespace FilterListManager {
       metadataLocalesUrl_ = other.metadataLocalesUrl_;
       requestTimeoutMs_ = other.requestTimeoutMs_;
       autoLiftUpDatabase_ = other.autoLiftUpDatabase_;
+      requestProxyMode_ = other.requestProxyMode_;
+      requestCustomProxyAddr_ = other.requestCustomProxyAddr_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -242,6 +266,36 @@ namespace FilterListManager {
       }
     }
 
+    /// <summary>Field number for the "request_proxy_mode" field.</summary>
+    public const int RequestProxyModeFieldNumber = 10;
+    private global::FilterListManager.RawRequestProxyMode requestProxyMode_ = global::FilterListManager.RawRequestProxyMode.UseSystemProxy;
+    /// <summary>
+    /// Proxy mode
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::FilterListManager.RawRequestProxyMode RequestProxyMode {
+      get { return requestProxyMode_; }
+      set {
+        requestProxyMode_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "request_custom_proxy_addr" field.</summary>
+    public const int RequestCustomProxyAddrFieldNumber = 11;
+    private string requestCustomProxyAddr_ = "";
+    /// <summary>
+    /// Custom proxy addr for requests
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string RequestCustomProxyAddr {
+      get { return requestCustomProxyAddr_; }
+      set {
+        requestCustomProxyAddr_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -266,6 +320,8 @@ namespace FilterListManager {
       if (MetadataLocalesUrl != other.MetadataLocalesUrl) return false;
       if (RequestTimeoutMs != other.RequestTimeoutMs) return false;
       if (AutoLiftUpDatabase != other.AutoLiftUpDatabase) return false;
+      if (RequestProxyMode != other.RequestProxyMode) return false;
+      if (RequestCustomProxyAddr != other.RequestCustomProxyAddr) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -282,6 +338,8 @@ namespace FilterListManager {
       if (MetadataLocalesUrl.Length != 0) hash ^= MetadataLocalesUrl.GetHashCode();
       if (RequestTimeoutMs != 0) hash ^= RequestTimeoutMs.GetHashCode();
       if (AutoLiftUpDatabase != false) hash ^= AutoLiftUpDatabase.GetHashCode();
+      if (RequestProxyMode != global::FilterListManager.RawRequestProxyMode.UseSystemProxy) hash ^= RequestProxyMode.GetHashCode();
+      if (RequestCustomProxyAddr.Length != 0) hash ^= RequestCustomProxyAddr.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -333,6 +391,14 @@ namespace FilterListManager {
         output.WriteRawTag(72);
         output.WriteBool(AutoLiftUpDatabase);
       }
+      if (RequestProxyMode != global::FilterListManager.RawRequestProxyMode.UseSystemProxy) {
+        output.WriteRawTag(80);
+        output.WriteEnum((int) RequestProxyMode);
+      }
+      if (RequestCustomProxyAddr.Length != 0) {
+        output.WriteRawTag(90);
+        output.WriteString(RequestCustomProxyAddr);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -376,6 +442,14 @@ namespace FilterListManager {
         output.WriteRawTag(72);
         output.WriteBool(AutoLiftUpDatabase);
       }
+      if (RequestProxyMode != global::FilterListManager.RawRequestProxyMode.UseSystemProxy) {
+        output.WriteRawTag(80);
+        output.WriteEnum((int) RequestProxyMode);
+      }
+      if (RequestCustomProxyAddr.Length != 0) {
+        output.WriteRawTag(90);
+        output.WriteString(RequestCustomProxyAddr);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -410,6 +484,12 @@ namespace FilterListManager {
       }
       if (AutoLiftUpDatabase != false) {
         size += 1 + 1;
+      }
+      if (RequestProxyMode != global::FilterListManager.RawRequestProxyMode.UseSystemProxy) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) RequestProxyMode);
+      }
+      if (RequestCustomProxyAddr.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(RequestCustomProxyAddr);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -447,6 +527,12 @@ namespace FilterListManager {
       }
       if (other.AutoLiftUpDatabase != false) {
         AutoLiftUpDatabase = other.AutoLiftUpDatabase;
+      }
+      if (other.RequestProxyMode != global::FilterListManager.RawRequestProxyMode.UseSystemProxy) {
+        RequestProxyMode = other.RequestProxyMode;
+      }
+      if (other.RequestCustomProxyAddr.Length != 0) {
+        RequestCustomProxyAddr = other.RequestCustomProxyAddr;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -503,6 +589,14 @@ namespace FilterListManager {
             AutoLiftUpDatabase = input.ReadBool();
             break;
           }
+          case 80: {
+            RequestProxyMode = (global::FilterListManager.RawRequestProxyMode) input.ReadEnum();
+            break;
+          }
+          case 90: {
+            RequestCustomProxyAddr = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -556,6 +650,14 @@ namespace FilterListManager {
           }
           case 72: {
             AutoLiftUpDatabase = input.ReadBool();
+            break;
+          }
+          case 80: {
+            RequestProxyMode = (global::FilterListManager.RawRequestProxyMode) input.ReadEnum();
+            break;
+          }
+          case 90: {
+            RequestCustomProxyAddr = input.ReadString();
             break;
           }
         }

@@ -256,5 +256,11 @@ namespace AdGuard.FilterListManager
         ///... and so on.
         /// </summary>
         void LiftUpDatabase();
+
+        /// <summary>
+        /// Sets a new proxy mode. Value will be applied on next method call
+        /// </summary>
+        /// <param name="requestProxyMode">The proxy mode for requests.</param>
+        void SetProxyMode(RequestProxyMode requestProxyMode);
     }
 }
