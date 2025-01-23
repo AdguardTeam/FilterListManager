@@ -60,6 +60,57 @@ extension FilterListManager_FilterListType: CaseIterable {
 
 #endif  // swift(>=4.2)
 
+/// FLM Requests proxy mode
+public enum FilterListManager_RawRequestProxyMode: SwiftProtobuf.Enum {
+  public typealias RawValue = Int
+
+  /// System proxy will be used
+  case useSystemProxy // = 0
+
+  /// All proxies disabled
+  case noProxy // = 1
+
+  /// Use custom proxy
+  case useCustomProxy // = 2
+  case UNRECOGNIZED(Int)
+
+  public init() {
+    self = .useSystemProxy
+  }
+
+  public init?(rawValue: Int) {
+    switch rawValue {
+    case 0: self = .useSystemProxy
+    case 1: self = .noProxy
+    case 2: self = .useCustomProxy
+    default: self = .UNRECOGNIZED(rawValue)
+    }
+  }
+
+  public var rawValue: Int {
+    switch self {
+    case .useSystemProxy: return 0
+    case .noProxy: return 1
+    case .useCustomProxy: return 2
+    case .UNRECOGNIZED(let i): return i
+    }
+  }
+
+}
+
+#if swift(>=4.2)
+
+extension FilterListManager_RawRequestProxyMode: CaseIterable {
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  public static var allCases: [FilterListManager_RawRequestProxyMode] = [
+    .useSystemProxy,
+    .noProxy,
+    .useCustomProxy,
+  ]
+}
+
+#endif  // swift(>=4.2)
+
 public struct FilterListManager_Configuration {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -97,6 +148,12 @@ public struct FilterListManager_Configuration {
   /// “Uplifting” a database is a set of measures that brings the database up to date:
   public var autoLiftUpDatabase: Bool = false
 
+  /// Proxy mode
+  public var requestProxyMode: FilterListManager_RawRequestProxyMode = .useSystemProxy
+
+  /// Custom proxy addr for requests
+  public var requestCustomProxyAddr: String = String()
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -104,6 +161,7 @@ public struct FilterListManager_Configuration {
 
 #if swift(>=5.5) && canImport(_Concurrency)
 extension FilterListManager_FilterListType: @unchecked Sendable {}
+extension FilterListManager_RawRequestProxyMode: @unchecked Sendable {}
 extension FilterListManager_Configuration: @unchecked Sendable {}
 #endif  // swift(>=5.5) && canImport(_Concurrency)
 
@@ -115,6 +173,14 @@ extension FilterListManager_FilterListType: SwiftProtobuf._ProtoNameProviding {
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "STANDARD"),
     1: .same(proto: "DNS"),
+  ]
+}
+
+extension FilterListManager_RawRequestProxyMode: SwiftProtobuf._ProtoNameProviding {
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    0: .same(proto: "USE_SYSTEM_PROXY"),
+    1: .same(proto: "NO_PROXY"),
+    2: .same(proto: "USE_CUSTOM_PROXY"),
   ]
 }
 
@@ -130,6 +196,8 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     7: .standard(proto: "metadata_locales_url"),
     8: .standard(proto: "request_timeout_ms"),
     9: .standard(proto: "auto_lift_up_database"),
+    10: .standard(proto: "request_proxy_mode"),
+    11: .standard(proto: "request_custom_proxy_addr"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -147,6 +215,8 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
       case 7: try { try decoder.decodeSingularStringField(value: &self.metadataLocalesURL) }()
       case 8: try { try decoder.decodeSingularInt32Field(value: &self.requestTimeoutMs) }()
       case 9: try { try decoder.decodeSingularBoolField(value: &self.autoLiftUpDatabase) }()
+      case 10: try { try decoder.decodeSingularEnumField(value: &self.requestProxyMode) }()
+      case 11: try { try decoder.decodeSingularStringField(value: &self.requestCustomProxyAddr) }()
       default: break
       }
     }
@@ -180,6 +250,12 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if self.autoLiftUpDatabase != false {
       try visitor.visitSingularBoolField(value: self.autoLiftUpDatabase, fieldNumber: 9)
     }
+    if self.requestProxyMode != .useSystemProxy {
+      try visitor.visitSingularEnumField(value: self.requestProxyMode, fieldNumber: 10)
+    }
+    if !self.requestCustomProxyAddr.isEmpty {
+      try visitor.visitSingularStringField(value: self.requestCustomProxyAddr, fieldNumber: 11)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -193,6 +269,8 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if lhs.metadataLocalesURL != rhs.metadataLocalesURL {return false}
     if lhs.requestTimeoutMs != rhs.requestTimeoutMs {return false}
     if lhs.autoLiftUpDatabase != rhs.autoLiftUpDatabase {return false}
+    if lhs.requestProxyMode != rhs.requestProxyMode {return false}
+    if lhs.requestCustomProxyAddr != rhs.requestCustomProxyAddr {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
