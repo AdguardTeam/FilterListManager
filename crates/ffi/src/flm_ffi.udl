@@ -239,4 +239,7 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     sequence<DisabledRulesRaw> get_disabled_rules(sequence<i32> ids);
+
+    [Throws=AGOuterError]
+    void set_proxy_mode(RequestProxyMode request_proxy_mode);
 };
