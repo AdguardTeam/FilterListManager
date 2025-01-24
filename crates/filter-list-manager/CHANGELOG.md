@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2025-01-24
+
+### Added
+- Tries to normalize slightly malformed filter urls
+- Proxy mode in configuration and flm interface
+
+### Fixed
+- Speed up http clients
+
+[1.2.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.1.11...flm-1.2.1
+
 ## [1.1.11] - 2025-01-17
 
 ### Fixed
