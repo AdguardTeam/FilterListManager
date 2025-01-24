@@ -24,7 +24,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             return method.Name;
         }
 
-        const int VERSION_TO_CHECK = 26;
+        const int VERSION_TO_CHECK = 24;
 
         /// <summary>
         /// The API checksum map. We are provided with Rust-backed checksums functions (*_checksum_*). This map is to call and check using these checksums.

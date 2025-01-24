@@ -31,17 +31,19 @@ namespace AdGuard.FilterListManager.Test
         [Test]
         public void CommonTest()
         {
-            IFilterListManager manager = new FilterListManager(new Configuration(
-                FilterListType.Standard, 
-                m_CurrentDirectory,
-                "en-us",
-                10,
-                new List<string>(),
-                "https://filters.adtidy.org/windows/filters.json",
-                "https://filters.adtidy.org/windows/filters_i18n.json", 
-                0, 
-                new RequestProxyMode.NoProxy(),
-                true));
+            Configuration cfg = Constants.GetDefaultConfiguration();
+            cfg.MetadataUrl = "https://filters.adtidy.org/windows/filters.json";
+            cfg.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
+            cfg.Locale = "en-us";
+            cfg.WorkingDirectory = m_CurrentDirectory;
+            cfg.DefaultFilterListExpiresPeriodSec = 10;
+            cfg.AutoLiftUpDatabase = true;
+
+
+            IFilterListManager manager = new FilterListManager(
+                cfg);
+
+            manager.SetProxyMode(new RequestProxyMode.UseSystemProxy());
             manager.PullMetadata();
             List<StoredFilterMetadata> metas = manager.GetStoredFiltersMetadata();
             Assert.IsTrue(metas.Count > 0);
