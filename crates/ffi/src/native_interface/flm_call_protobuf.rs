@@ -57,6 +57,10 @@ pub enum FFIMethod {
 }
 
 /// Calls FLM method described as [`FFIMethod`] for object behind [`FLMHandle`]
+///
+/// # Safety
+///
+/// 1. `handle.is_null()` is safe and returns error result
 #[no_mangle]
 pub unsafe extern "C" fn flm_call_protobuf(
     handle: *mut FLMHandle,
@@ -64,7 +68,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
     input_buffer: *mut u8,
     input_buf_len: usize,
 ) -> *mut RustResponse {
-    let mut rust_response = Box::new(RustResponse::default());
+    let mut rust_response = Box::<RustResponse>::default();
 
     if handle.is_null() {
         return build_rust_response_error(
@@ -461,10 +465,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
         return build_rust_response_error(
             Box::new(encode_error),
             rust_response,
-            &format!(
-                "Cannot encode output data for method '{}'",
-                method.to_string()
-            ),
+            &format!("Cannot encode output data for method '{}'", method),
         );
     }
 

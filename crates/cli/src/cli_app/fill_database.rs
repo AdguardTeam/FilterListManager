@@ -2,6 +2,7 @@ use adguard_flm::{Configuration, FilterListManager, FilterListManagerImpl, Filte
 use std::path::PathBuf;
 use std::time::Instant;
 
+#[allow(clippy::field_reassign_with_default)]
 /// Entry for `fill_database` command
 pub fn entry(
     db_path: &PathBuf,

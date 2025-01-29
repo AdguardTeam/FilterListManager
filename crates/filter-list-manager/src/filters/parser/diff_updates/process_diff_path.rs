@@ -7,6 +7,7 @@ use nom::sequence::{terminated, tuple};
 use nom::IResult;
 use std::num::ParseIntError;
 
+#[allow(clippy::type_complexity)]
 /// Processes Diff-Path string and returns [`DiffUpdateEntity`]
 ///
 /// * `filter_id`- FilterId for entity

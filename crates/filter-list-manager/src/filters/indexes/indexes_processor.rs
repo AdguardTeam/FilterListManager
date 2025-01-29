@@ -56,11 +56,7 @@ impl<'a> IndexesProcessor<'a> {
     /// * `index_url` - Remote server URL of filters index
     /// * `index_locales_url` - Remote server URL of filters index localisation info
     /// * `with_filters` - Filters from index will be downloaded after
-    pub fn sync_metadata(
-        &mut self,
-        index_url: &String,
-        index_locales_url: &String,
-    ) -> FLMResult<()> {
+    pub fn sync_metadata(&mut self, index_url: &str, index_locales_url: &str) -> FLMResult<()> {
         let async_rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
@@ -90,7 +86,7 @@ impl IndexesProcessor<'_> {
     /// Saves new indexes into existing database
     fn save_index_on_existing_database(
         &mut self,
-        mut conn: &mut Connection,
+        conn: &mut Connection,
         filters_from_storage: Vec<FilterEntity>,
     ) -> FLMResult<()> {
         let mut filters_must_be_deleted: Vec<FilterId> = vec![];
@@ -107,7 +103,7 @@ impl IndexesProcessor<'_> {
             }
 
             let filter_id = filter.filterId;
-            let storage_entities = filter.to_storage_entities();
+            let storage_entities = filter.into_storage_entities();
 
             tags_of_filters.push(storage_entities.tags);
             locales_of_filters.push(storage_entities.locales);
@@ -158,7 +154,7 @@ impl IndexesProcessor<'_> {
             }
         }
 
-        let (transaction, _) = spawn_transaction(&mut conn, |transaction: &Transaction| {
+        let (transaction, _) = spawn_transaction(conn, |transaction: &Transaction| {
             let filter_repository = FilterRepository::new();
             let group_repo = FilterGroupRepository::new();
             let tags_repo = FilterTagRepository::new();
@@ -170,37 +166,37 @@ impl IndexesProcessor<'_> {
             let group_localisation_repository = GroupLocalisationRepository::new();
 
             // Clear filter dependencies
-            locales_repository.clear(&transaction)?;
-            group_repo.delete_index_groups(&transaction)?;
-            tags_repo.clear(&transaction)?;
+            locales_repository.clear(transaction)?;
+            group_repo.delete_index_groups(transaction)?;
+            tags_repo.clear(transaction)?;
             // Remove old filters mappings and non-needed filters itself
-            filter_filter_tag_repository.bulk_delete(&transaction, &filters_must_be_deleted)?;
-            rules_repository.bulk_delete(&transaction, &filters_must_be_deleted)?;
-            filter_repository.bulk_delete(&transaction, &filters_must_be_deleted)?;
+            filter_filter_tag_repository.bulk_delete(transaction, &filters_must_be_deleted)?;
+            rules_repository.bulk_delete(transaction, &filters_must_be_deleted)?;
+            filter_repository.bulk_delete(transaction, &filters_must_be_deleted)?;
             // Clear filter dependencies localisations
-            filter_localisation_repository.clear(&transaction)?;
-            filter_tag_localisation_repository.clear(&transaction)?;
-            group_localisation_repository.clear(&transaction)?;
+            filter_localisation_repository.clear(transaction)?;
+            filter_tag_localisation_repository.clear(transaction)?;
+            group_localisation_repository.clear(transaction)?;
 
             // Save new or updated filters and all filter deps
             locales_repository.insert(
-                &transaction,
+                transaction,
                 &locales_of_filters
                     .into_iter()
                     .flatten()
                     .collect::<Vec<FilterLocaleEntity>>(),
             )?;
             filter_filter_tag_repository.insert(
-                &transaction,
+                transaction,
                 &tags_of_filters
                     .into_iter()
                     .flatten()
                     .collect::<Vec<FilterFilterTagEntity>>(),
             )?;
-            group_repo.insert(&transaction, &index.groups)?;
-            tags_repo.insert(&transaction, &index.tags)?;
+            group_repo.insert(transaction, &index.groups)?;
+            tags_repo.insert(transaction, &index.tags)?;
 
-            filter_repository.insert(&transaction, &new_or_updated_filters)?;
+            filter_repository.insert(transaction, &new_or_updated_filters)?;
 
             Ok(())
         })
@@ -215,13 +211,13 @@ impl IndexesProcessor<'_> {
     }
 
     /// Saves new indexes on empty database
-    fn save_indices_on_empty_database(&mut self, mut conn: &mut Connection) -> FLMResult<()> {
+    fn save_indices_on_empty_database(&mut self, conn: &mut Connection) -> FLMResult<()> {
         let index = self.exchange_index()?;
 
-        let (transaction, _) = spawn_transaction(&mut conn, |transaction: &Transaction| {
-            FilterGroupRepository::new().insert(&transaction, &index.groups)?;
+        let (transaction, _) = spawn_transaction(conn, |transaction: &Transaction| {
+            FilterGroupRepository::new().insert(transaction, &index.groups)?;
 
-            FilterTagRepository::new().insert(&transaction, &index.tags)?;
+            FilterTagRepository::new().insert(transaction, &index.tags)?;
 
             let mut filters = Vec::with_capacity(index.filters.len());
             let filter_repository = FilterRepository::new();
@@ -233,26 +229,26 @@ impl IndexesProcessor<'_> {
                     continue;
                 }
 
-                let storage_entities = filter_index_entity.to_storage_entities();
+                let storage_entities = filter_index_entity.into_storage_entities();
 
                 filters.push(storage_entities.filter);
                 locales.push(storage_entities.locales);
                 tags.push(storage_entities.tags);
             }
 
-            filter_repository.insert(&transaction, &filters)?;
+            filter_repository.insert(transaction, &filters)?;
 
             let flattened_locales = locales
                 .into_iter()
                 .flatten()
                 .collect::<Vec<FilterLocaleEntity>>();
-            FilterLocaleRepository::new().insert(&transaction, &flattened_locales)?;
+            FilterLocaleRepository::new().insert(transaction, &flattened_locales)?;
 
             let flattened_tags = tags
                 .into_iter()
                 .flatten()
                 .collect::<Vec<FilterFilterTagEntity>>();
-            FilterFilterTagRepository::new().insert(&transaction, &flattened_tags)?;
+            FilterFilterTagRepository::new().insert(transaction, &flattened_tags)?;
 
             Ok(filters)
         })
@@ -276,11 +272,7 @@ impl IndexesProcessor<'_> {
     ///
     /// May return an [`Err`] if the request to the remote server is unsuccessful
     /// or if the index consistency is violated.
-    async fn fetch_indices(
-        &mut self,
-        index_url: &String,
-        index_locales_url: &String,
-    ) -> FLMResult<()> {
+    async fn fetch_indices(&mut self, index_url: &str, index_locales_url: &str) -> FLMResult<()> {
         let (index_result, index_localisations_result) = tokio::join!(
             self.load_data::<IndexEntity>(index_url),
             self.load_data::<IndexI18NEntity>(index_locales_url)
@@ -342,15 +334,15 @@ impl IndexesProcessor<'_> {
         let (group_vec, tags_vec, filters_vec) = localisations.exchange()?;
 
         GroupLocalisationRepository::new()
-            .insert(&transaction, &group_vec)
+            .insert(transaction, &group_vec)
             .map_err(FLMError::from_database)?;
 
         FilterTagLocalisationRepository::new()
-            .insert(&transaction, &tags_vec)
+            .insert(transaction, &tags_vec)
             .map_err(FLMError::from_database)?;
 
         FilterLocalisationRepository::new()
-            .insert(&transaction, &filters_vec)
+            .insert(transaction, &filters_vec)
             .map_err(FLMError::from_database)
     }
 
@@ -362,7 +354,7 @@ impl IndexesProcessor<'_> {
     #[inline]
     fn exchange_index(&mut self) -> FLMResult<IndexEntity> {
         match take(&mut self.loaded_index) {
-            None => return FLMError::make_err("Empty index. You must fetch index before save"),
+            None => FLMError::make_err("Empty index. You must fetch index before save"),
             Some(index) => Ok(index),
         }
     }

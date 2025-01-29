@@ -43,41 +43,41 @@ impl From<Configuration> for filter_list_manager::Configuration {
     }
 }
 
-impl Into<Configuration> for filter_list_manager::Configuration {
-    fn into(self) -> Configuration {
-        let working_directory = if self.working_directory.is_empty() {
+impl From<filter_list_manager::Configuration> for Configuration {
+    fn from(val: filter_list_manager::Configuration) -> Self {
+        let working_directory = if val.working_directory.is_empty() {
             None
         } else {
-            Some(self.working_directory)
+            Some(val.working_directory)
         };
 
-        let compiler_conditional_constants = if self.compiler_conditional_constants.is_empty() {
+        let compiler_conditional_constants = if val.compiler_conditional_constants.is_empty() {
             None
         } else {
-            Some(self.compiler_conditional_constants)
+            Some(val.compiler_conditional_constants)
         };
 
         Configuration {
-            filter_list_type: match self.filter_list_type {
+            filter_list_type: match val.filter_list_type {
                 1 => FilterListType::DNS,
                 0 => FilterListType::STANDARD,
                 _ => unimplemented!(), // TODO: how it will fail in compile time?
             },
             working_directory,
-            locale: self.locale,
-            default_filter_list_expires_period_sec: self.default_filter_list_expires_period_sec,
+            locale: val.locale,
+            default_filter_list_expires_period_sec: val.default_filter_list_expires_period_sec,
             compiler_conditional_constants,
-            metadata_url: self.metadata_url,
-            metadata_locales_url: self.metadata_locales_url,
-            request_timeout_ms: self.request_timeout_ms,
-            request_proxy_mode: match self.request_proxy_mode {
+            metadata_url: val.metadata_url,
+            metadata_locales_url: val.metadata_locales_url,
+            request_timeout_ms: val.request_timeout_ms,
+            request_proxy_mode: match val.request_proxy_mode {
                 1 => RequestProxyMode::NoProxy,
                 2 => RequestProxyMode::UseCustomProxy {
-                    addr: self.request_custom_proxy_addr,
+                    addr: val.request_custom_proxy_addr,
                 },
                 _ => RequestProxyMode::UseSystemProxy,
             },
-            auto_lift_up_database: self.auto_lift_up_database,
+            auto_lift_up_database: val.auto_lift_up_database,
         }
     }
 }
@@ -268,12 +268,12 @@ impl From<FilterListRules> for filter_list_manager::FilterListRules {
     }
 }
 
-impl Into<FilterListRules> for filter_list_manager::FilterListRules {
-    fn into(self) -> FilterListRules {
+impl From<filter_list_manager::FilterListRules> for FilterListRules {
+    fn from(val: filter_list_manager::FilterListRules) -> Self {
         FilterListRules {
-            filter_id: self.filter_id,
-            rules: self.rules,
-            disabled_rules: self.disabled_rules,
+            filter_id: val.filter_id,
+            rules: val.rules,
+            disabled_rules: val.disabled_rules,
         }
     }
 }

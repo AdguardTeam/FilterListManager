@@ -2,6 +2,7 @@ use crate::filters::indexes::entities::IndexEntity;
 use crate::{FLMError, FLMResult};
 use std::collections::HashSet;
 
+#[allow(clippy::bool_comparison)]
 /// Check consistency of downloaded `index`
 ///
 /// # Failure
@@ -51,7 +52,7 @@ pub(super) fn check_consistency(index: &IndexEntity) -> FLMResult<()> {
         }
 
         for tag_id in &filter.tags {
-            if !existing_tags_ids.contains(&tag_id) {
+            if !existing_tags_ids.contains(tag_id) {
                 let tag_for_filter = index.tags.iter().find(|tag| tag.tag_id == *tag_id);
 
                 if tag_for_filter.is_none() {

@@ -14,7 +14,7 @@ impl FilterCursor {
             lineno: 0,
             normalized_url,
             // @TODO: inefficient
-            contents: contents.split("\n").map(str::to_string).collect(),
+            contents: contents.split('\n').map(str::to_string).collect(),
         }
     }
 

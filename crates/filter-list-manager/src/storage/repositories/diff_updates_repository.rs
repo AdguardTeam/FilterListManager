@@ -43,7 +43,7 @@ impl DiffUpdateRepository {
             let filter_id: FilterId = row.get(0)?;
 
             out.insert(
-                filter_id.clone(),
+                filter_id,
                 DiffUpdateEntity {
                     filter_id,
                     next_path: row.get(1)?,

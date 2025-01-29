@@ -6,10 +6,7 @@ pub(crate) const LF_BYTES_SLICE: u8 = b'\n';
 
 /// Is space allowed for parsing
 pub(crate) fn is_allowed_space(c: char) -> bool {
-    match c {
-        '\n' | '\r' | '\t' | ' ' => true,
-        _ => false,
-    }
+    matches!(c, '\n' | '\r' | '\t' | ' ')
 }
 
 /// Go to first non-space symbol

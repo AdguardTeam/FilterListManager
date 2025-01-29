@@ -59,8 +59,7 @@ pub(super) fn update_filters_action(
 
     let filter_ids = records
         .iter()
-        .filter(|filter| filter.filter_id.is_some())
-        .map(|filter| filter.filter_id.unwrap())
+        .filter_map(|filter| filter.filter_id)
         .collect::<Vec<FilterId>>();
 
     let (mut diff_updates_map, mut rules_map, mut disabled_rules_map) = db_connection_manager
@@ -220,7 +219,7 @@ pub(super) fn update_filters_action(
                 .get_metadata(KnownMetadataProperty::TimeUpdated)
                 .as_str()
             {
-                time_slice if time_slice.len() > 0 => DateTime::from_str(time_slice)
+                time_slice if !time_slice.is_empty() => DateTime::from_str(time_slice)
                     .unwrap_or_else(|_: ParseError| Utc::now())
                     .timestamp(),
 

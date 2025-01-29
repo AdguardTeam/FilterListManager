@@ -30,7 +30,7 @@ pub(crate) fn get_scheme(url: &str) -> Option<&str> {
 pub(crate) fn get_authority(url: &str) -> Option<&str> {
     if let Some(pos) = url.find("//") {
         let origin = &url[pos + 2..];
-        if let Some(slash_pos) = origin.find("/") {
+        if let Some(slash_pos) = origin.find('/') {
             return Some(&origin[..slash_pos]);
         }
 
@@ -53,9 +53,9 @@ impl From<std::io::Error> for ReadFilterFileError {
     }
 }
 
-impl Into<FLMError> for ReadFilterFileError {
-    fn into(self) -> FLMError {
-        match self {
+impl From<ReadFilterFileError> for FLMError {
+    fn from(value: ReadFilterFileError) -> Self {
+        match value {
             ReadFilterFileError::Io(io) => FLMError::Io(io),
             ReadFilterFileError::Other(other) => FLMError::Other(other),
         }
@@ -83,7 +83,7 @@ pub(crate) fn read_file_by_url(url: &str) -> Result<String, ReadFilterFileError>
 /// * `url` - url or path
 ///
 /// Returns a tuple [`Some((path without hash, substring after hash)`] or [`None`] if hash doesn't exist or hash substring is empty
-pub(crate) fn get_hash_from_url(url: &String) -> Option<(String, String)> {
+pub(crate) fn get_hash_from_url(url: &str) -> Option<(String, String)> {
     url.find('#').and_then(|index| {
         let (path, mut hash) = url.split_at(index);
 
@@ -167,8 +167,7 @@ mod tests {
         ]
         .into_iter()
         .for_each(|(url, expected)| {
-            let invariant = String::from(url);
-            let actual = get_hash_from_url(&invariant);
+            let actual = get_hash_from_url(url);
 
             assert_eq!(actual, expected)
         })

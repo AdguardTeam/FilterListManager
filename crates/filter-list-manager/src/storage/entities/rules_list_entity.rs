@@ -10,12 +10,12 @@ pub(crate) struct RulesListEntity {
     pub(crate) disabled_text: String,
 }
 
-impl Into<FilterListRules> for RulesListEntity {
-    fn into(self) -> FilterListRules {
+impl From<RulesListEntity> for FilterListRules {
+    fn from(value: RulesListEntity) -> Self {
         FilterListRules {
-            filter_id: self.filter_id,
-            rules: self.text.lines().map(str::to_string).collect(),
-            disabled_rules: self.disabled_text.lines().map(str::to_string).collect(),
+            filter_id: value.filter_id,
+            rules: value.text.lines().map(str::to_string).collect(),
+            disabled_rules: value.disabled_text.lines().map(str::to_string).collect(),
         }
     }
 }
@@ -30,12 +30,12 @@ impl From<FilterListRules> for RulesListEntity {
     }
 }
 
-impl Into<FilterListRulesRaw> for RulesListEntity {
-    fn into(self) -> FilterListRulesRaw {
+impl From<RulesListEntity> for FilterListRulesRaw {
+    fn from(value: RulesListEntity) -> Self {
         FilterListRulesRaw {
-            filter_id: self.filter_id,
-            rules: self.text,
-            disabled_rules: self.disabled_text,
+            filter_id: value.filter_id,
+            rules: value.text,
+            disabled_rules: value.disabled_text,
         }
     }
 }

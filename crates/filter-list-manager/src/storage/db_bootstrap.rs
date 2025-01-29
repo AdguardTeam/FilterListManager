@@ -18,6 +18,7 @@ pub(crate) fn get_bootstrapped_filter_id() -> FilterId {
     USER_RULES_FILTER_LIST_ID
 }
 
+#[allow(clippy::field_reassign_with_default)]
 /// Make special "User rules" filter
 fn make_user_rules_filter_entity() -> FilterEntity {
     let mut user_rules_entity = FilterEntity::default();

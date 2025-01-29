@@ -46,8 +46,8 @@ impl BooleanExpressionParser {
                 }
             }
 
-            let mut iter = sample.char_indices();
-            while let Some((idx, c)) = iter.next() {
+            let iter = sample.char_indices();
+            for (idx, c) in iter {
                 // Stops search on space
                 if is_allowed_space(c) {
                     offset += idx;
@@ -83,7 +83,7 @@ impl BooleanExpressionParser {
                 return None;
             }
 
-            return Some(result);
+            Some(result)
         })
     }
 

@@ -41,8 +41,9 @@ impl RuleLinesCollector {
 
     pub fn increment_rules_count(&mut self, line: &str) {
         self.rules_count += i32::from(
-            !line.is_empty()
-                && !(line.starts_with(NON_RULE_MARKER) || line.starts_with(EXTRA_COMMENT_MARKER)),
+            !(line.is_empty()
+                || line.starts_with(NON_RULE_MARKER)
+                || line.starts_with(EXTRA_COMMENT_MARKER)),
         )
     }
 

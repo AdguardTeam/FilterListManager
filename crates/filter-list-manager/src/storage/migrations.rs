@@ -45,7 +45,7 @@ fn migrations_internal(dir: &Dir, tx: &mut Transaction) -> FLMResult<()> {
 
     metadata.version = next_schema_version.get();
 
-    DBMetadataRepository::save(&tx, &metadata).map_err(FLMError::from_database)?;
+    DBMetadataRepository::save(tx, &metadata).map_err(FLMError::from_database)?;
 
     Ok(())
 }

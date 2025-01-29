@@ -38,7 +38,7 @@ impl DbConnectionManager {
         Block: FnOnce(Connection) -> FLMResult<Out>,
     {
         let _guard = self.db_mutex.lock();
-        let connection = connect(&self)?;
+        let connection = connect(self)?;
         block(connection)
     }
 
@@ -52,7 +52,7 @@ impl DbConnectionManager {
             self.get_calculated_path().to_owned(),
         )?;
 
-        let mut conn = connect_with_create(&self)?;
+        let mut conn = connect_with_create(self)?;
         let mut tx = conn.transaction().map_err(FLMError::from_database)?;
 
         match get_database_status(&tx, self.get_calculated_path())? {

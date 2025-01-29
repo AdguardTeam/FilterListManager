@@ -12,10 +12,7 @@ fn install_lists() {
     for n in 1..max_lists {
         manager
             .install_custom_filter_list(
-                String::from(format!(
-                    "https://filters.adtidy.org/mac_v2/filters/{}.txt",
-                    n
-                )),
+                format!("https://filters.adtidy.org/mac_v2/filters/{}.txt", n),
                 true,
                 None,
                 None,

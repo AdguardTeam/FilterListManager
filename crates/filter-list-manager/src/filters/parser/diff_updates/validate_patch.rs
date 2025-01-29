@@ -34,7 +34,7 @@ pub(crate) fn validate_patch(
         recognize_diff_directive.checksum.as_bytes(),
         &mut checksum_hex,
     )
-    .or_else(|why| return FilterParserError::other_err_from_to_string(why.to_string()))?;
+    .or_else(|why| FilterParserError::other_err_from_to_string(why.to_string()))?;
 
     if result.as_bytes() != checksum_hex {
         return FilterParserError::invalid_checksum(

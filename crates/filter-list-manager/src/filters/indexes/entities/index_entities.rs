@@ -30,8 +30,9 @@ pub(crate) struct FilterIndexEntity {
 }
 
 impl FilterIndexEntity {
+    #[allow(clippy::field_reassign_with_default)]
     /// Transforms index filter entity to storage entities
-    pub(crate) fn to_storage_entities(self) -> FilterIndexEntityComponents {
+    pub(crate) fn into_storage_entities(self) -> FilterIndexEntityComponents {
         let mut filter_list = FilterEntity::default();
 
         filter_list.filter_id = Some(self.filterId);

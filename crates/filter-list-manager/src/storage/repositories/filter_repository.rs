@@ -73,7 +73,7 @@ impl FilterRepository {
 
     /// Constructs condition (IS_CUSTOM_FILTER() AND `rhs`)
     #[inline]
-    pub(crate) fn custom_filter_with_extra<'a>(rhs: SQLOperator<'a>) -> SQLOperator<'a> {
+    pub(crate) fn custom_filter_with_extra(rhs: SQLOperator<'_>) -> SQLOperator<'_> {
         SQLOperator::And(heap(Self::custom_filter_operator()), heap(rhs))
     }
 
@@ -89,7 +89,7 @@ impl FilterRepository {
         conn: &Connection,
     ) -> rusqlite::Result<Option<Vec<FilterEntity>>> {
         self.select(
-            &conn,
+            conn,
             Some(FilterRepository::except_bootstrapped_filter_ids_operator()),
         )
     }
@@ -122,7 +122,7 @@ impl FilterRepository {
         transaction: &Transaction,
         entity: FilterEntity,
     ) -> Result<FilterEntity, Error> {
-        let last_insert_id = self.insert_internal(&transaction, &[entity])?;
+        let last_insert_id = self.insert_internal(transaction, &[entity])?;
 
         let mut sql = String::from(BASIC_SELECT_SQL);
         sql += "WHERE f.filter_id=?";
@@ -218,6 +218,7 @@ impl FilterRepository {
 
         let mut out: Vec<FilterId> = vec![];
         while let Some(row) = rows.next()? {
+            #[allow(clippy::bool_comparison)]
             if row.get::<usize, bool>(0)? == true {
                 out.push(row.get::<usize, FilterId>(1)?);
             }
@@ -479,7 +480,7 @@ impl FilterRepository {
         let last_insert_id = transaction.last_insert_rowid();
 
         if let Some(value) = metadata_entity {
-            DBMetadataRepository::save(&transaction, &value)?;
+            DBMetadataRepository::save(transaction, &value)?;
         }
 
         Ok(last_insert_id)

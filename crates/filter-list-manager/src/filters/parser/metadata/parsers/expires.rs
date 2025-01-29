@@ -100,30 +100,24 @@ pub(crate) fn process_expires(input: &str) -> i32 {
         let (next_iter_input, _) =
             skip_many_allowed_whitespaces(time_unit_remainder).unwrap_or_default();
 
-        let time_value_was_set: bool;
-        match time_unit {
+        let time_value_was_set: bool = match time_unit {
             "days" | "day" | "d" => {
-                time_value_was_set =
-                    time_holder.set_days(from_number_result_to_decimal(&time_value));
+                time_holder.set_days(from_number_result_to_decimal(&time_value))
             }
 
             "hours" | "hour" | "hrs" | "hr" | "h" => {
-                time_value_was_set =
-                    time_holder.set_hours(from_number_result_to_decimal(&time_value));
+                time_holder.set_hours(from_number_result_to_decimal(&time_value))
             }
-
             "minutes" | "minute" | "min" | "m" => {
-                time_value_was_set =
-                    time_holder.set_minutes(from_number_result_to_decimal(&time_value));
+                time_holder.set_minutes(from_number_result_to_decimal(&time_value))
             }
 
             "seconds" | "second" | "sec" | "s" => {
-                time_value_was_set =
-                    time_holder.set_seconds(from_number_result_to_integer(&time_value));
+                time_holder.set_seconds(from_number_result_to_integer(&time_value))
             }
 
-            _ => break,
-        }
+            _ => false,
+        };
 
         // Order is incorrect
         if !time_value_was_set {

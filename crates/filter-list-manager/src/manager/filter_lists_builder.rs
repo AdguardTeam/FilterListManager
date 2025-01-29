@@ -70,15 +70,15 @@ impl<'a> FullFilterListBuilder<'a> {
         Block: FnMut(StoredFilterMetadata) -> Out,
     {
         let locales_map = FilterLocaleRepository::new()
-            .select_mapped(&conn)
+            .select_mapped(conn)
             .map_err(FLMError::from_database)?;
 
         let tags_map = FilterTagRepository::new()
-            .select_with_filter_tag(&conn)
+            .select_with_filter_tag(conn)
             .map_err(FLMError::from_database)?;
 
         FilterLocalisationRepository::new()
-            .enrich_filter_lists_with_localisation(&conn, &mut entities, self.locale)
+            .enrich_filter_lists_with_localisation(conn, &mut entities, self.locale)
             .map_err(FLMError::from_database)?;
 
         let mut out = Vec::with_capacity(entities.len());
@@ -117,7 +117,7 @@ impl<'a> FullFilterListBuilder<'a> {
             Ok(map.unwrap())
         } else {
             RulesListRepository::new()
-                .select_mapped(&conn, None)
+                .select_mapped(conn, None)
                 .map_err(FLMError::from_database)
         }
     }

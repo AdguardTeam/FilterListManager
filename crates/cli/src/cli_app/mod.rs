@@ -80,7 +80,7 @@ pub(super) fn run_app() {
                 _ => unimplemented!(),
             };
 
-            fill_database::entry(db_path, index_url, index_i18n_url, filter_list_type.into());
+            fill_database::entry(db_path, index_url, index_i18n_url, filter_list_type);
         }
 
         Some(("test", _)) => {

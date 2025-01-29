@@ -50,7 +50,7 @@ impl ExpiresTimeHolder {
             return true;
         }
 
-        return false;
+        false
     }
 
     /// Sets minutes value
@@ -62,7 +62,7 @@ impl ExpiresTimeHolder {
             return true;
         }
 
-        return false;
+        false
     }
 
     /// Sets hours value
@@ -74,7 +74,7 @@ impl ExpiresTimeHolder {
             return true;
         }
 
-        return false;
+        false
     }
 
     /// Sets days value
@@ -86,7 +86,7 @@ impl ExpiresTimeHolder {
             return true;
         }
 
-        return false;
+        false
     }
 
     #[inline]

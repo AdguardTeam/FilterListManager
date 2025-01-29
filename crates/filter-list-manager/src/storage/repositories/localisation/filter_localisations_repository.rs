@@ -61,8 +61,7 @@ impl FilterLocalisationRepository {
 
         let mut params = filters
             .iter()
-            .map(|filter| filter.filter_id)
-            .flatten()
+            .filter_map(|filter| filter.filter_id)
             .map(|filter_id| filter_id.into())
             .collect::<Vec<Value>>();
 
@@ -80,16 +79,15 @@ impl FilterLocalisationRepository {
                 match filter.filter_id {
                     None => {}
                     Some(filter_id) => {
-                        map.remove(&filter_id)
-                            .map(|(maybe_title, maybe_description)| {
-                                maybe_title.map(|title| {
-                                    filter.title = title;
-                                });
+                        if let Some((maybe_title, maybe_description)) = map.remove(&filter_id) {
+                            if let Some(title) = maybe_title {
+                                filter.title = title;
+                            }
 
-                                maybe_description.map(|description| {
-                                    filter.description = description;
-                                });
-                            });
+                            if let Some(description) = maybe_description {
+                                filter.description = description;
+                            }
+                        }
                     }
                 }
             }

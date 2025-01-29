@@ -67,7 +67,7 @@ impl Configuration {
 
     /// Normalize locale string
     pub(crate) fn normalize_locale_string(locale: &Locale) -> Locale {
-        locale.replace("-", LOCALES_DELIMITER)
+        locale.replace('-', LOCALES_DELIMITER)
     }
 
     /// We shouldn't propagate values less than 3600

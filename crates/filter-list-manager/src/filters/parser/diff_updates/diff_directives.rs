@@ -102,28 +102,25 @@ pub(crate) fn extract_patch(
 
     for line in diff_lines_raw {
         if !lower_bound_found {
-            match recognize_diff_directive(line) {
-                Ok((_, Some(directive_found))) => {
-                    match &directive_found.name {
-                        Some(current_name) => {
-                            // Found needed directive, then start consuming
-                            if current_name == &resource_name {
-                                recognized_directive = directive_found;
+            if let Ok((_, Some(directive_found))) = recognize_diff_directive(line) {
+                match &directive_found.name {
+                    Some(current_name) => {
+                        // Found needed directive, then start consuming
+                        if current_name == &resource_name {
+                            recognized_directive = directive_found;
 
-                                lower_bound_found = true;
-                            }
-                        }
-                        None => {
-                            // We've found diff directive, but it doesn't contain name
-                            // So patch is broken
-                            return FilterParserError::other_err_from_to_string(
-                                r"We've found diff directive, but it doesn't contain name.
-So patch is broken",
-                            );
+                            lower_bound_found = true;
                         }
                     }
+                    None => {
+                        // We've found diff directive, but it doesn't contain name
+                        // So patch is broken
+                        return FilterParserError::other_err_from_to_string(
+                            r"We've found diff directive, but it doesn't contain name.
+So patch is broken",
+                        );
+                    }
                 }
-                _ => {}
             }
         } else if !upper_bound_found {
             match recognize_diff_directive(line) {
@@ -138,7 +135,7 @@ So patch is broken",
         }
     }
 
-    return Ok((Some(recognized_directive), out, !break_encountered));
+    Ok((Some(recognized_directive), out, !break_encountered))
 }
 
 /// Recognizes diff directive

@@ -10,8 +10,7 @@ pub(crate) fn to_absolute_path(parent_filter_path: &str, child_path: &str) -> Op
 
     root.pop();
 
-    let mut iter = child_path.split("/");
-    while let Some(chunk) = iter.next() {
+    for chunk in child_path.split('/') {
         match chunk {
             "." => { /* do nothing */ }
 
@@ -40,12 +39,9 @@ pub(crate) fn to_absolute_url(
     let mut slice = url.as_str();
 
     // Url always created with "/" after domain. We need to cut trailing slash
-    if child_url.len() > 0 && child_url.get(slice.len() - 1..) != Some("/") {
-        match slice.split_at(slice.len() - 1) {
-            (remainder, "/") => {
-                slice = remainder;
-            }
-            _ => {}
+    if !child_url.is_empty() && child_url.get(slice.len() - 1..) != Some("/") {
+        if let (remainder, "/") = slice.split_at(slice.len() - 1) {
+            slice = remainder;
         }
     }
 
@@ -93,7 +89,7 @@ pub(crate) fn resolve_absolute_uri(
         }
     };
 
-    return Ok(resolved_url);
+    Ok(resolved_url)
 }
 
 #[cfg(test)]

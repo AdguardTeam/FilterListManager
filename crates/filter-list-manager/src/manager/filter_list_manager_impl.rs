@@ -105,6 +105,7 @@ impl FilterListManager for FilterListManagerImpl {
         }))
     }
 
+    #[allow(clippy::field_reassign_with_default)]
     fn install_custom_filter_list(
         &self,
         download_url: String,
@@ -355,11 +356,11 @@ impl FilterListManager for FilterListManagerImpl {
 
                             filter_repository.insert(transaction, &filters)?;
 
-                            RulesListRepository::new().insert(&transaction, &[rules.into()])
+                            RulesListRepository::new().insert(transaction, &[rules.into()])
                         })
                     }
 
-                    _ => return Err(FLMError::EntityNotFound(rules.filter_id as i64)),
+                    _ => Err(FLMError::EntityNotFound(rules.filter_id as i64)),
                 }
             })
     }
@@ -386,7 +387,7 @@ impl FilterListManager for FilterListManagerImpl {
 
                 with_transaction(&mut conn, |transaction: &Transaction| {
                     rules_list_repository
-                        .set_disabled_rules(&transaction, filter_id, disabled_rules.join("\n"))
+                        .set_disabled_rules(transaction, filter_id, disabled_rules.join("\n"))
                         .map(|_| ())
                 })
             })
@@ -496,8 +497,8 @@ impl FilterListManager for FilterListManagerImpl {
             IndexesProcessor::factory(&self.connection_manager, &self.configuration)?;
 
         processor.sync_metadata(
-            &self.configuration.metadata_url,
-            &self.configuration.metadata_locales_url,
+            self.configuration.metadata_url.as_str(),
+            self.configuration.metadata_locales_url.as_str(),
         )
     }
 
@@ -518,14 +519,14 @@ impl FilterListManager for FilterListManagerImpl {
                 let count = filter_repository
                     .count(
                         &conn,
-                        Some(FilterRepository::custom_filter_with_id(filter_id.into())),
+                        Some(FilterRepository::custom_filter_with_id(filter_id)),
                     )
                     .map_err(FLMError::from_database)?;
 
                 if count > 0 {
                     with_transaction(&mut conn, move |transaction: &Transaction| {
                         filter_repository.update_custom_filter_metadata(
-                            &transaction,
+                            transaction,
                             filter_id,
                             title.as_str(),
                             is_trusted,
@@ -563,6 +564,7 @@ impl FilterListManager for FilterListManagerImpl {
         Ok(entity.map(|e| e.version))
     }
 
+    #[allow(clippy::field_reassign_with_default)]
     fn install_custom_filter_from_string(
         &self,
         download_url: String,
@@ -591,7 +593,7 @@ impl FilterListManager for FilterListManagerImpl {
             .get_metadata(KnownMetadataProperty::TimeUpdated)
             .as_str()
         {
-            time_slice if time_slice.len() > 0 => DateTime::from_str(time_slice)
+            time_slice if !time_slice.is_empty() => DateTime::from_str(time_slice)
                 .unwrap_or_else(|_: ParseError| Utc::now())
                 .timestamp(),
             _ => Utc::now().timestamp(),
@@ -709,12 +711,11 @@ impl FilterListManager for FilterListManagerImpl {
                                 .text
                                 .lines()
                                 .filter(|line| {
-                                    disabled_lines
+                                    !disabled_lines
                                         .iter()
-                                        .find(|line_from_disabled| line_from_disabled == &line)
-                                        .is_none()
+                                        .any(|line_from_disabled| line_from_disabled == line)
                                 })
-                                .map(|line| line.to_string())
+                                .map(ToString::to_string)
                                 .collect::<Vec<String>>();
 
                             return Some(ActiveRulesInfo {

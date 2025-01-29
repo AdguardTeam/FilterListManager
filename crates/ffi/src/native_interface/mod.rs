@@ -69,10 +69,10 @@ impl FLMHandle {
 
 /// Makes default [`Configuration`] object as protobuf in [`RustResponse`]
 #[no_mangle]
-pub unsafe extern "C" fn flm_default_configuration_protobuf() -> *mut RustResponse {
+pub extern "C" fn flm_default_configuration_protobuf() -> *mut RustResponse {
     let conf: filter_list_manager::Configuration = Configuration::default().into();
 
-    let mut rust_response = Box::new(RustResponse::default());
+    let mut rust_response = Box::<RustResponse>::default();
 
     let mut vec = vec![];
     if let Err(why) = conf.encode(&mut vec) {
@@ -96,9 +96,15 @@ pub unsafe extern "C" fn flm_default_configuration_protobuf() -> *mut RustRespon
 }
 
 /// Makes an FLM object and returns opaque pointer of [`FLMHandle`]
+///
+/// # Safety
+///
+/// 1. This function awaits protobuf pointer `bytes` and its size `size`
+/// 2. `handle.result_data_len <= handle.result_data_capacity` is unsafe and will panic
+/// 3. `handle.result_data.is_null()` || `size == 0` is safe, returns [`RustResponse`] with error
 #[no_mangle]
 pub unsafe extern "C" fn flm_init_protobuf(bytes: *const u8, size: usize) -> *mut RustResponse {
-    let mut rust_response = Box::new(RustResponse::default());
+    let mut rust_response = Box::<RustResponse>::default();
 
     if bytes.is_null() || size == 0 {
         return build_rust_response_error(
@@ -126,7 +132,7 @@ pub unsafe extern "C" fn flm_init_protobuf(bytes: *const u8, size: usize) -> *mu
         let error = filter_list_manager::AgOuterError::from(factory_result.err().unwrap());
         error
             .encode(&mut data)
-            .expect(&format!("[Cannot encode error message]: {}", error.message));
+            .unwrap_or_else(|_| panic!("[Cannot encode error message]: {}", error.message));
 
         rust_response.result_data_capacity = data.capacity();
         rust_response.result_data_len = data.len();
@@ -145,6 +151,11 @@ pub unsafe extern "C" fn flm_init_protobuf(bytes: *const u8, size: usize) -> *mu
 
 /// Frees memory of [`RustResponse`] objects and their data.
 /// NOTE: Actions for each discriminant are different.
+///
+/// # Safety
+///
+/// 1. `handle.result_data.is_null()` is safe
+/// 2. `handle.result_data_len <= handle.result_data_capacity` is unsafe and will panic
 #[no_mangle]
 pub unsafe extern "C" fn flm_free_response(handle: *mut RustResponse) {
     if !handle.is_null() {
@@ -176,6 +187,10 @@ pub unsafe extern "C" fn flm_free_response(handle: *mut RustResponse) {
 }
 
 /// Drops [`FLMHandle`]
+///
+/// # Safety
+///
+/// This function is safe as long as you pass designated pointer
 #[no_mangle]
 pub unsafe extern "C" fn flm_free_handle(handle: *mut FLMHandle) {
     if !handle.is_null() {
@@ -192,16 +207,12 @@ fn build_rust_response_error(
 ) -> *mut RustResponse {
     let mut vec = vec![];
     filter_list_manager::AgOuterError {
-        message: format!("{}: {}", error_span, error.to_string()),
+        message: format!("{}: {}", error_span, error),
         error: Some(ProtobufErrorEnum::Other(filter_list_manager::Other {})),
     }
     .encode(&mut vec)
     // All that's left is to fall with the right error
-    .expect(&format!(
-        "[Cannot encode error message] {}: {}",
-        error_span,
-        error.to_string()
-    ));
+    .unwrap_or_else(|_| panic!("[Cannot encode error message] {}: {}", error_span, error));
 
     rust_response.result_data_capacity = vec.capacity();
     rust_response.result_data_len = vec.len();

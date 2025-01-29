@@ -35,6 +35,6 @@ impl DbSchemaRepository {
             }
         }
 
-        return Ok(false);
+        Ok(false)
     }
 }

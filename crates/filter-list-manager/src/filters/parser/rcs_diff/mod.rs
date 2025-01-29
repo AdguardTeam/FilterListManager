@@ -17,6 +17,7 @@ pub(crate) fn apply_patch(
     let mut slices: Vec<&[&str]> = vec![];
     let mut base_filter_cursor = 0usize;
 
+    #[allow(clippy::while_let_on_iterator)]
     while let Some((index, line)) = diff_iter.next() {
         if line.is_empty() {
             continue;
@@ -104,7 +105,7 @@ pub(crate) fn apply_patch(
         .fold(
             String::with_capacity(base_filter.len()),
             |mut acc, sub_slice| {
-                sub_slice.into_iter().for_each(|line| {
+                sub_slice.iter().for_each(|line| {
                     acc.push_str(line);
                     acc.push('\n');
                 });
@@ -118,7 +119,7 @@ pub(crate) fn apply_patch(
         patch_result.pop();
     }
 
-    return Ok(patch_result);
+    Ok(patch_result)
 }
 
 /// Make special case error: when rcs diff `line` index is out of bounds for current file

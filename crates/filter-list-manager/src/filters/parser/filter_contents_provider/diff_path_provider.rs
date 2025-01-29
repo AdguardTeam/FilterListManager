@@ -68,9 +68,9 @@ impl<'a> DiffPathProvider<'a> {
                     validate_patch(diff_directive, patch_lines_count, patch_result.as_str())?;
                 }
 
-                return Ok(patch_result);
+                Ok(patch_result)
             }
-            Err(e) => return Err(e),
+            Err(e) => Err(e),
         }
     }
 }
@@ -85,30 +85,32 @@ impl FilterContentsProvider for DiffPathProvider<'_> {
         // If resource name exist we assume that this is batch patch file
         // According to <https://github.com/ameshkov/diffupdates/tree/master?tab=readme-ov-file#algorithm>
         // we must load patch diff file only once
-        let (resource_name, file_contents) = match get_hash_from_url(&patch_file_absolute_uri) {
-            Some((patch_path, resource_name)) => {
-                let mut pinned_container = self.batch_patches_container.borrow_mut();
+        let (resource_name, file_contents) =
+            match get_hash_from_url(patch_file_absolute_uri.as_str()) {
+                Some((patch_path, resource_name)) => {
+                    let mut pinned_container = self.batch_patches_container.borrow_mut();
 
-                let diff_contents = match pinned_container.get_a_copy(&patch_path) {
-                    None => {
-                        let body = fetch_by_scheme(&patch_path, scheme, self.get_http_client())?;
+                    let diff_contents = match pinned_container.get_a_copy(&patch_path) {
+                        None => {
+                            let body =
+                                fetch_by_scheme(&patch_path, scheme, self.get_http_client())?;
 
-                        pinned_container.insert(patch_path, body.clone());
+                            pinned_container.insert(patch_path, body.clone());
 
-                        body
-                    }
-                    Some(string) => string,
-                };
+                            body
+                        }
+                        Some(string) => string,
+                    };
 
-                (Some(resource_name), diff_contents)
-            }
-            None => {
-                let diff_contents =
-                    fetch_by_scheme(&patch_file_absolute_uri, scheme, self.get_http_client())?;
+                    (Some(resource_name), diff_contents)
+                }
+                None => {
+                    let diff_contents =
+                        fetch_by_scheme(&patch_file_absolute_uri, scheme, self.get_http_client())?;
 
-                (None, diff_contents)
-            }
-        };
+                    (None, diff_contents)
+                }
+            };
 
         self.do_patch(file_contents.as_str(), resource_name)
     }

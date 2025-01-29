@@ -17,6 +17,7 @@ pub(crate) enum DatabaseStatus {
     Filled,
 }
 
+#[allow(clippy::bool_comparison)]
 /// Determines current [`DatabaseStatus`]
 pub(crate) fn get_database_status(
     tx: &Transaction,
@@ -42,7 +43,7 @@ pub(crate) fn get_database_status(
         return Ok(DatabaseStatus::OnlySchema);
     }
 
-    return Ok(DatabaseStatus::Filled);
+    Ok(DatabaseStatus::Filled)
 }
 
 /// Check that db file exists

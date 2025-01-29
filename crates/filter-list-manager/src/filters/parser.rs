@@ -19,17 +19,17 @@ use crate::Configuration;
 use include_processor::get_include_path;
 use nom::Slice;
 
-pub(self) mod boolean_expression_parser;
+mod boolean_expression_parser;
 mod checksum_validator;
 pub(crate) mod diff_updates;
 pub(crate) mod filter_contents_provider;
 mod filter_cursor;
-pub(self) mod include_processor;
+mod include_processor;
 pub(crate) mod metadata;
 pub(crate) mod parser_error;
-pub(self) mod paths;
+mod paths;
 mod rcs_diff;
-pub(self) mod rule_lines_collector;
+mod rule_lines_collector;
 
 pub(super) const DIRECTIVE_IF: &str = "!#if";
 pub(super) const DIRECTIVE_ELSE: &str = "!#else";
@@ -104,11 +104,8 @@ impl<'a> FilterParser<'a> {
     /// * `url` - Absolute filter url. Now supports (https?, file) protocols
     ///
     /// Returns [`Result`] with absolute filter url
-    pub(crate) fn parse_from_url(
-        &mut self,
-        url: &String,
-    ) -> Result<String, FilterParserErrorContext> {
-        self.push_file(url.as_str(), true)?;
+    pub(crate) fn parse_from_url(&mut self, url: &str) -> Result<String, FilterParserErrorContext> {
+        self.push_file(url, true)?;
 
         let root_filter_url: String;
         if let Some(root_cursor) = self.filters_cursor.last() {
@@ -154,7 +151,7 @@ impl<'a> FilterParser<'a> {
         let cursor: FilterCursor;
 
         if from_root {
-            if self.filters_cursor.len() > 0 {
+            if !self.filters_cursor.is_empty() {
                 return Err(FilterParserErrorContext {
                     file: absolute_url.to_string(),
                     line: 0,
@@ -190,40 +187,39 @@ impl<'a> FilterParser<'a> {
                     }
                 }
             }
-        } else {
-            if let Some(_) = self.filters_cursor.last() {
-                let current_scheme = get_scheme(absolute_url);
+        } else if self.filters_cursor.last().is_some() {
+            let current_scheme = get_scheme(absolute_url);
 
-                let contents = self
-                    .filter_downloader
-                    .get_included_filter_contents(absolute_url, current_scheme.into())
+            let contents = self
+                .filter_downloader
+                .get_included_filter_contents(absolute_url, current_scheme.into())
+                .or_else(|why| self.build_error_with_context(why))?;
+
+            self.filter_downloader
+                .pre_check_filter_contents(contents.as_str())
+                .or_else(|why| self.build_error_with_context(why))?;
+
+            if !self.should_skip_checksum_validation {
+                validate_checksum(contents.as_str())
                     .or_else(|why| self.build_error_with_context(why))?;
-
-                self.filter_downloader
-                    .pre_check_filter_contents(contents.as_str())
-                    .or_else(|why| self.build_error_with_context(why))?;
-
-                if !self.should_skip_checksum_validation {
-                    validate_checksum(contents.as_str())
-                        .or_else(|why| self.build_error_with_context(why))?;
-                }
-
-                cursor = FilterCursor::new(absolute_url.to_owned(), contents);
-            } else {
-                // Empty context here, because the stack is corrupted
-                return Err(FilterParserErrorContext {
-                    line: 0,
-                    file: absolute_url.to_string(),
-                    error: FilterParserError::StackIsCorrupted,
-                });
             }
-        };
+
+            cursor = FilterCursor::new(absolute_url.to_owned(), contents);
+        } else {
+            // Empty context here, because the stack is corrupted
+            return Err(FilterParserErrorContext {
+                line: 0,
+                file: absolute_url.to_string(),
+                error: FilterParserError::StackIsCorrupted,
+            });
+        }
 
         self.filters_cursor.push(cursor);
 
         Ok(())
     }
 
+    #[allow(clippy::bool_comparison)]
     /// Parses line of the current file
     fn parse_line(&mut self, line: &str, lineno: usize) -> Result<(), FilterParserErrorContext> {
         let trimmed = line.trim();
@@ -343,9 +339,9 @@ impl<'a> FilterParser<'a> {
                 let cursor = self
                     .filters_cursor
                     .iter()
-                    .find(|filter_cursor| return &absolute_path == &filter_cursor.normalized_url);
+                    .find(|filter_cursor| absolute_path == filter_cursor.normalized_url);
 
-                if let Some(_) = cursor {
+                if cursor.is_some() {
                     return self.build_error_with_context(FilterParserError::RecursiveInclusion);
                 }
 
@@ -440,7 +436,7 @@ impl FilterParser<'_> {
                 }
             }
         } else {
-            return Err(FilterParserError::StackIsCorrupted);
+            Err(FilterParserError::StackIsCorrupted)
         }
     }
 
@@ -475,7 +471,7 @@ impl FilterParser<'_> {
             ));
         }
 
-        return Err(FilterParserErrorContext::new(error, 0, String::new()));
+        Err(FilterParserErrorContext::new(error, 0, String::new()))
     }
 
     /// Do we are capturing input lines right now?
