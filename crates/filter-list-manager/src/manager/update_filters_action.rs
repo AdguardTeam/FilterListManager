@@ -211,10 +211,6 @@ pub(super) fn update_filters_action(
             filter.expires = expires;
             filter.last_download_time = current_time;
 
-            // Do not change (description and title) for custom filters,
-            // 'cause user may set this info manually
-            // So we don't need change these values for registry filters
-
             filter.last_update_time = match parser
                 .get_metadata(KnownMetadataProperty::TimeUpdated)
                 .as_str()
@@ -229,6 +225,8 @@ pub(super) fn update_filters_action(
             // Should update `parsed info` only for custom filters
             if filter.is_custom() {
                 filter.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
+                filter.title = parser.get_metadata(KnownMetadataProperty::Title);
+                filter.description = parser.get_metadata(KnownMetadataProperty::Description);
             }
 
             // TODO: Spike, until we implement streaming parsing and/or index downloading before update;
@@ -588,7 +586,7 @@ mod tests {
                 assert_eq!(first_filter, &new_rules1);
                 assert_eq!(third_filter, &new_rules3);
 
-                // These wasn't update
+                // These weren't update
                 assert_eq!(second_filter, &rules2);
                 assert_eq!(fourth_filter, &rules4);
 
