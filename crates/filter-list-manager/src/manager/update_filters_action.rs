@@ -340,7 +340,7 @@ mod tests {
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::repositories::Repository;
     use crate::storage::DbConnectionManager;
-    use crate::test_utils::{do_with_tests_helper, RAIIFile};
+    use crate::test_utils::RAIIFile;
     use crate::{Configuration, FilterId};
     use chrono::Utc;
     use rusqlite::Connection;
@@ -350,9 +350,6 @@ mod tests {
     #[test]
     fn test_update_filters_action() {
         let timestamp = Utc::now().timestamp_micros();
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
 
         let source = DbConnectionManager::factory_test().unwrap();
 
@@ -606,9 +603,6 @@ mod tests {
     #[test]
     fn test_force_update_filters_action() {
         let timestamp = Utc::now().timestamp_micros();
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
 
         let source = DbConnectionManager::factory_test().unwrap();
 

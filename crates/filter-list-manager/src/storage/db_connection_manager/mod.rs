@@ -25,6 +25,19 @@ pub struct DbConnectionManager {
 }
 
 impl DbConnectionManager {
+    /// Default ctor
+    pub(crate) fn from_configuration(configuration: &Configuration) -> FLMResult<Self> {
+        let calculated_dir = match configuration.working_directory {
+            None => env::current_dir().map_err(FLMError::from_io),
+            Some(ref str) => Ok(PathBuf::from(str)),
+        }?;
+
+        Ok(Self::build_with_dir(
+            calculated_dir,
+            configuration.filter_list_type,
+        ))
+    }
+
     /// Path getter
     pub(crate) fn get_calculated_path(&self) -> &PathBuf {
         &self.calculated_path
@@ -75,19 +88,6 @@ impl DbConnectionManager {
 }
 
 impl DbConnectionManager {
-    /// Default ctor
-    pub(crate) fn from_configuration(configuration: &Configuration) -> FLMResult<Self> {
-        let calculated_dir = match configuration.working_directory {
-            None => env::current_dir().map_err(FLMError::from_io),
-            Some(ref str) => Ok(PathBuf::from(str)),
-        }?;
-
-        Ok(Self::build_with_dir(
-            calculated_dir,
-            configuration.filter_list_type,
-        ))
-    }
-
     #[cfg(test)]
     #[inline]
     fn build_with_dir(mut dir: PathBuf, filter_list_type: FilterListType) -> Self {
@@ -98,8 +98,10 @@ impl DbConnectionManager {
 
         dir.push(file_name);
 
-        use crate::test_utils::do_with_tests_helper;
-        dir = do_with_tests_helper(|mut helper| helper.build_temporary_db_name(dir));
+        use crate::test_utils::do_with_database_names_manipulator;
+        dir = do_with_database_names_manipulator(|mut helper| unsafe {
+            helper.build_temporary_db_name(dir)
+        });
 
         Self {
             calculated_path: dir,
@@ -123,13 +125,18 @@ impl DbConnectionManager {
         }
     }
 }
+#[cfg(test)]
+impl AsRef<DbConnectionManager> for DbConnectionManager {
+    fn as_ref(&self) -> &DbConnectionManager {
+        self
+    }
+}
 
 #[cfg(test)]
 impl DbConnectionManager {
+    /// Simplify creation of default database
     pub(crate) fn factory_test() -> FLMResult<DbConnectionManager> {
-        let cwd = env::current_dir().map_err(FLMError::from_io)?;
-
-        Ok(Self::build_with_dir(cwd, FilterListType::STANDARD))
+        Self::from_configuration(&Configuration::default())
     }
 }
 

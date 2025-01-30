@@ -821,7 +821,7 @@ mod tests {
     use crate::storage::sql_generators::operator::SQLOperator;
     use crate::storage::with_transaction;
     use crate::storage::DbConnectionManager;
-    use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
+    use crate::test_utils::spawn_test_db_with_metadata;
     use crate::{
         Configuration, FilterId, FilterListManager, FilterListManagerImpl, FilterListRules,
         USER_RULES_FILTER_LIST_ID,
@@ -838,10 +838,6 @@ mod tests {
 
     #[test]
     fn test_insert_custom_filter() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
@@ -879,10 +875,6 @@ mod tests {
 
     #[test]
     fn delete_filter_lists() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let (_, inserted_filters) = spawn_test_db_with_metadata(&source);
 
@@ -918,10 +910,6 @@ mod tests {
 
     #[test]
     fn test_install_local_custom_filter() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
         let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
@@ -946,13 +934,10 @@ mod tests {
 
     #[test]
     fn test_save_disabled_rules() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
-        let source = DbConnectionManager::factory_test().unwrap();
-        let _ = spawn_test_db_with_metadata(&source);
         let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let source = flm.connection_manager.as_ref();
+
+        let _ = spawn_test_db_with_metadata(source);
 
         let title = String::from("titleeee");
         let description = String::from("dessscrriptiiiioooonnn");
@@ -999,10 +984,6 @@ mod tests {
 
     #[test]
     fn test_install_custom_filter_from_string() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
         let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
@@ -1052,10 +1033,6 @@ mod tests {
 
     #[test]
     fn test_we_can_understand_aliases_fields() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
         let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
@@ -1086,18 +1063,14 @@ mod tests {
 
     #[test]
     fn test_we_can_select_localised_filters() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
-        let source = DbConnectionManager::factory_test().unwrap();
-        let _ = spawn_test_db_with_metadata(&source);
-
         {
             let mut conf = Configuration::default();
             conf.locale = String::from("el");
 
             let flm = FilterListManagerImpl::new(conf).unwrap();
+            let source = flm.connection_manager.as_ref();
+            let _ = spawn_test_db_with_metadata(&source);
+
             let filter = flm.get_full_filter_list_by_id(1).unwrap().unwrap();
 
             assert_eq!(filter.title.as_str(), "AdGuard Ρωσικό φίλτρο");
@@ -1113,6 +1086,9 @@ mod tests {
             conf.locale = String::from("31");
 
             let flm = FilterListManagerImpl::new(conf).unwrap();
+            let source = flm.connection_manager.as_ref();
+            let _ = spawn_test_db_with_metadata(&source);
+
             let filter = flm.get_full_filter_list_by_id(1).unwrap().unwrap();
 
             assert_eq!(filter.title.as_str(), "AdGuard Russian filter");
@@ -1125,14 +1101,11 @@ mod tests {
 
     #[test]
     fn test_select_index_filter() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let source = flm.connection_manager.as_ref();
 
-        let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
         let filter = flm.get_full_filter_list_by_id(257).unwrap().unwrap();
 
         assert_eq!(
@@ -1150,9 +1123,6 @@ mod tests {
     #[test]
     fn test_get_active_rules_with_disabled_rules() {
         let filter = include_str!("../../tests/fixtures/small_pseudo_custom_filter_rules_test.txt");
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
 
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
@@ -1196,10 +1166,6 @@ mod tests {
 
     #[test]
     fn test_get_active_rules() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
@@ -1228,10 +1194,6 @@ mod tests {
 
     #[test]
     fn test_save_custom_filter_rules_must_update_time() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
@@ -1268,10 +1230,6 @@ mod tests {
 
     #[test]
     fn test_guard_rewrite_user_rules_filter_by_another_filter() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
@@ -1313,10 +1271,6 @@ mod tests {
 
     #[test]
     fn test_database_is_automatically_lifted_in_constructor() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let lists = flm.get_full_filter_lists_internal(None).unwrap();
@@ -1329,14 +1283,10 @@ mod tests {
         const TEST_FILTERS_AMOUNT: usize = 3;
         const NONEXISTENT_ID: FilterId = 450_123_456;
 
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
-        let source = DbConnectionManager::factory_test().unwrap();
-        let (_, index_filters) = spawn_test_db_with_metadata(&source);
-
         let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let source = &flm.connection_manager;
+        let (_, index_filters) = spawn_test_db_with_metadata(source);
+
         let filter_repo = FilterRepository::new();
         let rules_repo = RulesListRepository::new();
 
@@ -1398,10 +1348,6 @@ mod tests {
 
     #[test]
     fn test_save_rules_to_file_blob() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let mut path = env::current_dir().unwrap();
         path.push("fixtures");
         path.push(format!(
@@ -1444,12 +1390,10 @@ mod tests {
 
     #[test]
     fn test_get_disabled_rules() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
+        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
-        let source = DbConnectionManager::factory_test().unwrap();
-        let (_, index_filters) = spawn_test_db_with_metadata(&source);
+        let source = &flm.connection_manager;
+        let (_, index_filters) = spawn_test_db_with_metadata(source);
 
         let last_filter_id = index_filters.last().unwrap().filter_id.unwrap();
         let first_filter_id = index_filters.first().unwrap().filter_id.unwrap();
@@ -1478,10 +1422,6 @@ mod tests {
                 Ok(())
             })
             .unwrap();
-
-        drop(source);
-
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
 
         let actual = flm
             .get_disabled_rules(vec![first_filter_id, last_filter_id])

@@ -54,14 +54,12 @@ mod tests {
     use crate::storage::repositories::{BulkDeleteRepository, Repository};
     use crate::storage::with_transaction;
     use crate::storage::DbConnectionManager;
-    use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
+    use crate::test_utils::spawn_test_db_with_metadata;
     use crate::FilterId;
     use rusqlite::{Connection, Transaction};
 
     #[test]
     fn test_bulk_delete_filters() {
-        do_with_tests_helper(|mut helper| helper.increment_postfix());
-
         let source = DbConnectionManager::factory_test().unwrap();
         let (_, index_filters) = spawn_test_db_with_metadata(&source);
         let filter_repository = FilterRepository::new();
@@ -108,9 +106,8 @@ mod tests {
 
     #[test]
     fn test_clear_table() {
-        do_with_tests_helper(|mut helper| helper.increment_postfix());
-
         let source = DbConnectionManager::factory_test().unwrap();
+
         let _ = spawn_test_db_with_metadata(&source);
         let locale_repository = FilterLocaleRepository::new();
 

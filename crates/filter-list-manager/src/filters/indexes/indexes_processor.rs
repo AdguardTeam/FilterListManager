@@ -394,7 +394,7 @@ mod tests {
     use crate::storage::with_transaction;
     use crate::storage::DbConnectionManager;
     use crate::test_utils::indexes_fixtures::build_filters_indices_fixtures;
-    use crate::test_utils::{do_with_tests_helper, tests_path};
+    use crate::test_utils::tests_path;
     use crate::utils::memory::heap;
     use crate::{
         Configuration, FLMError, FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID,
@@ -411,8 +411,6 @@ mod tests {
 
     #[test]
     fn test_save_indices_in_empty_db() {
-        do_with_tests_helper(|mut helper| helper.increment_postfix());
-
         let (mut index, index_localisation) = build_filters_indices_fixtures().unwrap();
 
         {
@@ -505,8 +503,6 @@ mod tests {
 
     #[test]
     fn test_save_indices_in_existent_db() {
-        do_with_tests_helper(|mut helper| helper.increment_postfix());
-
         let filter_repository = FilterRepository::new();
         let rules_repository = RulesListRepository::new();
         let groups_repository = FilterGroupRepository::new();
@@ -708,8 +704,6 @@ mod tests {
 
     #[test]
     fn test_load_indexes_from_local_paths() {
-        do_with_tests_helper(|mut helper| helper.increment_postfix());
-
         let index_path = tests_path("fixtures/filters.json");
         let index_i18n_path = tests_path("fixtures/filters_i18n.json");
 

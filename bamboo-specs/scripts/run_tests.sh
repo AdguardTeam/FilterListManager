@@ -9,4 +9,4 @@ rustup component add clippy
 echo "Testing the crates..."
 cargo fmt --all -- --check
 cargo clippy
-cargo test --workspace --lib --all-features -- --test-threads=1
+cargo test --workspace --lib --all-features

@@ -17,8 +17,7 @@ use crate::{Configuration, FLMError};
 use libc::atexit;
 use rusqlite::Connection;
 
-// TODO: For multithreading tests, we need a copy of each helper,
-// because we can increment postfixes, and databases names may collides in different tests
+/// Temporary databases filenames manipulator
 static TESTS_DB_HELPER: Lazy<Mutex<TestsDb>> = Lazy::new(|| Mutex::new(TestsDb::new()));
 
 /// Implemented teardown for DB files, hastily
@@ -67,7 +66,7 @@ pub(crate) fn spawn_test_db_with_metadata(
 }
 
 /// Helper for test database naming
-pub(crate) fn do_with_tests_helper<'a, F, R>(f: F) -> R
+pub(crate) fn do_with_database_names_manipulator<'a, F, R>(f: F) -> R
 where
     F: FnOnce(MutexGuard<TestsDb>) -> R,
 {

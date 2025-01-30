@@ -516,7 +516,7 @@ mod tests {
     use crate::storage::sql_generators::operator::SQLOperator;
     use crate::storage::with_transaction;
     use crate::storage::DbConnectionManager;
-    use crate::test_utils::{do_with_tests_helper, spawn_test_db_with_metadata};
+    use crate::test_utils::spawn_test_db_with_metadata;
     use crate::CUSTOM_FILTERS_GROUP_ID;
     use rand::seq::SliceRandom;
     use rand::thread_rng;
@@ -525,10 +525,6 @@ mod tests {
 
     #[test]
     fn test_count_negative_filters() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
         let filter_repository = FilterRepository::new();
@@ -600,10 +596,6 @@ mod tests {
 
     #[test]
     fn test_update_custom_filter() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
         let filter_repository = FilterRepository::new();
@@ -699,10 +691,6 @@ mod tests {
 
     #[test]
     fn test_toggle_filter_lists() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let filter_repository = FilterRepository::new();
 
         let source = DbConnectionManager::factory_test().unwrap();
@@ -744,10 +732,6 @@ mod tests {
 
     #[test]
     fn test_toggle_is_installed() {
-        do_with_tests_helper(|mut helper| {
-            helper.increment_postfix();
-        });
-
         let filter_repository = FilterRepository::new();
 
         let source = DbConnectionManager::factory_test().unwrap();

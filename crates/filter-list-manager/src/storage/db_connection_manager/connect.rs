@@ -41,13 +41,10 @@ mod tests {
     use super::connect;
     use crate::storage::error::DatabaseError;
     use crate::storage::DbConnectionManager;
-    use crate::test_utils::do_with_tests_helper;
     use crate::FLMError;
 
     #[test]
     fn test_db_file_does_not_exists() {
-        do_with_tests_helper(|mut helper| helper.increment_postfix());
-
         let database_path_holder = DbConnectionManager::factory_test().unwrap();
 
         let err = connect(&database_path_holder).err().unwrap();
