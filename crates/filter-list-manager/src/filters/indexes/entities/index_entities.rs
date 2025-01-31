@@ -9,7 +9,7 @@ use crate::storage::entities::{
     filter_locale_entity::FilterLocaleEntity,
 };
 
-/// Filter representation from index
+/// Necessary filter representation from index
 #[derive(Debug, Deserialize)]
 #[cfg_attr(test, derive(Clone))]
 pub(crate) struct FilterIndexEntity {
@@ -31,7 +31,9 @@ pub(crate) struct FilterIndexEntity {
 
 impl FilterIndexEntity {
     #[allow(clippy::field_reassign_with_default)]
-    /// Transforms index filter entity to storage entities
+    /// Transforms index filter entity to storage entities.
+    ///
+    /// Note: not all fields will be transformed.
     pub(crate) fn into_storage_entities(self) -> FilterIndexEntityComponents {
         let mut filter_list = FilterEntity::default();
 
@@ -42,7 +44,6 @@ impl FilterIndexEntity {
         filter_list.last_update_time = self.timeUpdated.timestamp();
         filter_list.download_url = self.downloadUrl;
         filter_list.subscription_url = self.subscriptionUrl;
-        filter_list.version = self.version;
         filter_list.display_number = self.displayNumber;
         filter_list.is_trusted = true;
         filter_list.expires = self.expires;

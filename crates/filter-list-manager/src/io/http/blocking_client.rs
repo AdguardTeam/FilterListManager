@@ -2,6 +2,7 @@ use crate::manager::models::configuration::request_proxy_mode::RequestProxyMode;
 use crate::{Configuration, FLMError, FLMResult, HttpClientError};
 use reqwest::blocking::{Client, ClientBuilder};
 use reqwest::{Proxy, StatusCode};
+use serde::de::DeserializeOwned;
 use std::time::Duration;
 
 /// Standard blocking client wrapper
@@ -58,5 +59,23 @@ impl BlockingClient {
         }
 
         response.text().map_err(HttpClientError::make_body_recovery)
+    }
+
+    /// Gets a json from `url` and constructs type `T`
+    pub(crate) fn get_json<T>(&self, url: &str) -> Result<T, HttpClientError>
+    where
+        T: DeserializeOwned,
+    {
+        let response = self
+            .inner
+            .get(url)
+            .send()
+            .map_err(HttpClientError::make_network)?
+            .error_for_status()
+            .map_err(HttpClientError::make_network)?;
+
+        response
+            .json::<T>()
+            .map_err(HttpClientError::make_body_recovery)
     }
 }

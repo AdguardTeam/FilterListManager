@@ -1,9 +1,12 @@
+use crate::filters::indexes::entities::IndexEntity;
 use crate::filters::parser::diff_updates::batch_patches_container::BatchPatchesContainer;
 use crate::filters::parser::diff_updates::process_diff_path::process_diff_path;
 use crate::filters::parser::filter_contents_provider::diff_path_provider::DiffPathProvider;
 use crate::filters::parser::metadata::parsers::expires::process_expires;
 use crate::filters::parser::metadata::KnownMetadataProperty;
 use crate::filters::parser::FilterParser;
+use crate::io::fetch_by_schemes::fetch_json_by_scheme;
+use crate::io::get_scheme;
 use crate::io::http::blocking_client::BlockingClient;
 use crate::manager::filter_lists_builder::FullFilterListBuilder;
 use crate::manager::models::update_result::UpdateFilterError;
@@ -57,9 +60,16 @@ pub(super) fn update_filters_action(
         filters_errors: vec![],
     };
 
+    let mut has_at_least_one_index_filter = false;
     let filter_ids = records
         .iter()
-        .filter_map(|filter| filter.filter_id)
+        .filter_map(|filter| {
+            if !filter.is_custom() {
+                has_at_least_one_index_filter = true;
+            }
+
+            filter.filter_id
+        })
         .collect::<Vec<FilterId>>();
 
     let (mut diff_updates_map, mut rules_map, mut disabled_rules_map) = db_connection_manager
@@ -80,6 +90,12 @@ pub(super) fn update_filters_action(
     // Parsers with successful filter downloads
     let mut successful_parsers_with_result: Vec<(FilterId, FilterParser)> =
         Vec::with_capacity(filter_entities.len() / 2);
+
+    let last_index_filter_versions = get_latest_filters_versions(
+        has_at_least_one_index_filter,
+        &shared_http_client,
+        configuration.metadata_url.as_str(),
+    )?;
 
     // Put here processed_filters
     let mut diff_path_entities: Vec<DiffUpdateEntity> = vec![];
@@ -108,6 +124,17 @@ pub(super) fn update_filters_action(
                 continue;
             }
         };
+
+        if let Some(new_version) = last_index_filter_versions.get(&filter_id) {
+            if !filter.version.is_empty() && &filter.version == new_version &&
+                // Extra spike, 'cause we may already have metadata, but not the filters
+                // This stupid spike is here, 'cause we MIGHT fall in situation,
+                // when filter metadata.version is provided, it is up-to-date, BUT empty rules object is saved
+                rules_map.get(&filter_id).map(|old_rules| !old_rules.is_empty()).unwrap_or_default()
+            {
+                continue;
+            }
+        }
 
         let build_parser_result = build_parser(
             ignore_filters_expiration,
@@ -229,18 +256,7 @@ pub(super) fn update_filters_action(
                 filter.description = parser.get_metadata(KnownMetadataProperty::Description);
             }
 
-            // TODO: Spike, until we implement streaming parsing and/or index downloading before update;
-            let new_version = parser.get_metadata(KnownMetadataProperty::Version);
-            if !filter.version.is_empty() && filter.version == new_version &&
-                // Extra spike, 'cause we may already have metadata, but not the filters
-                // This stupid spike is here, 'cause we MIGHT fall in situation,
-                // when filter metadata.version is provided, it is up-to-date, BUT empty rules object is saved
-                rules_map.get(&filter_id).map(|old_rules| !old_rules.is_empty()).unwrap_or_default()
-            {
-                continue;
-            }
-
-            filter.version = new_version;
+            filter.version = parser.get_metadata(KnownMetadataProperty::Version);
             filter.license = parser.get_metadata(KnownMetadataProperty::License);
             filter.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
 
@@ -329,6 +345,28 @@ fn build_parser<'h: 'p, 'p>(
     Ok(None)
 }
 
+/// Gets latest filters versions
+fn get_latest_filters_versions(
+    has_at_least_one_index_filter: bool,
+    shared_http_client: &BlockingClient,
+    metadata_url: &str,
+) -> FLMResult<HashMap<FilterId, String>> {
+    let mut last_index_filter_versions = HashMap::new();
+    if has_at_least_one_index_filter {
+        let index = fetch_json_by_scheme::<IndexEntity>(
+            metadata_url,
+            get_scheme(metadata_url).into(),
+            shared_http_client,
+        )?;
+
+        for entity in index.filters {
+            last_index_filter_versions.insert(entity.filterId, entity.version);
+        }
+    }
+
+    Ok(last_index_filter_versions)
+}
+
 #[cfg(test)]
 mod tests {
     use super::update_filters_action;
@@ -338,13 +376,14 @@ mod tests {
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::repositories::Repository;
     use crate::storage::DbConnectionManager;
-    use crate::test_utils::RAIIFile;
+    use crate::test_utils::{tests_path, RAIIFile};
     use crate::{Configuration, FilterId};
     use chrono::Utc;
     use rusqlite::Connection;
     use std::{env, thread};
     use url::Url;
 
+    #[allow(clippy::field_reassign_with_default)]
     #[test]
     fn test_update_filters_action() {
         let timestamp = Utc::now().timestamp_micros();
@@ -513,15 +552,13 @@ mod tests {
             disabled_text: rules4.clone().disabled_text,
         });
 
-        let result = update_filters_action(
-            installed_filters,
-            &source,
-            false,
-            false,
-            0,
-            &Configuration::default(),
-        )
-        .unwrap();
+        let mut conf = Configuration::default();
+        conf.metadata_url = Url::from_file_path(tests_path("fixtures/filters.json"))
+            .unwrap()
+            .to_string();
+
+        let result =
+            update_filters_action(installed_filters, &source, false, false, 0, &conf).unwrap();
 
         let updated_ids = result
             .updated_list
@@ -598,6 +635,7 @@ mod tests {
             .unwrap()
     }
 
+    #[allow(clippy::field_reassign_with_default)]
     #[test]
     fn test_force_update_filters_action() {
         let timestamp = Utc::now().timestamp_micros();
@@ -766,15 +804,13 @@ mod tests {
             disabled_text: rules4.clone().disabled_text,
         });
 
-        let result = update_filters_action(
-            installed_filters,
-            &source,
-            true,
-            true,
-            0,
-            &Configuration::default(),
-        )
-        .unwrap();
+        let mut conf = Configuration::default();
+        conf.metadata_url = Url::from_file_path(tests_path("fixtures/filters.json"))
+            .unwrap()
+            .to_string();
+
+        let result =
+            update_filters_action(installed_filters, &source, true, true, 0, &conf).unwrap();
 
         let updated_ids = result
             .updated_list

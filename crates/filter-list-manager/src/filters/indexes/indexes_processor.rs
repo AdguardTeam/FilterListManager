@@ -65,7 +65,6 @@ impl<'a> IndexesProcessor<'a> {
         // Load indices and check consistency
         async_rt.block_on(self.fetch_indices(index_url, index_locales_url))?;
 
-        // TODO: Write to readme when we get rid of metadata
         self.connection_source
             .execute_db(move |mut conn: Connection| {
                 let filters_optional = FilterRepository::new()
@@ -139,6 +138,7 @@ impl IndexesProcessor<'_> {
                 filter.expires = filter_from_index.expires;
                 filter.download_url = filter_from_index.download_url;
                 filter.last_update_time = filter_from_index.last_update_time;
+                filter.subscription_url = filter_from_index.subscription_url;
 
                 new_or_updated_filters.push(filter);
             } else {

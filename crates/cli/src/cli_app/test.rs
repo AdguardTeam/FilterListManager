@@ -49,14 +49,18 @@ fn gets_filter_list() {
     println!("{:?}", result)
 }
 
+#[allow(clippy::field_reassign_with_default)]
 #[allow(dead_code)]
 fn update_filters() {
     let start = Instant::now();
-    let updated = FilterListManagerImpl::new(Configuration::default())
-        .unwrap()
-        .update_filters(true, 0, true)
-        .unwrap()
-        .unwrap();
+    let mut conf = Configuration::default();
+    conf.metadata_url = "https://filters.adtidy.org/extension/safari/filters.json".to_string();
+    conf.metadata_locales_url =
+        "https://filters.adtidy.org/extension/safari/filters_i18n.json".to_string();
+
+    let flm = FilterListManagerImpl::new(conf).unwrap();
+    //  flm.pull_metadata().unwrap();
+    let updated = flm.update_filters(true, 0, true).unwrap().unwrap();
 
     println!("Updated filters count: {}", updated.updated_list.len());
     println!("{}", "=".repeat(30));
