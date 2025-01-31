@@ -677,13 +677,23 @@ mod tests {
                     // Custom group must be removed
                     assert!(!second_groups_mapped.contains_key(&chosen_group_id));
 
+                    // All index filters must have empty versions
+                    filter_repository
+                        .select_filters_except_bootstrapped(&conn)
+                        .unwrap()
+                        .unwrap()
+                        .iter()
+                        .for_each(|entity| {
+                            assert!(entity.version.is_empty());
+                        });
+
                     Ok(())
                 })
                 .unwrap();
         }
         // endregion
 
-        // region test deprecated filter
+        // region test deprecated filter + test versions is empty for index filters
         connection_manager
             .execute_db(|conn: Connection| {
                 let list = filter_repository
@@ -694,6 +704,9 @@ mod tests {
                 let found = list
                     .iter()
                     .find(|f| f.filter_id.unwrap() == DEPRECATED_FILTER_ID);
+
+                list.iter()
+                    .for_each(|entity| assert!(entity.version.is_empty()));
 
                 assert!(found.is_none());
 
