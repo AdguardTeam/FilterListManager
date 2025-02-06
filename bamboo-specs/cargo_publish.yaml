@@ -25,8 +25,7 @@ Test:
       ${bamboo.working.directory}: ${bamboo.working.directory}
       ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
       ${bamboo.git.cache.directory}: ${bamboo.git.cache.directory}
-      ${system.HOME}/.ssh: /root/.ssh
-      ${system.HOME}/.cargo/registry: /root/.cargo/registry
+      /caches/.cargo/registry: /root/.cargo/registry
     docker-run-arguments: [ ]
   tasks:
     - !include 'docker-clean.yaml'
@@ -50,11 +49,11 @@ Publish:
       ${bamboo.working.directory}: ${bamboo.working.directory}
       ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
       ${bamboo.git.cache.directory}: ${bamboo.git.cache.directory}
-      ${system.HOME}/.ssh: /root/.ssh
-      ${system.HOME}/.cargo/registry: /root/.cargo/registry
+      /caches/.cargo/registry: /root/.cargo/registry
     docker-run-arguments: [ ]
   tasks:
     - !include 'docker-clean.yaml'
+    - script: apt update && apt install -y rsync
     - checkout:
         force-clean-build: 'true'
         description: Checkout Default Repository
