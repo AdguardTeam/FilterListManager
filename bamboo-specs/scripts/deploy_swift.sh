@@ -104,6 +104,9 @@ let package = Package(
 )
 ' > ../../../../Package.swift
 
+git config user.email "Bamboo"
+git config user.name "Bamboo"
+
 cp -r ../../AdGuardFLM/Sources ../../../../Sources
 
 git add ../../../../Package.swift
