@@ -104,6 +104,9 @@ let package = Package(
 )
 ' > ../../../../Package.swift
 
+# Should add key on these agents i think
+printf "%b\n" "${bamboo_sshSecretKey}" | ssh-add -
+
 git config user.email "Bamboo"
 git config user.name "Bamboo"
 
