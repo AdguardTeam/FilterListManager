@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.3.5] - 2025-02-10
+
+### Added
+- `flm_get_constants` method for the new native API
+
+[1.3.5]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.3.1...ffi-1.3.5
+
 ## [1.3.1] - 2025-01-31
 
 ### Changed

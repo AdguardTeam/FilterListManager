@@ -3,7 +3,7 @@ import Foundation
 import SwiftProtobuf
 import AdGuardFLM
 
-/// Main endpoint for getting default  configuration protobuf.
+/// Main endpoint for getting default configuration protobuf.
 public func makeDefaultConfiguration() throws -> FilterListManager_Configuration {
     let pointer = flm_default_configuration_protobuf()
 
@@ -23,6 +23,11 @@ public func makeDefaultConfiguration() throws -> FilterListManager_Configuration
     }
 
     return try FilterListManager_Configuration(serializedBytes: byteData)
+}
+
+/// Gets a structure with all FLM public constant values
+public func getFLMConstants() -> FilterListManagerConstants {
+    return flm_get_constants()
 }
 
 public protocol FLMFacadeProtocol {
@@ -94,7 +99,7 @@ public protocol FLMFacadeProtocol {
     func setProxyMode(mode: FilterListManager_RawRequestProxyMode, custom_addr: String?) throws
 }
 
-/// Main FLM  facade.
+/// Main FLM facade.
 public class FLMFacade: FLMFacadeProtocol {
     private let flm_handle: OpaquePointer
 

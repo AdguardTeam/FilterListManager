@@ -14,7 +14,14 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
         /// </summary>
         [DllImport(Constants.FLM_DLL_NAME)]
         internal static extern IntPtr flm_default_configuration_protobuf();
-        
+
+        /// <summary>
+        /// Getter for the set of [`FilterListManager`] constants
+        /// </summary>
+        /// <returns></returns>
+        [DllImport(Constants.FLM_DLL_NAME)]
+        internal static extern FLMConstants flm_get_constants();
+
         /// <summary>
         /// Makes an FLM object and returns opaque pointer of [`FLMHandle`]
         /// </summary>

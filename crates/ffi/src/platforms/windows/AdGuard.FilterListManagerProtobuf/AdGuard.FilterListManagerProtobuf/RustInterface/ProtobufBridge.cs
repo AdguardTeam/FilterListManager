@@ -17,6 +17,11 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
             return configuration;
         }
 
+        internal static FLMConstants GetFLMConstants()
+        {
+            return ProtobufInterop.flm_get_constants();
+        }
+
         internal static IntPtr InitFLM(Configuration configuration)
         {
             byte[] data = configuration.ToByteArray();

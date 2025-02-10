@@ -83,6 +83,7 @@
     <Compile Include="ProtobufGeneratedImpl\FlmInterface.cs" />
     <Compile Include="ProtobufGenerated\*.cs" />
     <Compile Include="RustInterface\FFIMethod.cs" />
+    <Compile Include="RustInterface\FLMConstants.cs" />
     <Compile Include="RustInterface\ProtobufBridge.cs" />
     <Compile Include="RustInterface\ProtobufInterop.cs" />
     <Compile Include="RustInterface\RustResponse.cs" />

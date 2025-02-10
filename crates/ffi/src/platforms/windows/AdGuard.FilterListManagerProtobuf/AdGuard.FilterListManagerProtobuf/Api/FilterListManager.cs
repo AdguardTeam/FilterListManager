@@ -26,6 +26,15 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             return ProtobufBridge.MakeDefaultConfiguration();
         }
 
+        /// <summary>
+        /// Spawns a struct of Filter List Manager public constants 
+        /// </summary>
+        /// <returns></returns>
+        public static FLMConstants SpawnDefaultConstants()
+        {
+            return ProtobufBridge.GetFLMConstants();
+        }
+
         public FilterListManager(Configuration configuration, ISerializer<byte[]> serializer)
         {
             m_FLMHandle = ProtobufBridge.InitFLM(configuration);

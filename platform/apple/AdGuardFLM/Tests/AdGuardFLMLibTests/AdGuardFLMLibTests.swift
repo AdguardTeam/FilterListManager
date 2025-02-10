@@ -120,6 +120,13 @@ final class AdGuardFLMLibTests: XCTestCase {
         XCTAssertNoThrow(try flm.setProxyMode(mode: FilterListManager_RawRequestProxyMode.useCustomProxy, custom_addr: "http://localhost:8080"))
 
         XCTAssertNoThrow(try flm.setProxyMode(mode: FilterListManager_RawRequestProxyMode.noProxy, custom_addr: nil))
+
+        let constants = flm_get_constants()
+
+        XCTAssert(constants.user_rules_id == Int32.min, "FLM user rules id must be equal to int::min")
+        XCTAssert(constants.custom_group_id == Int32.min, "FLM Custom group id must be equal to int::min")
+        XCTAssert(constants.special_group_id == 0, "FLM Special group id must be zero")
+        XCTAssert(constants.smallest_filter_id == -2_000_000_000, "FLM Custom group id must be two billions")
     }
 }
 

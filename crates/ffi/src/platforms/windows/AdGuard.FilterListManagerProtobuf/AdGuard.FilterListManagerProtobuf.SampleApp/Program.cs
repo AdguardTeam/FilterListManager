@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using AdGuard.FilterListManagerProtobuf.Api;
 using AdGuard.FilterListManagerProtobuf.Utils;
@@ -80,6 +81,15 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 string path = flm.GetDatabasePath();
                 int version = flm.GetDatabaseVersion();
                 flm.SetProxyMode("https://127.0.0.1:8080", RawRequestProxyMode.NoProxy);
+
+                var constants = Api.FilterListManager.SpawnDefaultConstants();
+
+                Debug.Assert(constants.UserRulesId == -2147483648, "UserRulesId must be equal to int::min");
+                Debug.Assert(constants.CustomGroupId == -2147483648, "CustomGroupId must be equal to int::min");
+                Debug.Assert(constants.SpecialGroupId == 0, "SpecialGroupId must be zero");
+                Debug.Assert(constants.SmallestFilterId == -2_000_000_000, "UserRulesId must be two billions");
+                
+                Logger.Info("All Ok!");
             }
         }
     }
