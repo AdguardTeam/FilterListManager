@@ -8,6 +8,12 @@ namespace AdGuard.FilterListManagerProtobuf.Api
     public interface IFilterListManager : IDisposable
     {
         /// <summary>
+        /// Initializes inner RUST-based FLM under-the-hood the <see cref="IFilterListManager"/>
+        /// instance according to the passed <see cref="configuration"/>
+        /// </summary>
+        void Init(Configuration configuration);
+        
+        /// <summary>
         /// Installs a custom filter list
         ///
         /// * `download_url` - Remote server or a `file://` URL. Can be an

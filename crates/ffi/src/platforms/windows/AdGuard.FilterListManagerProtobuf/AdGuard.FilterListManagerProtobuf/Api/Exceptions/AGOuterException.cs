@@ -1,13 +1,12 @@
-﻿using System;
-using AGOuterErrorProtobuf = FilterListManager.AGOuterError;
+﻿using AGOuterErrorProtobuf = FilterListManager.AGOuterError;
 
-namespace AdGuard.FilterListManagerProtobuf.Api
+namespace AdGuard.FilterListManagerProtobuf.Api.Exceptions
 {
     /// <summary>
     /// Main general exception, based on
     /// ../filter-list-manager/browse/crates/ffi/src/protobuf/outer_error.proto 
     /// </summary>
-    public class AgOuterException: Exception
+    public class AgOuterException : FilterListManagerBaseException
     {
         public AGOuterErrorProtobuf.ErrorOneofCase ErrorKind;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using AdGuard.FilterListManagerProtobuf.Api.Exceptions;
 using AdGuard.FilterListManagerProtobuf.RustInterface;
 using AdGuard.Utils.Base.Logging;
 using AdGuard.Utils.Serializers;
@@ -12,7 +13,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
 {
     public class FilterListManager : IFilterListManager
     {
-        private readonly IntPtr m_FLMHandle;
+        private IntPtr m_FLMHandle;
         private readonly ISerializer<byte[]> m_Serializer;
 
         /// <summary>
@@ -35,10 +36,17 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             return ProtobufBridge.GetFLMConstants();
         }
 
-        public FilterListManager(Configuration configuration, ISerializer<byte[]> serializer)
+        public FilterListManager(ISerializer<byte[]> serializer)
+        {
+            m_Serializer = serializer;
+        }
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public void Init(Configuration configuration)
         {
             m_FLMHandle = ProtobufBridge.InitFLM(configuration);
-            m_Serializer = serializer;
         }
 
         #region IFilterListManager members
@@ -414,16 +422,35 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             [CallerMemberName] string methodName = null) 
             where TMessage : IMessage, IAGOuterError
         {
-            FfiMethod method = GetMethod(methodName);
-            byte[] args = message.ToByteArray();
-            byte[] data = ProtobufBridge.CallRust(m_FLMHandle, method, args);
-            TMessage response = m_Serializer.DeserializeObject<TMessage>(data);
-            if (response.Error != null)
+            string errorTemplate = $"Cannot call RUST method \"{methodName}\"";
+            if (m_FLMHandle == IntPtr.Zero)
             {
-                throw new AgOuterException(response.Error);
+                string errorMessage = $"instance must be initialized with \"{nameof(Init)}\" before invocation";
+                Logger.Error(errorTemplate);
+                throw new FilterListManagerNotInitializedException(errorMessage);
             }
 
-            return response;
+            try
+            {
+                FfiMethod method = GetMethod(methodName);
+                byte[] args = message.ToByteArray();
+                byte[] data = ProtobufBridge.CallRust(m_FLMHandle, method, args);
+                TMessage response = m_Serializer.DeserializeObject<TMessage>(data);
+                if (response.Error != null)
+                {
+                    throw new AgOuterException(response.Error);
+                }
+
+                return response;
+            }
+            catch (AgOuterException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new FilterListManagerCommonException(errorTemplate, ex);
+            }
         }
 
         private FfiMethod GetMethod(string methodName)
@@ -451,6 +478,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         
         private void ReleaseManagedResources()
         {
+            m_FLMHandle = IntPtr.Zero;
         }
 
         private void ReleaseUnmanagedResources()

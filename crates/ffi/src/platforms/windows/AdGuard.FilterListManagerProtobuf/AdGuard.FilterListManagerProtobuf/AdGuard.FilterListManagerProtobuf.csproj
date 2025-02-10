@@ -74,7 +74,10 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Api\AGOuterException.cs" />
+    <Compile Include="Api\Exceptions\AGOuterException.cs" />
+    <Compile Include="Api\Exceptions\FilterListManagerBaseException.cs" />
+    <Compile Include="Api\Exceptions\FilterListManagerCommonException.cs" />
+    <Compile Include="Api\Exceptions\FilterListManagerNotInitializedException.cs" />
     <Compile Include="Api\FilterListManager.cs" />
     <Compile Include="Api\FlmDllProvider.cs" />
     <Compile Include="Api\IAGOuterError.cs" />

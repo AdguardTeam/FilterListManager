@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using AdGuard.FilterListManagerProtobuf.Api;
+using AdGuard.FilterListManagerProtobuf.Api.Exceptions;
 using AdGuard.Utils.Base.Interop;
 using FilterListManager;
 using Google.Protobuf;

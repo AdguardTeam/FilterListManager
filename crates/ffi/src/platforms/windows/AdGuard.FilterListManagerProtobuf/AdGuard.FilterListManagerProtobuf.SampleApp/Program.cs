@@ -26,12 +26,13 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
             configuration.MetadataUrl = "https://filters.adtidy.org/extension/safari/filters.json";
             configuration.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
             ISerializer<byte[]> serializer = new ProtobufSerializer();
-            using (IFilterListManager flm = new Api.FilterListManager(configuration, serializer))
+            using (IFilterListManager flm = new Api.FilterListManager(serializer))
             {
+                flm.Init(configuration);
                 flm.PullMetadata();
                 flm.UpdateFilters(false, 0, false);
                 
-                flm.EnableFilterLists(new int[] {1, 2, 255}, true);
+                flm.EnableFilterLists(new[] {1, 2, 255}, true);
                 FullFilterList customFilter = flm.InstallCustomFilterFromString(
                     string.Empty,
                     1000000000,
@@ -42,8 +43,8 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                     "Desc");
                 bool localeResult = flm.ChangeLocale("ru_RU");
                 flm.LiftUpDatabase();
-                flm.EnableFilterLists(new int[] {1, 2, 255}, true);
-                flm.InstallFilterLists(new int[] {1, 2, 255}, true);
+                flm.EnableFilterLists(new[] {1, 2, 255}, true);
+                flm.InstallFilterLists(new[] {1, 2, 255}, true);
 
                 FilterListRules rules1 = new FilterListRules
                 {
@@ -64,7 +65,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 FileUtils.Touch(blobPath);
                 flm.SaveRulesToFileBlob(customFilter.Id, blobPath);
                 flm.GetFullFilterListById(customFilter.Id);
-                flm.ForceUpdateFiltersByIds(new int[] { 1, 2 }, 0);
+                flm.ForceUpdateFiltersByIds(new[] { 1, 2 }, 0);
                 customFilter = flm.InstallCustomFilterList(
                     "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt",
                     true,
