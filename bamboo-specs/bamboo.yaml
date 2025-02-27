@@ -8,3 +8,5 @@
 !include 'cargo_publish.yaml'
 ---
 !include 'tests.yaml'
+---
+!include 'permissions.yaml'

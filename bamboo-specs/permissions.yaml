@@ -1,0 +1,9 @@
+---
+version: 2
+plan: "CL-FLMRT"
+plan-permissions:
+  - groups: "sciter-developers"
+    permissions:
+      - view
+      - edit
+      - build
