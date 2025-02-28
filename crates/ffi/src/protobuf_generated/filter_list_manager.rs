@@ -41,6 +41,12 @@ pub struct Configuration {
     /// Custom proxy addr for requests
     #[prost(string, tag = "11")]
     pub request_custom_proxy_addr: ::prost::alloc::string::String,
+    /// Client app name
+    #[prost(string, tag = "12")]
+    pub app_name: ::prost::alloc::string::String,
+    /// Client app version
+    #[prost(string, tag = "13")]
+    pub version: ::prost::alloc::string::String,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

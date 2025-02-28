@@ -1715,7 +1715,9 @@ internal record Configuration (
     String @metadataLocalesUrl, 
     int @requestTimeoutMs, 
     RequestProxyMode @requestProxyMode, 
-    bool @autoLiftUpDatabase
+    bool @autoLiftUpDatabase, 
+    String @appName, 
+    String @version
 ) {
 }
 
@@ -1733,7 +1735,9 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             @metadataLocalesUrl: FfiConverterString.INSTANCE.Read(stream),
             @requestTimeoutMs: FfiConverterInt32.INSTANCE.Read(stream),
             @requestProxyMode: FfiConverterTypeRequestProxyMode.INSTANCE.Read(stream),
-            @autoLiftUpDatabase: FfiConverterBoolean.INSTANCE.Read(stream)
+            @autoLiftUpDatabase: FfiConverterBoolean.INSTANCE.Read(stream),
+            @appName: FfiConverterString.INSTANCE.Read(stream),
+            @version: FfiConverterString.INSTANCE.Read(stream)
         );
     }
 
@@ -1748,7 +1752,9 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterString.INSTANCE.AllocationSize(value.@metadataLocalesUrl) +
             FfiConverterInt32.INSTANCE.AllocationSize(value.@requestTimeoutMs) +
             FfiConverterTypeRequestProxyMode.INSTANCE.AllocationSize(value.@requestProxyMode) +
-            FfiConverterBoolean.INSTANCE.AllocationSize(value.@autoLiftUpDatabase);
+            FfiConverterBoolean.INSTANCE.AllocationSize(value.@autoLiftUpDatabase) +
+            FfiConverterString.INSTANCE.AllocationSize(value.@appName) +
+            FfiConverterString.INSTANCE.AllocationSize(value.@version);
     }
 
     public override void Write(Configuration value, BigEndianStream stream) {
@@ -1762,6 +1768,8 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterInt32.INSTANCE.Write(value.@requestTimeoutMs, stream);
             FfiConverterTypeRequestProxyMode.INSTANCE.Write(value.@requestProxyMode, stream);
             FfiConverterBoolean.INSTANCE.Write(value.@autoLiftUpDatabase, stream);
+            FfiConverterString.INSTANCE.Write(value.@appName, stream);
+            FfiConverterString.INSTANCE.Write(value.@version, stream);
     }
 }
 

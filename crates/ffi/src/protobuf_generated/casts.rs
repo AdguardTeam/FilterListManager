@@ -39,6 +39,8 @@ impl From<Configuration> for filter_list_manager::Configuration {
             auto_lift_up_database: value.auto_lift_up_database,
             request_proxy_mode: proxy_mode,
             request_custom_proxy_addr: proxy_addr,
+            app_name: value.app_name,
+            version: value.version,
         }
     }
 }
@@ -78,6 +80,8 @@ impl From<filter_list_manager::Configuration> for Configuration {
                 _ => RequestProxyMode::UseSystemProxy,
             },
             auto_lift_up_database: val.auto_lift_up_database,
+            app_name: val.app_name,
+            version: val.version,
         }
     }
 }

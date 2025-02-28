@@ -25,6 +25,8 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
             Configuration configuration = Api.FilterListManager.SpawnDefaultConfiguration();
             configuration.MetadataUrl = "https://filters.adtidy.org/extension/safari/filters.json";
             configuration.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
+            configuration.AppName = "FlmApp";
+            configuration.Version = "1.2.3";
             ISerializer<byte[]> serializer = new ProtobufSerializer();
             using (IFilterListManager flm = new Api.FilterListManager(serializer))
             {

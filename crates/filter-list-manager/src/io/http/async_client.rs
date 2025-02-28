@@ -14,9 +14,14 @@ impl AsyncHTTPClient {
     ///
     /// * `configuration` - FLM [`Configuration`]
     pub(crate) fn new(configuration: &Configuration) -> FLMResult<Self> {
-        let mut builder = ClientBuilder::new().timeout(Duration::from_millis(
-            configuration.request_timeout_ms as u64,
-        ));
+        let mut builder = ClientBuilder::new()
+            .timeout(Duration::from_millis(
+                configuration.request_timeout_ms as u64,
+            ))
+            .user_agent(format!(
+                "{}/{}",
+                configuration.app_name, configuration.version
+            ));
 
         match configuration.request_proxy_mode {
             RequestProxyMode::UseSystemProxy => {}

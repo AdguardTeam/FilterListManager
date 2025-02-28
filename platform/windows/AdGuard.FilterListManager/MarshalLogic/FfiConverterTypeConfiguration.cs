@@ -16,7 +16,9 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 metadataLocalesUrl: FfiConverterString.Instance.Read(stream),
                 requestTimeoutMs: FfiConverterInt32.Instance.Read(stream),
                 requestProxyMode: FfiConverterTypeRequestProxyMode.Instance.Read(stream),
-                autoLiftUpDatabase: FfiConverterBoolean.Instance.Read(stream)
+                autoLiftUpDatabase: FfiConverterBoolean.Instance.Read(stream),
+                appName: FfiConverterString.Instance.Read(stream),
+                version: FfiConverterString.Instance.Read(stream)
             );
         }
 
@@ -31,9 +33,11 @@ namespace AdGuard.FilterListManager.MarshalLogic
                    )
                    + FfiConverterString.Instance.AllocationSize(value.MetadataUrl)
                    + FfiConverterString.Instance.AllocationSize(value.MetadataLocalesUrl)
-                   + FfiConverterInt32.Instance.AllocationSize(value.RequestTimeoutMs) +
-                   FfiConverterTypeRequestProxyMode.Instance.AllocationSize(value.RequestProxyMode) +
-                   FfiConverterBoolean.Instance.AllocationSize(value.AutoLiftUpDatabase);
+                   + FfiConverterInt32.Instance.AllocationSize(value.RequestTimeoutMs)
+                   + FfiConverterTypeRequestProxyMode.Instance.AllocationSize(value.RequestProxyMode)
+                   + FfiConverterBoolean.Instance.AllocationSize(value.AutoLiftUpDatabase)
+                   + FfiConverterString.Instance.AllocationSize(value.AppName)
+                   + FfiConverterString.Instance.AllocationSize(value.Version);
         }
 
         public override void Write(Configuration value, BigEndianStream stream)
@@ -51,6 +55,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
             FfiConverterInt32.Instance.Write(value.RequestTimeoutMs, stream);
             FfiConverterTypeRequestProxyMode.Instance.Write(value.RequestProxyMode, stream);
             FfiConverterBoolean.Instance.Write(value.AutoLiftUpDatabase, stream);
+            FfiConverterString.Instance.Write(value.AppName, stream);
+            FfiConverterString.Instance.Write(value.Version, stream);
         }
     }
 }
