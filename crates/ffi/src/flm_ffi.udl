@@ -33,6 +33,11 @@ dictionary FilterListMetadata {
     i32 rules_count;
 };
 
+dictionary FilterListMetadataWithBody {
+    FilterListMetadata metadata;
+    string filter_body;
+};
+
 dictionary FilterListRules {
     i32 filter_id;
     sequence<string> rules;
@@ -200,6 +205,9 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     FilterListMetadata fetch_filter_list_metadata(string url);
+
+    [Throws=AGOuterError]
+    FilterListMetadataWithBody fetch_filter_list_metadata_with_body(string url);
 
     [Throws=AGOuterError]
     void lift_up_database();

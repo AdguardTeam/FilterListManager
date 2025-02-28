@@ -264,6 +264,7 @@ pub use crate::manager::models::stored_filter_metadata::StoredFilterMetadata;
 pub use crate::manager::models::update_result::UpdateFilterError;
 pub use crate::manager::models::FilterId;
 pub use crate::manager::models::FilterListMetadata;
+pub use crate::manager::models::FilterListMetadataWithBody;
 pub use crate::manager::models::FullFilterList;
 pub use crate::manager::models::UpdateResult;
 pub use crate::manager::FilterListManager;

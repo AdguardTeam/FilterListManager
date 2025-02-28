@@ -15,6 +15,7 @@
 
 #VS
 .vs
+.vscode
 
 # Tests
 **/agflm_*.db

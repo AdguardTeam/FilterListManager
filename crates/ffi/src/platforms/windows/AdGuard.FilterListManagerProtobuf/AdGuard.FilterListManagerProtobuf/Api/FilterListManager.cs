@@ -238,6 +238,21 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        public FilterListMetadataWithBody FetchFilterListMetadataWithBody(string url)
+        {
+            FetchFilterListMetadataWithBodyRequest request = new FetchFilterListMetadataWithBodyRequest
+            {
+                Url = url,
+            };
+
+            FetchFilterListMetadataWithBodyResponse response =
+                CallRust<FetchFilterListMetadataWithBodyResponse>(request);
+            return response.Metadata;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void LiftUpDatabase()
         {
             EmptyRequest request = new EmptyRequest();

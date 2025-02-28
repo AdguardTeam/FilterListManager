@@ -16,6 +16,7 @@ use crate::manager::models::UpdateResult;
 use crate::{FLMResult, StoredFilterMetadata};
 use models::configuration::Configuration;
 use models::filter_list_metadata::FilterListMetadata;
+use models::filter_list_metadata_with_body::FilterListMetadataWithBody;
 use models::full_filter_list::FullFilterList;
 use models::FilterId;
 use std::path::Path;
@@ -54,6 +55,16 @@ pub trait FilterListManager {
     ///
     /// Returns filter list metadata.
     fn fetch_filter_list_metadata(&self, url: String) -> FLMResult<FilterListMetadata>;
+
+    /// Fetches filter list by url and returns its raw metadata and body.
+    ///
+    /// * `url` - Remote server or a `file://` URL.
+    ///
+    /// Returns filter list metadata and body.
+    fn fetch_filter_list_metadata_with_body(
+        &self,
+        url: String,
+    ) -> FLMResult<FilterListMetadataWithBody>;
 
     /// Toggles filter lists, using their `filter_id`.
     ///

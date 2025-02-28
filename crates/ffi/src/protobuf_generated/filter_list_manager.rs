@@ -297,6 +297,15 @@ pub struct FilterListMetadata {
     pub rules_count: i32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FilterListMetadataWithBody {
+    /// Metadata for a remote filter list.
+    #[prost(message, optional, tag = "1")]
+    pub metadata: ::core::option::Option<FilterListMetadata>,
+    /// Filter body.
+    #[prost(string, tag = "2")]
+    pub filter_body: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct StoredFilterMetadata {
     /// Filter list unique ID
     #[prost(int32, tag = "1")]
@@ -555,6 +564,11 @@ pub struct FetchFilterListMetadataRequest {
     pub url: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FetchFilterListMetadataWithBodyRequest {
+    #[prost(string, tag = "1")]
+    pub url: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ChangeLocaleRequest {
     #[prost(string, tag = "1")]
     pub suggested_locale: ::prost::alloc::string::String,
@@ -661,6 +675,13 @@ pub struct ForceUpdateFiltersByIdsResponse {
 pub struct FetchFilterListMetadataResponse {
     #[prost(message, optional, tag = "1")]
     pub metadata: ::core::option::Option<FilterListMetadata>,
+    #[prost(message, optional, tag = "2")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FetchFilterListMetadataWithBodyResponse {
+    #[prost(message, optional, tag = "1")]
+    pub metadata: ::core::option::Option<FilterListMetadataWithBody>,
     #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }

@@ -11,8 +11,6 @@ repository = "https://github.com/AdguardTeam/FilterListManager"
 uniffi = { version = "0.25.0", features = ["build", "cli"] }
 regex = "1.10.2"
 thiserror = "1.0.61"
-security-framework = "=2.11.1" # 2.11.0 is broken with codegen-units=1
-cargo-platform = "=0.1.8" # 0.1.9 requires Rust 1.78+
 
 [profile.release]
 lto = "thin"

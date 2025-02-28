@@ -45,6 +45,14 @@ namespace AdGuard.FilterListManager
         FilterListMetadata FetchFilterListMetadata(string url);
 
         /// <summary>
+        /// Fetches filter list by url and returns its raw metadata and body
+        /// </summary>
+        /// <param name="url">Remote server or a `file://` URL</param>
+        /// <returns>Returns filter list metadata and body</returns>
+        /// <exception cref="AgOuterException" />
+        FilterListMetadataWithBody FetchFilterListMetadataWithBody(string url);
+
+        /// <summary>
         /// Tries to update passed list of [`FilterId`].
         /// The logic is the same as in the filter update method [`FilterListManager::update_filters`] with exceptions:
         /// * This returns [`None`] if DB result set is empty

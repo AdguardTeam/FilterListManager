@@ -64,6 +64,8 @@ public protocol FLMFacadeProtocol {
 
     func fetchFiltersListMetadata(url: String) throws -> FilterListManager_FilterListMetadata
 
+    func fetchFiltersListMetadataWithBody(url: String) throws -> FilterListManager_FilterListMetadataWithBody
+
     func liftUpDatabase() throws
 
     func getAllTags() throws -> [FilterListManager_FilterTag]
@@ -337,6 +339,20 @@ public class FLMFacade: FLMFacadeProtocol {
 
         let bytes = try callRust(method: FetchFilterListMetadata, message: message)
         let response = try FilterListManager_FetchFilterListMetadataResponse(serializedBytes: bytes)
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+
+        return response.metadata
+    }
+
+    public func fetchFiltersListMetadataWithBody(url: String) throws -> FilterListManager_FilterListMetadataWithBody {
+        var message = FilterListManager_FetchFilterListMetadataWithBodyRequest()
+        message.url = url
+
+        let bytes = try callRust(method: FetchFilterListMetadataWithBody, message: message)
+        let response = try FilterListManager_FetchFilterListMetadataWithBodyResponse(serializedBytes: bytes)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)

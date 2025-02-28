@@ -4,8 +4,8 @@ use crate::outer_error::AGOuterError;
 use crate::protobuf_generated::filter_list_manager;
 use adguard_flm::{
     ActiveRulesInfo, Configuration, DisabledRulesRaw, FilterGroup, FilterListMetadata,
-    FilterListRules, FilterListRulesRaw, FilterListType, FilterTag, FullFilterList,
-    RequestProxyMode, StoredFilterMetadata, UpdateFilterError, UpdateResult,
+    FilterListMetadataWithBody, FilterListRules, FilterListRulesRaw, FilterListType, FilterTag,
+    FullFilterList, RequestProxyMode, StoredFilterMetadata, UpdateFilterError, UpdateResult,
 };
 
 impl From<Configuration> for filter_list_manager::Configuration {
@@ -311,6 +311,17 @@ impl From<FilterListMetadata> for filter_list_manager::FilterListMetadata {
             checksum: value.checksum,
             url: value.url,
             rules_count: value.rules_count,
+        }
+    }
+}
+
+impl From<FilterListMetadataWithBody> for filter_list_manager::FilterListMetadataWithBody {
+    fn from(value: FilterListMetadataWithBody) -> Self {
+        Self {
+            metadata: Some(filter_list_manager::FilterListMetadata::from(
+                value.metadata,
+            )),
+            filter_body: value.filter_body,
         }
     }
 }

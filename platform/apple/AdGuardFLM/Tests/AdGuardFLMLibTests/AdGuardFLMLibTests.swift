@@ -111,6 +111,10 @@ final class AdGuardFLMLibTests: XCTestCase {
 
         NSLog("Got remote metadata. Homepage: \(filterMetadata.homepage)")
 
+        let filterMetadataWithBody = try flm.fetchFiltersListMetadataWithBody(url: "https://filters.adtidy.org/extension/safari/filters/101.txt")
+
+        NSLog("Got remote metadata with body. Homepage: \(filterMetadataWithBody.metadata.homepage)")
+
         XCTAssertNoThrow(try flm.deleteCustomFilterLists(ids: [anotherCustomFilter.id]))
 
         NSLog("Custom filter successfully removed")
@@ -127,6 +131,7 @@ final class AdGuardFLMLibTests: XCTestCase {
         XCTAssert(constants.custom_group_id == Int32.min, "FLM Custom group id must be equal to int::min")
         XCTAssert(constants.special_group_id == 0, "FLM Special group id must be zero")
         XCTAssert(constants.smallest_filter_id == -2_000_000_000, "FLM Custom group id must be two billions")
+        XCTAssert(filterMetadataWithBody.metadata.homepage.count > 0, "FLM Metadata homepage must be non-empty")
     }
 }
 

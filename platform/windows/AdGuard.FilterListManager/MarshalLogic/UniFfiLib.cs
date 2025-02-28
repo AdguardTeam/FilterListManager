@@ -141,6 +141,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
         );
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata_with_body(FilterListManagerSafeHandle ptr, RustBuffer url, ref RustCallStatus uniffiOutErr
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_filter_rules_as_strings(FilterListManagerSafeHandle ptr, RustBuffer ids, ref RustCallStatus uniffiOutErr
         );
 

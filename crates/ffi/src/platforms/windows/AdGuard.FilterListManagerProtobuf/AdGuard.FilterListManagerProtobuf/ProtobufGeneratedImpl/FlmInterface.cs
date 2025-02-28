@@ -49,7 +49,11 @@ namespace FilterListManager
     public partial class FetchFilterListMetadataResponse : IAGOuterError
     {
     }
-    
+
+    public partial class FetchFilterListMetadataWithBodyResponse : IAGOuterError
+    {
+    }
+
     public partial class GetAllTagsResponse : IAGOuterError
     {
     }

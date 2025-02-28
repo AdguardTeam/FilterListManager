@@ -109,6 +109,24 @@ namespace AdGuard.FilterListManager
         /// <summary>
         ///<inheritdoc cref="IFilterListManager"/>
         /// </summary>
+        public FilterListMetadataWithBody FetchFilterListMetadataWithBody(string url)
+        {
+            return FfiConverterTypeFilterListMetadataWithBody.Instance.Lift(
+                UniffiHelpers.RustCallWithError(
+                    FfiConverterTypeAgOuterException.Instance,
+                    (ref RustCallStatus status) =>
+                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata_with_body(
+                            GetHandle(),
+                            FfiConverterString.Instance.Lower(url),
+                            ref status
+                        )
+                )
+            );
+        }
+
+        /// <summary>
+        ///<inheritdoc cref="IFilterListManager"/>
+        /// </summary>
         public UpdateResult ForceUpdateFiltersByIds(List<int> ids, int looseTimeout)
         {
             return FfiConverterOptionalTypeUpdateResult.Instance.Lift(

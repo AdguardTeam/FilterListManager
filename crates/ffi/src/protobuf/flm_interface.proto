@@ -72,6 +72,10 @@ message FetchFilterListMetadataRequest {
   string url = 1;
 }
 
+message FetchFilterListMetadataWithBodyRequest {
+  string url = 1;
+}
+
 message ChangeLocaleRequest {
   string suggested_locale = 1;
 }
@@ -153,6 +157,11 @@ message ForceUpdateFiltersByIdsResponse {
 
 message FetchFilterListMetadataResponse {
   FilterListMetadata metadata = 1;
+  optional AGOuterError error = 2;
+}
+
+message FetchFilterListMetadataWithBodyResponse {
+  FilterListMetadataWithBody metadata = 1;
   optional AGOuterError error = 2;
 }
 

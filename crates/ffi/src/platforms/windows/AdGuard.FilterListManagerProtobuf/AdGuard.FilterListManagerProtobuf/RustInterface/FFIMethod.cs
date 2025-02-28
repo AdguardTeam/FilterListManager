@@ -14,6 +14,7 @@
         UpdateFilters,
         ForceUpdateFiltersByIds,
         FetchFilterListMetadata,
+        FetchFilterListMetadataWithBody,
         LiftUpDatabase,
         GetAllTags,
         GetAllGroups,

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.4.1] - 2025-02-24
+
+### Added
+- `fetch_filter_list_metadata_with_body` method for fetch filter metadata with filter body
+
+[1.4.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.3.5...ffi-1.4.1
+
 ## [1.3.5] - 2025-02-10
 
 ### Added

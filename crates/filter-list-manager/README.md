@@ -239,6 +239,14 @@ flm.save_rules_to_file_blob(id /* FilterId */, file_path: /* String or AsRef<Pat
 
 /// Returns lists of disabled rules by list of filter IDs as Vec<DisabledRulesRaw>
 flm.get_disabled_rules(ids, /* Vec<FilterId> */);
+
+// Fetches filter list by url and returns its raw metadata.
+// Returns FilterListMetadata.
+flm.fetch_filter_list_metadata(url, /* String */);
+
+// Fetches filter list by url and returns its raw metadata and body.
+// Returns FilterListMetadataWithBody.
+flm.fetch_filter_list_metadata_with_body(url, /* String */);
 ```
 
 #### This example references

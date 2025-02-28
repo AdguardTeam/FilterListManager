@@ -109,6 +109,13 @@ impl FilterListManager {
         self.wrap(move |flm| flm.fetch_filter_list_metadata(url))
     }
 
+    pub fn fetch_filter_list_metadata_with_body(
+        &self,
+        url: String,
+    ) -> AGResult<FilterListMetadataWithBody> {
+        self.wrap(move |flm| flm.fetch_filter_list_metadata_with_body(url))
+    }
+
     pub fn lift_up_database(&self) -> AGResult<()> {
         self.wrap(|flm| flm.lift_up_database())
     }

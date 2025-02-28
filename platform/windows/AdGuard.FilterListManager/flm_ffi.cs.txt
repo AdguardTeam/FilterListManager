@@ -454,6 +454,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata_with_body(FilterListManagerSafeHandle @ptr,RustBuffer @url,ref RustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("adguard-flm")]
     public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_force_update_filters_by_ids(FilterListManagerSafeHandle @ptr,RustBuffer @ids,int @looseTimeout,ref RustCallStatus _uniffi_out_err
     );
 
@@ -802,6 +806,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_fetch_filter_list_metadata_with_body(
+    );
+
+    [DllImport("adguard-flm")]
     public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_force_update_filters_by_ids(
     );
 
@@ -941,6 +949,12 @@ static class _UniFFILib {
             var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_fetch_filter_list_metadata();
             if (checksum != 5456) {
                 throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_fetch_filter_list_metadata` checksum `5456`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_fetch_filter_list_metadata_with_body();
+            if (checksum != 39887) {
+                throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_fetch_filter_list_metadata_with_body` checksum `39887`, library returned `{checksum}`");
             }
         }
         {
@@ -1316,6 +1330,9 @@ internal interface IFilterListManager {
     FilterListMetadata FetchFilterListMetadata(String @url);
     
     /// <exception cref="AgOuterException"></exception>
+    FilterListMetadataWithBody FetchFilterListMetadataWithBody(String @url);
+    
+    /// <exception cref="AgOuterException"></exception>
     UpdateResult? ForceUpdateFiltersByIds(List<int> @ids, int @looseTimeout);
     
     /// <exception cref="AgOuterException"></exception>
@@ -1433,6 +1450,14 @@ internal class FilterListManager: FFIObject<FilterListManagerSafeHandle>, IFilte
         return FfiConverterTypeFilterListMetadata.INSTANCE.Lift(
     _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
     _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata(this.GetHandle(), FfiConverterString.INSTANCE.Lower(@url), ref _status)
+));
+    }
+    
+    /// <exception cref="AgOuterException"></exception>
+    public FilterListMetadataWithBody FetchFilterListMetadataWithBody(String @url) {
+        return FfiConverterTypeFilterListMetadataWithBody.INSTANCE.Lift(
+    _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
+    _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata_with_body(this.GetHandle(), FfiConverterString.INSTANCE.Lower(@url), ref _status)
 ));
     }
     
@@ -1897,6 +1922,36 @@ class FfiConverterTypeFilterListMetadata: FfiConverterRustBuffer<FilterListMetad
             FfiConverterString.INSTANCE.Write(value.@checksum, stream);
             FfiConverterString.INSTANCE.Write(value.@url, stream);
             FfiConverterInt32.INSTANCE.Write(value.@rulesCount, stream);
+    }
+}
+
+
+
+internal record FilterListMetadataWithBody (
+    FilterListMetadata @metadata, 
+    String @filterBody
+) {
+}
+
+class FfiConverterTypeFilterListMetadataWithBody: FfiConverterRustBuffer<FilterListMetadataWithBody> {
+    public static FfiConverterTypeFilterListMetadataWithBody INSTANCE = new FfiConverterTypeFilterListMetadataWithBody();
+
+    public override FilterListMetadataWithBody Read(BigEndianStream stream) {
+        return new FilterListMetadataWithBody(
+            @metadata: FfiConverterTypeFilterListMetadata.INSTANCE.Read(stream),
+            @filterBody: FfiConverterString.INSTANCE.Read(stream)
+        );
+    }
+
+    public override int AllocationSize(FilterListMetadataWithBody value) {
+        return
+            FfiConverterTypeFilterListMetadata.INSTANCE.AllocationSize(value.@metadata) +
+            FfiConverterString.INSTANCE.AllocationSize(value.@filterBody);
+    }
+
+    public override void Write(FilterListMetadataWithBody value, BigEndianStream stream) {
+            FfiConverterTypeFilterListMetadata.INSTANCE.Write(value.@metadata, stream);
+            FfiConverterString.INSTANCE.Write(value.@filterBody, stream);
     }
 }
 

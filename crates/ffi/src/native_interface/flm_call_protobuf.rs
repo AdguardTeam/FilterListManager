@@ -7,6 +7,7 @@ use crate::protobuf_generated::filter_list_manager::{
     ChangeLocaleRequest, ChangeLocaleResponse, DeleteCustomFilterListsRequest,
     DeleteCustomFilterListsResponse, EmptyResponse, EnableFilterListsRequest,
     EnableFilterListsResponse, FetchFilterListMetadataRequest, FetchFilterListMetadataResponse,
+    FetchFilterListMetadataWithBodyRequest, FetchFilterListMetadataWithBodyResponse,
     ForceUpdateFiltersByIdsRequest, ForceUpdateFiltersByIdsResponse, GetActiveRulesResponse,
     GetAllGroupsResponse, GetAllTagsResponse, GetDatabasePathResponse, GetDatabaseVersionResponse,
     GetDisabledRulesRequest, GetDisabledRulesResponse, GetFilterRulesAsStringsRequest,
@@ -40,6 +41,7 @@ pub enum FFIMethod {
     UpdateFilters,
     ForceUpdateFiltersByIds,
     FetchFilterListMetadata,
+    FetchFilterListMetadataWithBody,
     LiftUpDatabase,
     GetAllTags,
     GetAllGroups,
@@ -295,6 +297,24 @@ pub unsafe extern "C" fn flm_call_protobuf(
                     error: None,
                 },
                 Err(why) => FetchFilterListMetadataResponse {
+                    metadata: None,
+                    error: Some(why.into()),
+                },
+            }
+            .encode(&mut out_bytes_buffer)
+        }
+        FFIMethod::FetchFilterListMetadataWithBody => {
+            let request = decode_input_request!(FetchFilterListMetadataWithBodyRequest);
+
+            match flm_handle
+                .flm
+                .fetch_filter_list_metadata_with_body(request.url)
+            {
+                Ok(value) => FetchFilterListMetadataWithBodyResponse {
+                    metadata: Some(value.into()),
+                    error: None,
+                },
+                Err(why) => FetchFilterListMetadataWithBodyResponse {
                     metadata: None,
                     error: Some(why.into()),
                 },

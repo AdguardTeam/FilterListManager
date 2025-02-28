@@ -77,6 +77,8 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                        true);
                 FilterListMetadata filterListMetadata =
                     flm.FetchFilterListMetadata("https://filters.adtidy.org/extension/safari/filters/101.txt");
+                FilterListMetadataWithBody filterListMetadataWithBody =
+                    flm.FetchFilterListMetadataWithBody("https://filters.adtidy.org/extension/safari/filters/101.txt");
                 flm.GetActiveRules();
                 flm.DeleteCustomFilterLists(new[] { customFilter.Id });
                 string path = flm.GetDatabasePath();
@@ -89,7 +91,8 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 Debug.Assert(constants.CustomGroupId == -2147483648, "CustomGroupId must be equal to int::min");
                 Debug.Assert(constants.SpecialGroupId == 0, "SpecialGroupId must be zero");
                 Debug.Assert(constants.SmallestFilterId == -2_000_000_000, "UserRulesId must be two billions");
-                
+                Debug.Assert(filterListMetadataWithBody.Metadata.Homepage.Length > 0, "Metadata Homepage must be non-empty");
+
                 Logger.Info("All Ok!");
             }
         }

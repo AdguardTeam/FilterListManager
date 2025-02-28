@@ -1,7 +1,8 @@
 //! Default implementation for [`FilterListManager`]
 
 use super::models::{
-    configuration::Configuration, FilterId, FilterListMetadata, FullFilterList, UpdateResult,
+    configuration::Configuration, FilterId, FilterListMetadata, FilterListMetadataWithBody,
+    FullFilterList, UpdateResult,
 };
 use crate::filters::indexes::indexes_processor::IndexesProcessor;
 use crate::filters::parser::diff_updates::process_diff_path::process_diff_path;
@@ -232,6 +233,33 @@ impl FilterListManager for FilterListManagerImpl {
             checksum: parser.get_metadata(KnownMetadataProperty::Checksum),
             url: download_url,
             rules_count: parser.get_rules_count(),
+        })
+    }
+
+    fn fetch_filter_list_metadata_with_body(
+        &self,
+        url: String,
+    ) -> FLMResult<FilterListMetadataWithBody> {
+        let client = BlockingClient::new(&self.configuration)?;
+        let mut parser = FilterParser::factory(&self.configuration, &client);
+
+        let download_url = parser
+            .parse_from_url(&url)
+            .map_err(FLMError::from_parser_error)?;
+
+        Ok(FilterListMetadataWithBody {
+            metadata: FilterListMetadata {
+                title: parser.get_metadata(KnownMetadataProperty::Title),
+                description: parser.get_metadata(KnownMetadataProperty::Description),
+                time_updated: parser.get_metadata(KnownMetadataProperty::TimeUpdated),
+                version: parser.get_metadata(KnownMetadataProperty::Version),
+                homepage: parser.get_metadata(KnownMetadataProperty::Homepage),
+                license: parser.get_metadata(KnownMetadataProperty::License),
+                checksum: parser.get_metadata(KnownMetadataProperty::Checksum),
+                url: download_url,
+                rules_count: parser.get_rules_count(),
+            },
+            filter_body: parser.extract_rule_entity(0).text,
         })
     }
 

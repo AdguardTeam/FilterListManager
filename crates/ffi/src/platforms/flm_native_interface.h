@@ -24,6 +24,7 @@ typedef enum FFIMethod {
     UpdateFilters,
     ForceUpdateFiltersByIds,
     FetchFilterListMetadata,
+    FetchFilterListMetadataWithBody,
     LiftUpDatabase,
     GetAllTags,
     GetAllGroups,
@@ -130,17 +131,32 @@ struct RustResponse *flm_default_configuration_protobuf(void);
 
 /**
  * Makes an FLM object and returns opaque pointer of [`FLMHandle`]
+ *
+ * # Safety
+ *
+ * 1. This function awaits protobuf pointer `bytes` and its size `size`
+ * 2. `handle.result_data_len <= handle.result_data_capacity` is unsafe and will panic
+ * 3. `handle.result_data.is_null()` || `size == 0` is safe, returns [`RustResponse`] with error
  */
 struct RustResponse *flm_init_protobuf(const uint8_t *bytes, size_t size);
 
 /**
  * Frees memory of [`RustResponse`] objects and their data.
  * NOTE: Actions for each discriminant are different.
+ *
+ * # Safety
+ *
+ * 1. `handle.result_data.is_null()` is safe
+ * 2. `handle.result_data_len <= handle.result_data_capacity` is unsafe and will panic
  */
 void flm_free_response(struct RustResponse *handle);
 
 /**
  * Drops [`FLMHandle`]
+ *
+ * # Safety
+ *
+ * This function is safe as long as you pass designated pointer
  */
 void flm_free_handle(struct FLMHandle *handle);
 
@@ -151,6 +167,10 @@ struct FilterListManagerConstants flm_get_constants(void);
 
 /**
  * Calls FLM method described as [`FFIMethod`] for object behind [`FLMHandle`]
+ *
+ * # Safety
+ *
+ * 1. `handle.is_null()` is safe and returns error result
  */
 struct RustResponse *flm_call_protobuf(struct FLMHandle *handle,
                                        enum FFIMethod method,

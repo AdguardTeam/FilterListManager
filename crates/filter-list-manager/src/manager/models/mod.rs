@@ -4,6 +4,7 @@ pub mod configuration;
 pub mod disabled_rules_raw;
 pub mod filter_group;
 pub mod filter_list_metadata;
+pub mod filter_list_metadata_with_body;
 pub mod filter_list_rules;
 pub mod filter_list_rules_raw;
 pub mod filter_tag;
@@ -14,6 +15,7 @@ pub mod update_result;
 
 pub use self::disabled_rules_raw::DisabledRulesRaw;
 pub use self::filter_list_metadata::FilterListMetadata;
+pub use self::filter_list_metadata_with_body::FilterListMetadataWithBody;
 pub use self::filter_list_rules_raw::FilterListRulesRaw;
 pub use self::flm_error::FLMError;
 pub use self::full_filter_list::FullFilterList;

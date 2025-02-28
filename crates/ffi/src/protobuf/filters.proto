@@ -80,6 +80,14 @@ message FilterListMetadata {
   int32 rules_count = 9;
 }
 
+message FilterListMetadataWithBody {
+  // Metadata for a remote filter list.
+  FilterListMetadata metadata = 1;
+
+  // Filter body.
+  string filter_body = 2;
+}
+
 message StoredFilterMetadata {
   // Filter list unique ID
   int32 id = 1;

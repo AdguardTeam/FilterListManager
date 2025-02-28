@@ -155,6 +155,15 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         FilterListMetadata FetchFilterListMetadata(string url);
         
         /// <summary>
+        /// Fetches filter list by url and returns its raw metadata and body.
+        ///
+        /// * `url` - Remote server or a `file://` URL.
+        ///
+        /// Returns filter list metadata and body.
+        /// </summary>
+        FilterListMetadataWithBody FetchFilterListMetadataWithBody(string url);
+
+        /// <summary>
         /// The method “raises” the state of the database to the working state.
         ///
         /// **If the database doesn't exist:**
