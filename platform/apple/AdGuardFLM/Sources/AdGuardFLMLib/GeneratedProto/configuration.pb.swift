@@ -142,6 +142,12 @@ public struct FilterListManager_Configuration: Sendable {
   /// Custom proxy addr for requests
   public var requestCustomProxyAddr: String = String()
 
+  /// Client app name
+  public var appName: String = String()
+
+  /// Client app version
+  public var version: String = String()
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -180,6 +186,8 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     9: .standard(proto: "auto_lift_up_database"),
     10: .standard(proto: "request_proxy_mode"),
     11: .standard(proto: "request_custom_proxy_addr"),
+    12: .standard(proto: "app_name"),
+    13: .same(proto: "version"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -199,6 +207,8 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
       case 9: try { try decoder.decodeSingularBoolField(value: &self.autoLiftUpDatabase) }()
       case 10: try { try decoder.decodeSingularEnumField(value: &self.requestProxyMode) }()
       case 11: try { try decoder.decodeSingularStringField(value: &self.requestCustomProxyAddr) }()
+      case 12: try { try decoder.decodeSingularStringField(value: &self.appName) }()
+      case 13: try { try decoder.decodeSingularStringField(value: &self.version) }()
       default: break
       }
     }
@@ -238,6 +248,12 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if !self.requestCustomProxyAddr.isEmpty {
       try visitor.visitSingularStringField(value: self.requestCustomProxyAddr, fieldNumber: 11)
     }
+    if !self.appName.isEmpty {
+      try visitor.visitSingularStringField(value: self.appName, fieldNumber: 12)
+    }
+    if !self.version.isEmpty {
+      try visitor.visitSingularStringField(value: self.version, fieldNumber: 13)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -253,6 +269,8 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if lhs.autoLiftUpDatabase != rhs.autoLiftUpDatabase {return false}
     if lhs.requestProxyMode != rhs.requestProxyMode {return false}
     if lhs.requestCustomProxyAddr != rhs.requestCustomProxyAddr {return false}
+    if lhs.appName != rhs.appName {return false}
+    if lhs.version != rhs.version {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

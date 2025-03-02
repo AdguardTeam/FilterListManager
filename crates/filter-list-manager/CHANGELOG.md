@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.3] - 2025-02-28
 
-### Changed
+### Added
 - Add client app name and version in configuration
 
 [1.4.3]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.4.1...flm-1.4.3

@@ -12,6 +12,8 @@ final class AdGuardFLMLibTests: XCTestCase {
         configuration.metadataURL = "https://filters.adtidy.org/extension/safari/filters.json"
         configuration.metadataLocalesURL = "https://filters.adtidy.org/extension/safari/filters_i18n.json"
         configuration.workingDirectory = "."
+        configuration.appName = "FlmApp"
+        configuration.version = "1.2.3"
 
         return configuration
     }

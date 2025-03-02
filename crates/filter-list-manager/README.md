@@ -70,7 +70,7 @@ configuration.locale = "pt_PT".to_string();
 configuration.filter_list_type = FilterListType::DNS;
 
 // Sets app name and version for user-agent header.
-configuration.app_name = "MyApp";
+configuration.app_name = "FlmApp";
 configuration.version = "1.2.3";
 
 // Creates facade instance
