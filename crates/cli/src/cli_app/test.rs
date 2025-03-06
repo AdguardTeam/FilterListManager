@@ -6,7 +6,12 @@ use std::time::{Instant, SystemTime};
 #[allow(dead_code)]
 fn install_lists() {
     let start = SystemTime::now();
-    let manager = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
+    let mut conf = Configuration::default();
+    conf.app_name = "FlmApp".to_string();
+    conf.version = "1.2.3".to_string();
+
+    let manager = FilterListManagerImpl::new(conf).unwrap();
 
     let mut max_lists = 6;
     for n in 1..max_lists {
@@ -41,7 +46,11 @@ fn install_lists() {
 
 #[allow(dead_code)]
 fn gets_filter_list() {
-    let result = FilterListManagerImpl::new(Configuration::default())
+    let mut conf = Configuration::default();
+    conf.app_name = "FlmApp".to_string();
+    conf.version = "1.2.3".to_string();
+
+    let result = FilterListManagerImpl::new(conf)
         .unwrap()
         .get_full_filter_list_by_id(1)
         .unwrap();
@@ -57,6 +66,8 @@ fn update_filters() {
     conf.metadata_url = "https://filters.adtidy.org/extension/safari/filters.json".to_string();
     conf.metadata_locales_url =
         "https://filters.adtidy.org/extension/safari/filters_i18n.json".to_string();
+    conf.app_name = "FlmApp".to_string();
+    conf.version = "1.2.3".to_string();
 
     let flm = FilterListManagerImpl::new(conf).unwrap();
     //  flm.pull_metadata().unwrap();

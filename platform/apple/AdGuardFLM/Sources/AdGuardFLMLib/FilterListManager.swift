@@ -133,7 +133,8 @@ public class FLMFacade: FLMFacadeProtocol {
             flm_free_response(response)
         }
 
-        guard response.pointee.ffi_error == false else {
+        guard response.pointee.ffi_error == false
+                && response.pointee.response_type == FLMHandlePointer.rawValue else {
             let data = Data(bytes: response.pointee.result_data, count: response.pointee.result_data_len)
 
             let error = try FilterListManager_AGOuterError(serializedBytes: data)

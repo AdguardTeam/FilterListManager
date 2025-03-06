@@ -65,6 +65,10 @@ pub enum AGOuterError {
     #[error("Mutex failed: {0}")]
     Mutex(String),
 
+    /// Invalid configuration error
+    #[error("Invalid configuration: {0}")]
+    InvalidConfiguration(&'static str),
+
     /// Other errors
     #[error("{0}")]
     Other(String),
@@ -90,6 +94,7 @@ impl From<FLMError> for AGOuterError {
                 _ => Self::Other(String::from("Unknown i/o error")),
             },
             FLMError::FieldIsEmpty(value) => Self::FieldIsEmpty(value),
+            FLMError::InvalidConfiguration(value) => Self::InvalidConfiguration(value),
             FLMError::EntityNotFound(id) => Self::EntityNotFound(id),
             FLMError::Other(msg) => Self::Other(msg),
             FLMError::Network(variant) => match variant {

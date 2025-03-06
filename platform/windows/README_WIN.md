@@ -5,6 +5,7 @@
 - `Rust` - [See how to install](https://www.rust-lang.org/tools/install)
 - `cargo` 1.75. Versions 1.76+ don't support Windows 7. [See for more info](https://blog.rust-lang.org/2023/08/24/Rust-1.72.0.html#future-windows-compatibility)
 - `uniffi-bindgen-cs` - [See how to install](https://github.com/NordSecurity/uniffi-bindgen-cs)
+- `Visual studio build tools` - [See how to install](https://visualstudio.microsoft.com/ru/downloads/#build-tools-for-visual-studio-2022) and add build tools to path
 
 First run
 
@@ -60,3 +61,9 @@ Versions should be deployed from the master branch.
 5. Note that the version in the actual FLM Rust .dll file is specified in the `crates\ffi\resources\AGWinFLM.rc` file and can be modified in `build.ps1`; the default value comes from `crates\ffi\Cargo.toml`.
 6. The version of the adapter .dll file specified in `AdGuard.FilterListManager.csproj` in the `<Version>` section should be automatically updated based on the version from the `AdGuard.FilterListManager.schema.json` file. This is handled by the `platform\windows\build.ps1` script.
 
+### Simple test project build
+1. For a test build, you can download already assembled [nugget package](https://art.int.agrd.dev/artifactory/webapp/#/artifacts/browse/tree/General/adguard-windows/7.18.4771.0-windows-nightly/AdGuard-v7.18.4771.0-windows-nightly.exe).
+2. Then you need to unpack the dll into the appropriate folders (aarch64-pc-windows-msvc\release|i686-pc-windows-msvc\release|x86_64-pc-windows-msvc\release)
+3. Now you can build test project
+
+If a signature error occurs during assembly you can use [this solution](https://www.notion.so/adguard/sn-Vr-7f55f6d2080546c1a3fd69d509e926a2) or just remove signing from [cs proj](https://bit.int.agrd.dev/projects/ADGUARD-CORE-LIBS/repos/filter-list-manager/browse/platform/windows/AdGuard.FilterListManager/AdGuard.FilterListManager.csproj#39) only for test.

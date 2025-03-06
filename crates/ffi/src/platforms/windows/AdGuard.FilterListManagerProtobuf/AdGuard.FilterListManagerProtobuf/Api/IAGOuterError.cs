@@ -8,6 +8,9 @@ namespace AdGuard.FilterListManagerProtobuf.Api
     // ReSharper disable once InconsistentNaming
     public interface IAGOuterError
     {
+        /// <summary>
+        /// Error
+        /// </summary>
         AGOuterError Error { get; set; }
     }
 }

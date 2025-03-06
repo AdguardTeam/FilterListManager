@@ -1,55 +1,33 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using AdGuard.FilterListManagerProtobuf.Api;
 using AdGuard.FilterListManagerProtobuf.Api.Exceptions;
 using AdGuard.Utils.Base.Interop;
-using FilterListManager;
-using Google.Protobuf;
 using AGErrorProtobuf = FilterListManager.AGOuterError;
 
 namespace AdGuard.FilterListManagerProtobuf.RustInterface
 {
     static class ProtobufBridge
     {
-        internal static Configuration MakeDefaultConfiguration()
-        {
-            byte[] resultDataBytes = GetResultData(ProtobufInterop.flm_default_configuration_protobuf, out IntPtr _);
-            Configuration configuration = Configuration.Parser.ParseFrom(resultDataBytes);
-            return configuration;
-        }
-
-        internal static FLMConstants GetFLMConstants()
-        {
-            return ProtobufInterop.flm_get_constants();
-        }
-
-        internal static IntPtr InitFLM(Configuration configuration)
-        {
-            byte[] data = configuration.ToByteArray();
-            IntPtr pData = IntPtr.Zero;
-            try
-            {
-                pData = Marshal.AllocHGlobal(data.Length);
-                Marshal.Copy(data, 0, pData, data.Length);
-                byte [] _ = GetResultData(
-                    () => ProtobufInterop.flm_init_protobuf(pData, (ulong)data.Length), out IntPtr pResultData);
-                return pResultData;
-            }
-            finally
-            {
-                MarshalUtils.SafeFreeHGlobal(pData);
-            }
-        }
-
-        internal static byte[] CallRust(IntPtr flmHandle, FfiMethod method, byte[] args)
+        internal static RustResponseResult CallRust(
+            IntPtr flmHandle, 
+            FfiMethod ffiMethod, 
+            byte[] args, 
+            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc)
         {
             IntPtr pArgs = IntPtr.Zero;
             try
             {
                 pArgs = Marshal.AllocHGlobal(args.Length);
                 Marshal.Copy(args, 0, pArgs, args.Length);
-                byte[] resultDataBytes = GetResultData(
-                    () => ProtobufInterop.flm_call_protobuf(flmHandle, method, pArgs, (ulong)args.Length), out IntPtr _);
-                return resultDataBytes;
+                RustResponseResult rustResponseResult = GetRustResponseResult(
+                    () => 
+                        flmInteropFunc(
+                            flmHandle, 
+                            ffiMethod, 
+                            pArgs, 
+                            (ulong)args.Length));
+                return rustResponseResult;
             }
             finally
             {
@@ -57,29 +35,34 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
             }
         }
         
-        internal static void FreeFLMHandle(IntPtr handle)
-        {
-            ProtobufInterop.flm_free_handle(handle);
-        }
-        
-        private static byte[] GetResultData(Func<IntPtr> nativeFunc, out IntPtr pResultData)
+        private static RustResponseResult GetRustResponseResult(Func<IntPtr> nativeRustFunc)
         {
             IntPtr pRustResponse = IntPtr.Zero;
             try
             {
-                pRustResponse = nativeFunc();
+                pRustResponse = nativeRustFunc();
                 RustResponse rustResponse = MarshalUtils.PtrToStructure<RustResponse>(pRustResponse);
                 uint resultDataLen = rustResponse.ResultDataLen.ToUInt32();
-                byte[] resultDataBytes = new byte[resultDataLen];
-                Marshal.Copy(rustResponse.PResultData, resultDataBytes, 0, (int)resultDataLen);
-                if (!rustResponse.FfiError)
+                byte[] resultDataBuffer = new byte[resultDataLen];
+                Marshal.Copy(rustResponse.PResultData, resultDataBuffer, 0, (int)resultDataLen);
+                if (rustResponse.FfiError)
                 {
-                    pResultData = rustResponse.PResultData;
-                    return resultDataBytes;
+                    // fi_error is set to true if an error occurs directly in the interface between languages.
+                    // In this case, we are just throwing a business logic error.
+                    // In other words, the RUST - constructor throws an exception.
+                    // see more https://bit.int.agrd.dev/projects/ADGUARD-CORE-LIBS/repos/filter-list-manager/pull-requests/156/overview?commentId=344275
+                    AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(resultDataBuffer);
+                    throw new AgOuterException(error);
                 }
                 
-                AGErrorProtobuf error = AGErrorProtobuf.Parser.ParseFrom(resultDataBytes);
-                throw new AgOuterException(error);
+                RustResponseResult rustResponseResult = new RustResponseResult
+                {
+                    HandlePointer = rustResponse.PResultData,
+                    Discriminant = rustResponse.Discriminant,
+                    Buffer = resultDataBuffer
+                };
+                    
+                return rustResponseResult;
             }
             finally
             {

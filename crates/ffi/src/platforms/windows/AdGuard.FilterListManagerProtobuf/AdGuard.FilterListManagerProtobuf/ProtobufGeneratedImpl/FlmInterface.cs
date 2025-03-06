@@ -9,6 +9,17 @@ namespace FilterListManager
 {
     // Partial classed below have the only purpose to allow inheritance from IAGOuterError
     // in order to gentle handle in generic manner in CallRust method
+    
+    // ReSharper disable once InconsistentNaming
+    public partial class AGOuterError : IAGOuterError
+    {
+        public AGOuterError Error { get; set; }
+    }
+
+    public partial class Configuration : IAGOuterError
+    {
+        public AGOuterError Error { get; set; }
+    }
 
     public partial class InstallCustomFilterListResponse : IAGOuterError
     {

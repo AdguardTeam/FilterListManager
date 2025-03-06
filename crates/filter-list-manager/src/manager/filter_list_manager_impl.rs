@@ -93,6 +93,13 @@ impl FilterListManagerImpl {
 
 impl FilterListManager for FilterListManagerImpl {
     fn new(mut configuration: Configuration) -> FLMResult<Box<Self>> {
+        if configuration.app_name.is_empty() {
+            return Err(FLMError::InvalidConfiguration("app_name is empty"));
+        }
+        if configuration.version.is_empty() {
+            return Err(FLMError::InvalidConfiguration("version is empty"));
+        }
+
         configuration.normalized();
 
         let connection_manager = DbConnectionManager::from_configuration(&configuration)?;
@@ -869,7 +876,10 @@ mod tests {
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let path = fs::canonicalize("./tests/fixtures/1.txt").unwrap();
 
@@ -906,7 +916,10 @@ mod tests {
         let source = DbConnectionManager::factory_test().unwrap();
         let (_, inserted_filters) = spawn_test_db_with_metadata(&source);
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let deleted = flm
             .delete_custom_filter_lists(vec![inserted_filters.first().unwrap().filter_id.unwrap()])
@@ -940,7 +953,11 @@ mod tests {
     fn test_install_local_custom_filter() {
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let title = String::from("titleeee");
         let description = String::from("dessscrriptiiiioooonnn");
@@ -962,7 +979,10 @@ mod tests {
 
     #[test]
     fn test_save_disabled_rules() {
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
         let source = flm.connection_manager.as_ref();
 
         let _ = spawn_test_db_with_metadata(source);
@@ -1014,7 +1034,11 @@ mod tests {
     fn test_install_custom_filter_from_string() {
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let download_url = String::from("http://install.custom.filter.list.from.string");
         let last_download_time = Utc::now().sub(Duration::days(5));
@@ -1063,7 +1087,11 @@ mod tests {
     fn test_we_can_understand_aliases_fields() {
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let download_url = String::from("http://install.custom.filter.list.from.string");
         let last_download_time = Utc::now().sub(Duration::days(5));
@@ -1094,6 +1122,8 @@ mod tests {
         {
             let mut conf = Configuration::default();
             conf.locale = String::from("el");
+            conf.app_name = "FlmApp".to_string();
+            conf.version = "1.2.3".to_string();
 
             let flm = FilterListManagerImpl::new(conf).unwrap();
             let source = flm.connection_manager.as_ref();
@@ -1112,6 +1142,8 @@ mod tests {
             let mut conf = Configuration::default();
             // Nonexistent
             conf.locale = String::from("31");
+            conf.app_name = "FlmApp".to_string();
+            conf.version = "1.2.3".to_string();
 
             let flm = FilterListManagerImpl::new(conf).unwrap();
             let source = flm.connection_manager.as_ref();
@@ -1129,7 +1161,10 @@ mod tests {
 
     #[test]
     fn test_select_index_filter() {
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
         let source = flm.connection_manager.as_ref();
 
         let _ = spawn_test_db_with_metadata(&source);
@@ -1155,7 +1190,10 @@ mod tests {
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let new_filter = flm
             .install_custom_filter_from_string(
@@ -1197,7 +1235,10 @@ mod tests {
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
         let list_ids = flm
             .get_full_filter_lists_internal(None)
             .unwrap()
@@ -1225,7 +1266,10 @@ mod tests {
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let rules = FilterListRules {
             filter_id: USER_RULES_FILTER_LIST_ID,
@@ -1261,7 +1305,10 @@ mod tests {
         let source = DbConnectionManager::factory_test().unwrap();
         let _ = spawn_test_db_with_metadata(&source);
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let _ = flm
             .install_custom_filter_from_string(
@@ -1299,7 +1346,10 @@ mod tests {
 
     #[test]
     fn test_database_is_automatically_lifted_in_constructor() {
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let lists = flm.get_full_filter_lists_internal(None).unwrap();
 
@@ -1311,7 +1361,10 @@ mod tests {
         const TEST_FILTERS_AMOUNT: usize = 3;
         const NONEXISTENT_ID: FilterId = 450_123_456;
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
         let source = &flm.connection_manager;
         let (_, index_filters) = spawn_test_db_with_metadata(source);
 
@@ -1383,7 +1436,10 @@ mod tests {
             Utc::now().timestamp_micros()
         ));
 
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         {
             File::create(&path).unwrap();
@@ -1418,7 +1474,10 @@ mod tests {
 
     #[test]
     fn test_get_disabled_rules() {
-        let flm = FilterListManagerImpl::new(Configuration::default()).unwrap();
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
 
         let source = &flm.connection_manager;
         let (_, index_filters) = spawn_test_db_with_metadata(source);

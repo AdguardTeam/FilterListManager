@@ -17,8 +17,23 @@ final class AdGuardFLMLibTests: XCTestCase {
     }
 
     func testAllMethods() throws {
-        let conf = try spawnConf()
+        var conf = try spawnConf()
+        XCTAssertThrowsError( try FLMFacade(configuration: conf)) { error in
+            XCTAssertEqual(
+                error.localizedDescription,
+                "Invalid configuration: app_name is empty"
+            )
+        }
 
+        conf.appName = "FlmApp"
+        XCTAssertThrowsError( try FLMFacade(configuration: conf)) { error in
+            XCTAssertEqual(
+                error.localizedDescription,
+                "Invalid configuration: version is empty"
+            )
+        }
+
+        conf.version = "1.2.3"
         let flm = try FLMFacade(configuration: conf)
         try flm.pullMetadata()
         XCTAssertNoThrow(

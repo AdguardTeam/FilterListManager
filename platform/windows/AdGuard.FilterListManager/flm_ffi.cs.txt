@@ -1715,7 +1715,9 @@ internal record Configuration (
     String @metadataLocalesUrl, 
     int @requestTimeoutMs, 
     RequestProxyMode @requestProxyMode, 
-    bool @autoLiftUpDatabase
+    bool @autoLiftUpDatabase, 
+    String @appName, 
+    String @version
 ) {
 }
 
@@ -1733,7 +1735,9 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             @metadataLocalesUrl: FfiConverterString.INSTANCE.Read(stream),
             @requestTimeoutMs: FfiConverterInt32.INSTANCE.Read(stream),
             @requestProxyMode: FfiConverterTypeRequestProxyMode.INSTANCE.Read(stream),
-            @autoLiftUpDatabase: FfiConverterBoolean.INSTANCE.Read(stream)
+            @autoLiftUpDatabase: FfiConverterBoolean.INSTANCE.Read(stream),
+            @appName: FfiConverterString.INSTANCE.Read(stream),
+            @version: FfiConverterString.INSTANCE.Read(stream)
         );
     }
 
@@ -1748,7 +1752,9 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterString.INSTANCE.AllocationSize(value.@metadataLocalesUrl) +
             FfiConverterInt32.INSTANCE.AllocationSize(value.@requestTimeoutMs) +
             FfiConverterTypeRequestProxyMode.INSTANCE.AllocationSize(value.@requestProxyMode) +
-            FfiConverterBoolean.INSTANCE.AllocationSize(value.@autoLiftUpDatabase);
+            FfiConverterBoolean.INSTANCE.AllocationSize(value.@autoLiftUpDatabase) +
+            FfiConverterString.INSTANCE.AllocationSize(value.@appName) +
+            FfiConverterString.INSTANCE.AllocationSize(value.@version);
     }
 
     public override void Write(Configuration value, BigEndianStream stream) {
@@ -1762,6 +1768,8 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterInt32.INSTANCE.Write(value.@requestTimeoutMs, stream);
             FfiConverterTypeRequestProxyMode.INSTANCE.Write(value.@requestProxyMode, stream);
             FfiConverterBoolean.INSTANCE.Write(value.@autoLiftUpDatabase, stream);
+            FfiConverterString.INSTANCE.Write(value.@appName, stream);
+            FfiConverterString.INSTANCE.Write(value.@version, stream);
     }
 }
 
@@ -2399,6 +2407,10 @@ internal class AgOuterException: UniffiException {
         public Mutex(string message): base(message) {}
     }
     
+    public class InvalidConfiguration: AgOuterException {
+        public InvalidConfiguration(string message): base(message) {}
+    }
+    
     public class Other: AgOuterException {
         public Other(string message): base(message) {}
     }
@@ -2427,7 +2439,8 @@ class FfiConverterTypeAgOuterException : FfiConverterRustBuffer<AgOuterException
             case 14: return new AgOuterException.FilterParserException(FfiConverterString.INSTANCE.Read(stream));
             case 15: return new AgOuterException.FieldIsEmpty(FfiConverterString.INSTANCE.Read(stream));
             case 16: return new AgOuterException.Mutex(FfiConverterString.INSTANCE.Read(stream));
-            case 17: return new AgOuterException.Other(FfiConverterString.INSTANCE.Read(stream));
+            case 17: return new AgOuterException.InvalidConfiguration(FfiConverterString.INSTANCE.Read(stream));
+            case 18: return new AgOuterException.Other(FfiConverterString.INSTANCE.Read(stream));
             default:
                 throw new InternalException(String.Format("invalid error value '{0}' in FfiConverterTypeAgOuterException.Read()", value));
         }
@@ -2487,8 +2500,11 @@ class FfiConverterTypeAgOuterException : FfiConverterRustBuffer<AgOuterException
             case AgOuterException.Mutex:
                 stream.WriteInt(16);
                 break;
-            case AgOuterException.Other:
+            case AgOuterException.InvalidConfiguration:
                 stream.WriteInt(17);
+                break;
+            case AgOuterException.Other:
+                stream.WriteInt(18);
                 break;
             default:
                 throw new InternalException(String.Format("invalid error value '{0}' in FfiConverterTypeAgOuterException.Write()", value));

@@ -8,7 +8,10 @@ namespace AdGuard.FilterListManagerProtobuf.Api.Exceptions
     /// </summary>
     public class AgOuterException : FilterListManagerBaseException
     {
-        public AGOuterErrorProtobuf.ErrorOneofCase ErrorKind;
+        /// <summary>
+        /// Kind of AgOuterException set by FLM itself
+        /// </summary>
+        public AGOuterErrorProtobuf.ErrorOneofCase ErrorKind { get; private set; }
 
         /// <summary>
         /// Creates new instance of <see cref="AgOuterException"/>

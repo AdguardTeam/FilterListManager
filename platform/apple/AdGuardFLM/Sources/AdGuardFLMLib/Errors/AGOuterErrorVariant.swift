@@ -20,6 +20,7 @@ public enum AGOuterErrorVariant: Error {
     case FieldIsEmpty(String)
     case DatabaseBusy
     case Mutex
+    case InvalidConfiguration(String)
     case Other
 }
 
@@ -64,6 +65,8 @@ extension AGOuterErrorVariant {
             self = Self.FieldIsEmpty(container.fieldName)
         case .mutex(_):
             self = Self.Mutex
+        case .invalidConfiguration(let container):
+            self = Self.InvalidConfiguration(container.msg)
         case .other(_):
             self = Self.Other
         case .databaseBusy(_):

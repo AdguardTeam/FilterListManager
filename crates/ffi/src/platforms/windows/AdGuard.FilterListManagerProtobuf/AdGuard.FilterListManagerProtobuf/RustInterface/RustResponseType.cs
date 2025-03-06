@@ -3,7 +3,7 @@
     /// <summary>
     /// Discriminant for [`RustResponse`] result_data value
     /// </summary>
-    enum RustResponseType
+    internal enum RustResponseType : byte
     {
         /// <summary>
         /// Contains u8 pointer with size

@@ -59,6 +59,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 case 16:
                     return new AgOuterException.MutexException(FfiConverterString.Instance.Read(stream));
                 case 17:
+                    return new AgOuterException.InvalidConfigurationException(FfiConverterString.Instance.Read(stream));
+                case 18:
                     return new AgOuterException.OtherException(FfiConverterString.Instance.Read(stream));
                 default:
                     throw new InternalException(
@@ -106,8 +108,10 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 stream.WriteInt(15);
             else if (value is AgOuterException.MutexException)
                 stream.WriteInt(16);
-            else if (value is AgOuterException.OtherException)
+            else if (value is AgOuterException.InvalidConfigurationException)
                 stream.WriteInt(17);
+            else if (value is AgOuterException.OtherException)
+                stream.WriteInt(18);
             else
                 throw new InternalException(
                     $"invalid error value '{value}' in FfiConverterTypeAgOuterException.Write()"

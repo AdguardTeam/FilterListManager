@@ -48,7 +48,7 @@ namespace AdGuard.FilterListManager.Test
             List<StoredFilterMetadata> metas = manager.GetStoredFiltersMetadata();
             Assert.IsTrue(metas.Count > 0);
 
-            StoredFilterMetadata firstFilter = metas.FirstOrDefault(a => a.Id == 1);
+            StoredFilterMetadata firstFilter = metas.FirstOrDefault(a => a.Id == 14);
             Assert.IsNotNull(firstFilter);
             StoredFilterMetadata meta = manager.GetStoredFiltersMetadataById(firstFilter.Id);
             Assert.IsNotNull(meta);

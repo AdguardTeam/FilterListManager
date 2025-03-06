@@ -41,6 +41,12 @@ pub struct Configuration {
     /// Custom proxy addr for requests
     #[prost(string, tag = "11")]
     pub request_custom_proxy_addr: ::prost::alloc::string::String,
+    /// Client app name
+    #[prost(string, tag = "12")]
+    pub app_name: ::prost::alloc::string::String,
+    /// Client app version
+    #[prost(string, tag = "13")]
+    pub version: ::prost::alloc::string::String,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -107,7 +113,7 @@ pub struct AgOuterError {
     pub message: ::prost::alloc::string::String,
     #[prost(
         oneof = "ag_outer_error::Error",
-        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18"
+        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19"
     )]
     pub error: ::core::option::Option<ag_outer_error::Error>,
 }
@@ -148,6 +154,8 @@ pub mod ag_outer_error {
         #[prost(message, tag = "17")]
         Mutex(super::Mutex),
         #[prost(message, tag = "18")]
+        InvalidConfiguration(super::InvalidConfiguration),
+        #[prost(message, tag = "19")]
         Other(super::Other),
     }
 }
@@ -209,6 +217,12 @@ pub struct FieldIsEmpty {
 /// Do not duplicate the message
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct Mutex {}
+/// Do not duplicate the message
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct InvalidConfiguration {
+    #[prost(string, tag = "1")]
+    pub msg: ::prost::alloc::string::String,
+}
 /// Do not duplicate the message
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct Other {}

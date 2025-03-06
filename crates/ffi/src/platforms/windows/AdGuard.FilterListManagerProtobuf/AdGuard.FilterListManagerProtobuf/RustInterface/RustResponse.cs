@@ -32,13 +32,13 @@ namespace AdGuard.FilterListManagerProtobuf.RustInterface
          * If request or response have failed, try to send [`AGOuterError::Other`] error with the explanation
          * See: [`build_rust_response_error`]
          */
-        [MarshalAs(UnmanagedType.I1)]
+        [MarshalAs(UnmanagedType.U1)]
         internal bool FfiError;
         
         /**
          * Data type discriminant
          */
-        [MarshalAs(UnmanagedType.I4)]
+        [MarshalAs(UnmanagedType.U1)]
         internal RustResponseType Discriminant;
     }
 }

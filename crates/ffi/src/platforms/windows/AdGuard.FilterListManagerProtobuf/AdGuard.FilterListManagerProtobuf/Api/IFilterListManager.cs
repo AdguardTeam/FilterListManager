@@ -8,6 +8,14 @@ namespace AdGuard.FilterListManagerProtobuf.Api
     public interface IFilterListManager : IDisposable
     {
         /// <summary>
+        ///  header - crates/ffi/src/flm_native_interface.h
+        ///  swift.file - crates/ffi/src/platforms/apple/flmctest/flmctest/main.swift
+        ///  protobuf schema - crates/ffi/src/protobuf
+        /// </summary>
+        /// Spawns configuration for set up
+        Configuration SpawnDefaultConfiguration();
+        
+        /// <summary>
         /// Initializes inner RUST-based FLM under-the-hood the <see cref="IFilterListManager"/>
         /// instance according to the passed <see cref="configuration"/>
         /// </summary>

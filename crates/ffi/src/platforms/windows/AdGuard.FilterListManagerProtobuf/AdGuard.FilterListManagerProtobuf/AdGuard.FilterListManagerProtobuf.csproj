@@ -77,9 +77,11 @@
     <Compile Include="Api\Exceptions\AGOuterException.cs" />
     <Compile Include="Api\Exceptions\FilterListManagerBaseException.cs" />
     <Compile Include="Api\Exceptions\FilterListManagerCommonException.cs" />
+    <Compile Include="Api\Exceptions\FilterListManagerInvalidDiscriminantException.cs" />
     <Compile Include="Api\Exceptions\FilterListManagerNotInitializedException.cs" />
     <Compile Include="Api\FilterListManager.cs" />
     <Compile Include="Api\FlmDllProvider.cs" />
+    <Compile Include="Api\RustResponseResult.cs" />
     <Compile Include="Api\IAGOuterError.cs" />
     <Compile Include="Api\IFilterListManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

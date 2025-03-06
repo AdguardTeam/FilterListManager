@@ -12,8 +12,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
         )
             where TE : UniffiException
         {
-            var status = new RustCallStatus();
-            var returnValue = callback(ref status);
+            RustCallStatus status = new RustCallStatus();
+            TU returnValue = callback(ref status);
             if (status.IsSuccess())
             {
                 return returnValue;

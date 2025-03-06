@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using AdGuard.FilterListManagerProtobuf.Api;
+using AdGuard.FilterListManagerProtobuf.RustInterface;
 using AdGuard.FilterListManagerProtobuf.Utils;
 using AdGuard.Utils.Base.Files;
 using AdGuard.Utils.Base.Logging;
@@ -22,12 +23,14 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
             Logger.Level = LogLevel.Trace;
             FlmDllProvider.SetFlmDllName(Constants.FLM_DLL_NAME);
             FlmDllProvider _ = (FlmDllProvider)FlmDllProvider.Instance;
-            Configuration configuration = Api.FilterListManager.SpawnDefaultConfiguration();
-            configuration.MetadataUrl = "https://filters.adtidy.org/extension/safari/filters.json";
-            configuration.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
             ISerializer<byte[]> serializer = new ProtobufSerializer();
             using (IFilterListManager flm = new Api.FilterListManager(serializer))
             {
+                Configuration configuration = flm.SpawnDefaultConfiguration();
+                configuration.MetadataUrl = "https://filters.adtidy.org/extension/safari/filters.json";
+                configuration.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
+                configuration.AppName = "AppName";
+                configuration.Version = "Version";
                 flm.Init(configuration);
                 flm.PullMetadata();
                 flm.UpdateFilters(false, 0, false);
@@ -85,7 +88,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 int version = flm.GetDatabaseVersion();
                 flm.SetProxyMode("https://127.0.0.1:8080", RawRequestProxyMode.NoProxy);
 
-                var constants = Api.FilterListManager.SpawnDefaultConstants();
+                FLMConstants constants = Api.FilterListManager.SpawnDefaultConstants();
 
                 Debug.Assert(constants.UserRulesId == -2147483648, "UserRulesId must be equal to int::min");
                 Debug.Assert(constants.CustomGroupId == -2147483648, "CustomGroupId must be equal to int::min");

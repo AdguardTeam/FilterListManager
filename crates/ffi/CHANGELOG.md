@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.5.1] - 2025-03-06
+
+### Added
+- Add client app name and version in configuration
+
+[1.5.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.4.3...ffi-1.5.1
+
 ## [1.4.3] - 2025-03-06
 
 ### Added

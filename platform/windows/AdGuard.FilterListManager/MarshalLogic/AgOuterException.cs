@@ -227,6 +227,20 @@ namespace AdGuard.FilterListManager.MarshalLogic
         }
 
         /// <summary>
+        /// Occurs on invalid configuration error.
+        /// </summary>
+        /// <seealso cref="AgOuterException" />
+        public class InvalidConfigurationException : AgOuterException
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="AgOuterException.InvalidConfigurationException"/> class.
+            /// </summary>
+            /// <param name="message">The message.</param>
+            public InvalidConfigurationException(string message)
+                : base(message) { }
+        }
+
+        /// <summary>
         /// Occurs on other errors.
         /// </summary>
         /// <seealso cref="AgOuterException" />

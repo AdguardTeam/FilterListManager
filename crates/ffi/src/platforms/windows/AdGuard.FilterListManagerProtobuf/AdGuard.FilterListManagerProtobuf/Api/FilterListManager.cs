@@ -17,23 +17,12 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         private readonly ISerializer<byte[]> m_Serializer;
 
         /// <summary>
-        ///  header - crates/ffi/src/flm_native_interface.h
-        ///  swift.file - crates/ffi/src/platforms/apple/flmctest/flmctest/main.swift
-        ///  protobuf schema - crates/ffi/src/protobuf
-        /// </summary>
-        /// Spawns configuration for set up
-        public static Configuration SpawnDefaultConfiguration()
-        {
-            return ProtobufBridge.MakeDefaultConfiguration();
-        }
-
-        /// <summary>
         /// Spawns a struct of Filter List Manager public constants 
         /// </summary>
         /// <returns></returns>
         public static FLMConstants SpawnDefaultConstants()
         {
-            return ProtobufBridge.GetFLMConstants();
+            return ProtobufInterop.flm_get_constants();
         }
 
         public FilterListManager(ISerializer<byte[]> serializer)
@@ -41,15 +30,31 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             m_Serializer = serializer;
         }
         
+        #region IFilterListManager members
+        
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public void Init(Configuration configuration)
         {
-            m_FLMHandle = ProtobufBridge.InitFLM(configuration);
+            IntPtr FlmInteropFunc(IntPtr pHandle, FfiMethod ffiMethod, IntPtr pInputData, ulong inputDataLength) => 
+                ProtobufInterop.flm_init_protobuf(pInputData, inputDataLength);
+            m_FLMHandle = CallRustHandle<AGOuterError>(configuration, FlmInteropFunc);
         }
-
-        #region IFilterListManager members
+                
+        /// <summary>
+        ///  header - crates/ffi/src/flm_native_interface.h
+        ///  swift.file - crates/ffi/src/platforms/apple/flmctest/flmctest/main.swift
+        ///  protobuf schema - crates/ffi/src/protobuf
+        /// </summary>
+        /// Spawns configuration for set up
+        public Configuration SpawnDefaultConfiguration()
+        {
+            IntPtr FlmInteropFunc(IntPtr pHandle, FfiMethod ffiMethod, IntPtr pInputData, ulong inputDataLength) => 
+                ProtobufInterop.flm_default_configuration_protobuf();
+            EmptyRequest request = new EmptyRequest();
+            return CallRustMessage<Configuration>(request, FlmInteropFunc);
+        }
         
         /// <summary>
         /// <inheritdoc/>
@@ -71,7 +76,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             };
 
             InstallCustomFilterListResponse response = 
-                CallRust<InstallCustomFilterListResponse>(request);
+                CallRustMessage<InstallCustomFilterListResponse>(request);
             return response.FilterList;
         }
         
@@ -86,7 +91,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             };
 
             request.Ids.AddRange(ids);
-            EnableFilterListsResponse response = CallRust<EnableFilterListsResponse>(request);
+            EnableFilterListsResponse response = CallRustMessage<EnableFilterListsResponse>(request);
             return response.Count;
         }
         
@@ -102,7 +107,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
 
             request.Ids.AddRange(ids);
             InstallFilterListsResponse response = 
-                CallRust<InstallFilterListsResponse>(request);
+                CallRustMessage<InstallFilterListsResponse>(request);
             return response.Count;
         }
         
@@ -114,7 +119,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             DeleteCustomFilterListsRequest request = new DeleteCustomFilterListsRequest();
             request.Ids.AddRange(ids);
             DeleteCustomFilterListsResponse response = 
-                CallRust<DeleteCustomFilterListsResponse>(request);
+                CallRustMessage<DeleteCustomFilterListsResponse>(request);
             return response.Count;
         }
         
@@ -128,7 +133,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 Id = filterId
             };
 
-            GetFullFilterListByIdResponse response = CallRust<GetFullFilterListByIdResponse>(request);
+            GetFullFilterListByIdResponse response = CallRustMessage<GetFullFilterListByIdResponse>(request);
             return response.FilterList;
         }
         
@@ -139,7 +144,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         {
             EmptyRequest request = new EmptyRequest();
             GetStoredFiltersMetadataResponse response = 
-                CallRust<GetStoredFiltersMetadataResponse>(request);
+                CallRustMessage<GetStoredFiltersMetadataResponse>(request);
             return response.FilterLists;
         }
         
@@ -154,7 +159,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             };
 
             GetStoredFilterMetadataByIdResponse response = 
-                CallRust<GetStoredFilterMetadataByIdResponse>(request);
+                CallRustMessage<GetStoredFilterMetadataByIdResponse>(request);
             return response.FilterList;
         }
         
@@ -168,7 +173,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 Rules = rules
             };
 
-            CallRust<EmptyResponse>(request);
+            CallRustMessage<EmptyResponse>(request);
         }
         
         /// <summary>
@@ -182,7 +187,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             };
 
             request.DisabledRules.AddRange(disabledRules);
-            CallRust<EmptyResponse>(request);
+            CallRustMessage<EmptyResponse>(request);
         }
         
         /// <summary>
@@ -200,7 +205,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 IgnoreFiltersStatus = ignoreFilterStatus
             };
 
-            UpdateFiltersResponse response = CallRust<UpdateFiltersResponse>(request);
+            UpdateFiltersResponse response = CallRustMessage<UpdateFiltersResponse>(request);
             return response.Result;
         }
         
@@ -216,7 +221,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             
             request.Ids.AddRange(filterIds);
             ForceUpdateFiltersByIdsResponse response = 
-                CallRust<ForceUpdateFiltersByIdsResponse>(request);
+                CallRustMessage<ForceUpdateFiltersByIdsResponse>(request);
             return response.Result;
         }
         
@@ -231,7 +236,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             };
             
             FetchFilterListMetadataResponse response = 
-                CallRust<FetchFilterListMetadataResponse>(request);
+                CallRustMessage<FetchFilterListMetadataResponse>(request);
             return response.Metadata;
         }
         
@@ -246,7 +251,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             };
 
             FetchFilterListMetadataWithBodyResponse response =
-                CallRust<FetchFilterListMetadataWithBodyResponse>(request);
+                CallRustMessage<FetchFilterListMetadataWithBodyResponse>(request);
             return response.Metadata;
         }
 
@@ -256,7 +261,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         public void LiftUpDatabase()
         {
             EmptyRequest request = new EmptyRequest();
-            CallRust<EmptyResponse>(request);
+            CallRustMessage<EmptyResponse>(request);
         }
         
         /// <summary>
@@ -265,7 +270,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         public IEnumerable<FilterTag> GetAllTags()
         {
             EmptyRequest request = new EmptyRequest();
-            GetAllTagsResponse response = CallRust<GetAllTagsResponse>(request);
+            GetAllTagsResponse response = CallRustMessage<GetAllTagsResponse>(request);
             return response.Tags;
         }
         
@@ -275,7 +280,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         public IEnumerable<FilterGroup> GetAllGroups()
         {
             EmptyRequest request = new EmptyRequest();
-            GetAllGroupsResponse response = CallRust<GetAllGroupsResponse>(request);
+            GetAllGroupsResponse response = CallRustMessage<GetAllGroupsResponse>(request);
             return response.Groups;
         }
         
@@ -289,7 +294,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 SuggestedLocale = suggestedLocale
             };
             
-            ChangeLocaleResponse response = CallRust<ChangeLocaleResponse>(request);
+            ChangeLocaleResponse response = CallRustMessage<ChangeLocaleResponse>(request);
             return response.Success;
         }
         
@@ -299,7 +304,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         public void PullMetadata()
         {
             EmptyRequest request = new EmptyRequest();
-            CallRust<EmptyResponse>(request);
+            CallRustMessage<EmptyResponse>(request);
         }
         
         /// <summary>
@@ -314,7 +319,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 IsTrusted = isTrusted
             };
             
-            UpdateCustomFilterMetadataResponse response = CallRust<UpdateCustomFilterMetadataResponse>(request);
+            UpdateCustomFilterMetadataResponse response = CallRustMessage<UpdateCustomFilterMetadataResponse>(request);
             return response.Success;
         }
         
@@ -324,7 +329,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         public string GetDatabasePath()
         {
             EmptyRequest request = new EmptyRequest();
-            GetDatabasePathResponse response = CallRust<GetDatabasePathResponse>(request);
+            GetDatabasePathResponse response = CallRustMessage<GetDatabasePathResponse>(request);
             return response.Path;
         }
         
@@ -334,7 +339,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         public int GetDatabaseVersion()
         {
             EmptyRequest request = new EmptyRequest();
-            GetDatabaseVersionResponse response = CallRust<GetDatabaseVersionResponse>(request);
+            GetDatabaseVersionResponse response = CallRustMessage<GetDatabaseVersionResponse>(request);
             return response.Version;
         }
         
@@ -363,7 +368,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 CustomDescription = customDescription
             };
             
-            InstallCustomFilterFromStringResponse response = CallRust<InstallCustomFilterFromStringResponse>(request);
+            InstallCustomFilterFromStringResponse response = CallRustMessage<InstallCustomFilterFromStringResponse>(request);
             return response.FilterList;
         }
         
@@ -373,7 +378,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         public IEnumerable<ActiveRulesInfo> GetActiveRules()
         {
             EmptyRequest request = new EmptyRequest();
-            GetActiveRulesResponse response = CallRust<GetActiveRulesResponse>(request);
+            GetActiveRulesResponse response = CallRustMessage<GetActiveRulesResponse>(request);
             return response.Rules;
         }
         
@@ -384,7 +389,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         {
             GetFilterRulesAsStringsRequest request = new GetFilterRulesAsStringsRequest();
             request.Ids.AddRange(filterIds);
-            GetFilterRulesAsStringsResponse response = CallRust<GetFilterRulesAsStringsResponse>(request);
+            GetFilterRulesAsStringsResponse response = CallRustMessage<GetFilterRulesAsStringsResponse>(request);
             return response.RulesList;
         }
         
@@ -399,7 +404,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 FilePath = filePath
             };
             
-            CallRust<EmptyResponse>(request);
+            CallRustMessage<EmptyResponse>(request);
         }
         
         /// <summary>
@@ -409,7 +414,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         {
             GetDisabledRulesRequest request = new GetDisabledRulesRequest();
             request.Ids.AddRange(filterIds);
-            GetDisabledRulesResponse response = CallRust<GetDisabledRulesResponse>(request);
+            GetDisabledRulesResponse response = CallRustMessage<GetDisabledRulesResponse>(request);
             return response.RulesRaw;
         }
 
@@ -424,7 +429,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 Mode = proxyMode
             };
             
-            CallRust<EmptyResponse>(request);
+            CallRustMessage<EmptyResponse>(request);
         }
 
         #endregion
@@ -432,13 +437,68 @@ namespace AdGuard.FilterListManagerProtobuf.Api
 
         #region Helpers
 
-        private TMessage CallRust<TMessage>(
-            IMessage message,
-            [CallerMemberName] string methodName = null) 
-            where TMessage : IMessage, IAGOuterError
+        private IntPtr CallRustHandle<TOutMessage>(
+            IMessage inMessage,
+            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc,
+            [CallerMemberName] string ffiMethodName = null)
+            where TOutMessage : IMessage, IAGOuterError
         {
-            string errorTemplate = $"Cannot call RUST method \"{methodName}\"";
-            if (m_FLMHandle == IntPtr.Zero)
+            CallRust(
+                m_FLMHandle, 
+                inMessage, 
+                out TOutMessage _, 
+                out IntPtr outHandle, 
+                flmInteropFunc, 
+                ffiMethodName);
+            return outHandle;
+        }
+        
+        private TOutMessage CallRustMessage<TOutMessage>(
+            IMessage inMessage,
+            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc,
+            [CallerMemberName] string ffiMethodName = null) 
+            where TOutMessage : IMessage, IAGOuterError
+        {
+            CallRust(
+                m_FLMHandle, 
+                inMessage, 
+                out TOutMessage outMessage, 
+                out IntPtr _, 
+                flmInteropFunc, 
+                ffiMethodName);
+            return outMessage;
+        }
+
+        private TOutMessage CallRustMessage<TOutMessage>(
+            IMessage inMessage,
+            [CallerMemberName] string ffiMethodName = null) 
+            where TOutMessage : IMessage, IAGOuterError
+        {
+            CallRust(
+                m_FLMHandle, 
+                inMessage, 
+                out TOutMessage outMessage, 
+                out IntPtr _, 
+                ProtobufInterop.flm_call_protobuf, 
+                ffiMethodName);
+            return outMessage;
+        }
+        
+        private void CallRust<TOutMessage>(
+            IntPtr flmHandle,
+            IMessage inMessage,
+            out TOutMessage outMessage,
+            out IntPtr outHandle,
+            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc,
+            [CallerMemberName] string ffiMethodName = null)
+            where TOutMessage : IMessage, IAGOuterError
+        {
+            string errorTemplate = $"Cannot call RUST method \"{ffiMethodName}\"";
+            FfiMethod ffiMethod = GetFfiMethod(ffiMethodName);
+            if (flmHandle == IntPtr.Zero && 
+                // only two methods below can be invoked correctly without set flmHandle before
+                ffiMethod != FfiMethod.SpawnDefaultConfiguration && 
+                ffiMethod != FfiMethod.Init)
             {
                 string errorMessage = $"instance must be initialized with \"{nameof(Init)}\" before invocation";
                 Logger.Error(errorTemplate);
@@ -447,20 +507,43 @@ namespace AdGuard.FilterListManagerProtobuf.Api
 
             try
             {
-                FfiMethod method = GetMethod(methodName);
-                byte[] args = message.ToByteArray();
-                byte[] data = ProtobufBridge.CallRust(m_FLMHandle, method, args);
-                TMessage response = m_Serializer.DeserializeObject<TMessage>(data);
-                if (response.Error != null)
+                outMessage = default;
+                outHandle = default;
+                byte[] args = inMessage?.ToByteArray() ?? new byte[0];
+                RustResponseResult rustResponseResult = ProtobufBridge.CallRust(flmHandle, ffiMethod, args, flmInteropFunc);
+                TOutMessage response = default;
+                switch (rustResponseResult.Discriminant)
+                {
+                    case RustResponseType.RustBuffer:
+                    {
+                        response = m_Serializer.DeserializeObject<TOutMessage>(rustResponseResult.Buffer);
+                        outMessage = response;
+                        break;
+                    }
+                    case RustResponseType.FLMHandlePointer:
+                    {
+                        outHandle = rustResponseResult.HandlePointer;
+                        break;
+                    }
+                    default:
+                    {
+                        string errorMessage = $"Invalid discriminant {rustResponseResult.Discriminant} was obtained while method {ffiMethodName} called";
+                        throw new FilterListManagerInvalidDiscriminantException(errorMessage);
+                    }
+                }
+                
+                if (response?.Error != null)
                 {
                     throw new AgOuterException(response.Error);
                 }
-
-                return response;
-            }
-            catch (AgOuterException)
-            {
-                throw;
+                
+                // special case iа response represents AGOuterError explicitly.
+                // This case is actual when ffiMethodName is looking for the RustResponseType.FLMHandlePointer
+                // in the answer
+                if (response is AGOuterError responseAgOuterError)
+                {
+                    throw new AgOuterException(responseAgOuterError);
+                }
             }
             catch (Exception ex)
             {
@@ -468,7 +551,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             }
         }
 
-        private FfiMethod GetMethod(string methodName)
+        private FfiMethod GetFfiMethod(string methodName)
         {
             if (!Enum.TryParse(methodName, out FfiMethod method))
             {
@@ -479,7 +562,6 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 methodName,
                 method);
             return method;
-
         }
 
         #endregion
@@ -498,7 +580,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
 
         private void ReleaseUnmanagedResources()
         {
-            ProtobufBridge.FreeFLMHandle(m_FLMHandle);
+            ProtobufInterop.flm_free_handle(m_FLMHandle);
         }
 
         private void Dispose(bool disposing)

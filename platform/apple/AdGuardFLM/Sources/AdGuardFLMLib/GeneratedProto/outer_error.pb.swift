@@ -157,6 +157,14 @@ public struct FilterListManager_AGOuterError: Sendable {
     set {error = .mutex(newValue)}
   }
 
+  public var invalidConfiguration: FilterListManager_InvalidConfiguration {
+    get {
+      if case .invalidConfiguration(let v)? = error {return v}
+      return FilterListManager_InvalidConfiguration()
+    }
+    set {error = .invalidConfiguration(newValue)}
+  }
+
   public var other: FilterListManager_Other {
     get {
       if case .other(let v)? = error {return v}
@@ -184,6 +192,7 @@ public struct FilterListManager_AGOuterError: Sendable {
     case filterParserError(FilterListManager_FilterParserError)
     case fieldIsEmpty(FilterListManager_FieldIsEmpty)
     case mutex(FilterListManager_Mutex)
+    case invalidConfiguration(FilterListManager_InvalidConfiguration)
     case other(FilterListManager_Other)
 
   }
@@ -372,6 +381,19 @@ public struct FilterListManager_Mutex: Sendable {
 }
 
 /// Do not duplicate the message
+public struct FilterListManager_InvalidConfiguration: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var msg: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+/// Do not duplicate the message
 public struct FilterListManager_Other: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -406,7 +428,8 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
     15: .standard(proto: "filter_parser_error"),
     16: .standard(proto: "field_is_empty"),
     17: .same(proto: "mutex"),
-    18: .same(proto: "other"),
+    18: .standard(proto: "invalid_configuration"),
+    19: .same(proto: "other"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -625,6 +648,19 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
         }
       }()
       case 18: try {
+        var v: FilterListManager_InvalidConfiguration?
+        var hadOneofValue = false
+        if let current = self.error {
+          hadOneofValue = true
+          if case .invalidConfiguration(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.error = .invalidConfiguration(v)
+        }
+      }()
+      case 19: try {
         var v: FilterListManager_Other?
         var hadOneofValue = false
         if let current = self.error {
@@ -715,9 +751,13 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
       guard case .mutex(let v)? = self.error else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 17)
     }()
+    case .invalidConfiguration?: try {
+      guard case .invalidConfiguration(let v)? = self.error else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 18)
+    }()
     case .other?: try {
       guard case .other(let v)? = self.error else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 18)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 19)
     }()
     case nil: break
     }
@@ -1115,6 +1155,38 @@ extension FilterListManager_Mutex: SwiftProtobuf.Message, SwiftProtobuf._Message
   }
 
   public static func ==(lhs: FilterListManager_Mutex, rhs: FilterListManager_Mutex) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension FilterListManager_InvalidConfiguration: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".InvalidConfiguration"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "msg"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.msg) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.msg.isEmpty {
+      try visitor.visitSingularStringField(value: self.msg, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: FilterListManager_InvalidConfiguration, rhs: FilterListManager_InvalidConfiguration) -> Bool {
+    if lhs.msg != rhs.msg {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

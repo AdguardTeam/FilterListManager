@@ -143,6 +143,8 @@ dictionary Configuration {
     i32 request_timeout_ms;
     RequestProxyMode request_proxy_mode;
     boolean auto_lift_up_database;
+    string app_name;
+    string version;
 };
 
 [Error]
@@ -163,6 +165,7 @@ enum AGOuterError {
     "FilterParserError",
     "FieldIsEmpty",
     "Mutex",
+    "InvalidConfiguration",
     "Other"
 };
 

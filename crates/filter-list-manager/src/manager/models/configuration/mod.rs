@@ -54,6 +54,10 @@ pub struct Configuration {
     /// If you want to disable this option, you will need to manually call `flm.lift_up_database()`
     /// when you update the library in your application.
     pub auto_lift_up_database: bool,
+    /// Client app name
+    pub app_name: String,
+    /// Client app version
+    pub version: String,
 }
 
 /// Normalized locales delimiter
@@ -98,6 +102,8 @@ impl Default for Configuration {
             metadata_locales_url: String::new(),
             request_timeout_ms: DEFAULT_REQUEST_TIMEOUT_MS,
             auto_lift_up_database: true,
+            app_name: String::new(),
+            version: String::new(),
         }
     }
 }

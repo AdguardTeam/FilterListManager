@@ -69,6 +69,11 @@ configuration.locale = "pt_PT".to_string();
 // By default, FilterListType::STANDARD will be selected.
 configuration.filter_list_type = FilterListType::DNS;
 
+// Sets app name and version for user-agent header.
+// Required fields.
+configuration.app_name = "FlmApp";
+configuration.version = "1.2.3";
+
 // Creates facade instance
 let flm = FilterListManagerImpl::new(configuration);
 ```

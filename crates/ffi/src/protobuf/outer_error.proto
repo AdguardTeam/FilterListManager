@@ -21,7 +21,8 @@ message AGOuterError {
     FilterParserError filter_parser_error = 15;
     FieldIsEmpty field_is_empty = 16;
     Mutex mutex = 17;
-    Other other = 18;
+    InvalidConfiguration invalid_configuration = 18;
+    Other other = 19;
   }
 }
 
@@ -75,6 +76,11 @@ message FieldIsEmpty {
 
 // Do not duplicate the message
 message Mutex {}
+
+// Do not duplicate the message
+message InvalidConfiguration {
+  string msg = 1;
+}
 
 // Do not duplicate the message
 message Other {}

@@ -20,6 +20,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <param name="requestTimeoutMs">The request timeout ms.</param>
         /// <param name="requestProxyMode">The proxy settings</param>
         /// <param name="autoLiftUpDatabase">if set to <c>true</c> the database will be lifted (up version) automatically.</param>
+        /// <param name="appName">Client app name.</param>
+        /// <param name="version">Client app version.</param>
         public Configuration(FilterListType filterListType,
             string workingDirectory,
             string locale,
@@ -29,7 +31,9 @@ namespace AdGuard.FilterListManager.MarshalLogic
             string metadataLocalesUrl,
             int requestTimeoutMs,
             RequestProxyMode requestProxyMode,
-            bool autoLiftUpDatabase)
+            bool autoLiftUpDatabase,
+            string appName,
+            string version)
         {
             FilterListType = filterListType;
             WorkingDirectory = workingDirectory;
@@ -41,6 +45,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
             RequestTimeoutMs = requestTimeoutMs;
             RequestProxyMode = requestProxyMode;
             AutoLiftUpDatabase = autoLiftUpDatabase;
+            AppName = appName;
+            Version = version;
         }
 
         /// <summary>
@@ -95,6 +101,16 @@ namespace AdGuard.FilterListManager.MarshalLogic
         ///   If set to <c>true</c> the database will be lifted (up version) automatically; otherwise, <c>false</c>.
         /// </value>
         public bool AutoLiftUpDatabase { get; set; }
+
+        /// <summary>
+        /// Gets or sets the client app name.
+        /// </summary>
+        public string AppName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the client app version.
+        /// </summary>
+        public string Version { get; set; }
     }
 
 }

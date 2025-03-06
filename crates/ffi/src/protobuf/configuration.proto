@@ -55,4 +55,10 @@ message Configuration {
 
   // Custom proxy addr for requests
   string request_custom_proxy_addr = 11;
+
+  // Client app name
+  string app_name = 12;
+
+  // Client app version
+  string version = 13;
 }

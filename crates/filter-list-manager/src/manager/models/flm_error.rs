@@ -34,6 +34,10 @@ pub enum FLMError {
     #[error("FieldEmpty: {0}")]
     FieldIsEmpty(&'static str),
 
+    /// Invalid configuration error
+    #[error("InvalidConfiguration: {0}")]
+    InvalidConfiguration(&'static str),
+
     /// Other errors
     #[error("{0}")]
     Other(String),
