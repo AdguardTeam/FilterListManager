@@ -218,7 +218,7 @@ flm.get_full_filter_lists();
 flm.get_full_filter_list_by_id(id /* FilterId */);
 
 // Retrieves all enabled filters as ActiveRulesInfo.
-flm.get_active_filters();
+flm.get_active_rules();
 
 // Retrieves all filters metadata from the database **without** theirs rules.
 // Returns Vec<StoredFilterMetadata>

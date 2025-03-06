@@ -71,6 +71,9 @@ final class AdGuardFLMLibTests: XCTestCase {
         let FRAS = try flm.getFilterRulesAsStrings(ids: [customFilterFromString.id])
         NSLog("Rules from getFilterRulesAsStrings for customId: \(FRAS)")
 
+        let activeRules = try flm.getActiveRules()
+        NSLog("Rules from getActiveRules: \(activeRules.count)")
+
         let testFile = FileManager.default.temporaryDirectory.appending(path: "flmtest_2.txt")
         XCTAssertNoThrow(try flm.saveRulesToFileBlob(id: customFilterFromString.id, filePath: testFile.path()))
         NSLog("Rules were written into \(testFile)")
