@@ -3,6 +3,8 @@ import sys
 import shutil
 import argparse
 import logging
+parent_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(os.path.join(parent_path, 'Common'))
 import log_helper
 import constants
 from args_validation_helper import check_arguments_type

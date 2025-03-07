@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="python $(SolutionDir)Scripts\prepare_build.py --solution_dir=$(SolutionDir) --target_dir=$(TargetDir)" />
+    <Exec Command="python $(SolutionDir)Scripts\BuildEvents\Pre\prepare_build.py --solution_dir=$(SolutionDir) --target_dir=$(TargetDir)" />
   </Target>
 
 </Project>
