@@ -18,10 +18,4 @@
     <ProjectReference Include="..\AdGuard.FilterListManager\AdGuard.FilterListManager.csproj" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="xcopy &quot;$(SolutionDir)..\..\target\i686-pc-windows-msvc\release\AdGuardFLM.dll&quot; &quot;$(TargetDir)x86\&quot; /Y&#xD;&#xA;xcopy &quot;$(SolutionDir)..\..\target\i686-pc-windows-msvc\release\AdGuardFLM.pdb&quot; &quot;$(TargetDir)x86\&quot; /Y" />
-    <Exec Command="xcopy &quot;$(SolutionDir)..\..\target\x86_64-pc-windows-msvc\release\AdGuardFLM.dll&quot; &quot;$(TargetDir)x64\&quot; /Y&#xD;&#xA;xcopy &quot;$(SolutionDir)..\..\target\x86_64-pc-windows-msvc\release\AdGuardFLM.pdb&quot; &quot;$(TargetDir)x64\&quot; /Y" />
-    <Exec Command="xcopy &quot;$(SolutionDir)..\..\target\aarch64-pc-windows-msvc\release\AdGuardFLM.dll&quot; &quot;$(TargetDir)arm64\&quot; /Y&#xD;&#xA;xcopy &quot;$(SolutionDir)..\..\target\aarch64-pc-windows-msvc\release\AdGuardFLM.pdb&quot; &quot;$(TargetDir)arm64\&quot; /Y" />
-  </Target>
-
 </Project>
