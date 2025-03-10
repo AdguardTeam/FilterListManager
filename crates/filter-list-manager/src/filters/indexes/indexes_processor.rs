@@ -398,7 +398,7 @@ mod tests {
     use crate::utils::memory::heap;
     use crate::{
         Configuration, FLMError, FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID,
-        MINIMUM_CUSTOM_FILTER_ID,
+        MINIMUM_CUSTOM_FILTER_ID, USER_RULES_COUNT,
     };
     use rand::seq::SliceRandom;
     use rand::{thread_rng, Rng};
@@ -595,6 +595,7 @@ mod tests {
                             filter_id: new_chosen_filter.filter_id.clone().unwrap(),
                             text: "".to_string(),
                             disabled_text: "".to_string(),
+                            rules_count: USER_RULES_COUNT,
                         };
 
                         let _ = &rules_repository

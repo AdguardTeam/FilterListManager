@@ -32,10 +32,13 @@ impl RuleLinesCollector {
         self.collected_lines.clear();
         self.collected_lines.shrink_to_fit();
 
+        let rules_count = self.rules_count;
+
         RulesListEntity {
             filter_id: id,
             text,
             disabled_text: String::new(),
+            rules_count,
         }
     }
 

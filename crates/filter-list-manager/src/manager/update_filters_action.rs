@@ -377,7 +377,7 @@ mod tests {
     use crate::storage::repositories::Repository;
     use crate::storage::DbConnectionManager;
     use crate::test_utils::{tests_path, RAIIFile};
-    use crate::{Configuration, FilterId};
+    use crate::{Configuration, FilterId, USER_RULES_COUNT};
     use chrono::Utc;
     use rusqlite::Connection;
     use std::{env, thread};
@@ -427,6 +427,7 @@ mod tests {
             filter_id: first_filter_id,
             text: "Filter1\nNonFilter1".to_string(),
             disabled_text: "NonFilter1".to_string(),
+            rules_count: USER_RULES_COUNT,
         });
         filter1.download_url = download_url1.to_string();
 
@@ -438,6 +439,7 @@ mod tests {
             filter_id: second_filter_id,
             text: "Filter2\nNonFilter2".to_string(),
             disabled_text: "NonFilter2".to_string(),
+            rules_count: USER_RULES_COUNT,
         });
         filter2.download_url = download_url2.to_string();
 
@@ -449,6 +451,7 @@ mod tests {
             filter_id: third_filter_id,
             text: "Filter3\nNonFilter3".to_string(),
             disabled_text: "NonFilter3".to_string(),
+            rules_count: USER_RULES_COUNT,
         });
         filter3.download_url = download_url3.to_string();
 
@@ -463,6 +466,7 @@ mod tests {
             filter_id: fourth_filter_id,
             text: "Filter4\nNonFilter4".to_string(),
             disabled_text: "NonFilter4".to_string(),
+            rules_count: USER_RULES_COUNT,
         });
         filter4.download_url = download_url4.to_string();
 
@@ -481,6 +485,7 @@ mod tests {
             // Disabled rules weren't written that way.
             // It will be mistaken to put here non-empty string
             disabled_text: String::new(),
+            rules_count: USER_RULES_COUNT,
         });
         filter5.download_url = download_url5.to_string();
 
@@ -532,24 +537,28 @@ mod tests {
             filter_id: first_filter_id,
             text: "Filter1_new\nNonFilter1_new".to_string(),
             disabled_text: rules1.disabled_text,
+            rules_count: USER_RULES_COUNT,
         });
 
         let _ = write_rules(RulesListEntity {
             filter_id: second_filter_id,
             text: "Filter2_new\nNonFilter2_new".to_string(),
             disabled_text: rules2.clone().disabled_text,
+            rules_count: USER_RULES_COUNT,
         });
 
         let (_, new_rules3) = write_rules(RulesListEntity {
             filter_id: third_filter_id,
             text: "Filter3_new\nNonFilter3_new".to_string(),
             disabled_text: rules3.disabled_text,
+            rules_count: USER_RULES_COUNT,
         });
 
         let _ = write_rules(RulesListEntity {
             filter_id: fourth_filter_id,
             text: "Filter4_new\nNonFilter4_new".to_string(),
             disabled_text: rules4.clone().disabled_text,
+            rules_count: USER_RULES_COUNT,
         });
 
         let mut conf = Configuration::default();
@@ -679,6 +688,7 @@ mod tests {
             filter_id: first_filter_id,
             text: "Filter1\nNonFilter1".to_string(),
             disabled_text: "NonFilter1".to_string(),
+            rules_count: USER_RULES_COUNT,
         });
         filter1.download_url = download_url1.to_string();
 
@@ -690,6 +700,7 @@ mod tests {
             filter_id: second_filter_id,
             text: "Filter2\nNonFilter2".to_string(),
             disabled_text: "NonFilter2".to_string(),
+            rules_count: USER_RULES_COUNT,
         });
         filter2.download_url = download_url2.to_string();
 
@@ -701,6 +712,7 @@ mod tests {
             filter_id: third_filter_id,
             text: "Filter3\nNonFilter3".to_string(),
             disabled_text: "NonFilter3".to_string(),
+            rules_count: USER_RULES_COUNT,
         });
         filter3.download_url = download_url3.to_string();
 
@@ -715,6 +727,7 @@ mod tests {
             filter_id: fourth_filter_id,
             text: "Filter4\nNonFilter4".to_string(),
             disabled_text: "NonFilter4".to_string(),
+            rules_count: USER_RULES_COUNT,
         });
         filter4.download_url = download_url4.to_string();
 
@@ -733,6 +746,7 @@ mod tests {
             // Disabled rules weren't written that way.
             // It will be mistaken to put here non-empty string
             disabled_text: String::new(),
+            rules_count: USER_RULES_COUNT,
         });
         filter5.download_url = download_url5.to_string();
 
@@ -784,24 +798,28 @@ mod tests {
             filter_id: first_filter_id,
             text: "Filter1_new\nNonFilter1_new".to_string(),
             disabled_text: rules1.clone().disabled_text,
+            rules_count: USER_RULES_COUNT,
         });
 
         let (_, new_rules2) = write_rules(RulesListEntity {
             filter_id: second_filter_id,
             text: "Filter2_new\nNonFilter2_new".to_string(),
             disabled_text: rules2.clone().disabled_text,
+            rules_count: USER_RULES_COUNT,
         });
 
         let (_, new_rules3) = write_rules(RulesListEntity {
             filter_id: third_filter_id,
             text: "Filter3_new\nNonFilter3_new".to_string(),
             disabled_text: rules3.clone().disabled_text,
+            rules_count: USER_RULES_COUNT,
         });
 
         let (_, new_rules4) = write_rules(RulesListEntity {
             filter_id: fourth_filter_id,
             text: "Filter4_new\nNonFilter4_new".to_string(),
             disabled_text: rules4.clone().disabled_text,
+            rules_count: USER_RULES_COUNT,
         });
 
         let mut conf = Configuration::default();

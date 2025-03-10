@@ -20,7 +20,8 @@ const BASIC_SELECT_SQL: &str = r"
     SELECT
         filter_id,
         rules_text,
-        disabled_rules_text
+        disabled_rules_text,
+        rules_count
     FROM
         [rules_list]
 ";
@@ -186,6 +187,7 @@ impl RulesListRepository {
             filter_id: row.get(0)?,
             text: row.get(1)?,
             disabled_text: row.get(2)?,
+            rules_count: row.get(3)?,
         })
     }
 
@@ -272,13 +274,15 @@ impl Repository<RulesListEntity> for RulesListRepository {
                     (
                         filter_id,
                         rules_text,
-                        disabled_rules_text
+                        disabled_rules_text,
+                        rules_count
                     )
                 VALUES
                     (
                         :filter_id,
                         :rules_text,
-                        :disabled_rules_text
+                        :disabled_rules_text,
+                        :rules_count
                     )
             ",
         )?;

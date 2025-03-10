@@ -276,6 +276,7 @@ impl From<FilterListRules> for filter_list_manager::FilterListRules {
             filter_id: value.filter_id,
             rules: value.rules,
             disabled_rules: value.disabled_rules,
+            rules_count: value.rules_count,
         }
     }
 }
@@ -286,6 +287,7 @@ impl From<filter_list_manager::FilterListRules> for FilterListRules {
             filter_id: val.filter_id,
             rules: val.rules,
             disabled_rules: val.disabled_rules,
+            rules_count: val.rules_count,
         }
     }
 }
@@ -371,6 +373,7 @@ impl From<FilterListRulesRaw> for filter_list_manager::FilterListRulesRaw {
             filter_id: value.filter_id,
             rules: value.rules,
             disabled_rules: value.disabled_rules,
+            rules_count: value.rules_count,
         }
     }
 }

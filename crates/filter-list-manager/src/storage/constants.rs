@@ -4,6 +4,9 @@ use crate::FilterId;
 /// Filter ID for special filter for user rules
 pub const USER_RULES_FILTER_LIST_ID: FilterId = i32::MIN;
 
+/// Rules count for special filters
+pub const USER_RULES_COUNT: i32 = 0;
+
 /// Group ID for custom filters
 pub const CUSTOM_FILTERS_GROUP_ID: i32 = i32::MIN;
 

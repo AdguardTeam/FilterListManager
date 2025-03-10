@@ -18,6 +18,7 @@ use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::update_filters_action::update_filters_action;
 use crate::storage::blob::write_to_stream;
+use crate::storage::entities::rules_list_entity::RulesListEntity;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
 use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
@@ -230,6 +231,13 @@ impl FilterListManager for FilterListManagerImpl {
             .parse_from_url(&url)
             .map_err(FLMError::from_parser_error)?;
 
+        let RulesListEntity {
+            filter_id: _,
+            text: _,
+            disabled_text: _,
+            rules_count,
+        } = parser.extract_rule_entity(0);
+
         Ok(FilterListMetadata {
             title: parser.get_metadata(KnownMetadataProperty::Title),
             description: parser.get_metadata(KnownMetadataProperty::Description),
@@ -239,7 +247,7 @@ impl FilterListManager for FilterListManagerImpl {
             license: parser.get_metadata(KnownMetadataProperty::License),
             checksum: parser.get_metadata(KnownMetadataProperty::Checksum),
             url: download_url,
-            rules_count: parser.get_rules_count(),
+            rules_count,
         })
     }
 
@@ -254,6 +262,13 @@ impl FilterListManager for FilterListManagerImpl {
             .parse_from_url(&url)
             .map_err(FLMError::from_parser_error)?;
 
+        let RulesListEntity {
+            filter_id: _,
+            text: filter_body,
+            disabled_text: _,
+            rules_count,
+        } = parser.extract_rule_entity(0);
+
         Ok(FilterListMetadataWithBody {
             metadata: FilterListMetadata {
                 title: parser.get_metadata(KnownMetadataProperty::Title),
@@ -264,9 +279,9 @@ impl FilterListManager for FilterListManagerImpl {
                 license: parser.get_metadata(KnownMetadataProperty::License),
                 checksum: parser.get_metadata(KnownMetadataProperty::Checksum),
                 url: download_url,
-                rules_count: parser.get_rules_count(),
+                rules_count,
             },
-            filter_body: parser.extract_rule_entity(0).text,
+            filter_body,
         })
     }
 
@@ -859,7 +874,7 @@ mod tests {
     use crate::test_utils::spawn_test_db_with_metadata;
     use crate::{
         Configuration, FilterId, FilterListManager, FilterListManagerImpl, FilterListRules,
-        USER_RULES_FILTER_LIST_ID,
+        USER_RULES_COUNT, USER_RULES_FILTER_LIST_ID,
     };
     use chrono::{Duration, Utc};
     use rand::prelude::SliceRandom;
@@ -1275,6 +1290,7 @@ mod tests {
             filter_id: USER_RULES_FILTER_LIST_ID,
             rules: vec![String::from("example.com")],
             disabled_rules: vec![],
+            rules_count: USER_RULES_COUNT,
         };
 
         // Set a new time here
@@ -1406,6 +1422,7 @@ mod tests {
                             filter_id: id,
                             text: "example.com\nexample.org".to_string(),
                             disabled_text: "example.com".to_string(),
+                            rules_count: USER_RULES_COUNT,
                         })
                         .collect::<Vec<RulesListEntity>>();
 
@@ -1459,6 +1476,7 @@ mod tests {
                 String::from("fourth"),
                 String::from("second"),
             ],
+            rules_count: USER_RULES_COUNT,
         };
 
         flm.save_custom_filter_rules(rules).unwrap();
@@ -1491,12 +1509,14 @@ mod tests {
                     filter_id: last_filter_id,
                     text: "Text\nDisabled Text\n123".to_string(),
                     disabled_text: "Disabled Text\n123".to_string(),
+                    rules_count: USER_RULES_COUNT,
                 };
 
                 let rules2 = RulesListEntity {
                     filter_id: first_filter_id,
                     text: "Text2\nDisabled Text2".to_string(),
                     disabled_text: "Disabled Text2".to_string(),
+                    rules_count: USER_RULES_COUNT,
                 };
 
                 let tx = connection.transaction().unwrap();

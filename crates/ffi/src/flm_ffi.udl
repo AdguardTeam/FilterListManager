@@ -42,6 +42,7 @@ dictionary FilterListRules {
     i32 filter_id;
     sequence<string> rules;
     sequence<string> disabled_rules;
+    i32 rules_count;
 };
 
 dictionary FilterTag {
@@ -107,6 +108,7 @@ dictionary FilterListRulesRaw {
     i32 filter_id;
     string rules;
     string disabled_rules;
+    i32 rules_count;
 };
 
 dictionary UpdateFilterError {

@@ -1968,7 +1968,8 @@ class FfiConverterTypeFilterListMetadataWithBody: FfiConverterRustBuffer<FilterL
 internal record FilterListRules (
     int @filterId, 
     List<String> @rules, 
-    List<String> @disabledRules
+    List<String> @disabledRules, 
+    int @rulesCount
 ) {
 }
 
@@ -1979,7 +1980,8 @@ class FfiConverterTypeFilterListRules: FfiConverterRustBuffer<FilterListRules> {
         return new FilterListRules(
             @filterId: FfiConverterInt32.INSTANCE.Read(stream),
             @rules: FfiConverterSequenceString.INSTANCE.Read(stream),
-            @disabledRules: FfiConverterSequenceString.INSTANCE.Read(stream)
+            @disabledRules: FfiConverterSequenceString.INSTANCE.Read(stream),
+            @rulesCount: FfiConverterInt32.INSTANCE.Read(stream)
         );
     }
 
@@ -1987,13 +1989,15 @@ class FfiConverterTypeFilterListRules: FfiConverterRustBuffer<FilterListRules> {
         return
             FfiConverterInt32.INSTANCE.AllocationSize(value.@filterId) +
             FfiConverterSequenceString.INSTANCE.AllocationSize(value.@rules) +
-            FfiConverterSequenceString.INSTANCE.AllocationSize(value.@disabledRules);
+            FfiConverterSequenceString.INSTANCE.AllocationSize(value.@disabledRules) +
+            FfiConverterInt32.INSTANCE.AllocationSize(value.@rulesCount);
     }
 
     public override void Write(FilterListRules value, BigEndianStream stream) {
             FfiConverterInt32.INSTANCE.Write(value.@filterId, stream);
             FfiConverterSequenceString.INSTANCE.Write(value.@rules, stream);
             FfiConverterSequenceString.INSTANCE.Write(value.@disabledRules, stream);
+            FfiConverterInt32.INSTANCE.Write(value.@rulesCount, stream);
     }
 }
 
@@ -2002,7 +2006,8 @@ class FfiConverterTypeFilterListRules: FfiConverterRustBuffer<FilterListRules> {
 internal record FilterListRulesRaw (
     int @filterId, 
     String @rules, 
-    String @disabledRules
+    String @disabledRules, 
+    int @rulesCount
 ) {
 }
 
@@ -2013,7 +2018,8 @@ class FfiConverterTypeFilterListRulesRaw: FfiConverterRustBuffer<FilterListRules
         return new FilterListRulesRaw(
             @filterId: FfiConverterInt32.INSTANCE.Read(stream),
             @rules: FfiConverterString.INSTANCE.Read(stream),
-            @disabledRules: FfiConverterString.INSTANCE.Read(stream)
+            @disabledRules: FfiConverterString.INSTANCE.Read(stream),
+            @rulesCount: FfiConverterInt32.INSTANCE.Read(stream)
         );
     }
 
@@ -2021,13 +2027,15 @@ class FfiConverterTypeFilterListRulesRaw: FfiConverterRustBuffer<FilterListRules
         return
             FfiConverterInt32.INSTANCE.AllocationSize(value.@filterId) +
             FfiConverterString.INSTANCE.AllocationSize(value.@rules) +
-            FfiConverterString.INSTANCE.AllocationSize(value.@disabledRules);
+            FfiConverterString.INSTANCE.AllocationSize(value.@disabledRules) +
+            FfiConverterInt32.INSTANCE.AllocationSize(value.@rulesCount);
     }
 
     public override void Write(FilterListRulesRaw value, BigEndianStream stream) {
             FfiConverterInt32.INSTANCE.Write(value.@filterId, stream);
             FfiConverterString.INSTANCE.Write(value.@rules, stream);
             FfiConverterString.INSTANCE.Write(value.@disabledRules, stream);
+            FfiConverterInt32.INSTANCE.Write(value.@rulesCount, stream);
     }
 }
 
