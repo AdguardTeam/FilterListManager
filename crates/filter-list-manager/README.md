@@ -252,6 +252,9 @@ flm.fetch_filter_list_metadata(url, /* String */);
 // Fetches filter list by url and returns its raw metadata and body.
 // Returns FilterListMetadataWithBody.
 flm.fetch_filter_list_metadata_with_body(url, /* String */);
+
+/// Returns lists of rules count by list of filter IDs
+flm.get_rules_count(ids, /* Vec<FilterId> */);
 ```
 
 #### This example references
