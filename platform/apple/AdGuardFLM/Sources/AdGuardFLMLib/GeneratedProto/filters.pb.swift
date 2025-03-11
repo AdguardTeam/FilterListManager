@@ -69,6 +69,10 @@ public struct FilterListManager_FilterListRules: Sendable {
   /// List of only disabled rules.
   public var disabledRules: [String] = []
 
+  //// Rules count in this filter list. Simply a number of non-empty lines
+  //// and does not start with a comment marker.
+  public var rulesCount: Int32 = 0
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -87,6 +91,10 @@ public struct FilterListManager_FilterListRulesRaw: Sendable {
 
   /// List of only disabled rules as string.
   public var disabledRules: String = String()
+
+  //// Rules count in this filter list. Simply a number of non-empty lines
+  //// and does not start with a comment marker.
+  public var rulesCount: Int32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -537,6 +545,7 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
     1: .standard(proto: "filter_id"),
     2: .same(proto: "rules"),
     3: .standard(proto: "disabled_rules"),
+    4: .standard(proto: "rules_count"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -548,6 +557,7 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
       case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeRepeatedStringField(value: &self.rules) }()
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.disabledRules) }()
+      case 4: try { try decoder.decodeSingularInt32Field(value: &self.rulesCount) }()
       default: break
       }
     }
@@ -563,6 +573,9 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
     if !self.disabledRules.isEmpty {
       try visitor.visitRepeatedStringField(value: self.disabledRules, fieldNumber: 3)
     }
+    if self.rulesCount != 0 {
+      try visitor.visitSingularInt32Field(value: self.rulesCount, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -570,6 +583,7 @@ extension FilterListManager_FilterListRules: SwiftProtobuf.Message, SwiftProtobu
     if lhs.filterID != rhs.filterID {return false}
     if lhs.rules != rhs.rules {return false}
     if lhs.disabledRules != rhs.disabledRules {return false}
+    if lhs.rulesCount != rhs.rulesCount {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -581,6 +595,7 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
     1: .standard(proto: "filter_id"),
     2: .same(proto: "rules"),
     3: .standard(proto: "disabled_rules"),
+    4: .standard(proto: "rules_count"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -592,6 +607,7 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
       case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.rules) }()
       case 3: try { try decoder.decodeSingularStringField(value: &self.disabledRules) }()
+      case 4: try { try decoder.decodeSingularInt32Field(value: &self.rulesCount) }()
       default: break
       }
     }
@@ -607,6 +623,9 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
     if !self.disabledRules.isEmpty {
       try visitor.visitSingularStringField(value: self.disabledRules, fieldNumber: 3)
     }
+    if self.rulesCount != 0 {
+      try visitor.visitSingularInt32Field(value: self.rulesCount, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -614,6 +633,7 @@ extension FilterListManager_FilterListRulesRaw: SwiftProtobuf.Message, SwiftProt
     if lhs.filterID != rhs.filterID {return false}
     if lhs.rules != rhs.rules {return false}
     if lhs.disabledRules != rhs.disabledRules {return false}
+    if lhs.rulesCount != rhs.rulesCount {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
