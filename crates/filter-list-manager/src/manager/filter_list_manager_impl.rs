@@ -1551,4 +1551,71 @@ mod tests {
         assert_eq!(actual[0].text.as_str(), "Disabled Text2");
         assert_eq!(actual[1].text.as_str(), "Disabled Text\n123");
     }
+
+    #[test]
+    fn test_get_rules_count() {
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
+
+        let source = &flm.connection_manager;
+        spawn_test_db_with_metadata(source);
+
+        let user_rules_count_result = 5;
+
+        source
+            .execute_db(|mut connection: Connection| {
+                let rules = RulesListEntity {
+                    filter_id: USER_RULES_FILTER_LIST_ID,
+                    text: "".to_string(),
+                    disabled_text: "".to_string(),
+                    rules_count: user_rules_count_result,
+                };
+
+                let tx = connection.transaction().unwrap();
+                let repo = RulesListRepository::new();
+
+                repo.insert(&tx, vec![rules].as_slice()).unwrap();
+
+                tx.commit().unwrap();
+
+                Ok(())
+            })
+            .unwrap();
+
+        let rules_count = flm
+            .get_rules_count(vec![USER_RULES_FILTER_LIST_ID])
+            .unwrap();
+
+        assert_eq!(rules_count[0], user_rules_count_result);
+    }
+
+    #[test]
+    fn test_save_custom_filter_rules_must_update_rules_count() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        spawn_test_db_with_metadata(&source);
+
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
+
+        let rules = FilterListRules {
+            filter_id: USER_RULES_FILTER_LIST_ID,
+            rules: vec![String::from("Text\n!Text\n# Text\n\n\nText")],
+            disabled_rules: vec![String::from("Disabled Text")],
+            rules_count: USER_RULES_COUNT,
+        };
+
+        let user_rules_count_result = 2;
+
+        flm.save_custom_filter_rules(rules).unwrap();
+
+        let rules_count = flm
+            .get_rules_count(vec![USER_RULES_FILTER_LIST_ID])
+            .unwrap();
+
+        assert_eq!(rules_count[0], user_rules_count_result);
+    }
 }
