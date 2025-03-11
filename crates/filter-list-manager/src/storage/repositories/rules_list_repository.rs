@@ -193,7 +193,7 @@ impl RulesListRepository {
         &'a self,
         connection: &'a Connection,
         filter_id: FilterId,
-    ) -> Result<(Vec<u8>, BlobHandleImpl)> {
+    ) -> Result<(Vec<u8>, BlobHandleImpl<'a>)> {
         let mut statement = connection.prepare(
             r"
             SELECT

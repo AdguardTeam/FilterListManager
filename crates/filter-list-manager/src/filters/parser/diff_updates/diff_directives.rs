@@ -178,7 +178,7 @@ pub(crate) fn recognize_diff_directive(
 /// Maps successful parser result into [`RecognizedDiffDirective`]
 fn map_diff_directive<'a>(
     (name, checksum, lines): (Option<Vec<&'a str>>, &'a str, &'a str),
-) -> Result<RecognizedDiffDirective, nom::Err<&'a str>> {
+) -> Result<RecognizedDiffDirective<'a>, nom::Err<&'a str>> {
     let lines = str::parse::<i32>(lines).map_err(|_| Error(""))?;
 
     let final_name = name.map(|list| list.join(""));

@@ -88,7 +88,7 @@ impl BooleanExpressionParser {
     }
 
     /// Parse expression
-    fn expr<'a>(&'a self, expr: &'a str) -> Option<(bool, &str)> {
+    fn expr<'a>(&'a self, expr: &'a str) -> Option<(bool, &'a str)> {
         let (mut left, mut remainder) = self.term(expr)?;
 
         // TODO: Add Max line length?
@@ -124,17 +124,15 @@ impl BooleanExpressionParser {
                     continue;
                 }
                 ParserOperator::Or => {
-                    let right = self.term(remainder)?;
-                    remainder = right.1;
-
-                    return Some((left || right.0, remainder));
+                    let right = self.expr(remainder)?;
+                    return Some((left || right.0, right.1));
                 }
             }
         }
     }
 
     /// Take term
-    fn term<'a>(&'a self, expr: &'a str) -> Option<(bool, &str)> {
+    fn term<'a>(&'a self, expr: &'a str) -> Option<(bool, &'a str)> {
         let (token, remainder) = self.take(expr);
 
         match token {
@@ -158,7 +156,7 @@ impl BooleanExpressionParser {
     }
 
     /// Take operator
-    fn operator<'a>(&'a self, slice: &'a str) -> Option<(ParserOperator, &str)> {
+    fn operator<'a>(&'a self, slice: &'a str) -> Option<(ParserOperator, &'a str)> {
         let (token, remainder) = self.take(slice);
 
         match token {
@@ -169,14 +167,14 @@ impl BooleanExpressionParser {
     }
 
     /// Take to the next token
-    fn take<'a>(&'a self, slice: &'a str) -> (&str, &str) {
+    fn take<'a>(&'a self, slice: &'a str) -> (&'a str, &'a str) {
         let (token, count) = BooleanExpressionParser::next_token(slice);
 
         (token, &slice[count..])
     }
 
     /// Just look ahead to the next token
-    fn peek<'a>(&'a self, slice: &'a str) -> &str {
+    fn peek<'a>(&'a self, slice: &'a str) -> &'a str {
         let (token, _) = BooleanExpressionParser::next_token(slice);
 
         token
@@ -210,6 +208,7 @@ mod tests {
             BooleanExpressionParser::new(Some(vec![String::from("windows"), String::from("iOS")]));
 
         [
+            ("(adguard && (adguard_ext_firefox || adguard_app_windows || adguard_app_mac || adguard_app_android))", Some(false)),
             ("", None),
             (" (false ", None),
             (" t|| f", Some(false)),
