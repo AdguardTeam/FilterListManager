@@ -628,6 +628,11 @@ pub struct SetProxyModeRequest {
     #[prost(string, tag = "2")]
     pub custom_proxy_addr: ::prost::alloc::string::String,
 }
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetRulesCountRequest {
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
+}
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct EmptyRequest {}
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -774,6 +779,13 @@ pub struct GetFilterRulesAsStringsResponse {
 pub struct GetDisabledRulesResponse {
     #[prost(message, repeated, tag = "1")]
     pub rules_raw: ::prost::alloc::vec::Vec<DisabledRulesRaw>,
+    #[prost(message, optional, tag = "2")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetRulesCountResponse {
+    #[prost(int32, repeated, tag = "1")]
+    pub rules_count: ::prost::alloc::vec::Vec<i32>,
     #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }

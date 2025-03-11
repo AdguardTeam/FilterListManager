@@ -12,6 +12,7 @@ pub(crate) mod entities;
 pub mod error;
 mod migrations;
 pub(crate) mod repositories;
+pub(crate) mod services;
 pub(crate) mod sql_generators;
 mod utils;
 

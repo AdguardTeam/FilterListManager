@@ -257,6 +257,37 @@ impl RulesListRepository {
 
         Ok(out)
     }
+
+    pub(crate) fn get_rules_count(
+        &self,
+        connection: &Connection,
+        ids: &[FilterId],
+    ) -> Result<Vec<i32>> {
+        let mut sql = String::from(
+            r"
+            SELECT
+                rules_count
+            FROM
+                [rules_list]
+            WHERE ",
+        );
+
+        sql += build_in_clause("filter_id", ids.len()).as_str();
+        let params = params_from_iter(ids);
+
+        let mut statement = connection.prepare(sql.as_str())?;
+
+        let mut out = vec![];
+        let Some(mut rows) = statement.query(params).optional()? else {
+            return Ok(out);
+        };
+
+        while let Some(row) = rows.next()? {
+            out.push(row.get(0)?)
+        }
+
+        Ok(out)
+    }
 }
 
 impl BulkDeleteRepository<RulesListEntity, FilterId> for RulesListRepository {
@@ -291,7 +322,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
             statement.execute(named_params! {
                 ":filter_id": entity.filter_id,
                 ":rules_text": entity.text,
-                ":disabled_rules_text": entity.disabled_text
+                ":disabled_rules_text": entity.disabled_text,
+                ":rules_count": entity.rules_count
             })?;
         }
 

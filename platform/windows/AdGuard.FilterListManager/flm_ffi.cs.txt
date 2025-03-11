@@ -494,6 +494,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_rules_count(FilterListManagerSafeHandle @ptr,RustBuffer @ids,ref RustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("adguard-flm")]
     public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_stored_filters_metadata(FilterListManagerSafeHandle @ptr,ref RustCallStatus _uniffi_out_err
     );
 
@@ -846,6 +850,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count(
+    );
+
+    [DllImport("adguard-flm")]
     public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_stored_filters_metadata(
     );
 
@@ -1009,6 +1017,12 @@ static class _UniFFILib {
             var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_list_by_id();
             if (checksum != 18236) {
                 throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_list_by_id` checksum `18236`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count();
+            if (checksum != 26075) {
+                throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count` checksum `26075`, library returned `{checksum}`");
             }
         }
         {
@@ -1360,6 +1374,9 @@ internal interface IFilterListManager {
     FullFilterList? GetFullFilterListById(int @id);
     
     /// <exception cref="AgOuterException"></exception>
+    List<int> GetRulesCount(List<int> @ids);
+    
+    /// <exception cref="AgOuterException"></exception>
     List<StoredFilterMetadata> GetStoredFiltersMetadata();
     
     /// <exception cref="AgOuterException"></exception>
@@ -1530,6 +1547,14 @@ internal class FilterListManager: FFIObject<FilterListManagerSafeHandle>, IFilte
         return FfiConverterOptionalTypeFullFilterList.INSTANCE.Lift(
     _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
     _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_list_by_id(this.GetHandle(), FfiConverterInt32.INSTANCE.Lower(@id), ref _status)
+));
+    }
+    
+    /// <exception cref="AgOuterException"></exception>
+    public List<int> GetRulesCount(List<int> @ids) {
+        return FfiConverterSequenceInt32.INSTANCE.Lift(
+    _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
+    _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_rules_count(this.GetHandle(), FfiConverterSequenceInt32.INSTANCE.Lower(@ids), ref _status)
 ));
     }
     

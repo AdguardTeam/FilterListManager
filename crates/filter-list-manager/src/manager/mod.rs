@@ -333,4 +333,7 @@ pub trait FilterListManager {
 
     /// Sets a new proxy mode. Value will be applied on next method call
     fn set_proxy_mode(&mut self, mode: RequestProxyMode);
+
+    /// Returns lists of rules count by list of filter IDs
+    fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<i32>>;
 }

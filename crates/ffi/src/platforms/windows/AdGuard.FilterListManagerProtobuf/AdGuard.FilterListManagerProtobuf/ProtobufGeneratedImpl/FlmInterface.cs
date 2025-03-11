@@ -108,5 +108,9 @@ namespace FilterListManager
     public partial class GetDisabledRulesResponse : IAGOuterError 
     {
     }
+
+    public partial class GetRulesCountResponse : IAGOuterError
+    {
+    }
 }
 

@@ -25,6 +25,7 @@ use crate::storage::repositories::filter_group_repository::FilterGroupRepository
 use crate::storage::repositories::filter_tag_repository::FilterTagRepository;
 use crate::storage::repositories::localisation::filter_localisations_repository::FilterLocalisationRepository;
 use crate::storage::repositories::BulkDeleteRepository;
+use crate::storage::services::rules_list_service::RulesListService;
 use crate::storage::spawn_transaction;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::DbConnectionManager;
@@ -406,7 +407,11 @@ impl FilterListManager for FilterListManagerImpl {
 
                             filter_repository.insert(transaction, &filters)?;
 
-                            RulesListRepository::new().insert(transaction, &[rules.into()])
+                            RulesListRepository::new().insert(
+                                transaction,
+                                &[RulesListService::new()
+                                    .update_rules_count(&self.configuration, rules.into())],
+                            )
                         })
                     }
 
@@ -859,6 +864,15 @@ impl FilterListManager for FilterListManagerImpl {
 
     fn set_proxy_mode(&mut self, mode: RequestProxyMode) {
         self.configuration.request_proxy_mode = mode;
+    }
+
+    fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<i32>> {
+        self.connection_manager
+            .execute_db(|connection: Connection| {
+                RulesListRepository::new()
+                    .get_rules_count(&connection, &ids)
+                    .map_err(FLMError::from_database)
+            })
     }
 }
 

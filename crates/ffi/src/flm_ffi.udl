@@ -255,4 +255,7 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     void set_proxy_mode(RequestProxyMode request_proxy_mode);
+
+    [Throws=AGOuterError]
+    sequence<i32> get_rules_count(sequence<i32> ids);
 };
