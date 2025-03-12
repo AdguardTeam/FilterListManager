@@ -1,6 +1,6 @@
 [package]
 name = "adguard-flm"
-version = "1.5.2"
+version = "1.5.9"
 edition = "2021"
 resolver = "2"
 homepage.workspace = true
