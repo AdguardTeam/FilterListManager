@@ -122,6 +122,11 @@ dictionary UpdateResult {
     sequence<UpdateFilterError> filters_errors;
 };
 
+dictionary RulesCountByFilter {
+    i32 filter_id;
+    i32 rules_count;
+};
+
 enum FilterListType {
     "STANDARD",
     "DNS"
@@ -257,5 +262,5 @@ interface FilterListManager {
     void set_proxy_mode(RequestProxyMode request_proxy_mode);
 
     [Throws=AGOuterError]
-    sequence<i32> get_rules_count(sequence<i32> ids);
+    sequence<RulesCountByFilter> get_rules_count(sequence<i32> ids);
 };

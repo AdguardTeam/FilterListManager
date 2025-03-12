@@ -127,11 +127,13 @@ namespace FilterListManager {
             "b3IilQEKGEdldERpc2FibGVkUnVsZXNSZXNwb25zZRI4CglydWxlc19yYXcY",
             "ASADKAsyJS5maWx0ZXJfbGlzdF9tYW5hZ2VyLkRpc2FibGVkUnVsZXNSYXcS",
             "NQoFZXJyb3IYAiABKAsyIS5maWx0ZXJfbGlzdF9tYW5hZ2VyLkFHT3V0ZXJF",
-            "cnJvckgAiAEBQggKBl9lcnJvciJtChVHZXRSdWxlc0NvdW50UmVzcG9uc2US",
-            "EwoLcnVsZXNfY291bnQYASADKAUSNQoFZXJyb3IYAiABKAsyIS5maWx0ZXJf",
-            "bGlzdF9tYW5hZ2VyLkFHT3V0ZXJFcnJvckgAiAEBQggKBl9lcnJvciJQCg1F",
-            "bXB0eVJlc3BvbnNlEjUKBWVycm9yGAEgASgLMiEuZmlsdGVyX2xpc3RfbWFu",
-            "YWdlci5BR091dGVyRXJyb3JIAIgBAUIICgZfZXJyb3JiBnByb3RvMw=="));
+            "cnJvckgAiAEBQggKBl9lcnJvciKgAQoVR2V0UnVsZXNDb3VudFJlc3BvbnNl",
+            "EkYKFXJ1bGVzX2NvdW50X2J5X2ZpbHRlchgBIAMoCzInLmZpbHRlcl9saXN0",
+            "X21hbmFnZXIuUnVsZXNDb3VudEJ5RmlsdGVyEjUKBWVycm9yGAIgASgLMiEu",
+            "ZmlsdGVyX2xpc3RfbWFuYWdlci5BR091dGVyRXJyb3JIAIgBAUIICgZfZXJy",
+            "b3IiUAoNRW1wdHlSZXNwb25zZRI1CgVlcnJvchgBIAEoCzIhLmZpbHRlcl9s",
+            "aXN0X21hbmFnZXIuQUdPdXRlckVycm9ySACIAQFCCAoGX2Vycm9yYgZwcm90",
+            "bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::FilterListManager.ConfigurationReflection.Descriptor, global::FilterListManager.OuterErrorReflection.Descriptor, global::FilterListManager.FiltersReflection.Descriptor, global::FilterListManager.MiscModelsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -177,7 +179,7 @@ namespace FilterListManager {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.GetActiveRulesResponse), global::FilterListManager.GetActiveRulesResponse.Parser, new[]{ "Rules", "Error" }, new[]{ "Error" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.GetFilterRulesAsStringsResponse), global::FilterListManager.GetFilterRulesAsStringsResponse.Parser, new[]{ "RulesList", "Error" }, new[]{ "Error" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.GetDisabledRulesResponse), global::FilterListManager.GetDisabledRulesResponse.Parser, new[]{ "RulesRaw", "Error" }, new[]{ "Error" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.GetRulesCountResponse), global::FilterListManager.GetRulesCountResponse.Parser, new[]{ "RulesCount", "Error" }, new[]{ "Error" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.GetRulesCountResponse), global::FilterListManager.GetRulesCountResponse.Parser, new[]{ "RulesCountByFilter", "Error" }, new[]{ "Error" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.EmptyResponse), global::FilterListManager.EmptyResponse.Parser, new[]{ "Error" }, new[]{ "Error" }, null, null, null)
           }));
     }
@@ -9793,7 +9795,7 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public GetRulesCountResponse(GetRulesCountResponse other) : this() {
-      rulesCount_ = other.rulesCount_.Clone();
+      rulesCountByFilter_ = other.rulesCountByFilter_.Clone();
       error_ = other.error_ != null ? other.error_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -9804,15 +9806,15 @@ namespace FilterListManager {
       return new GetRulesCountResponse(this);
     }
 
-    /// <summary>Field number for the "rules_count" field.</summary>
-    public const int RulesCountFieldNumber = 1;
-    private static readonly pb::FieldCodec<int> _repeated_rulesCount_codec
-        = pb::FieldCodec.ForInt32(10);
-    private readonly pbc::RepeatedField<int> rulesCount_ = new pbc::RepeatedField<int>();
+    /// <summary>Field number for the "rules_count_by_filter" field.</summary>
+    public const int RulesCountByFilterFieldNumber = 1;
+    private static readonly pb::FieldCodec<global::FilterListManager.RulesCountByFilter> _repeated_rulesCountByFilter_codec
+        = pb::FieldCodec.ForMessage(10, global::FilterListManager.RulesCountByFilter.Parser);
+    private readonly pbc::RepeatedField<global::FilterListManager.RulesCountByFilter> rulesCountByFilter_ = new pbc::RepeatedField<global::FilterListManager.RulesCountByFilter>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<int> RulesCount {
-      get { return rulesCount_; }
+    public pbc::RepeatedField<global::FilterListManager.RulesCountByFilter> RulesCountByFilter {
+      get { return rulesCountByFilter_; }
     }
 
     /// <summary>Field number for the "error" field.</summary>
@@ -9842,7 +9844,7 @@ namespace FilterListManager {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if(!rulesCount_.Equals(other.rulesCount_)) return false;
+      if(!rulesCountByFilter_.Equals(other.rulesCountByFilter_)) return false;
       if (!object.Equals(Error, other.Error)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -9851,7 +9853,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      hash ^= rulesCount_.GetHashCode();
+      hash ^= rulesCountByFilter_.GetHashCode();
       if (error_ != null) hash ^= Error.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -9871,7 +9873,7 @@ namespace FilterListManager {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      rulesCount_.WriteTo(output, _repeated_rulesCount_codec);
+      rulesCountByFilter_.WriteTo(output, _repeated_rulesCountByFilter_codec);
       if (error_ != null) {
         output.WriteRawTag(18);
         output.WriteMessage(Error);
@@ -9886,7 +9888,7 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      rulesCount_.WriteTo(ref output, _repeated_rulesCount_codec);
+      rulesCountByFilter_.WriteTo(ref output, _repeated_rulesCountByFilter_codec);
       if (error_ != null) {
         output.WriteRawTag(18);
         output.WriteMessage(Error);
@@ -9901,7 +9903,7 @@ namespace FilterListManager {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      size += rulesCount_.CalculateSize(_repeated_rulesCount_codec);
+      size += rulesCountByFilter_.CalculateSize(_repeated_rulesCountByFilter_codec);
       if (error_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Error);
       }
@@ -9917,7 +9919,7 @@ namespace FilterListManager {
       if (other == null) {
         return;
       }
-      rulesCount_.Add(other.rulesCount_);
+      rulesCountByFilter_.Add(other.rulesCountByFilter_);
       if (other.error_ != null) {
         if (error_ == null) {
           Error = new global::FilterListManager.AGOuterError();
@@ -9939,9 +9941,8 @@ namespace FilterListManager {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 10:
-          case 8: {
-            rulesCount_.AddEntriesFrom(input, _repeated_rulesCount_codec);
+          case 10: {
+            rulesCountByFilter_.AddEntriesFrom(input, _repeated_rulesCountByFilter_codec);
             break;
           }
           case 18: {
@@ -9966,9 +9967,8 @@ namespace FilterListManager {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 10:
-          case 8: {
-            rulesCount_.AddEntriesFrom(ref input, _repeated_rulesCount_codec);
+          case 10: {
+            rulesCountByFilter_.AddEntriesFrom(ref input, _repeated_rulesCountByFilter_codec);
             break;
           }
           case 18: {

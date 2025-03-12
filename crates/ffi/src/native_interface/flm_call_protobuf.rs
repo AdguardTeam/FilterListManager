@@ -485,11 +485,11 @@ pub unsafe extern "C" fn flm_call_protobuf(
 
             match flm_handle.flm.get_rules_count(request.ids) {
                 Ok(value) => GetRulesCountResponse {
-                    rules_count: value.into_iter().map(Into::into).collect(),
+                    rules_count_by_filter: value.into_iter().map(Into::into).collect(),
                     error: None,
                 },
                 Err(why) => GetRulesCountResponse {
-                    rules_count: vec![],
+                    rules_count_by_filter: vec![],
                     error: Some(why.into()),
                 },
             }

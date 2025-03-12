@@ -2,7 +2,7 @@ mod connect;
 
 use self::connect::{connect, connect_with_create};
 use crate::storage::database_status::{get_database_status, DatabaseStatus};
-use crate::storage::db_bootstrap::{db_bootstrap, db_bootstrap_metadata};
+use crate::storage::db_bootstrap::db_bootstrap;
 use crate::storage::migrations::run_migrations;
 use crate::{
     Configuration, FLMError, FLMResult, FilterListType, DNS_FILTERS_DATABASE_FILENAME,
@@ -73,15 +73,11 @@ impl DbConnectionManager {
                 tx.execute_batch(SCHEMA_STR)
                     .map_err(FLMError::from_database)?;
 
-                db_bootstrap_metadata(&mut tx).map_err(FLMError::from_database)?;
-
                 run_migrations(&mut tx)?;
 
                 db_bootstrap(&mut tx).map_err(FLMError::from_database)?;
             }
             DatabaseStatus::OnlySchema => {
-                db_bootstrap_metadata(&mut tx).map_err(FLMError::from_database)?;
-
                 run_migrations(&mut tx)?;
 
                 db_bootstrap(&mut tx).map_err(FLMError::from_database)?;

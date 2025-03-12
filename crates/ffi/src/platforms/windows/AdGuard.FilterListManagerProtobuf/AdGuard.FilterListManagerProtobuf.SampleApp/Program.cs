@@ -63,7 +63,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 IEnumerable<FilterGroup> groups = flm.GetAllGroups();
                 IEnumerable<StoredFilterMetadata> storedFiltersMetadata = flm.GetStoredFiltersMetadata();
                 StoredFilterMetadata filterMetadata = flm.GetStoredFilterMetadataById(customFilter.Id);
-                IEnumerable<int> rulesCount = flm.GetRulesCount(new[] { customFilter.Id });
+                IEnumerable<RulesCountByFilter> rulesCount = flm.GetRulesCount(new[] { customFilter.Id });
 
                 flm.GetFilterRulesAsStrings(new[] { customFilter.Id });
                 string blobPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "flmtest_2.txt");
@@ -97,7 +97,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 Debug.Assert(constants.SpecialGroupId == 0, "SpecialGroupId must be zero");
                 Debug.Assert(constants.SmallestFilterId == -2_000_000_000, "UserRulesId must be two billions");
                 Debug.Assert(filterListMetadataWithBody.Metadata.Homepage.Length > 0, "Metadata Homepage must be non-empty");
-                Debug.Assert(rulesCount.ToArray()[0] == 2, "Rules count must be equal to 2");
+                Debug.Assert(rulesCount.ToArray()[0].RulesCount == 2, "Rules count must be equal to 2");
 
                 Logger.Info("All Ok!");
             }

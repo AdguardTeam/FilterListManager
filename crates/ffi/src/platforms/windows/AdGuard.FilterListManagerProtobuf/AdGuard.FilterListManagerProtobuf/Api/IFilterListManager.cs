@@ -356,6 +356,6 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// Returns lists of rules count by list of filter IDs
         /// </summary>
-        IEnumerable<int> GetRulesCount(IEnumerable<int> filterIds);
+        IEnumerable<RulesCountByFilter> GetRulesCount(IEnumerable<int> filterIds);
     }
 }

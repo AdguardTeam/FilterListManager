@@ -377,7 +377,7 @@ mod tests {
     use crate::storage::repositories::Repository;
     use crate::storage::DbConnectionManager;
     use crate::test_utils::{tests_path, RAIIFile};
-    use crate::{Configuration, FilterId, USER_RULES_COUNT};
+    use crate::{Configuration, FilterId};
     use chrono::Utc;
     use rusqlite::Connection;
     use std::{env, thread};
@@ -429,7 +429,7 @@ mod tests {
             filter_id: first_filter_id,
             text: "Filter1\nNonFilter1".to_string(),
             disabled_text: "NonFilter1".to_string(),
-            rules_count: USER_RULES_COUNT,
+            rules_count: 0,
         });
         filter1.download_url = download_url1.to_string();
 
@@ -441,7 +441,7 @@ mod tests {
             filter_id: second_filter_id,
             text: "Filter2\nNonFilter2".to_string(),
             disabled_text: "NonFilter2".to_string(),
-            rules_count: USER_RULES_COUNT,
+            rules_count: 0,
         });
         filter2.download_url = download_url2.to_string();
 
@@ -453,7 +453,7 @@ mod tests {
             filter_id: third_filter_id,
             text: "Filter3\nNonFilter3".to_string(),
             disabled_text: "NonFilter3".to_string(),
-            rules_count: USER_RULES_COUNT,
+            rules_count: 0,
         });
         filter3.download_url = download_url3.to_string();
 
@@ -468,7 +468,7 @@ mod tests {
             filter_id: fourth_filter_id,
             text: "Filter4\nNonFilter4".to_string(),
             disabled_text: "NonFilter4".to_string(),
-            rules_count: USER_RULES_COUNT,
+            rules_count: 0,
         });
         filter4.download_url = download_url4.to_string();
 
@@ -692,7 +692,7 @@ mod tests {
             filter_id: first_filter_id,
             text: "Filter1\nNonFilter1".to_string(),
             disabled_text: "NonFilter1".to_string(),
-            rules_count: USER_RULES_COUNT,
+            rules_count: 0,
         });
         filter1.download_url = download_url1.to_string();
 
@@ -704,7 +704,7 @@ mod tests {
             filter_id: second_filter_id,
             text: "Filter2\nNonFilter2".to_string(),
             disabled_text: "NonFilter2".to_string(),
-            rules_count: USER_RULES_COUNT,
+            rules_count: 0,
         });
         filter2.download_url = download_url2.to_string();
 
@@ -716,7 +716,7 @@ mod tests {
             filter_id: third_filter_id,
             text: "Filter3\nNonFilter3".to_string(),
             disabled_text: "NonFilter3".to_string(),
-            rules_count: USER_RULES_COUNT,
+            rules_count: 0,
         });
         filter3.download_url = download_url3.to_string();
 
@@ -731,7 +731,7 @@ mod tests {
             filter_id: fourth_filter_id,
             text: "Filter4\nNonFilter4".to_string(),
             disabled_text: "NonFilter4".to_string(),
-            rules_count: USER_RULES_COUNT,
+            rules_count: 0,
         });
         filter4.download_url = download_url4.to_string();
 

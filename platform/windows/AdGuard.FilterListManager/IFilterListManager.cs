@@ -275,6 +275,6 @@ namespace AdGuard.FilterListManager
         /// Returns lists of rules count by list of filter IDs
         /// </summary>
         /// <param name="ids">The filter ids.</param>
-        List<int> GetRulesCount(List<int> ids);
+        List<RulesCountByFilter> GetRulesCount(List<int> ids);
     }
 }

@@ -456,6 +456,16 @@ pub struct FullFilterList {
     #[prost(message, optional, tag = "21")]
     pub rules: ::core::option::Option<FilterListRules>,
 }
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct RulesCountByFilter {
+    /// Associated filter id.
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
+    /// Rules count in this filter list. Simply a number of non-empty lines
+    /// and does not start with a comment marker.
+    #[prost(int32, tag = "2")]
+    pub rules_count: i32,
+}
 /// ActiveRulesInfo
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ActiveRulesInfo {
@@ -784,8 +794,8 @@ pub struct GetDisabledRulesResponse {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetRulesCountResponse {
-    #[prost(int32, repeated, tag = "1")]
-    pub rules_count: ::prost::alloc::vec::Vec<i32>,
+    #[prost(message, repeated, tag = "1")]
+    pub rules_count_by_filter: ::prost::alloc::vec::Vec<RulesCountByFilter>,
     #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }

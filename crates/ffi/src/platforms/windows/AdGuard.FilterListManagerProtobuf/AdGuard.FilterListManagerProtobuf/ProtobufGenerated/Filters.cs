@@ -60,7 +60,9 @@ namespace FilterListManager {
             "DGlzX2luc3RhbGxlZBgQIAEoCBIQCghob21lcGFnZRgRIAEoCRIPCgdsaWNl",
             "bnNlGBIgASgJEhAKCGNoZWNrc3VtGBMgASgJEhEKCWxhbmd1YWdlcxgUIAMo",
             "CRI4CgVydWxlcxgVIAEoCzIkLmZpbHRlcl9saXN0X21hbmFnZXIuRmlsdGVy",
-            "TGlzdFJ1bGVzSACIAQFCCAoGX3J1bGVzYgZwcm90bzM="));
+            "TGlzdFJ1bGVzSACIAQFCCAoGX3J1bGVzIjwKElJ1bGVzQ291bnRCeUZpbHRl",
+            "chIRCglmaWx0ZXJfaWQYASABKAUSEwoLcnVsZXNfY291bnQYAiABKAViBnBy",
+            "b3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -72,7 +74,8 @@ namespace FilterListManager {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FilterListMetadata), global::FilterListManager.FilterListMetadata.Parser, new[]{ "Title", "Description", "TimeUpdated", "Version", "Homepage", "License", "Checksum", "Url", "RulesCount" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FilterListMetadataWithBody), global::FilterListManager.FilterListMetadataWithBody.Parser, new[]{ "Metadata", "FilterBody" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.StoredFilterMetadata), global::FilterListManager.StoredFilterMetadata.Parser, new[]{ "Id", "GroupId", "TimeUpdated", "LastDownloadTime", "Title", "Description", "Version", "DisplayNumber", "DownloadUrl", "SubscriptionUrl", "Tags", "Expires", "IsTrusted", "IsCustom", "IsEnabled", "IsInstalled", "Homepage", "License", "Checksum", "Languages" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FullFilterList), global::FilterListManager.FullFilterList.Parser, new[]{ "Id", "GroupId", "TimeUpdated", "LastDownloadTime", "Title", "Description", "Version", "DisplayNumber", "DownloadUrl", "SubscriptionUrl", "Tags", "Expires", "IsTrusted", "IsCustom", "IsEnabled", "IsInstalled", "Homepage", "License", "Checksum", "Languages", "Rules" }, new[]{ "Rules" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FullFilterList), global::FilterListManager.FullFilterList.Parser, new[]{ "Id", "GroupId", "TimeUpdated", "LastDownloadTime", "Title", "Description", "Version", "DisplayNumber", "DownloadUrl", "SubscriptionUrl", "Tags", "Expires", "IsTrusted", "IsCustom", "IsEnabled", "IsInstalled", "Homepage", "License", "Checksum", "Languages", "Rules" }, new[]{ "Rules" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.RulesCountByFilter), global::FilterListManager.RulesCountByFilter.Parser, new[]{ "FilterId", "RulesCount" }, null, null, null, null)
           }));
     }
     #endregion
@@ -4072,6 +4075,239 @@ namespace FilterListManager {
               Rules = new global::FilterListManager.FilterListRules();
             }
             input.ReadMessage(Rules);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class RulesCountByFilter : pb::IMessage<RulesCountByFilter>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<RulesCountByFilter> _parser = new pb::MessageParser<RulesCountByFilter>(() => new RulesCountByFilter());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<RulesCountByFilter> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::FilterListManager.FiltersReflection.Descriptor.MessageTypes[9]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RulesCountByFilter() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RulesCountByFilter(RulesCountByFilter other) : this() {
+      filterId_ = other.filterId_;
+      rulesCount_ = other.rulesCount_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RulesCountByFilter Clone() {
+      return new RulesCountByFilter(this);
+    }
+
+    /// <summary>Field number for the "filter_id" field.</summary>
+    public const int FilterIdFieldNumber = 1;
+    private int filterId_;
+    /// <summary>
+    /// Associated filter id.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int FilterId {
+      get { return filterId_; }
+      set {
+        filterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rules_count" field.</summary>
+    public const int RulesCountFieldNumber = 2;
+    private int rulesCount_;
+    /// <summary>
+    /// Rules count in this filter list. Simply a number of non-empty lines
+    /// and does not start with a comment marker.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int RulesCount {
+      get { return rulesCount_; }
+      set {
+        rulesCount_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as RulesCountByFilter);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(RulesCountByFilter other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (FilterId != other.FilterId) return false;
+      if (RulesCount != other.RulesCount) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (FilterId != 0) hash ^= FilterId.GetHashCode();
+      if (RulesCount != 0) hash ^= RulesCount.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (FilterId != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(FilterId);
+      }
+      if (RulesCount != 0) {
+        output.WriteRawTag(16);
+        output.WriteInt32(RulesCount);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (FilterId != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(FilterId);
+      }
+      if (RulesCount != 0) {
+        output.WriteRawTag(16);
+        output.WriteInt32(RulesCount);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (FilterId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilterId);
+      }
+      if (RulesCount != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(RulesCount);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(RulesCountByFilter other) {
+      if (other == null) {
+        return;
+      }
+      if (other.FilterId != 0) {
+        FilterId = other.FilterId;
+      }
+      if (other.RulesCount != 0) {
+        RulesCount = other.RulesCount;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            FilterId = input.ReadInt32();
+            break;
+          }
+          case 16: {
+            RulesCount = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            FilterId = input.ReadInt32();
+            break;
+          }
+          case 16: {
+            RulesCount = input.ReadInt32();
             break;
           }
         }

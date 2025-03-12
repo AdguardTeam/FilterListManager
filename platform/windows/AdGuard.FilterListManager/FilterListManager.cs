@@ -506,9 +506,9 @@ namespace AdGuard.FilterListManager
         /// <summary>
         ///<inheritdoc cref="IFilterListManager"/>
         /// </summary>
-        public List<int> GetRulesCount(List<int> ids)
+        public List<RulesCountByFilter> GetRulesCount(List<int> ids)
         {
-            return FfiConverterSequenceInt32.Instance.Lift(
+            return FfiConverterSequenceTypeRulesCountByFilter.Instance.Lift(
                 UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
                     (ref RustCallStatus status) =>
                         UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_rules_count(

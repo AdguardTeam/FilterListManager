@@ -92,7 +92,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings),
                 new KeyValuePair<ushort, Func<ushort>>(58681,
                     uniffi_filter_list_manager_ffi_checksum_func_make_default_configuration),
-                new KeyValuePair<ushort, Func<ushort>>(26075,
+                new KeyValuePair<ushort, Func<ushort>>(14183,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count),
             };
 

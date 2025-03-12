@@ -1,11 +1,9 @@
 use crate::storage::constants::{
-    CUSTOM_FILTERS_GROUP_ID, SERVICE_GROUP_ID, USER_RULES_COUNT, USER_RULES_FILTER_LIST_ID,
+    CUSTOM_FILTERS_GROUP_ID, SERVICE_GROUP_ID, USER_RULES_FILTER_LIST_ID,
 };
-use crate::storage::entities::db_metadata_entity::DBMetadataEntity;
 use crate::storage::entities::filter_entity::FilterEntity;
 use crate::storage::entities::filter_group_entity::FilterGroupEntity;
 use crate::storage::entities::rules_list_entity::RulesListEntity;
-use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
@@ -40,7 +38,7 @@ fn create_user_rules_rules_list_entity() -> RulesListEntity {
         filter_id: USER_RULES_FILTER_LIST_ID,
         text: String::new(),
         disabled_text: String::new(),
-        rules_count: USER_RULES_COUNT,
+        rules_count: 0,
     }
 }
 
@@ -51,18 +49,6 @@ fn create_group_entity_for_custom_filters() -> FilterGroupEntity {
         name: "Custom filters".to_string(),
         display_number: 0,
     }
-}
-
-/// Creates metadata info
-fn create_db_metadata() -> DBMetadataEntity {
-    DBMetadataEntity::default()
-}
-
-/// Makes specific metadata query to an empty database with a schema
-pub(crate) fn db_bootstrap_metadata(transaction: &mut Transaction) -> rusqlite::Result<()> {
-    let metadata_entity = create_db_metadata();
-
-    DBMetadataRepository::save(transaction, &metadata_entity)
 }
 
 /// Makes specific queries to an empty database with a schema

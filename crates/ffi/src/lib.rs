@@ -202,7 +202,7 @@ impl FilterListManager {
         })
     }
 
-    pub fn get_rules_count(&self, ids: Vec<FilterId>) -> AGResult<Vec<i32>> {
+    pub fn get_rules_count(&self, ids: Vec<FilterId>) -> AGResult<Vec<RulesCountByFilter>> {
         self.wrap(move |flm| flm.get_rules_count(ids))
     }
 }

@@ -1,4 +1,5 @@
 use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
+use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::manager::models::FilterId;
 use crate::storage::blob::BlobHandleImpl;
 use crate::storage::entities::rules_list_entity::RulesListEntity;
@@ -262,10 +263,11 @@ impl RulesListRepository {
         &self,
         connection: &Connection,
         ids: &[FilterId],
-    ) -> Result<Vec<i32>> {
+    ) -> Result<Vec<RulesCountByFilter>> {
         let mut sql = String::from(
             r"
             SELECT
+                filter_id,
                 rules_count
             FROM
                 [rules_list]
@@ -283,7 +285,10 @@ impl RulesListRepository {
         };
 
         while let Some(row) = rows.next()? {
-            out.push(row.get(0)?)
+            out.push(RulesCountByFilter {
+                filter_id: row.get(0)?,
+                rules_count: row.get(1)?,
+            })
         }
 
         Ok(out)

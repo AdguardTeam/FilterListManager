@@ -220,7 +220,7 @@ message GetDisabledRulesResponse {
 }
 
 message GetRulesCountResponse {
-  repeated int32 rules_count = 1;
+  repeated RulesCountByFilter rules_count_by_filter = 1;
   optional AGOuterError error = 2;
 }
 
