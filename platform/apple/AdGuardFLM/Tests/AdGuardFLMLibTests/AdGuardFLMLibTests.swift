@@ -153,7 +153,7 @@ final class AdGuardFLMLibTests: XCTestCase {
         XCTAssert(constants.special_group_id == 0, "FLM Special group id must be zero")
         XCTAssert(constants.smallest_filter_id == -2_000_000_000, "FLM Custom group id must be two billions")
         XCTAssert(filterMetadataWithBody.metadata.homepage.count > 0, "FLM Metadata homepage must be non-empty")
-        XCTAssert(rulesCount[0] == 2, "FLM Rules count must be 2")
+        XCTAssert(rulesCount[0].rulesCount == 2, "FLM Rules count must be 2")
     }
 }
 

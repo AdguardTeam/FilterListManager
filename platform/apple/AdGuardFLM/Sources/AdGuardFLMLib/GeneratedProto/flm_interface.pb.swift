@@ -911,7 +911,7 @@ public struct FilterListManager_GetRulesCountResponse: Sendable {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var rulesCount: [Int32] = []
+  public var rulesCountByFilter: [FilterListManager_RulesCountByFilter] = []
 
   public var error: FilterListManager_AGOuterError {
     get {return _error ?? FilterListManager_AGOuterError()}
@@ -2624,7 +2624,7 @@ extension FilterListManager_GetDisabledRulesResponse: SwiftProtobuf.Message, Swi
 extension FilterListManager_GetRulesCountResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetRulesCountResponse"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "rules_count"),
+    1: .standard(proto: "rules_count_by_filter"),
     2: .same(proto: "error"),
   ]
 
@@ -2634,7 +2634,7 @@ extension FilterListManager_GetRulesCountResponse: SwiftProtobuf.Message, SwiftP
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.rulesCount) }()
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.rulesCountByFilter) }()
       case 2: try { try decoder.decodeSingularMessageField(value: &self._error) }()
       default: break
       }
@@ -2646,8 +2646,8 @@ extension FilterListManager_GetRulesCountResponse: SwiftProtobuf.Message, SwiftP
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
     // https://github.com/apple/swift-protobuf/issues/1182
-    if !self.rulesCount.isEmpty {
-      try visitor.visitPackedInt32Field(value: self.rulesCount, fieldNumber: 1)
+    if !self.rulesCountByFilter.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.rulesCountByFilter, fieldNumber: 1)
     }
     try { if let v = self._error {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
@@ -2656,7 +2656,7 @@ extension FilterListManager_GetRulesCountResponse: SwiftProtobuf.Message, SwiftP
   }
 
   public static func ==(lhs: FilterListManager_GetRulesCountResponse, rhs: FilterListManager_GetRulesCountResponse) -> Bool {
-    if lhs.rulesCount != rhs.rulesCount {return false}
+    if lhs.rulesCountByFilter != rhs.rulesCountByFilter {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

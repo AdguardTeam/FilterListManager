@@ -102,7 +102,7 @@ public protocol FLMFacadeProtocol {
 
     func setProxyMode(mode: FilterListManager_RawRequestProxyMode, custom_addr: String?) throws
 
-    func getRulesCount(ids: [Int32]) throws -> [Int32]
+    func getRulesCount(ids: [Int32]) throws -> [FilterListManager_RulesCountByFilter]
 }
 
 /// Main FLM facade.
@@ -570,7 +570,7 @@ public class FLMFacade: FLMFacadeProtocol {
         }
     }
 
-    public func getRulesCount(ids: [Int32]) throws -> [Int32] {
+    public func getRulesCount(ids: [Int32]) throws -> [FilterListManager_RulesCountByFilter] {
         var message = FilterListManager_GetRulesCountRequest()
         message.ids = ids
 
@@ -581,7 +581,7 @@ public class FLMFacade: FLMFacadeProtocol {
             throw AGOuterError(from: response.error)
         }
 
-        return response.rulesCount
+        return response.rulesCountByFilter
     }
 
     deinit {
