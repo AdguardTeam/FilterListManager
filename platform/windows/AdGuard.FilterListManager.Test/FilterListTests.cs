@@ -38,7 +38,8 @@ namespace AdGuard.FilterListManager.Test
             cfg.WorkingDirectory = m_CurrentDirectory;
             cfg.DefaultFilterListExpiresPeriodSec = 10;
             cfg.AutoLiftUpDatabase = true;
-
+            cfg.AppName = "AdGuard.FilterListManager.Test";
+            cfg.Version = "1.0";
 
             IFilterListManager manager = new FilterListManager(
                 cfg);
@@ -48,7 +49,7 @@ namespace AdGuard.FilterListManager.Test
             List<StoredFilterMetadata> metas = manager.GetStoredFiltersMetadata();
             Assert.IsTrue(metas.Count > 0);
 
-            StoredFilterMetadata firstFilter = metas.FirstOrDefault(a => a.Id == 14);
+            StoredFilterMetadata firstFilter = metas.FirstOrDefault(a => a.Id == 1);
             Assert.IsNotNull(firstFilter);
             StoredFilterMetadata meta = manager.GetStoredFiltersMetadataById(firstFilter.Id);
             Assert.IsNotNull(meta);
