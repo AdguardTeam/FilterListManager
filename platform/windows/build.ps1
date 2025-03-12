@@ -127,11 +127,6 @@ function SetNativeVersion {
 
 Function RustBuild {
     $rust_version = (& cargo -V);
-    if (!$rust_version.StartsWith("cargo 1.75")) {
-        Write-Output "Only Rust 1.75 supported for now! Current version is $rust_version";
-        exit 1;
-    }
-
     try {
         SetNativeVersion;
         SetAdapterVersion;
