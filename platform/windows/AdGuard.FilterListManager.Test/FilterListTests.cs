@@ -38,7 +38,8 @@ namespace AdGuard.FilterListManager.Test
             cfg.WorkingDirectory = m_CurrentDirectory;
             cfg.DefaultFilterListExpiresPeriodSec = 10;
             cfg.AutoLiftUpDatabase = true;
-
+            cfg.AppName = "AdGuard.FilterListManager.Test";
+            cfg.Version = "1.0";
 
             IFilterListManager manager = new FilterListManager(
                 cfg);
