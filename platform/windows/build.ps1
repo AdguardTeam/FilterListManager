@@ -1,3 +1,40 @@
+$ARCH_TO_FOLDER_MAP = @{
+    "i686-pc-windows-msvc" = "x86"
+    "x86_64-pc-windows-msvc" = "x64"
+    "aarch64-pc-windows-msvc" = "arm64"
+}
+
+$FILES = @(
+    "AdGuardFLM.dll",
+    "AdGuardFLM.pdb"
+)
+
+Function CopyToTestsBuildFolder {
+    Write-Output "Copying files...";
+    foreach ($arch in $ARCH_TO_FOLDER_MAP.Keys) {
+       foreach ($file in $FILES) {
+        $folder = $ARCH_TO_FOLDER_MAP[$arch]
+        $srcPath = "target\$arch\release\$file"
+        $destPath = "platform\windows\build\bin\Release\$folder\$file"
+        
+        $destDir = Split-Path -Path $destPath -Parent
+        if (!(Test-Path -Path $destDir)) {
+            New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+        }
+        
+        Copy-Item -Path $srcPath -Destination $destPath
+        if (!$?) {
+            Write-Error "Failed to copy file from $srcPath to $destPath"
+            exit 1
+        }
+        
+        Write-Output "Copied: $srcPath to: $destPath"
+       }
+    }
+
+    Write-Output "Copying files has been completed successfully";
+}
+
 Function RenameOutFile {
     param([string]$profile_name)
     Move-Item -Path "target\$profile_name\release\filter_list_manager_ffi.dll" -Destination "target\$profile_name\release\AdGuardFLM.dll" -Force
@@ -113,5 +150,8 @@ Function RustBuild {
     RenameOutFile "x86_64-pc-windows-msvc"
     & cargo build --release --lib --package adguard-flm-ffi --target aarch64-pc-windows-msvc --features rusqlite-bundled
     RenameOutFile "aarch64-pc-windows-msvc"
+
+    CopyToTestsBuildFolder;
+
     Write-Output "Executing method RustBuild has been completed successfully";
 }
