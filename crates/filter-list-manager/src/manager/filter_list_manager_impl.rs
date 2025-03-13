@@ -18,19 +18,18 @@ use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::manager::update_filters_action::update_filters_action;
-use crate::storage::blob::write_to_stream;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
 use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
 use crate::storage::repositories::filter_tag_repository::FilterTagRepository;
 use crate::storage::repositories::localisation::filter_localisations_repository::FilterLocalisationRepository;
 use crate::storage::repositories::BulkDeleteRepository;
+use crate::storage::services::filter_service::FilterService;
 use crate::storage::services::rules_list_service::RulesListService;
 use crate::storage::spawn_transaction;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::DbConnectionManager;
 use crate::utils::memory::heap;
-use crate::utils::parsing::LF_BYTES_SLICE;
 use crate::{
     filters::parser::metadata::parsers::expires::process_expires,
     filters::parser::metadata::KnownMetadataProperty,
@@ -46,10 +45,7 @@ use crate::{
 };
 use chrono::{DateTime, ParseError, Utc};
 use rusqlite::types::Value;
-use rusqlite::{Connection, Error, Transaction};
-use std::collections::HashSet;
-use std::fs;
-use std::fs::OpenOptions;
+use rusqlite::{Connection, Transaction};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -275,33 +271,11 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn enable_filter_lists(&self, ids: Vec<FilterId>, is_enabled: bool) -> FLMResult<usize> {
-        self.connection_manager
-            .execute_db(move |mut conn: Connection| {
-                let tx = conn.transaction().map_err(FLMError::from_database)?;
-
-                let result = FilterRepository::new()
-                    .toggle_filter_lists(&tx, &ids, is_enabled)
-                    .map_err(FLMError::from_database)?;
-
-                tx.commit().map_err(FLMError::from_database)?;
-
-                Ok(result)
-            })
+        FilterService::new().enable_filter_lists(&self.connection_manager, ids, is_enabled)
     }
 
     fn install_filter_lists(&self, ids: Vec<FilterId>, is_installed: bool) -> FLMResult<usize> {
-        self.connection_manager
-            .execute_db(move |mut conn: Connection| {
-                let tx = conn.transaction().map_err(FLMError::from_database)?;
-
-                let result = FilterRepository::new()
-                    .toggle_is_installed(&tx, &ids, is_installed)
-                    .map_err(FLMError::from_database)?;
-
-                tx.commit().map_err(FLMError::from_database)?;
-
-                Ok(result)
-            })
+        FilterService::new().toggle_is_installed(&self.connection_manager, ids, is_installed)
     }
 
     fn delete_custom_filter_lists(&self, ids: Vec<FilterId>) -> FLMResult<usize> {
@@ -373,38 +347,7 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn save_custom_filter_rules(&self, rules: FilterListRules) -> FLMResult<()> {
-        self.connection_manager
-            .execute_db(move |mut conn: Connection| {
-                let filter_repository = FilterRepository::new();
-
-                let result = filter_repository
-                    .select(
-                        &conn,
-                        Some(FilterRepository::custom_filter_with_id(rules.filter_id)),
-                    )
-                    .map_err(FLMError::from_database)?;
-
-                match result {
-                    Some(mut filters) if !filters.is_empty() => {
-                        with_transaction(&mut conn, |transaction: &Transaction| {
-                            // SAFETY: index "0" always present in this branch until condition
-                            // `!filters.is_empty()` is met.
-                            let filter = unsafe { filters.get_unchecked_mut(0) };
-
-                            filter.last_update_time = Utc::now().timestamp();
-
-                            filter_repository.insert(transaction, &filters)?;
-
-                            RulesListRepository::new().insert(
-                                transaction,
-                                &[RulesListService::new().update_rules_count(rules)],
-                            )
-                        })
-                    }
-
-                    _ => Err(FLMError::EntityNotFound(rules.filter_id as i64)),
-                }
-            })
+        RulesListService::new().save_custom_filter_rules(&self.connection_manager, rules)
     }
 
     fn save_disabled_rules(
@@ -412,27 +355,11 @@ impl FilterListManager for FilterListManagerImpl {
         filter_id: FilterId,
         disabled_rules: Vec<String>,
     ) -> FLMResult<()> {
-        self.connection_manager
-            .execute_db(move |mut conn: Connection| {
-                let rules_list_repository = RulesListRepository::new();
-
-                let rules_lists_count = rules_list_repository
-                    .count(
-                        &conn,
-                        Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
-                    )
-                    .map_err(FLMError::from_database)?;
-
-                if rules_lists_count == 0 {
-                    return Err(FLMError::EntityNotFound(filter_id as i64));
-                }
-
-                with_transaction(&mut conn, |transaction: &Transaction| {
-                    rules_list_repository
-                        .set_disabled_rules(transaction, filter_id, disabled_rules.join("\n"))
-                        .map(|_| ())
-                })
-            })
+        RulesListService::new().save_disabled_rules(
+            &self.connection_manager,
+            filter_id,
+            disabled_rules,
+        )
     }
 
     fn update_filters(
@@ -550,34 +477,12 @@ impl FilterListManager for FilterListManagerImpl {
         title: String,
         is_trusted: bool,
     ) -> FLMResult<bool> {
-        if title.trim().is_empty() {
-            return Err(FLMError::FieldIsEmpty("title"));
-        }
-
-        self.connection_manager
-            .execute_db(move |mut conn: Connection| {
-                let filter_repository = FilterRepository::new();
-
-                let count = filter_repository
-                    .count(
-                        &conn,
-                        Some(FilterRepository::custom_filter_with_id(filter_id)),
-                    )
-                    .map_err(FLMError::from_database)?;
-
-                if count > 0 {
-                    with_transaction(&mut conn, move |transaction: &Transaction| {
-                        filter_repository.update_custom_filter_metadata(
-                            transaction,
-                            filter_id,
-                            title.as_str(),
-                            is_trusted,
-                        )
-                    })
-                } else {
-                    Err(FLMError::EntityNotFound(filter_id as i64))
-                }
-            })
+        FilterService::new().update_custom_filter_metadata(
+            &self.connection_manager,
+            filter_id,
+            title,
+            is_trusted,
+        )
     }
 
     fn get_database_path(&self) -> FLMResult<String> {
@@ -779,23 +684,7 @@ impl FilterListManager for FilterListManagerImpl {
         &self,
         ids: Vec<FilterId>,
     ) -> FLMResult<Vec<FilterListRulesRaw>> {
-        let result = self.connection_manager.execute_db(|conn: Connection| {
-            RulesListRepository::new()
-                .select(
-                    &conn,
-                    Some(SQLOperator::FieldIn(
-                        "filter_id",
-                        ids.into_iter().map(Into::into).collect(),
-                    )),
-                )
-                .map_err(FLMError::from_database)
-        })?;
-
-        Ok(result
-            .unwrap_or_default()
-            .into_iter()
-            .map(Into::into)
-            .collect())
+        RulesListService::new().get_filter_rules_as_strings(&self.connection_manager, ids)
     }
 
     fn save_rules_to_file_blob<P: AsRef<Path>>(
@@ -803,50 +692,15 @@ impl FilterListManager for FilterListManagerImpl {
         filter_id: FilterId,
         file_path: P,
     ) -> FLMResult<()> {
-        let file_already_exists = fs::metadata(&file_path).is_ok();
-
-        let mut handler = OpenOptions::new()
-            .write(true)
-            .create(true)
-            .open(&file_path)
-            .map_err(FLMError::from_io)?;
-
-        self.connection_manager
-            .execute_db(|connection: Connection| {
-                let rules_repository = RulesListRepository::new();
-                let (disabled_rules, blob) = rules_repository
-                    .get_blob_handle_and_disabled_rules(&connection, filter_id)
-                    .map_err(|why| match why {
-                        Error::QueryReturnedNoRows => FLMError::EntityNotFound(filter_id as i64),
-                        err => FLMError::from_database(err),
-                    })?;
-
-                let disabled_rules_set = disabled_rules
-                    .split(|i| i == &LF_BYTES_SLICE)
-                    .map(|value| value.to_vec())
-                    .collect::<HashSet<Vec<u8>>>();
-
-                write_to_stream(&mut handler, blob, disabled_rules_set)?;
-
-                Ok(())
-            })
-            .map_err(|why| {
-                drop(handler);
-                if !file_already_exists {
-                    fs::remove_file(&file_path).unwrap_or(());
-                }
-
-                why
-            })
+        RulesListService::new().save_rules_to_file_blob(
+            &self.connection_manager,
+            filter_id,
+            file_path,
+        )
     }
 
     fn get_disabled_rules(&self, ids: Vec<FilterId>) -> FLMResult<Vec<DisabledRulesRaw>> {
-        self.connection_manager
-            .execute_db(|connection: Connection| {
-                RulesListRepository::new()
-                    .get_disabled_rules_by_ids(&connection, &ids)
-                    .map_err(FLMError::from_database)
-            })
+        RulesListService::new().get_disabled_rules(&self.connection_manager, ids)
     }
 
     fn set_proxy_mode(&mut self, mode: RequestProxyMode) {
@@ -854,12 +708,7 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>> {
-        self.connection_manager
-            .execute_db(|connection: Connection| {
-                RulesListRepository::new()
-                    .get_rules_count(&connection, &ids)
-                    .map_err(FLMError::from_database)
-            })
+        RulesListService::new().get_rules_count(&self.connection_manager, ids)
     }
 }
 
