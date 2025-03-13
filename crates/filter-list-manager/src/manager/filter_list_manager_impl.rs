@@ -397,7 +397,7 @@ impl FilterListManager for FilterListManagerImpl {
 
                             RulesListRepository::new().insert(
                                 transaction,
-                                &[RulesListService::new().update_rules_count(rules.into())],
+                                &[RulesListService::new().update_rules_count(rules)],
                             )
                         })
                     }
@@ -1597,8 +1597,11 @@ mod tests {
 
         let rules = FilterListRules {
             filter_id: USER_RULES_FILTER_LIST_ID,
-            rules: vec![String::from("Text\n!Text\n# Text\n\n\nText")],
-            disabled_rules: vec![String::from("Disabled Text")],
+            rules: "Text\n!Text\n# Text\n\n\nText"
+                .split('\n')
+                .map(str::to_string)
+                .collect(),
+            disabled_rules: "Disabled Text".split('\n').map(str::to_string).collect(),
             rules_count: 0,
         };
 

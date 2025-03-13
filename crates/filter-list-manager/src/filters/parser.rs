@@ -29,7 +29,7 @@ pub(crate) mod metadata;
 pub(crate) mod parser_error;
 mod paths;
 mod rcs_diff;
-pub(crate) mod rule_lines_collector;
+mod rule_lines_collector;
 
 pub(super) const DIRECTIVE_IF: &str = "!#if";
 pub(super) const DIRECTIVE_ELSE: &str = "!#else";
