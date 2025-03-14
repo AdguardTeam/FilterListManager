@@ -501,6 +501,7 @@ impl FilterListManager for FilterListManagerImpl {
             fallback_locale = Some(&normalized_locale[0..position])
         }
 
+        let mut is_found_fallback_locale = false;
         for locale in saved_locales {
             if locale == normalized_locale {
                 self.configuration.locale = locale;
@@ -510,10 +511,18 @@ impl FilterListManager for FilterListManagerImpl {
 
             if let Some(value) = fallback_locale {
                 if locale == value {
-                    self.configuration.locale = locale;
-
-                    return Ok(true);
+                    is_found_fallback_locale = true;
+                    break;
                 }
+            }
+        }
+
+        // We didn't find exact locale, but we may use fallback
+        if is_found_fallback_locale {
+            if let Some(value) = fallback_locale {
+                self.configuration.locale = value.to_string();
+
+                return Ok(true);
             }
         }
 
