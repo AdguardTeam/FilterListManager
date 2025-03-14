@@ -510,7 +510,7 @@ impl FilterListManager for FilterListManagerImpl {
             }
 
             if let Some(value) = fallback_locale {
-                if value == new_locale {
+                if locale == value {
                     is_found_fallback_locale = true;
                     break;
                 }
@@ -519,7 +519,7 @@ impl FilterListManager for FilterListManagerImpl {
 
         // We didn't find exact locale, but we may use fallback
         if is_found_fallback_locale {
-            self.configuration.locale = new_locale;
+            self.configuration.locale = fallback_locale.unwrap().to_string();
 
             return Ok(true);
         }
