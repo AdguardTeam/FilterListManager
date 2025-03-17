@@ -494,34 +494,35 @@ impl FilterListManager for FilterListManagerImpl {
         })?;
 
         // Process suggested locale
-        let new_locale = Configuration::normalize_locale_string(&suggested_locale);
+        let normalized_locale = Configuration::normalize_locale_string(&suggested_locale);
         let mut fallback_locale: Option<&str> = None;
 
-        if let Some(position) = new_locale.find(LOCALES_DELIMITER) {
-            fallback_locale = Some(&new_locale[0..position])
+        if let Some(position) = normalized_locale.find(LOCALES_DELIMITER) {
+            fallback_locale = Some(&normalized_locale[0..position])
         }
 
         let mut is_found_fallback_locale = false;
         for locale in saved_locales {
-            if locale == new_locale {
-                self.configuration.locale = new_locale;
+            if locale == normalized_locale {
+                self.configuration.locale = locale;
 
                 return Ok(true);
             }
 
             if let Some(value) = fallback_locale {
-                if value == new_locale {
+                if locale == value {
                     is_found_fallback_locale = true;
-                    break;
                 }
             }
         }
 
         // We didn't find exact locale, but we may use fallback
         if is_found_fallback_locale {
-            self.configuration.locale = new_locale;
+            if let Some(value) = fallback_locale {
+                self.configuration.locale = value.to_string();
 
-            return Ok(true);
+                return Ok(true);
+            }
         }
 
         Ok(false)
@@ -1516,5 +1517,33 @@ mod tests {
 
         assert_eq!(actual[0].text.as_str(), "Disabled Text2");
         assert_eq!(actual[1].text.as_str(), "Disabled Text\n123");
+    }
+
+    #[test]
+    fn test_change_locale() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        spawn_test_db_with_metadata(&source);
+
+        let mut conf = Configuration::default();
+        conf.metadata_url = "https://filters.adtidy.org/extension/safari/filters.json".to_string();
+        conf.metadata_locales_url =
+            "https://filters.adtidy.org/windows/filters_i18n.json".to_string();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+
+        let mut flm = FilterListManagerImpl::new(conf).unwrap();
+        flm.pull_metadata().unwrap();
+
+        let mut res = flm.change_locale("ru".to_string()).unwrap();
+        assert!(res);
+
+        res = flm.change_locale("ru-RU".to_string()).unwrap();
+        assert!(res);
+
+        res = flm.change_locale("ru_RU".to_string()).unwrap();
+        assert!(res);
+
+        res = flm.change_locale("ruRU".to_string()).unwrap();
+        assert!(!res);
     }
 }
