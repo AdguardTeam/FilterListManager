@@ -230,6 +230,8 @@ impl From<FullFilterList> for filter_list_manager::FullFilterList {
             checksum: value.checksum,
             languages: value.languages,
             rules: value.rules.map(Into::into),
+            is_user_title: value.is_user_title,
+            is_user_description: value.is_user_description,
         }
     }
 }
@@ -361,6 +363,8 @@ impl From<StoredFilterMetadata> for filter_list_manager::StoredFilterMetadata {
             license: value.license,
             checksum: value.checksum,
             languages: value.languages,
+            is_user_title: value.is_user_title,
+            is_user_description: value.is_user_description,
         }
     }
 }

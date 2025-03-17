@@ -31,6 +31,8 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <param name="checksum">The checksum.</param>
         /// <param name="languages">The languages.</param>
         /// <param name="rules">The rules.</param>
+        /// <param name="isUserTitle">if set to <c>true</c> [is user title].</param>
+        /// <param name="isUserDescription">if set to <c>true</c> [is user title].</param>
         public FullFilterList(int id,
             int groupId,
             long timeUpdated,
@@ -51,146 +53,166 @@ namespace AdGuard.FilterListManager.MarshalLogic
             string license,
             string checksum,
             List<string> languages,
-            FilterListRules rules)
+            FilterListRules rules,
+            bool isUserTitle,
+            bool isUserDescription)
         {
-            this.id = id;
-            this.groupId = groupId;
-            this.timeUpdated = timeUpdated;
-            this.lastDownloadTime = lastDownloadTime;
-            this.title = title;
-            this.description = description;
-            this.version = version;
-            this.displayNumber = displayNumber;
-            this.downloadUrl = downloadUrl;
-            this.subscriptionUrl = subscriptionUrl;
-            this.tags = tags;
-            this.expires = expires;
-            this.isTrusted = isTrusted;
-            this.isCustom = isCustom;
-            this.isEnabled = isEnabled;
-            this.isInstalled = isInstalled;
-            this.homepage = homepage;
-            this.license = license;
-            this.checksum = checksum;
-            this.languages = languages;
-            this.rules = rules;
+            Id = id;
+            GroupId = groupId;
+            TimeUpdated = timeUpdated;
+            LastDownloadTime = lastDownloadTime;
+            Title = title;
+            Description = description;
+            Version = version;
+            DisplayNumber = displayNumber;
+            DownloadUrl = downloadUrl;
+            SubscriptionUrl = subscriptionUrl;
+            Tags = tags;
+            Expires = expires;
+            IsTrusted = isTrusted;
+            IsCustom = isCustom;
+            IsEnabled = isEnabled;
+            IsInstalled = isInstalled;
+            Homepage = homepage;
+            License = license;
+            Checksum = checksum;
+            Languages = languages;
+            Rules = rules;
+            IsUserTitle = isUserTitle;
+            IsUserDescription = isUserDescription;
         }
 
         /// <summary>
-        /// Gets or sets the filter identifier.
+        /// Gets the filter identifier.
         /// </summary>
-        public int id { get; set; }
+        public int Id { get; }
 
         /// <summary>
-        /// Gets or sets the group identifier.
+        /// Gets the group identifier.
         /// </summary>
-        public int groupId { get; set; }
+        public int GroupId { get; }
 
         /// <summary>
-        /// Gets or sets the time updated.
+        /// Gets the time updated.
         /// </summary>
-        public long timeUpdated { get; set; }
+        public long TimeUpdated { get; }
 
         /// <summary>
-        /// Gets or sets the last download time.
+        /// Gets the last download time.
         /// </summary>
-        public long lastDownloadTime { get; set; }
+        public long LastDownloadTime { get; }
 
         /// <summary>
-        /// Gets or sets the title.
+        /// Gets the title.
         /// </summary>
-        public string title { get; set; }
+        public string Title { get; }
 
         /// <summary>
-        /// Gets or sets the description.
+        /// Gets the description.
         /// </summary>
-        public string description { get; set; }
+        public string Description { get; }
 
         /// <summary>
-        /// Gets or sets the version.
+        /// Gets the version.
         /// </summary>
-        public string version { get; set; }
+        public string Version { get; }
 
         /// <summary>
-        /// Gets or sets the display number.
+        /// Gets the display number.
         /// </summary>
-        public int displayNumber { get; set; }
+        public int DisplayNumber { get; }
 
         /// <summary>
-        /// Gets or sets the download URL.
+        /// Gets the download URL.
         /// </summary>
-        public string downloadUrl { get; set; }
+        public string DownloadUrl { get; }
 
         /// <summary>
-        /// Gets or sets the subscription URL.
+        /// Gets the subscription URL.
         /// </summary>
-        public string subscriptionUrl { get; set; }
+        public string SubscriptionUrl { get; }
 
         /// <summary>
-        /// Gets or sets the tags.
+        /// Gets the tags.
         /// </summary>
-        public List<FilterTag> tags { get; set; }
+        public List<FilterTag> Tags { get; }
 
         /// <summary>
-        /// Gets or sets when this filter the expires.
+        /// Gets when this filter the expires.
         /// </summary>
-        public int expires { get; set; }
+        public int Expires { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this filter is trusted.
+        /// Gets a value indicating whether this filter is trusted.
         /// </summary>
         /// <value>
         ///   <c>true</c> if this filter is trusted; otherwise, <c>false</c>.
         /// </value>
-        public bool isTrusted { get; set; }
+        public bool IsTrusted { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this filter is custom.
+        /// Gets a value indicating whether this filter is custom.
         /// </summary>
         /// <value>
         ///   <c>true</c> if this filter is custom; otherwise, <c>false</c>.
         /// </value>
-        public bool isCustom { get; set; }
+        public bool IsCustom { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this filter is enabled.
+        /// Gets a value indicating whether this filter is enabled.
         /// </summary>
         /// <value>
         ///   <c>true</c> if this filter is enabled; otherwise, <c>false</c>.
         /// </value>
-        public bool isEnabled { get; set; }
+        public bool IsEnabled { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this filter is installed.
+        /// Gets a value indicating whether this filter is installed.
         /// </summary>
         /// <value>
         ///   <c>true</c> if this filter is installed; otherwise, <c>false</c>.
         /// </value>
-        public bool isInstalled { get; set; }
+        public bool IsInstalled { get; }
 
         /// <summary>
-        /// Gets or sets the homepage of the filter.
+        /// Gets the homepage of the filter.
         /// </summary>
-        public string homepage { get; set; }
+        public string Homepage { get; }
 
         /// <summary>
-        /// Gets or sets the license string.
+        /// Gets the license string.
         /// </summary>
-        public string license { get; set; }
+        public string License { get; }
 
         /// <summary>
-        /// Gets or sets the checksum.
+        /// Gets the checksum.
         /// </summary>
-        public string checksum { get; set; }
+        public string Checksum { get; }
 
         /// <summary>
-        /// Gets or sets the languages of the filter.
+        /// Gets the languages of the filter.
         /// </summary>
-        public List<string> languages { get; set; }
-        
+        public List<string> Languages { get; }
+
         /// <summary>
-        /// Gets or sets the rules entity of th filter.
+        /// Gets the rules entity of th filter.
         /// </summary>
-        public FilterListRules rules { get; set; }
+        public FilterListRules Rules { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this filter title is user defined.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this filter title is user defined; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsUserTitle { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this filter description is user defined.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this filter description is user defined; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsUserDescription { get; }
     }
 }

@@ -2084,7 +2084,9 @@ internal record FullFilterList (
     String @license, 
     String @checksum, 
     List<String> @languages, 
-    FilterListRules? @rules
+    FilterListRules? @rules, 
+    bool @isUserTitle, 
+    bool @isUserDescription
 ) {
 }
 
@@ -2113,7 +2115,9 @@ class FfiConverterTypeFullFilterList: FfiConverterRustBuffer<FullFilterList> {
             @license: FfiConverterString.INSTANCE.Read(stream),
             @checksum: FfiConverterString.INSTANCE.Read(stream),
             @languages: FfiConverterSequenceString.INSTANCE.Read(stream),
-            @rules: FfiConverterOptionalTypeFilterListRules.INSTANCE.Read(stream)
+            @rules: FfiConverterOptionalTypeFilterListRules.INSTANCE.Read(stream),
+            @isUserTitle: FfiConverterBoolean.INSTANCE.Read(stream),
+            @isUserDescription: FfiConverterBoolean.INSTANCE.Read(stream)
         );
     }
 
@@ -2139,7 +2143,9 @@ class FfiConverterTypeFullFilterList: FfiConverterRustBuffer<FullFilterList> {
             FfiConverterString.INSTANCE.AllocationSize(value.@license) +
             FfiConverterString.INSTANCE.AllocationSize(value.@checksum) +
             FfiConverterSequenceString.INSTANCE.AllocationSize(value.@languages) +
-            FfiConverterOptionalTypeFilterListRules.INSTANCE.AllocationSize(value.@rules);
+            FfiConverterOptionalTypeFilterListRules.INSTANCE.AllocationSize(value.@rules) +
+            FfiConverterBoolean.INSTANCE.AllocationSize(value.@isUserTitle) +
+            FfiConverterBoolean.INSTANCE.AllocationSize(value.@isUserDescription);
     }
 
     public override void Write(FullFilterList value, BigEndianStream stream) {
@@ -2164,6 +2170,8 @@ class FfiConverterTypeFullFilterList: FfiConverterRustBuffer<FullFilterList> {
             FfiConverterString.INSTANCE.Write(value.@checksum, stream);
             FfiConverterSequenceString.INSTANCE.Write(value.@languages, stream);
             FfiConverterOptionalTypeFilterListRules.INSTANCE.Write(value.@rules, stream);
+            FfiConverterBoolean.INSTANCE.Write(value.@isUserTitle, stream);
+            FfiConverterBoolean.INSTANCE.Write(value.@isUserDescription, stream);
     }
 }
 
@@ -2189,7 +2197,9 @@ internal record StoredFilterMetadata (
     String @homepage, 
     String @license, 
     String @checksum, 
-    List<String> @languages
+    List<String> @languages, 
+    bool @isUserTitle, 
+    bool @isUserDescription
 ) {
 }
 
@@ -2217,7 +2227,9 @@ class FfiConverterTypeStoredFilterMetadata: FfiConverterRustBuffer<StoredFilterM
             @homepage: FfiConverterString.INSTANCE.Read(stream),
             @license: FfiConverterString.INSTANCE.Read(stream),
             @checksum: FfiConverterString.INSTANCE.Read(stream),
-            @languages: FfiConverterSequenceString.INSTANCE.Read(stream)
+            @languages: FfiConverterSequenceString.INSTANCE.Read(stream),
+            @isUserTitle: FfiConverterBoolean.INSTANCE.Read(stream),
+            @isUserDescription: FfiConverterBoolean.INSTANCE.Read(stream)
         );
     }
 
@@ -2242,7 +2254,9 @@ class FfiConverterTypeStoredFilterMetadata: FfiConverterRustBuffer<StoredFilterM
             FfiConverterString.INSTANCE.AllocationSize(value.@homepage) +
             FfiConverterString.INSTANCE.AllocationSize(value.@license) +
             FfiConverterString.INSTANCE.AllocationSize(value.@checksum) +
-            FfiConverterSequenceString.INSTANCE.AllocationSize(value.@languages);
+            FfiConverterSequenceString.INSTANCE.AllocationSize(value.@languages) +
+            FfiConverterBoolean.INSTANCE.AllocationSize(value.@isUserTitle) +
+            FfiConverterBoolean.INSTANCE.AllocationSize(value.@isUserDescription);
     }
 
     public override void Write(StoredFilterMetadata value, BigEndianStream stream) {
@@ -2266,6 +2280,8 @@ class FfiConverterTypeStoredFilterMetadata: FfiConverterRustBuffer<StoredFilterM
             FfiConverterString.INSTANCE.Write(value.@license, stream);
             FfiConverterString.INSTANCE.Write(value.@checksum, stream);
             FfiConverterSequenceString.INSTANCE.Write(value.@languages, stream);
+            FfiConverterBoolean.INSTANCE.Write(value.@isUserTitle, stream);
+            FfiConverterBoolean.INSTANCE.Write(value.@isUserDescription, stream);
     }
 }
 

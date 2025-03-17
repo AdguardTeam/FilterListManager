@@ -21,6 +21,8 @@ pub(crate) struct FilterEntity {
     pub is_enabled: bool,
     pub is_installed: bool,
     pub is_trusted: bool,
+    pub is_user_title: bool,
+    pub is_user_description: bool,
 }
 
 impl FilterEntity {
@@ -51,6 +53,8 @@ impl Default for FilterEntity {
             license: String::new(),
             checksum: String::new(),
             is_installed: false,
+            is_user_title: false,
+            is_user_description: false,
         }
     }
 }

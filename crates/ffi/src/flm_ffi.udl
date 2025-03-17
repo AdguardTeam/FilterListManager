@@ -71,6 +71,8 @@ dictionary FullFilterList {
     string checksum;
     sequence<string> languages;
     FilterListRules? rules;
+    boolean is_user_title;
+    boolean is_user_description;
 };
 
 dictionary StoredFilterMetadata {
@@ -94,6 +96,8 @@ dictionary StoredFilterMetadata {
     string license;
     string checksum;
     sequence<string> languages;
+    boolean is_user_title;
+    boolean is_user_description;
 };
 
 dictionary ActiveRulesInfo {

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.5.11] - 2025-03-17
+
+### Fixed
+- `update_filters` updates user defined title and description
+
+[1.5.11]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.5.10...ffi-1.5.11
+
 ## [1.5.10] - 2025-03-14
 
 ### Fixed

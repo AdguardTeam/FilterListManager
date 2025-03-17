@@ -26,33 +26,37 @@
                 homepage: FfiConverterString.Instance.Read(stream),
                 license: FfiConverterString.Instance.Read(stream),
                 checksum: FfiConverterString.Instance.Read(stream),
-                languages: FfiConverterSequenceString.Instance.Read(stream)
+                languages: FfiConverterSequenceString.Instance.Read(stream),
+                isUserTitle: FfiConverterBoolean.Instance.Read(stream),
+                isUserDescription: FfiConverterBoolean.Instance.Read(stream)
             );
         }
 
         public override int AllocationSize(StoredFilterMetadata value)
         {
             return
-                FfiConverterInt32.Instance.AllocationSize(value.Id) +
-                FfiConverterInt32.Instance.AllocationSize(value.GroupId) +
-                FfiConverterInt64.Instance.AllocationSize(value.TimeUpdated) +
-                FfiConverterInt64.Instance.AllocationSize(value.LastDownloadTime) +
-                FfiConverterString.Instance.AllocationSize(value.Title) +
-                FfiConverterString.Instance.AllocationSize(value.Description) +
-                FfiConverterString.Instance.AllocationSize(value.Version) +
-                FfiConverterInt32.Instance.AllocationSize(value.DisplayNumber) +
-                FfiConverterString.Instance.AllocationSize(value.DownloadUrl) +
-                FfiConverterString.Instance.AllocationSize(value.SubscriptionUrl) +
-                FfiConverterSequenceTypeFilterTag.Instance.AllocationSize(value.Tags) +
-                FfiConverterInt32.Instance.AllocationSize(value.Expires) +
-                FfiConverterBoolean.Instance.AllocationSize(value.IsTrusted) +
-                FfiConverterBoolean.Instance.AllocationSize(value.IsCustom) +
-                FfiConverterBoolean.Instance.AllocationSize(value.IsEnabled) +
-                FfiConverterBoolean.Instance.AllocationSize(value.IsInstalled) +
-                FfiConverterString.Instance.AllocationSize(value.Homepage) +
-                FfiConverterString.Instance.AllocationSize(value.License) +
-                FfiConverterString.Instance.AllocationSize(value.Checksum) +
-                FfiConverterSequenceString.Instance.AllocationSize(value.Languages);
+                FfiConverterInt32.Instance.AllocationSize(value.Id)
+                + FfiConverterInt32.Instance.AllocationSize(value.GroupId)
+                + FfiConverterInt64.Instance.AllocationSize(value.TimeUpdated)
+                + FfiConverterInt64.Instance.AllocationSize(value.LastDownloadTime)
+                + FfiConverterString.Instance.AllocationSize(value.Title)
+                + FfiConverterString.Instance.AllocationSize(value.Description)
+                + FfiConverterString.Instance.AllocationSize(value.Version)
+                + FfiConverterInt32.Instance.AllocationSize(value.DisplayNumber)
+                + FfiConverterString.Instance.AllocationSize(value.DownloadUrl)
+                + FfiConverterString.Instance.AllocationSize(value.SubscriptionUrl)
+                + FfiConverterSequenceTypeFilterTag.Instance.AllocationSize(value.Tags)
+                + FfiConverterInt32.Instance.AllocationSize(value.Expires)
+                + FfiConverterBoolean.Instance.AllocationSize(value.IsTrusted)
+                + FfiConverterBoolean.Instance.AllocationSize(value.IsCustom)
+                + FfiConverterBoolean.Instance.AllocationSize(value.IsEnabled)
+                + FfiConverterBoolean.Instance.AllocationSize(value.IsInstalled)
+                + FfiConverterString.Instance.AllocationSize(value.Homepage)
+                + FfiConverterString.Instance.AllocationSize(value.License)
+                + FfiConverterString.Instance.AllocationSize(value.Checksum)
+                + FfiConverterSequenceString.Instance.AllocationSize(value.Languages)
+                + FfiConverterBoolean.Instance.AllocationSize(value.IsUserTitle)
+                + FfiConverterBoolean.Instance.AllocationSize(value.IsUserDescription);
         }
 
         public override void Write(StoredFilterMetadata value, BigEndianStream stream)
@@ -77,6 +81,8 @@
             FfiConverterString.Instance.Write(value.License, stream);
             FfiConverterString.Instance.Write(value.Checksum, stream);
             FfiConverterSequenceString.Instance.Write(value.Languages, stream);
+            FfiConverterBoolean.Instance.Write(value.IsUserTitle, stream);
+            FfiConverterBoolean.Instance.Write(value.IsUserDescription, stream);
         }
     }
 }

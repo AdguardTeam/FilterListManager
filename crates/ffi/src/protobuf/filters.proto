@@ -148,6 +148,12 @@ message StoredFilterMetadata {
 
   // List of languages the filter supports
   repeated string languages = 20;
+
+  // Indicates if the filter list title is user defined
+  bool is_user_title = 21;
+
+  // Indicates if the filter list description is user defined
+  bool is_user_description = 22;
 }
 
 message FullFilterList {
@@ -213,4 +219,10 @@ message FullFilterList {
 
   // Optional container for rules
   optional FilterListRules rules = 21;
+
+  // Indicates if the filter list title is user defined
+  bool is_user_title = 22;
+
+  // Indicates if the filter list description is user defined
+  bool is_user_description = 23;
 }

@@ -381,6 +381,12 @@ pub struct StoredFilterMetadata {
     /// List of languages the filter supports
     #[prost(string, repeated, tag = "20")]
     pub languages: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Indicates if the filter list title is user defined
+    #[prost(bool, tag = "21")]
+    pub is_user_title: bool,
+    /// Indicates if the filter list description is user defined
+    #[prost(bool, tag = "22")]
+    pub is_user_description: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FullFilterList {
@@ -447,6 +453,12 @@ pub struct FullFilterList {
     /// Optional container for rules
     #[prost(message, optional, tag = "21")]
     pub rules: ::core::option::Option<FilterListRules>,
+    /// Indicates if the filter list title is user defined
+    #[prost(bool, tag = "22")]
+    pub is_user_title: bool,
+    /// Indicates if the filter list description is user defined
+    #[prost(bool, tag = "23")]
+    pub is_user_description: bool,
 }
 /// ActiveRulesInfo
 #[derive(Clone, PartialEq, ::prost::Message)]

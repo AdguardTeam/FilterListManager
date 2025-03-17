@@ -35,7 +35,9 @@ const BASIC_SELECT_SQL: &str = r"
         f.subscription_url,
         f.is_enabled,
         f.is_installed,
-        f.is_trusted
+        f.is_trusted,
+        f.is_user_title,
+        f.is_user_description
     FROM
         [filter] f
 ";
@@ -333,6 +335,8 @@ impl FilterRepository {
             is_enabled: row.get(14)?,
             is_installed: row.get(15)?,
             is_trusted: row.get(16)?,
+            is_user_title: row.get(17)?,
+            is_user_description: row.get(18)?,
         })
     }
 
@@ -349,7 +353,8 @@ impl FilterRepository {
                 [filter]
             SET
                 title=:title,
-                is_trusted=:is_trusted
+                is_trusted=:is_trusted,
+                is_user_title=1
             WHERE
                 filter_id=:filter_id
         ",
@@ -419,7 +424,9 @@ impl FilterRepository {
                     subscription_url,
                     is_enabled,
                     is_installed,
-                    is_trusted
+                    is_trusted,
+                    is_user_title,
+                    is_user_description
                 ) VALUES (
                     :filter_id,
                     :group_id,
@@ -437,7 +444,9 @@ impl FilterRepository {
                     :subscription_url,
                     :is_enabled,
                     :is_installed,
-                    :is_trusted
+                    :is_trusted,
+                    :is_user_title,
+                    :is_user_description
                 )",
         )?;
 
@@ -474,6 +483,8 @@ impl FilterRepository {
                 ":is_enabled": entity.is_enabled,
                 ":is_installed": entity.is_installed,
                 ":is_trusted": entity.is_trusted,
+                ":is_user_title": entity.is_user_title,
+                ":is_user_description": entity.is_user_description,
             })?;
         }
 
@@ -548,6 +559,8 @@ mod tests {
                 expires: 0,
                 homepage: "".to_string(),
                 is_installed: false,
+                is_user_title: false,
+                is_user_description: false,
             };
 
             source
@@ -619,6 +632,8 @@ mod tests {
                 expires: 0,
                 homepage: "".to_string(),
                 is_installed: false,
+                is_user_title: false,
+                is_user_description: false,
             };
 
             source
