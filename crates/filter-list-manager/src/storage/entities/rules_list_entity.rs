@@ -8,6 +8,7 @@ pub(crate) struct RulesListEntity {
     pub(crate) filter_id: FilterId,
     pub(crate) text: String,
     pub(crate) disabled_text: String,
+    pub(crate) rules_count: i32,
 }
 
 impl From<RulesListEntity> for FilterListRules {
@@ -16,6 +17,7 @@ impl From<RulesListEntity> for FilterListRules {
             filter_id: value.filter_id,
             rules: value.text.lines().map(str::to_string).collect(),
             disabled_rules: value.disabled_text.lines().map(str::to_string).collect(),
+            rules_count: value.rules_count,
         }
     }
 }
@@ -26,6 +28,7 @@ impl From<FilterListRules> for RulesListEntity {
             filter_id: value.filter_id,
             text: value.rules.join("\n"),
             disabled_text: value.disabled_rules.join("\n"),
+            rules_count: value.rules_count,
         }
     }
 }
@@ -36,6 +39,7 @@ impl From<RulesListEntity> for FilterListRulesRaw {
             filter_id: value.filter_id,
             rules: value.text,
             disabled_rules: value.disabled_text,
+            rules_count: value.rules_count,
         }
     }
 }

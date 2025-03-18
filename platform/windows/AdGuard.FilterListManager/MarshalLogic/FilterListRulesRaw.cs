@@ -11,20 +11,22 @@
         /// <param name="filterId">The filter identifier.</param>
         /// <param name="rules">The rules.</param>
         /// <param name="disabledRules">The disabled rules.</param>
-        public FilterListRulesRaw(int filterId, string rules, string disabledRules)
+        /// <param name="rulesCount">The rules count.</param>
+        public FilterListRulesRaw(int filterId, string rules, string disabledRules, int rulesCount)
         {
             FilterId = filterId;
             Rules = rules;
             DisabledRules = disabledRules;
+            RulesCount = rulesCount;
         }
         
         /// <summary>
-        /// Gets or sets the filter identifier.
+        /// Gets the filter identifier.
         /// </summary>
         public int FilterId { get; }
         
         /// <summary>
-        /// Gets or sets the rules of the filter.
+        /// Gets the rules of the filter.
         /// </summary>
         public string Rules { get; }
 
@@ -32,5 +34,10 @@
         /// Gets the disabled rules of the filter.
         /// </summary>
         public string DisabledRules { get; }
+
+        /// <summary>
+        /// Gets the rules count.
+        /// </summary>
+        public int RulesCount { get; }
     }
 }

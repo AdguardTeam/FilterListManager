@@ -270,5 +270,11 @@ namespace AdGuard.FilterListManager
         /// </summary>
         /// <param name="requestProxyMode">The proxy mode for requests.</param>
         void SetProxyMode(RequestProxyMode requestProxyMode);
+
+        /// <summary>
+        /// Returns lists of rules count by list of filter IDs
+        /// </summary>
+        /// <param name="ids">The filter ids.</param>
+        List<RulesCountByFilter> GetRulesCount(List<int> ids);
     }
 }

@@ -38,6 +38,7 @@ fn create_user_rules_rules_list_entity() -> RulesListEntity {
         filter_id: USER_RULES_FILTER_LIST_ID,
         text: String::new(),
         disabled_text: String::new(),
+        rules_count: 0,
     }
 }
 

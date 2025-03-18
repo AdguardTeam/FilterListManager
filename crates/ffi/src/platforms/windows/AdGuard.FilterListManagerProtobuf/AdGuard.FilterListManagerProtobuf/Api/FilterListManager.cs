@@ -432,6 +432,17 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             CallRustMessage<EmptyResponse>(request);
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public IEnumerable<RulesCountByFilter> GetRulesCount(IEnumerable<int> filterIds)
+        {
+            GetRulesCountRequest request = new GetRulesCountRequest();
+            request.Ids.AddRange(filterIds);
+            GetRulesCountResponse response = CallRustMessage<GetRulesCountResponse>(request);
+            return response.RulesCountByFilter;
+        }
+
         #endregion
 
 

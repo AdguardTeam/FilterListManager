@@ -29,6 +29,7 @@
         SaveRulesToFileBlob,
         GetDisabledRules,
         SetProxyMode,
+        GetRulesCount,
         // There are ffi methods which not used for working with filters explicitly
         Init,
         SpawnDefaultConfiguration,

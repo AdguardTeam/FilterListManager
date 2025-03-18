@@ -12,6 +12,7 @@ use crate::manager::models::filter_group::FilterGroup;
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
+use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::manager::models::UpdateResult;
 use crate::{FLMResult, StoredFilterMetadata};
 use models::configuration::Configuration;
@@ -333,4 +334,7 @@ pub trait FilterListManager {
 
     /// Sets a new proxy mode. Value will be applied on next method call
     fn set_proxy_mode(&mut self, mode: RequestProxyMode);
+
+    /// Returns lists of rules count by list of filter IDs
+    fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>>;
 }

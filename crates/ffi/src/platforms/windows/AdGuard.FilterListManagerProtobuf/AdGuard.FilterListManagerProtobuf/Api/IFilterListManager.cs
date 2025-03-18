@@ -352,5 +352,10 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// Sets the proxy mode request
         /// </summary>
         void SetProxyMode(string customProxyAddr, RawRequestProxyMode proxyMode);
+
+        /// <summary>
+        /// Returns lists of rules count by list of filter IDs
+        /// </summary>
+        IEnumerable<RulesCountByFilter> GetRulesCount(IEnumerable<int> filterIds);
     }
 }

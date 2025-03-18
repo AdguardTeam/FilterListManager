@@ -13,7 +13,8 @@
             return new FilterListRulesRaw(
                 filterId: FfiConverterInt32.Instance.Read(stream),
                 rules: FfiConverterString.Instance.Read(stream),
-                disabledRules: FfiConverterString.Instance.Read(stream)
+                disabledRules: FfiConverterString.Instance.Read(stream),
+                rulesCount: FfiConverterInt32.Instance.Read(stream)
             );
         }
 
@@ -21,9 +22,10 @@
         public override int AllocationSize(FilterListRulesRaw value)
         {
             return
-                FfiConverterInt32.Instance.AllocationSize(value.FilterId) +
-                FfiConverterString.Instance.AllocationSize(value.Rules) +
-                FfiConverterString.Instance.AllocationSize(value.DisabledRules);
+                FfiConverterInt32.Instance.AllocationSize(value.FilterId)
+                + FfiConverterString.Instance.AllocationSize(value.Rules)
+                + FfiConverterString.Instance.AllocationSize(value.DisabledRules)
+                + FfiConverterInt32.Instance.AllocationSize(value.RulesCount);
         }
 
         ///  <inheritdoc/>
@@ -32,6 +34,7 @@
             FfiConverterInt32.Instance.Write(value.FilterId, stream);
             FfiConverterString.Instance.Write(value.Rules, stream);
             FfiConverterString.Instance.Write(value.DisabledRules, stream);
+            FfiConverterInt32.Instance.Write(value.RulesCount, stream);
         }
     }
 }

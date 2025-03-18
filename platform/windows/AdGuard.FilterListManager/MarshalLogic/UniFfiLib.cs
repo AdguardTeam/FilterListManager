@@ -91,7 +91,9 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 new KeyValuePair<ushort, Func<ushort>>(58893,
                     uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_filter_rules_as_strings),
                 new KeyValuePair<ushort, Func<ushort>>(58681,
-                    uniffi_filter_list_manager_ffi_checksum_func_make_default_configuration)
+                    uniffi_filter_list_manager_ffi_checksum_func_make_default_configuration),
+                new KeyValuePair<ushort, Func<ushort>>(14183,
+                    uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count),
             };
 
         static void UniffiCheckApiChecksums()
@@ -594,6 +596,14 @@ namespace AdGuard.FilterListManager.MarshalLogic
 
         [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
         public static extern ushort uniffi_filter_list_manager_ffi_fn_func_make_default_configuration(
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_rules_count(FilterListManagerSafeHandle ptr, RustBuffer ids, ref RustCallStatus uniffiOutErr
+        );
+
+        [DllImport(Constants.RUST_DLL_IMPORT_NAME)]
+        public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count(
         );
 
         #endregion

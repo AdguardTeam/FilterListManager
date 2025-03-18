@@ -1,11 +1,6 @@
 use crate::manager::models::FilterId;
 use crate::storage::entities::rules_list_entity::RulesListEntity;
-
-/// This marks line as "non-rule" line: comment, directive, etc.
-const NON_RULE_MARKER: char = '!';
-
-/// Also, comment line can start from "# " sequence
-const EXTRA_COMMENT_MARKER: &str = "# ";
+use crate::storage::services::rules_list_service::RulesListService;
 
 /// Used for rules lines collection, then turns to string joined with new lines
 #[derive(Default)]
@@ -32,19 +27,18 @@ impl RuleLinesCollector {
         self.collected_lines.clear();
         self.collected_lines.shrink_to_fit();
 
+        let rules_count = self.rules_count;
+
         RulesListEntity {
             filter_id: id,
             text,
             disabled_text: String::new(),
+            rules_count,
         }
     }
 
     pub fn increment_rules_count(&mut self, line: &str) {
-        self.rules_count += i32::from(
-            !(line.is_empty()
-                || line.starts_with(NON_RULE_MARKER)
-                || line.starts_with(EXTRA_COMMENT_MARKER)),
-        )
+        self.rules_count += i32::from(RulesListService::new().is_line_is_rule(line))
     }
 
     pub fn get_rules_count(&self) -> i32 {

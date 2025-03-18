@@ -502,5 +502,18 @@ namespace AdGuard.FilterListManager
                     FfiConverterTypeRequestProxyMode.Instance.Lower(requestProxyMode), ref status)
             );
         }
+
+        /// <summary>
+        ///<inheritdoc cref="IFilterListManager"/>
+        /// </summary>
+        public List<RulesCountByFilter> GetRulesCount(List<int> ids)
+        {
+            return FfiConverterSequenceTypeRulesCountByFilter.Instance.Lift(
+                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
+                    (ref RustCallStatus status) =>
+                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_rules_count(
+                            GetHandle(), FfiConverterSequenceInt32.Instance.Lower(ids), ref status)
+                ));
+        }
     }
 }

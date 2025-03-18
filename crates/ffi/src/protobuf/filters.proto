@@ -30,6 +30,10 @@ message FilterListRules {
 
   // List of only disabled rules.
   repeated string disabled_rules = 3;
+
+  /// Rules count in this filter list. Simply a number of non-empty lines
+  /// and does not start with a comment marker.
+  int32 rules_count = 4;
 }
 
 message FilterListRulesRaw {
@@ -41,6 +45,10 @@ message FilterListRulesRaw {
 
   // List of only disabled rules as string.
   string disabled_rules = 3;
+
+  /// Rules count in this filter list. Simply a number of non-empty lines
+  /// and does not start with a comment marker.
+  int32 rules_count = 4;
 }
 
 message DisabledRulesRaw {
@@ -225,4 +233,13 @@ message FullFilterList {
 
   // Indicates if the filter list description is user defined
   bool is_user_description = 23;
+}
+
+message RulesCountByFilter {
+  // Associated filter id.
+  int32 filter_id = 1;
+
+  // Rules count in this filter list. Simply a number of non-empty lines
+  // and does not start with a comment marker.
+  int32 rules_count = 2;
 }

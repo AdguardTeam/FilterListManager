@@ -5,12 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.11] - 2025-03-17
+## [1.6.2] - 2025-03-18
 
 ### Fixed
 - `update_filters` updates user defined title and description
 
-[1.5.11]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.5.10...flm-1.5.11
+[1.6.2]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.6.1...flm-1.6.2
+
+## [1.6.1] - 2025-03-17
+
+### Added
+- `get_rules_count` method for getting rules count by filter ids
+
+[1.6.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.5.10...flm-1.6.1
 
 ## [1.5.10] - 2025-03-14
 

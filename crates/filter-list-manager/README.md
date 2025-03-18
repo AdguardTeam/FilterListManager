@@ -252,6 +252,9 @@ flm.fetch_filter_list_metadata(url, /* String */);
 // Fetches filter list by url and returns its raw metadata and body.
 // Returns FilterListMetadataWithBody.
 flm.fetch_filter_list_metadata_with_body(url, /* String */);
+
+/// Returns lists of rules count by list of filter IDs as Vec<RulesCountByFilter>
+flm.get_rules_count(ids, /* Vec<FilterId> */);
 ```
 
 #### This example references
@@ -260,7 +263,8 @@ flm.fetch_filter_list_metadata_with_body(url, /* String */);
 [StoredFilterMetadata reference](./src/manager/models/stored_filter_metadata.rs)\
 [ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)\
 [FilterListRulesRaw reference](./src/manager/models/filter_list_rules_raw.rs)\
-[DisabledRulesRaw reference](./src/manager/models/disabled_rules_raw.rs)
+[DisabledRulesRaw reference](./src/manager/models/disabled_rules_raw.rs)\
+[RulesCountByFilter reference](./src/manager/models/rules_count_by_filter.rs)
 
 ### Other (All) operations
 

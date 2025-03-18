@@ -11,14 +11,14 @@ use crate::protobuf_generated::filter_list_manager::{
     ForceUpdateFiltersByIdsRequest, ForceUpdateFiltersByIdsResponse, GetActiveRulesResponse,
     GetAllGroupsResponse, GetAllTagsResponse, GetDatabasePathResponse, GetDatabaseVersionResponse,
     GetDisabledRulesRequest, GetDisabledRulesResponse, GetFilterRulesAsStringsRequest,
-    GetFilterRulesAsStringsResponse, GetFullFilterListByIdRequest,
-    GetStoredFilterMetadataByIdResponse, GetStoredFiltersMetadataByIdRequest,
-    GetStoredFiltersMetadataResponse, InstallCustomFilterFromStringRequest,
-    InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
-    InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
-    SaveCustomFilterRulesRequest, SaveDisabledRulesRequest, SaveRulesToFileBlobRequest,
-    SetProxyModeRequest, UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse,
-    UpdateFiltersRequest, UpdateFiltersResponse,
+    GetFilterRulesAsStringsResponse, GetFullFilterListByIdRequest, GetRulesCountRequest,
+    GetRulesCountResponse, GetStoredFilterMetadataByIdResponse,
+    GetStoredFiltersMetadataByIdRequest, GetStoredFiltersMetadataResponse,
+    InstallCustomFilterFromStringRequest, InstallCustomFilterFromStringResponse,
+    InstallCustomFilterListRequest, InstallCustomFilterListResponse, InstallFilterListsRequest,
+    InstallFilterListsResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
+    SaveRulesToFileBlobRequest, SetProxyModeRequest, UpdateCustomFilterMetadataRequest,
+    UpdateCustomFilterMetadataResponse, UpdateFiltersRequest, UpdateFiltersResponse,
 };
 use adguard_flm::RequestProxyMode;
 use enum_stringify::EnumStringify;
@@ -56,6 +56,7 @@ pub enum FFIMethod {
     SaveRulesToFileBlob,
     GetDisabledRules,
     SetProxyMode,
+    GetRulesCount,
 }
 
 /// Calls FLM method described as [`FFIMethod`] for object behind [`FLMHandle`]
@@ -476,6 +477,21 @@ pub unsafe extern "C" fn flm_call_protobuf(
 
             EmptyResponse {
                 error: flm_handle.flm.set_proxy_mode(inner).err().map(Into::into),
+            }
+        }
+        .encode(&mut out_bytes_buffer),
+        FFIMethod::GetRulesCount => {
+            let request = decode_input_request!(GetRulesCountRequest);
+
+            match flm_handle.flm.get_rules_count(request.ids) {
+                Ok(value) => GetRulesCountResponse {
+                    rules_count_by_filter: value.into_iter().map(Into::into).collect(),
+                    error: None,
+                },
+                Err(why) => GetRulesCountResponse {
+                    rules_count_by_filter: vec![],
+                    error: Some(why.into()),
+                },
             }
         }
         .encode(&mut out_bytes_buffer),

@@ -260,6 +260,7 @@ pub use crate::manager::models::filter_list_rules::FilterListRules;
 pub use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 pub use crate::manager::models::filter_tag::FilterTag;
 pub use crate::manager::models::flm_error::FLMError;
+pub use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 pub use crate::manager::models::stored_filter_metadata::StoredFilterMetadata;
 pub use crate::manager::models::update_result::UpdateFilterError;
 pub use crate::manager::models::FilterId;

@@ -104,6 +104,10 @@ message SetProxyModeRequest {
   string custom_proxy_addr = 2;
 }
 
+message GetRulesCountRequest {
+  repeated int32 ids = 1;
+}
+
 message EmptyRequest {}
 
 // endregion
@@ -212,6 +216,11 @@ message GetFilterRulesAsStringsResponse {
 
 message GetDisabledRulesResponse {
   repeated DisabledRulesRaw rules_raw = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetRulesCountResponse {
+  repeated RulesCountByFilter rules_count_by_filter = 1;
   optional AGOuterError error = 2;
 }
 
