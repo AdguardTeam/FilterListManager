@@ -39,7 +39,7 @@ namespace FilterListManager {
             "GAcgASgJEgsKA3VybBgIIAEoCRITCgtydWxlc19jb3VudBgJIAEoBSJsChpG",
             "aWx0ZXJMaXN0TWV0YWRhdGFXaXRoQm9keRI5CghtZXRhZGF0YRgBIAEoCzIn",
             "LmZpbHRlcl9saXN0X21hbmFnZXIuRmlsdGVyTGlzdE1ldGFkYXRhEhMKC2Zp",
-            "bHRlcl9ib2R5GAIgASgJIu8DChRTdG9yZWRGaWx0ZXJNZXRhZGF0YRIKCgJp",
+            "bHRlcl9ib2R5GAIgASgJIrsDChRTdG9yZWRGaWx0ZXJNZXRhZGF0YRIKCgJp",
             "ZBgBIAEoBRIQCghncm91cF9pZBgCIAEoBRIUCgx0aW1lX3VwZGF0ZWQYAyAB",
             "KAMSGgoSbGFzdF9kb3dubG9hZF90aW1lGAQgASgDEg0KBXRpdGxlGAUgASgJ",
             "EhMKC2Rlc2NyaXB0aW9uGAYgASgJEg8KB3ZlcnNpb24YByABKAkSFgoOZGlz",
@@ -49,22 +49,20 @@ namespace FilterListManager {
             "dHJ1c3RlZBgNIAEoCBIRCglpc19jdXN0b20YDiABKAgSEgoKaXNfZW5hYmxl",
             "ZBgPIAEoCBIUCgxpc19pbnN0YWxsZWQYECABKAgSEAoIaG9tZXBhZ2UYESAB",
             "KAkSDwoHbGljZW5zZRgSIAEoCRIQCghjaGVja3N1bRgTIAEoCRIRCglsYW5n",
-            "dWFnZXMYFCADKAkSFQoNaXNfdXNlcl90aXRsZRgVIAEoCBIbChNpc191c2Vy",
-            "X2Rlc2NyaXB0aW9uGBYgASgIIq0ECg5GdWxsRmlsdGVyTGlzdBIKCgJpZBgB",
-            "IAEoBRIQCghncm91cF9pZBgCIAEoBRIUCgx0aW1lX3VwZGF0ZWQYAyABKAMS",
-            "GgoSbGFzdF9kb3dubG9hZF90aW1lGAQgASgDEg0KBXRpdGxlGAUgASgJEhMK",
-            "C2Rlc2NyaXB0aW9uGAYgASgJEg8KB3ZlcnNpb24YByABKAkSFgoOZGlzcGxh",
-            "eV9udW1iZXIYCCABKAUSFAoMZG93bmxvYWRfdXJsGAkgASgJEhgKEHN1YnNj",
-            "cmlwdGlvbl91cmwYCiABKAkSLAoEdGFncxgLIAMoCzIeLmZpbHRlcl9saXN0",
-            "X21hbmFnZXIuRmlsdGVyVGFnEg8KB2V4cGlyZXMYDCABKAUSEgoKaXNfdHJ1",
-            "c3RlZBgNIAEoCBIRCglpc19jdXN0b20YDiABKAgSEgoKaXNfZW5hYmxlZBgP",
-            "IAEoCBIUCgxpc19pbnN0YWxsZWQYECABKAgSEAoIaG9tZXBhZ2UYESABKAkS",
-            "DwoHbGljZW5zZRgSIAEoCRIQCghjaGVja3N1bRgTIAEoCRIRCglsYW5ndWFn",
-            "ZXMYFCADKAkSOAoFcnVsZXMYFSABKAsyJC5maWx0ZXJfbGlzdF9tYW5hZ2Vy",
-            "LkZpbHRlckxpc3RSdWxlc0gAiAEBEhUKDWlzX3VzZXJfdGl0bGUYFiABKAgS",
-            "GwoTaXNfdXNlcl9kZXNjcmlwdGlvbhgXIAEoCEIICgZfcnVsZXMiPAoSUnVs",
-            "ZXNDb3VudEJ5RmlsdGVyEhEKCWZpbHRlcl9pZBgBIAEoBRITCgtydWxlc19j",
-            "b3VudBgCIAEoBWIGcHJvdG8z"));
+            "dWFnZXMYFCADKAki+QMKDkZ1bGxGaWx0ZXJMaXN0EgoKAmlkGAEgASgFEhAK",
+            "CGdyb3VwX2lkGAIgASgFEhQKDHRpbWVfdXBkYXRlZBgDIAEoAxIaChJsYXN0",
+            "X2Rvd25sb2FkX3RpbWUYBCABKAMSDQoFdGl0bGUYBSABKAkSEwoLZGVzY3Jp",
+            "cHRpb24YBiABKAkSDwoHdmVyc2lvbhgHIAEoCRIWCg5kaXNwbGF5X251bWJl",
+            "chgIIAEoBRIUCgxkb3dubG9hZF91cmwYCSABKAkSGAoQc3Vic2NyaXB0aW9u",
+            "X3VybBgKIAEoCRIsCgR0YWdzGAsgAygLMh4uZmlsdGVyX2xpc3RfbWFuYWdl",
+            "ci5GaWx0ZXJUYWcSDwoHZXhwaXJlcxgMIAEoBRISCgppc190cnVzdGVkGA0g",
+            "ASgIEhEKCWlzX2N1c3RvbRgOIAEoCBISCgppc19lbmFibGVkGA8gASgIEhQK",
+            "DGlzX2luc3RhbGxlZBgQIAEoCBIQCghob21lcGFnZRgRIAEoCRIPCgdsaWNl",
+            "bnNlGBIgASgJEhAKCGNoZWNrc3VtGBMgASgJEhEKCWxhbmd1YWdlcxgUIAMo",
+            "CRI4CgVydWxlcxgVIAEoCzIkLmZpbHRlcl9saXN0X21hbmFnZXIuRmlsdGVy",
+            "TGlzdFJ1bGVzSACIAQFCCAoGX3J1bGVzIjwKElJ1bGVzQ291bnRCeUZpbHRl",
+            "chIRCglmaWx0ZXJfaWQYASABKAUSEwoLcnVsZXNfY291bnQYAiABKAViBnBy",
+            "b3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -75,8 +73,8 @@ namespace FilterListManager {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.DisabledRulesRaw), global::FilterListManager.DisabledRulesRaw.Parser, new[]{ "FilterId", "Text" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FilterListMetadata), global::FilterListManager.FilterListMetadata.Parser, new[]{ "Title", "Description", "TimeUpdated", "Version", "Homepage", "License", "Checksum", "Url", "RulesCount" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FilterListMetadataWithBody), global::FilterListManager.FilterListMetadataWithBody.Parser, new[]{ "Metadata", "FilterBody" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.StoredFilterMetadata), global::FilterListManager.StoredFilterMetadata.Parser, new[]{ "Id", "GroupId", "TimeUpdated", "LastDownloadTime", "Title", "Description", "Version", "DisplayNumber", "DownloadUrl", "SubscriptionUrl", "Tags", "Expires", "IsTrusted", "IsCustom", "IsEnabled", "IsInstalled", "Homepage", "License", "Checksum", "Languages", "IsUserTitle", "IsUserDescription" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FullFilterList), global::FilterListManager.FullFilterList.Parser, new[]{ "Id", "GroupId", "TimeUpdated", "LastDownloadTime", "Title", "Description", "Version", "DisplayNumber", "DownloadUrl", "SubscriptionUrl", "Tags", "Expires", "IsTrusted", "IsCustom", "IsEnabled", "IsInstalled", "Homepage", "License", "Checksum", "Languages", "Rules", "IsUserTitle", "IsUserDescription" }, new[]{ "Rules" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.StoredFilterMetadata), global::FilterListManager.StoredFilterMetadata.Parser, new[]{ "Id", "GroupId", "TimeUpdated", "LastDownloadTime", "Title", "Description", "Version", "DisplayNumber", "DownloadUrl", "SubscriptionUrl", "Tags", "Expires", "IsTrusted", "IsCustom", "IsEnabled", "IsInstalled", "Homepage", "License", "Checksum", "Languages" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FullFilterList), global::FilterListManager.FullFilterList.Parser, new[]{ "Id", "GroupId", "TimeUpdated", "LastDownloadTime", "Title", "Description", "Version", "DisplayNumber", "DownloadUrl", "SubscriptionUrl", "Tags", "Expires", "IsTrusted", "IsCustom", "IsEnabled", "IsInstalled", "Homepage", "License", "Checksum", "Languages", "Rules" }, new[]{ "Rules" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.RulesCountByFilter), global::FilterListManager.RulesCountByFilter.Parser, new[]{ "FilterId", "RulesCount" }, null, null, null, null)
           }));
     }
@@ -2231,8 +2229,6 @@ namespace FilterListManager {
       license_ = other.license_;
       checksum_ = other.checksum_;
       languages_ = other.languages_.Clone();
-      isUserTitle_ = other.isUserTitle_;
-      isUserDescription_ = other.isUserDescription_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2540,36 +2536,6 @@ namespace FilterListManager {
       get { return languages_; }
     }
 
-    /// <summary>Field number for the "is_user_title" field.</summary>
-    public const int IsUserTitleFieldNumber = 21;
-    private bool isUserTitle_;
-    /// <summary>
-    /// Indicates if the filter list title is user defined
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool IsUserTitle {
-      get { return isUserTitle_; }
-      set {
-        isUserTitle_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "is_user_description" field.</summary>
-    public const int IsUserDescriptionFieldNumber = 22;
-    private bool isUserDescription_;
-    /// <summary>
-    /// Indicates if the filter list description is user defined
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool IsUserDescription {
-      get { return isUserDescription_; }
-      set {
-        isUserDescription_ = value;
-      }
-    }
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -2605,8 +2571,6 @@ namespace FilterListManager {
       if (License != other.License) return false;
       if (Checksum != other.Checksum) return false;
       if(!languages_.Equals(other.languages_)) return false;
-      if (IsUserTitle != other.IsUserTitle) return false;
-      if (IsUserDescription != other.IsUserDescription) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2634,8 +2598,6 @@ namespace FilterListManager {
       if (License.Length != 0) hash ^= License.GetHashCode();
       if (Checksum.Length != 0) hash ^= Checksum.GetHashCode();
       hash ^= languages_.GetHashCode();
-      if (IsUserTitle != false) hash ^= IsUserTitle.GetHashCode();
-      if (IsUserDescription != false) hash ^= IsUserDescription.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2728,14 +2690,6 @@ namespace FilterListManager {
         output.WriteString(Checksum);
       }
       languages_.WriteTo(output, _repeated_languages_codec);
-      if (IsUserTitle != false) {
-        output.WriteRawTag(168, 1);
-        output.WriteBool(IsUserTitle);
-      }
-      if (IsUserDescription != false) {
-        output.WriteRawTag(176, 1);
-        output.WriteBool(IsUserDescription);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2820,14 +2774,6 @@ namespace FilterListManager {
         output.WriteString(Checksum);
       }
       languages_.WriteTo(ref output, _repeated_languages_codec);
-      if (IsUserTitle != false) {
-        output.WriteRawTag(168, 1);
-        output.WriteBool(IsUserTitle);
-      }
-      if (IsUserDescription != false) {
-        output.WriteRawTag(176, 1);
-        output.WriteBool(IsUserDescription);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2894,12 +2840,6 @@ namespace FilterListManager {
         size += 2 + pb::CodedOutputStream.ComputeStringSize(Checksum);
       }
       size += languages_.CalculateSize(_repeated_languages_codec);
-      if (IsUserTitle != false) {
-        size += 2 + 1;
-      }
-      if (IsUserDescription != false) {
-        size += 2 + 1;
-      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -2968,12 +2908,6 @@ namespace FilterListManager {
         Checksum = other.Checksum;
       }
       languages_.Add(other.languages_);
-      if (other.IsUserTitle != false) {
-        IsUserTitle = other.IsUserTitle;
-      }
-      if (other.IsUserDescription != false) {
-        IsUserDescription = other.IsUserDescription;
-      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -3067,14 +3001,6 @@ namespace FilterListManager {
           }
           case 162: {
             languages_.AddEntriesFrom(input, _repeated_languages_codec);
-            break;
-          }
-          case 168: {
-            IsUserTitle = input.ReadBool();
-            break;
-          }
-          case 176: {
-            IsUserDescription = input.ReadBool();
             break;
           }
         }
@@ -3172,14 +3098,6 @@ namespace FilterListManager {
             languages_.AddEntriesFrom(ref input, _repeated_languages_codec);
             break;
           }
-          case 168: {
-            IsUserTitle = input.ReadBool();
-            break;
-          }
-          case 176: {
-            IsUserDescription = input.ReadBool();
-            break;
-          }
         }
       }
     }
@@ -3242,8 +3160,6 @@ namespace FilterListManager {
       checksum_ = other.checksum_;
       languages_ = other.languages_.Clone();
       rules_ = other.rules_ != null ? other.rules_.Clone() : null;
-      isUserTitle_ = other.isUserTitle_;
-      isUserDescription_ = other.isUserDescription_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3566,36 +3482,6 @@ namespace FilterListManager {
       }
     }
 
-    /// <summary>Field number for the "is_user_title" field.</summary>
-    public const int IsUserTitleFieldNumber = 22;
-    private bool isUserTitle_;
-    /// <summary>
-    /// Indicates if the filter list title is user defined
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool IsUserTitle {
-      get { return isUserTitle_; }
-      set {
-        isUserTitle_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "is_user_description" field.</summary>
-    public const int IsUserDescriptionFieldNumber = 23;
-    private bool isUserDescription_;
-    /// <summary>
-    /// Indicates if the filter list description is user defined
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool IsUserDescription {
-      get { return isUserDescription_; }
-      set {
-        isUserDescription_ = value;
-      }
-    }
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -3632,8 +3518,6 @@ namespace FilterListManager {
       if (Checksum != other.Checksum) return false;
       if(!languages_.Equals(other.languages_)) return false;
       if (!object.Equals(Rules, other.Rules)) return false;
-      if (IsUserTitle != other.IsUserTitle) return false;
-      if (IsUserDescription != other.IsUserDescription) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3662,8 +3546,6 @@ namespace FilterListManager {
       if (Checksum.Length != 0) hash ^= Checksum.GetHashCode();
       hash ^= languages_.GetHashCode();
       if (rules_ != null) hash ^= Rules.GetHashCode();
-      if (IsUserTitle != false) hash ^= IsUserTitle.GetHashCode();
-      if (IsUserDescription != false) hash ^= IsUserDescription.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3760,14 +3642,6 @@ namespace FilterListManager {
         output.WriteRawTag(170, 1);
         output.WriteMessage(Rules);
       }
-      if (IsUserTitle != false) {
-        output.WriteRawTag(176, 1);
-        output.WriteBool(IsUserTitle);
-      }
-      if (IsUserDescription != false) {
-        output.WriteRawTag(184, 1);
-        output.WriteBool(IsUserDescription);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -3856,14 +3730,6 @@ namespace FilterListManager {
         output.WriteRawTag(170, 1);
         output.WriteMessage(Rules);
       }
-      if (IsUserTitle != false) {
-        output.WriteRawTag(176, 1);
-        output.WriteBool(IsUserTitle);
-      }
-      if (IsUserDescription != false) {
-        output.WriteRawTag(184, 1);
-        output.WriteBool(IsUserDescription);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -3932,12 +3798,6 @@ namespace FilterListManager {
       size += languages_.CalculateSize(_repeated_languages_codec);
       if (rules_ != null) {
         size += 2 + pb::CodedOutputStream.ComputeMessageSize(Rules);
-      }
-      if (IsUserTitle != false) {
-        size += 2 + 1;
-      }
-      if (IsUserDescription != false) {
-        size += 2 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -4012,12 +3872,6 @@ namespace FilterListManager {
           Rules = new global::FilterListManager.FilterListRules();
         }
         Rules.MergeFrom(other.Rules);
-      }
-      if (other.IsUserTitle != false) {
-        IsUserTitle = other.IsUserTitle;
-      }
-      if (other.IsUserDescription != false) {
-        IsUserDescription = other.IsUserDescription;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -4121,14 +3975,6 @@ namespace FilterListManager {
             input.ReadMessage(Rules);
             break;
           }
-          case 176: {
-            IsUserTitle = input.ReadBool();
-            break;
-          }
-          case 184: {
-            IsUserDescription = input.ReadBool();
-            break;
-          }
         }
       }
     #endif
@@ -4229,14 +4075,6 @@ namespace FilterListManager {
               Rules = new global::FilterListManager.FilterListRules();
             }
             input.ReadMessage(Rules);
-            break;
-          }
-          case 176: {
-            IsUserTitle = input.ReadBool();
-            break;
-          }
-          case 184: {
-            IsUserDescription = input.ReadBool();
             break;
           }
         }

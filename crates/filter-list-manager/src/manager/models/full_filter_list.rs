@@ -142,10 +142,6 @@ pub struct FullFilterList {
     /// This field can be empty when the filter list is not yet downloaded, but
     /// it was received from the registry (using `pull_metadata`).
     pub rules: Option<FilterListRules>,
-    /// Indicates if the filter list title is user defined
-    pub is_user_title: bool,
-    /// Indicates if the filter list description is user defined
-    pub is_user_description: bool,
 }
 
 impl FullFilterList {
@@ -176,8 +172,6 @@ impl FullFilterList {
             checksum: stored_filter_metadata.checksum,
             languages: stored_filter_metadata.languages,
             rules,
-            is_user_title: stored_filter_metadata.is_user_title,
-            is_user_description: stored_filter_metadata.is_user_description,
         }
     }
     /// Builds `[Self]` from `[FilterEntity]` and friends
@@ -212,8 +206,6 @@ impl FullFilterList {
                 languages,
                 rules,
                 is_installed: entity.is_installed,
-                is_user_title: entity.is_user_title,
-                is_user_description: entity.is_user_description,
             });
         }
 

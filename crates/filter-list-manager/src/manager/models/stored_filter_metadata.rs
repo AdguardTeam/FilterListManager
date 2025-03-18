@@ -132,10 +132,6 @@ pub struct StoredFilterMetadata {
     /// code without locale (i.e. `en`, `zh`) or with locale (i.e. `en-GB`,
     /// etc.)
     pub languages: Vec<String>,
-    /// Indicates if the filter list title is user defined
-    pub is_user_title: bool,
-    /// Indicates if the filter list description is user defined
-    pub is_user_description: bool,
 }
 
 impl StoredFilterMetadata {
@@ -169,8 +165,6 @@ impl StoredFilterMetadata {
                 checksum: entity.checksum,
                 languages,
                 is_installed: entity.is_installed,
-                is_user_title: entity.is_user_title,
-                is_user_description: entity.is_user_description,
             });
         }
 
