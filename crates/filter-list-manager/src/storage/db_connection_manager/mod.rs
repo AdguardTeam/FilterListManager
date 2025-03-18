@@ -73,15 +73,19 @@ impl DbConnectionManager {
                 tx.execute_batch(SCHEMA_STR)
                     .map_err(FLMError::from_database)?;
 
+                run_migrations(&mut tx)?;
+
                 db_bootstrap(&mut tx).map_err(FLMError::from_database)?;
             }
             DatabaseStatus::OnlySchema => {
+                run_migrations(&mut tx)?;
+
                 db_bootstrap(&mut tx).map_err(FLMError::from_database)?;
             }
-            DatabaseStatus::Filled => {}
+            DatabaseStatus::Filled => {
+                run_migrations(&mut tx)?;
+            }
         };
-
-        run_migrations(&mut tx)?;
 
         tx.commit().map_err(FLMError::from_database)
     }

@@ -101,6 +101,8 @@ public protocol FLMFacadeProtocol {
     func getDisabledRules(ids: [Int32]) throws -> [FilterListManager_DisabledRulesRaw]
 
     func setProxyMode(mode: FilterListManager_RawRequestProxyMode, custom_addr: String?) throws
+
+    func getRulesCount(ids: [Int32]) throws -> [FilterListManager_RulesCountByFilter]
 }
 
 /// Main FLM facade.
@@ -566,6 +568,20 @@ public class FLMFacade: FLMFacadeProtocol {
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
         }
+    }
+
+    public func getRulesCount(ids: [Int32]) throws -> [FilterListManager_RulesCountByFilter] {
+        var message = FilterListManager_GetRulesCountRequest()
+        message.ids = ids
+
+        let bytes = try callRust(method: GetRulesCount, message: message)
+        let response = try FilterListManager_GetRulesCountResponse(serializedBytes: bytes)
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+
+        return response.rulesCountByFilter
     }
 
     deinit {

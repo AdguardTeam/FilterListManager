@@ -1,4 +1,5 @@
 use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
+use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::manager::models::FilterId;
 use crate::storage::blob::BlobHandleImpl;
 use crate::storage::entities::rules_list_entity::RulesListEntity;
@@ -20,7 +21,8 @@ const BASIC_SELECT_SQL: &str = r"
     SELECT
         filter_id,
         rules_text,
-        disabled_rules_text
+        disabled_rules_text,
+        rules_count
     FROM
         [rules_list]
 ";
@@ -186,6 +188,7 @@ impl RulesListRepository {
             filter_id: row.get(0)?,
             text: row.get(1)?,
             disabled_text: row.get(2)?,
+            rules_count: row.get(3)?,
         })
     }
 
@@ -255,6 +258,41 @@ impl RulesListRepository {
 
         Ok(out)
     }
+
+    pub(crate) fn get_rules_count(
+        &self,
+        connection: &Connection,
+        ids: &[FilterId],
+    ) -> Result<Vec<RulesCountByFilter>> {
+        let mut sql = String::from(
+            r"
+            SELECT
+                filter_id,
+                rules_count
+            FROM
+                [rules_list]
+            WHERE ",
+        );
+
+        sql += build_in_clause("filter_id", ids.len()).as_str();
+        let params = params_from_iter(ids);
+
+        let mut statement = connection.prepare(sql.as_str())?;
+
+        let mut out = vec![];
+        let Some(mut rows) = statement.query(params).optional()? else {
+            return Ok(out);
+        };
+
+        while let Some(row) = rows.next()? {
+            out.push(RulesCountByFilter {
+                filter_id: row.get(0)?,
+                rules_count: row.get(1)?,
+            })
+        }
+
+        Ok(out)
+    }
 }
 
 impl BulkDeleteRepository<RulesListEntity, FilterId> for RulesListRepository {
@@ -272,13 +310,15 @@ impl Repository<RulesListEntity> for RulesListRepository {
                     (
                         filter_id,
                         rules_text,
-                        disabled_rules_text
+                        disabled_rules_text,
+                        rules_count
                     )
                 VALUES
                     (
                         :filter_id,
                         :rules_text,
-                        :disabled_rules_text
+                        :disabled_rules_text,
+                        :rules_count
                     )
             ",
         )?;
@@ -287,7 +327,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
             statement.execute(named_params! {
                 ":filter_id": entity.filter_id,
                 ":rules_text": entity.text,
-                ":disabled_rules_text": entity.disabled_text
+                ":disabled_rules_text": entity.disabled_text,
+                ":rules_count": entity.rules_count
             })?;
         }
 

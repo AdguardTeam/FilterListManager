@@ -16,6 +16,7 @@ use crate::manager::models::filter_group::FilterGroup;
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
+use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::manager::update_filters_action::update_filters_action;
 use crate::storage::blob::write_to_stream;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
@@ -24,6 +25,7 @@ use crate::storage::repositories::filter_group_repository::FilterGroupRepository
 use crate::storage::repositories::filter_tag_repository::FilterTagRepository;
 use crate::storage::repositories::localisation::filter_localisations_repository::FilterLocalisationRepository;
 use crate::storage::repositories::BulkDeleteRepository;
+use crate::storage::services::rules_list_service::RulesListService;
 use crate::storage::spawn_transaction;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::DbConnectionManager;
@@ -254,6 +256,8 @@ impl FilterListManager for FilterListManagerImpl {
             .parse_from_url(&url)
             .map_err(FLMError::from_parser_error)?;
 
+        let rule_entity = parser.extract_rule_entity(0);
+
         Ok(FilterListMetadataWithBody {
             metadata: FilterListMetadata {
                 title: parser.get_metadata(KnownMetadataProperty::Title),
@@ -264,9 +268,9 @@ impl FilterListManager for FilterListManagerImpl {
                 license: parser.get_metadata(KnownMetadataProperty::License),
                 checksum: parser.get_metadata(KnownMetadataProperty::Checksum),
                 url: download_url,
-                rules_count: parser.get_rules_count(),
+                rules_count: rule_entity.rules_count,
             },
-            filter_body: parser.extract_rule_entity(0).text,
+            filter_body: rule_entity.text,
         })
     }
 
@@ -391,7 +395,10 @@ impl FilterListManager for FilterListManagerImpl {
 
                             filter_repository.insert(transaction, &filters)?;
 
-                            RulesListRepository::new().insert(transaction, &[rules.into()])
+                            RulesListRepository::new().insert(
+                                transaction,
+                                &[RulesListService::new().update_rules_count(rules)],
+                            )
                         })
                     }
 
@@ -846,6 +853,15 @@ impl FilterListManager for FilterListManagerImpl {
     fn set_proxy_mode(&mut self, mode: RequestProxyMode) {
         self.configuration.request_proxy_mode = mode;
     }
+
+    fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>> {
+        self.connection_manager
+            .execute_db(|connection: Connection| {
+                RulesListRepository::new()
+                    .get_rules_count(&connection, &ids)
+                    .map_err(FLMError::from_database)
+            })
+    }
 }
 
 #[cfg(test)]
@@ -1276,6 +1292,7 @@ mod tests {
             filter_id: USER_RULES_FILTER_LIST_ID,
             rules: vec![String::from("example.com")],
             disabled_rules: vec![],
+            rules_count: 0,
         };
 
         // Set a new time here
@@ -1407,6 +1424,7 @@ mod tests {
                             filter_id: id,
                             text: "example.com\nexample.org".to_string(),
                             disabled_text: "example.com".to_string(),
+                            rules_count: 0,
                         })
                         .collect::<Vec<RulesListEntity>>();
 
@@ -1460,6 +1478,7 @@ mod tests {
                 String::from("fourth"),
                 String::from("second"),
             ],
+            rules_count: 0,
         };
 
         flm.save_custom_filter_rules(rules).unwrap();
@@ -1492,12 +1511,14 @@ mod tests {
                     filter_id: last_filter_id,
                     text: "Text\nDisabled Text\n123".to_string(),
                     disabled_text: "Disabled Text\n123".to_string(),
+                    rules_count: 0,
                 };
 
                 let rules2 = RulesListEntity {
                     filter_id: first_filter_id,
                     text: "Text2\nDisabled Text2".to_string(),
                     disabled_text: "Disabled Text2".to_string(),
+                    rules_count: 0,
                 };
 
                 let tx = connection.transaction().unwrap();
@@ -1545,5 +1566,89 @@ mod tests {
 
         res = flm.change_locale("ruRU".to_string()).unwrap();
         assert!(!res);
+    }
+
+    #[test]
+    fn test_get_rules_count() {
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
+
+        let source = &flm.connection_manager;
+        spawn_test_db_with_metadata(source);
+
+        let user_rules_count_result = 5;
+
+        source
+            .execute_db(|mut connection: Connection| {
+                let rules = RulesListEntity {
+                    filter_id: USER_RULES_FILTER_LIST_ID,
+                    text: "".to_string(),
+                    disabled_text: "".to_string(),
+                    rules_count: user_rules_count_result,
+                };
+
+                let tx = connection.transaction().unwrap();
+                let repo = RulesListRepository::new();
+
+                repo.insert(&tx, vec![rules].as_slice()).unwrap();
+
+                tx.commit().unwrap();
+
+                Ok(())
+            })
+            .unwrap();
+
+        let rules_count_by_filter = flm
+            .get_rules_count(vec![USER_RULES_FILTER_LIST_ID])
+            .unwrap();
+
+        assert_eq!(
+            rules_count_by_filter[0].filter_id,
+            USER_RULES_FILTER_LIST_ID
+        );
+        assert_eq!(
+            rules_count_by_filter[0].rules_count,
+            user_rules_count_result
+        );
+    }
+
+    #[test]
+    fn test_save_custom_filter_rules_must_update_rules_count() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        spawn_test_db_with_metadata(&source);
+
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        let flm = FilterListManagerImpl::new(conf).unwrap();
+
+        let rules = FilterListRules {
+            filter_id: USER_RULES_FILTER_LIST_ID,
+            rules: "Text\n!Text\n# Text\n\n\nText"
+                .split('\n')
+                .map(str::to_string)
+                .collect(),
+            disabled_rules: "Disabled Text".split('\n').map(str::to_string).collect(),
+            rules_count: 0,
+        };
+
+        let user_rules_count_result = 2;
+
+        flm.save_custom_filter_rules(rules).unwrap();
+
+        let rules_count_by_filter = flm
+            .get_rules_count(vec![USER_RULES_FILTER_LIST_ID])
+            .unwrap();
+
+        assert_eq!(
+            rules_count_by_filter[0].filter_id,
+            USER_RULES_FILTER_LIST_ID
+        );
+        assert_eq!(
+            rules_count_by_filter[0].rules_count,
+            user_rules_count_result
+        );
     }
 }

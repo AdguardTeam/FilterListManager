@@ -13,26 +13,33 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <param name="filterId">The filter identifier.</param>
         /// <param name="rules">The rules.</param>
         /// <param name="disabledRules">The disabled rules.</param>
-        public FilterListRules(int filterId, List<string> rules, List<string> disabledRules)
+        /// <param name="rulesCount">The rules count.</param>
+        public FilterListRules(int filterId, List<string> rules, List<string> disabledRules, int rulesCount)
         {
-            this.filterId = filterId;
-            this.rules = rules;
-            this.disabledRules = disabledRules;
+            FilterId = filterId;
+            Rules = rules;
+            DisabledRules = disabledRules;
+            RulesCount = rulesCount;
         }
 
         /// <summary>
-        /// Gets or sets the filter identifier.
+        /// Gets the filter identifier.
         /// </summary>
-        public int filterId { get; set; }
+        public int FilterId { get; }
 
         /// <summary>
-        /// Gets or sets the rules of the filter.
+        /// Gets the rules of the filter.
         /// </summary>
-        public List<string> rules { get; set; }
+        public List<string> Rules { get; }
 
         /// <summary>
-        /// Gets or sets the disabled rules of the filter.
+        /// Gets the disabled rules of the filter.
         /// </summary>
-        public List<string> disabledRules { get; set; }
+        public List<string> DisabledRules { get; }
+
+        /// <summary>
+        /// Gets the rules count.
+        /// </summary>
+        public int RulesCount { get; }
     }
 }

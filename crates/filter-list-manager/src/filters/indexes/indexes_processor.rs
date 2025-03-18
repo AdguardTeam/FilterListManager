@@ -595,6 +595,7 @@ mod tests {
                             filter_id: new_chosen_filter.filter_id.clone().unwrap(),
                             text: "".to_string(),
                             disabled_text: "".to_string(),
+                            rules_count: 0,
                         };
 
                         let _ = &rules_repository

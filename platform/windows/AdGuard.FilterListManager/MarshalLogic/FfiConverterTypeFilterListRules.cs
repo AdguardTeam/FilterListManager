@@ -9,22 +9,25 @@ namespace AdGuard.FilterListManager.MarshalLogic
             return new FilterListRules(
                 filterId: FfiConverterInt32.Instance.Read(stream),
                 rules: FfiConverterSequenceString.Instance.Read(stream),
-                disabledRules: FfiConverterSequenceString.Instance.Read(stream)
+                disabledRules: FfiConverterSequenceString.Instance.Read(stream),
+                rulesCount: FfiConverterInt32.Instance.Read(stream)
             );
         }
 
         public override int AllocationSize(FilterListRules value)
         {
-            return FfiConverterInt32.Instance.AllocationSize(value.filterId)
-                   + FfiConverterSequenceString.Instance.AllocationSize(value.rules)
-                   + FfiConverterSequenceString.Instance.AllocationSize(value.disabledRules);
+            return FfiConverterInt32.Instance.AllocationSize(value.FilterId)
+                   + FfiConverterSequenceString.Instance.AllocationSize(value.Rules)
+                   + FfiConverterSequenceString.Instance.AllocationSize(value.DisabledRules)
+                   + FfiConverterInt32.Instance.AllocationSize(value.RulesCount);
         }
 
         public override void Write(FilterListRules value, BigEndianStream stream)
         {
-            FfiConverterInt32.Instance.Write(value.filterId, stream);
-            FfiConverterSequenceString.Instance.Write(value.rules, stream);
-            FfiConverterSequenceString.Instance.Write(value.disabledRules, stream);
+            FfiConverterInt32.Instance.Write(value.FilterId, stream);
+            FfiConverterSequenceString.Instance.Write(value.Rules, stream);
+            FfiConverterSequenceString.Instance.Write(value.DisabledRules, stream);
+            FfiConverterInt32.Instance.Write(value.RulesCount, stream);
         }
     }
 }

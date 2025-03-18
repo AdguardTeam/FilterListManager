@@ -39,6 +39,7 @@ typedef enum FFIMethod {
     SaveRulesToFileBlob,
     GetDisabledRules,
     SetProxyMode,
+    GetRulesCount,
 } FFIMethod;
 
 /**

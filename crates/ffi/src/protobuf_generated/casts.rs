@@ -5,7 +5,8 @@ use crate::protobuf_generated::filter_list_manager;
 use adguard_flm::{
     ActiveRulesInfo, Configuration, DisabledRulesRaw, FilterGroup, FilterListMetadata,
     FilterListMetadataWithBody, FilterListRules, FilterListRulesRaw, FilterListType, FilterTag,
-    FullFilterList, RequestProxyMode, StoredFilterMetadata, UpdateFilterError, UpdateResult,
+    FullFilterList, RequestProxyMode, RulesCountByFilter, StoredFilterMetadata, UpdateFilterError,
+    UpdateResult,
 };
 
 impl From<Configuration> for filter_list_manager::Configuration {
@@ -276,6 +277,7 @@ impl From<FilterListRules> for filter_list_manager::FilterListRules {
             filter_id: value.filter_id,
             rules: value.rules,
             disabled_rules: value.disabled_rules,
+            rules_count: value.rules_count,
         }
     }
 }
@@ -286,6 +288,7 @@ impl From<filter_list_manager::FilterListRules> for FilterListRules {
             filter_id: val.filter_id,
             rules: val.rules,
             disabled_rules: val.disabled_rules,
+            rules_count: val.rules_count,
         }
     }
 }
@@ -371,6 +374,7 @@ impl From<FilterListRulesRaw> for filter_list_manager::FilterListRulesRaw {
             filter_id: value.filter_id,
             rules: value.rules,
             disabled_rules: value.disabled_rules,
+            rules_count: value.rules_count,
         }
     }
 }
@@ -380,6 +384,15 @@ impl From<DisabledRulesRaw> for filter_list_manager::DisabledRulesRaw {
         Self {
             filter_id: value.filter_id,
             text: value.text,
+        }
+    }
+}
+
+impl From<RulesCountByFilter> for filter_list_manager::RulesCountByFilter {
+    fn from(value: RulesCountByFilter) -> Self {
+        Self {
+            filter_id: value.filter_id,
+            rules_count: value.rules_count,
         }
     }
 }

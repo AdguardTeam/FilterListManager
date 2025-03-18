@@ -258,6 +258,10 @@ pub struct FilterListRules {
     /// List of only disabled rules.
     #[prost(string, repeated, tag = "3")]
     pub disabled_rules: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// / Rules count in this filter list. Simply a number of non-empty lines
+    /// / and does not start with a comment marker.
+    #[prost(int32, tag = "4")]
+    pub rules_count: i32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterListRulesRaw {
@@ -270,6 +274,10 @@ pub struct FilterListRulesRaw {
     /// List of only disabled rules as string.
     #[prost(string, tag = "3")]
     pub disabled_rules: ::prost::alloc::string::String,
+    /// / Rules count in this filter list. Simply a number of non-empty lines
+    /// / and does not start with a comment marker.
+    #[prost(int32, tag = "4")]
+    pub rules_count: i32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DisabledRulesRaw {
@@ -448,6 +456,16 @@ pub struct FullFilterList {
     #[prost(message, optional, tag = "21")]
     pub rules: ::core::option::Option<FilterListRules>,
 }
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct RulesCountByFilter {
+    /// Associated filter id.
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
+    /// Rules count in this filter list. Simply a number of non-empty lines
+    /// and does not start with a comment marker.
+    #[prost(int32, tag = "2")]
+    pub rules_count: i32,
+}
 /// ActiveRulesInfo
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ActiveRulesInfo {
@@ -620,6 +638,11 @@ pub struct SetProxyModeRequest {
     #[prost(string, tag = "2")]
     pub custom_proxy_addr: ::prost::alloc::string::String,
 }
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetRulesCountRequest {
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
+}
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct EmptyRequest {}
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -766,6 +789,13 @@ pub struct GetFilterRulesAsStringsResponse {
 pub struct GetDisabledRulesResponse {
     #[prost(message, repeated, tag = "1")]
     pub rules_raw: ::prost::alloc::vec::Vec<DisabledRulesRaw>,
+    #[prost(message, optional, tag = "2")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetRulesCountResponse {
+    #[prost(message, repeated, tag = "1")]
+    pub rules_count_by_filter: ::prost::alloc::vec::Vec<RulesCountByFilter>,
     #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }

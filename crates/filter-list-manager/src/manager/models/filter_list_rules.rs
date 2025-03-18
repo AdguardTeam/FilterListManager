@@ -14,4 +14,7 @@ pub struct FilterListRules {
     pub rules: Vec<String>,
     /// List of only disabled rules.
     pub disabled_rules: Vec<String>,
+    /// Rules count in this filter list. Simply a number of non-empty lines
+    /// and does not start with a comment marker.
+    pub rules_count: i32,
 }

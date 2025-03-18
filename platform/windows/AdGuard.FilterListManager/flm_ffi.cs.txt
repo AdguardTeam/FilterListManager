@@ -494,6 +494,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_rules_count(FilterListManagerSafeHandle @ptr,RustBuffer @ids,ref RustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("adguard-flm")]
     public static extern RustBuffer uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_stored_filters_metadata(FilterListManagerSafeHandle @ptr,ref RustCallStatus _uniffi_out_err
     );
 
@@ -846,6 +850,10 @@ static class _UniFFILib {
     );
 
     [DllImport("adguard-flm")]
+    public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count(
+    );
+
+    [DllImport("adguard-flm")]
     public static extern ushort uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_stored_filters_metadata(
     );
 
@@ -1009,6 +1017,12 @@ static class _UniFFILib {
             var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_list_by_id();
             if (checksum != 18236) {
                 throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_full_filter_list_by_id` checksum `18236`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count();
+            if (checksum != 14183) {
+                throw new UniffiContractChecksumException($"com.adguard.flm: uniffi bindings expected function `uniffi_filter_list_manager_ffi_checksum_method_filterlistmanager_get_rules_count` checksum `14183`, library returned `{checksum}`");
             }
         }
         {
@@ -1360,6 +1374,9 @@ internal interface IFilterListManager {
     FullFilterList? GetFullFilterListById(int @id);
     
     /// <exception cref="AgOuterException"></exception>
+    List<RulesCountByFilter> GetRulesCount(List<int> @ids);
+    
+    /// <exception cref="AgOuterException"></exception>
     List<StoredFilterMetadata> GetStoredFiltersMetadata();
     
     /// <exception cref="AgOuterException"></exception>
@@ -1530,6 +1547,14 @@ internal class FilterListManager: FFIObject<FilterListManagerSafeHandle>, IFilte
         return FfiConverterOptionalTypeFullFilterList.INSTANCE.Lift(
     _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
     _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_list_by_id(this.GetHandle(), FfiConverterInt32.INSTANCE.Lower(@id), ref _status)
+));
+    }
+    
+    /// <exception cref="AgOuterException"></exception>
+    public List<RulesCountByFilter> GetRulesCount(List<int> @ids) {
+        return FfiConverterSequenceTypeRulesCountByFilter.INSTANCE.Lift(
+    _UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.INSTANCE, (ref RustCallStatus _status) =>
+    _UniFFILib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_rules_count(this.GetHandle(), FfiConverterSequenceInt32.INSTANCE.Lower(@ids), ref _status)
 ));
     }
     
@@ -1968,7 +1993,8 @@ class FfiConverterTypeFilterListMetadataWithBody: FfiConverterRustBuffer<FilterL
 internal record FilterListRules (
     int @filterId, 
     List<String> @rules, 
-    List<String> @disabledRules
+    List<String> @disabledRules, 
+    int @rulesCount
 ) {
 }
 
@@ -1979,7 +2005,8 @@ class FfiConverterTypeFilterListRules: FfiConverterRustBuffer<FilterListRules> {
         return new FilterListRules(
             @filterId: FfiConverterInt32.INSTANCE.Read(stream),
             @rules: FfiConverterSequenceString.INSTANCE.Read(stream),
-            @disabledRules: FfiConverterSequenceString.INSTANCE.Read(stream)
+            @disabledRules: FfiConverterSequenceString.INSTANCE.Read(stream),
+            @rulesCount: FfiConverterInt32.INSTANCE.Read(stream)
         );
     }
 
@@ -1987,13 +2014,15 @@ class FfiConverterTypeFilterListRules: FfiConverterRustBuffer<FilterListRules> {
         return
             FfiConverterInt32.INSTANCE.AllocationSize(value.@filterId) +
             FfiConverterSequenceString.INSTANCE.AllocationSize(value.@rules) +
-            FfiConverterSequenceString.INSTANCE.AllocationSize(value.@disabledRules);
+            FfiConverterSequenceString.INSTANCE.AllocationSize(value.@disabledRules) +
+            FfiConverterInt32.INSTANCE.AllocationSize(value.@rulesCount);
     }
 
     public override void Write(FilterListRules value, BigEndianStream stream) {
             FfiConverterInt32.INSTANCE.Write(value.@filterId, stream);
             FfiConverterSequenceString.INSTANCE.Write(value.@rules, stream);
             FfiConverterSequenceString.INSTANCE.Write(value.@disabledRules, stream);
+            FfiConverterInt32.INSTANCE.Write(value.@rulesCount, stream);
     }
 }
 
@@ -2002,7 +2031,8 @@ class FfiConverterTypeFilterListRules: FfiConverterRustBuffer<FilterListRules> {
 internal record FilterListRulesRaw (
     int @filterId, 
     String @rules, 
-    String @disabledRules
+    String @disabledRules, 
+    int @rulesCount
 ) {
 }
 
@@ -2013,7 +2043,8 @@ class FfiConverterTypeFilterListRulesRaw: FfiConverterRustBuffer<FilterListRules
         return new FilterListRulesRaw(
             @filterId: FfiConverterInt32.INSTANCE.Read(stream),
             @rules: FfiConverterString.INSTANCE.Read(stream),
-            @disabledRules: FfiConverterString.INSTANCE.Read(stream)
+            @disabledRules: FfiConverterString.INSTANCE.Read(stream),
+            @rulesCount: FfiConverterInt32.INSTANCE.Read(stream)
         );
     }
 
@@ -2021,13 +2052,15 @@ class FfiConverterTypeFilterListRulesRaw: FfiConverterRustBuffer<FilterListRules
         return
             FfiConverterInt32.INSTANCE.AllocationSize(value.@filterId) +
             FfiConverterString.INSTANCE.AllocationSize(value.@rules) +
-            FfiConverterString.INSTANCE.AllocationSize(value.@disabledRules);
+            FfiConverterString.INSTANCE.AllocationSize(value.@disabledRules) +
+            FfiConverterInt32.INSTANCE.AllocationSize(value.@rulesCount);
     }
 
     public override void Write(FilterListRulesRaw value, BigEndianStream stream) {
             FfiConverterInt32.INSTANCE.Write(value.@filterId, stream);
             FfiConverterString.INSTANCE.Write(value.@rules, stream);
             FfiConverterString.INSTANCE.Write(value.@disabledRules, stream);
+            FfiConverterInt32.INSTANCE.Write(value.@rulesCount, stream);
     }
 }
 
@@ -2164,6 +2197,36 @@ class FfiConverterTypeFullFilterList: FfiConverterRustBuffer<FullFilterList> {
             FfiConverterString.INSTANCE.Write(value.@checksum, stream);
             FfiConverterSequenceString.INSTANCE.Write(value.@languages, stream);
             FfiConverterOptionalTypeFilterListRules.INSTANCE.Write(value.@rules, stream);
+    }
+}
+
+
+
+internal record RulesCountByFilter (
+    int @filterId, 
+    int @rulesCount
+) {
+}
+
+class FfiConverterTypeRulesCountByFilter: FfiConverterRustBuffer<RulesCountByFilter> {
+    public static FfiConverterTypeRulesCountByFilter INSTANCE = new FfiConverterTypeRulesCountByFilter();
+
+    public override RulesCountByFilter Read(BigEndianStream stream) {
+        return new RulesCountByFilter(
+            @filterId: FfiConverterInt32.INSTANCE.Read(stream),
+            @rulesCount: FfiConverterInt32.INSTANCE.Read(stream)
+        );
+    }
+
+    public override int AllocationSize(RulesCountByFilter value) {
+        return
+            FfiConverterInt32.INSTANCE.AllocationSize(value.@filterId) +
+            FfiConverterInt32.INSTANCE.AllocationSize(value.@rulesCount);
+    }
+
+    public override void Write(RulesCountByFilter value, BigEndianStream stream) {
+            FfiConverterInt32.INSTANCE.Write(value.@filterId, stream);
+            FfiConverterInt32.INSTANCE.Write(value.@rulesCount, stream);
     }
 }
 
@@ -3146,6 +3209,45 @@ class FfiConverterSequenceTypeFullFilterList: FfiConverterRustBuffer<List<FullFi
 
         stream.WriteInt(value.Count);
         value.ForEach(item => FfiConverterTypeFullFilterList.INSTANCE.Write(item, stream));
+    }
+}
+
+
+
+
+class FfiConverterSequenceTypeRulesCountByFilter: FfiConverterRustBuffer<List<RulesCountByFilter>> {
+    public static FfiConverterSequenceTypeRulesCountByFilter INSTANCE = new FfiConverterSequenceTypeRulesCountByFilter();
+
+    public override List<RulesCountByFilter> Read(BigEndianStream stream) {
+        var length = stream.ReadInt();
+        var result = new List<RulesCountByFilter>(length);
+        for (int i = 0; i < length; i++) {
+            result.Add(FfiConverterTypeRulesCountByFilter.INSTANCE.Read(stream));
+        }
+        return result;
+    }
+
+    public override int AllocationSize(List<RulesCountByFilter> value) {
+        var sizeForLength = 4;
+
+        // details/1-empty-list-as-default-method-parameter.md
+        if (value == null) {
+            return sizeForLength;
+        }
+
+        var sizeForItems = value.Select(item => FfiConverterTypeRulesCountByFilter.INSTANCE.AllocationSize(item)).Sum();
+        return sizeForLength + sizeForItems;
+    }
+
+    public override void Write(List<RulesCountByFilter> value, BigEndianStream stream) {
+        // details/1-empty-list-as-default-method-parameter.md
+        if (value == null) {
+            stream.WriteInt(0);
+            return;
+        }
+
+        stream.WriteInt(value.Count);
+        value.ForEach(item => FfiConverterTypeRulesCountByFilter.INSTANCE.Write(item, stream));
     }
 }
 

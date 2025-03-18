@@ -42,6 +42,7 @@ dictionary FilterListRules {
     i32 filter_id;
     sequence<string> rules;
     sequence<string> disabled_rules;
+    i32 rules_count;
 };
 
 dictionary FilterTag {
@@ -107,6 +108,7 @@ dictionary FilterListRulesRaw {
     i32 filter_id;
     string rules;
     string disabled_rules;
+    i32 rules_count;
 };
 
 dictionary UpdateFilterError {
@@ -118,6 +120,11 @@ dictionary UpdateResult {
     sequence<FullFilterList> updated_list;
     i32 remaining_filters_count;
     sequence<UpdateFilterError> filters_errors;
+};
+
+dictionary RulesCountByFilter {
+    i32 filter_id;
+    i32 rules_count;
 };
 
 enum FilterListType {
@@ -253,4 +260,7 @@ interface FilterListManager {
 
     [Throws=AGOuterError]
     void set_proxy_mode(RequestProxyMode request_proxy_mode);
+
+    [Throws=AGOuterError]
+    sequence<RulesCountByFilter> get_rules_count(sequence<i32> ids);
 };

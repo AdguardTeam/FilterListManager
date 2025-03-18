@@ -10,6 +10,7 @@ pub mod filter_list_rules_raw;
 pub mod filter_tag;
 pub mod flm_error;
 pub mod full_filter_list;
+pub mod rules_count_by_filter;
 pub mod stored_filter_metadata;
 pub mod update_result;
 
