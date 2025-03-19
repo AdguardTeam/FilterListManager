@@ -21,14 +21,30 @@ pub(crate) struct FilterEntity {
     pub is_enabled: bool,
     pub is_installed: bool,
     pub is_trusted: bool,
-    pub is_user_title: bool,
-    pub is_user_description: bool,
+    pub(in crate::storage) is_user_title: Option<bool>,
+    pub(in crate::storage) is_user_description: Option<bool>,
 }
 
 impl FilterEntity {
     /// Filter is custom
     pub(crate) fn is_custom(&self) -> bool {
         self.group_id < 1
+    }
+
+    pub(crate) fn is_user_title(&self) -> Option<bool> {
+        self.is_user_title
+    }
+
+    pub(crate) fn is_user_description(&self) -> Option<bool> {
+        self.is_user_description
+    }
+
+    pub(crate) fn set_is_user_title(&mut self, is_user_title: Option<bool>) {
+        self.is_user_title = is_user_title;
+    }
+
+    pub(crate) fn set_is_user_description(&mut self, is_user_description: Option<bool>) {
+        self.is_user_description = is_user_description;
     }
 }
 
@@ -53,8 +69,8 @@ impl Default for FilterEntity {
             license: String::new(),
             checksum: String::new(),
             is_installed: false,
-            is_user_title: false,
-            is_user_description: false,
+            is_user_title: None,
+            is_user_description: None,
         }
     }
 }

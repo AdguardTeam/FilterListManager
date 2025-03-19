@@ -445,8 +445,18 @@ impl FilterRepository {
                     :is_enabled,
                     :is_installed,
                     :is_trusted,
-                    :is_user_title,
-                    :is_user_description
+                    CASE 
+                        WHEN :is_user_title IS NULL 
+                            AND (SELECT [is_user_title] FROM [filter] WHERE [filter_id]=:filter_id) IS NOT NULL 
+                        THEN (SELECT [is_user_title] FROM [filter] WHERE [filter_id]=:filter_id)
+                        ELSE :is_user_title
+                    END,
+                    CASE 
+                        WHEN :is_user_description IS NULL 
+                            AND (SELECT [is_user_description] FROM [filter] WHERE [filter_id]=:filter_id) IS NOT NULL 
+                        THEN (SELECT [is_user_description] FROM [filter] WHERE [filter_id]=:filter_id)
+                        ELSE :is_user_description
+                    END
                 )",
         )?;
 
@@ -559,8 +569,8 @@ mod tests {
                 expires: 0,
                 homepage: "".to_string(),
                 is_installed: false,
-                is_user_title: false,
-                is_user_description: false,
+                is_user_title: None,
+                is_user_description: None,
             };
 
             source
@@ -632,8 +642,8 @@ mod tests {
                 expires: 0,
                 homepage: "".to_string(),
                 is_installed: false,
-                is_user_title: false,
-                is_user_description: false,
+                is_user_title: None,
+                is_user_description: None,
             };
 
             source
@@ -780,6 +790,111 @@ mod tests {
                 for selected_filter in selected_filters {
                     assert!(selected_filter.is_installed);
                 }
+
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    #[test]
+    fn test_insert_must_not_update_is_user_title_and_description_columns() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        spawn_test_db_with_metadata(&source);
+
+        let filter_id = -10011;
+
+        // insert new filter
+        let mut filter_entity = FilterEntity::default();
+        filter_entity.filter_id = Some(filter_id);
+
+        source
+            .execute_db(|mut conn: Connection| {
+                with_transaction(&mut conn, |tx: &Transaction| {
+                    FilterRepository::new().insert(tx, &[filter_entity])
+                })
+                .unwrap();
+                Ok(())
+            })
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert_eq!(filters[0].is_user_title(), Some(false));
+                assert_eq!(filters[0].is_user_description(), Some(false));
+
+                Ok(())
+            })
+            .unwrap();
+
+        let filter_id = -10012;
+
+        // insert new filter with flags
+        let mut filter_entity = FilterEntity::default();
+        filter_entity.filter_id = Some(filter_id);
+        filter_entity.set_is_user_title(Some(true));
+        filter_entity.set_is_user_description(Some(true));
+
+        source
+            .execute_db(|mut conn: Connection| {
+                with_transaction(&mut conn, |tx: &Transaction| {
+                    FilterRepository::new().insert(tx, &[filter_entity])
+                })
+                .unwrap();
+                Ok(())
+            })
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert_eq!(filters[0].is_user_title(), Some(true));
+                assert_eq!(filters[0].is_user_description(), Some(true));
+
+                Ok(())
+            })
+            .unwrap();
+
+        // insert existed filter
+        let mut filter_entity = FilterEntity::default();
+        filter_entity.filter_id = Some(filter_id);
+
+        source
+            .execute_db(|mut conn: Connection| {
+                with_transaction(&mut conn, |tx: &Transaction| {
+                    FilterRepository::new().insert(tx, &[filter_entity])
+                })
+                .unwrap();
+                Ok(())
+            })
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert_eq!(filters[0].is_user_title(), Some(true));
+                assert_eq!(filters[0].is_user_description(), Some(true));
 
                 Ok(())
             })
