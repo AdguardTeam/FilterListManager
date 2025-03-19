@@ -354,7 +354,12 @@ impl FilterRepository {
             SET
                 title=:title,
                 is_trusted=:is_trusted,
-                is_user_title=1
+                is_user_title=
+                    CASE 
+                        WHEN :title = '' 
+                        THEN (SELECT [is_user_title] FROM [filter] WHERE [filter_id]=:filter_id) 
+                        ELSE 1
+                    END             
             WHERE
                 filter_id=:filter_id
         ",
@@ -445,18 +450,8 @@ impl FilterRepository {
                     :is_enabled,
                     :is_installed,
                     :is_trusted,
-                    CASE 
-                        WHEN :is_user_title IS NULL 
-                            AND (SELECT [is_user_title] FROM [filter] WHERE [filter_id]=:filter_id) IS NOT NULL 
-                        THEN (SELECT [is_user_title] FROM [filter] WHERE [filter_id]=:filter_id)
-                        ELSE :is_user_title
-                    END,
-                    CASE 
-                        WHEN :is_user_description IS NULL 
-                            AND (SELECT [is_user_description] FROM [filter] WHERE [filter_id]=:filter_id) IS NOT NULL 
-                        THEN (SELECT [is_user_description] FROM [filter] WHERE [filter_id]=:filter_id)
-                        ELSE :is_user_description
-                    END
+                    COALESCE(:is_user_title, (SELECT [is_user_title] FROM [filter] WHERE [filter_id]=:filter_id)),
+                    COALESCE(:is_user_description, (SELECT [is_user_description] FROM [filter] WHERE [filter_id]=:filter_id))
                 )",
         )?;
 
@@ -827,8 +822,8 @@ mod tests {
                     .unwrap()
                     .unwrap();
 
-                assert_eq!(filters[0].is_user_title(), Some(false));
-                assert_eq!(filters[0].is_user_description(), Some(false));
+                assert!(!filters[0].is_user_title());
+                assert!(!filters[0].is_user_description());
 
                 Ok(())
             })
@@ -839,8 +834,8 @@ mod tests {
         // insert new filter with flags
         let mut filter_entity = FilterEntity::default();
         filter_entity.filter_id = Some(filter_id);
-        filter_entity.set_is_user_title(Some(true));
-        filter_entity.set_is_user_description(Some(true));
+        filter_entity.set_is_user_title(true);
+        filter_entity.set_is_user_description(true);
 
         source
             .execute_db(|mut conn: Connection| {
@@ -862,8 +857,8 @@ mod tests {
                     .unwrap()
                     .unwrap();
 
-                assert_eq!(filters[0].is_user_title(), Some(true));
-                assert_eq!(filters[0].is_user_description(), Some(true));
+                assert!(filters[0].is_user_title());
+                assert!(filters[0].is_user_description());
 
                 Ok(())
             })
@@ -893,8 +888,8 @@ mod tests {
                     .unwrap()
                     .unwrap();
 
-                assert_eq!(filters[0].is_user_title(), Some(true));
-                assert_eq!(filters[0].is_user_description(), Some(true));
+                assert!(filters[0].is_user_title());
+                assert!(filters[0].is_user_description());
 
                 Ok(())
             })

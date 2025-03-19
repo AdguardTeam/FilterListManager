@@ -1,6 +1,8 @@
 use crate::manager::models::FilterId;
 use crate::CUSTOM_FILTERS_GROUP_ID;
 
+use super::constants::{DEFAULT_IS_USER_DESCRIPTION_VALUE, DEFAULT_IS_USER_TITLE_VALUE};
+
 #[derive(Clone)]
 #[cfg_attr(test, derive(Debug))]
 pub(crate) struct FilterEntity {
@@ -31,20 +33,21 @@ impl FilterEntity {
         self.group_id < 1
     }
 
-    pub(crate) fn is_user_title(&self) -> Option<bool> {
-        self.is_user_title
+    pub(crate) fn is_user_title(&self) -> bool {
+        self.is_user_title.unwrap_or(DEFAULT_IS_USER_TITLE_VALUE)
     }
 
-    pub(crate) fn is_user_description(&self) -> Option<bool> {
+    pub(crate) fn is_user_description(&self) -> bool {
         self.is_user_description
+            .unwrap_or(DEFAULT_IS_USER_DESCRIPTION_VALUE)
     }
 
-    pub(crate) fn set_is_user_title(&mut self, is_user_title: Option<bool>) {
-        self.is_user_title = is_user_title;
+    pub(crate) fn set_is_user_title(&mut self, is_user_title: bool) {
+        self.is_user_title = Some(is_user_title);
     }
 
-    pub(crate) fn set_is_user_description(&mut self, is_user_description: Option<bool>) {
-        self.is_user_description = is_user_description;
+    pub(crate) fn set_is_user_description(&mut self, is_user_description: bool) {
+        self.is_user_description = Some(is_user_description);
     }
 }
 

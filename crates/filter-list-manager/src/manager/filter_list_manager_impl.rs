@@ -190,8 +190,12 @@ impl FilterListManager for FilterListManagerImpl {
         entity.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
         entity.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
         entity.license = parser.get_metadata(KnownMetadataProperty::License);
-        entity.set_is_user_title(Some(is_user_title));
-        entity.set_is_user_description(Some(is_user_description));
+        if is_user_title {
+            entity.set_is_user_title(is_user_title);
+        }
+        if is_user_description {
+            entity.set_is_user_description(is_user_description);
+        }
 
         self.connection_manager
             .execute_db(move |mut connection: Connection| {
@@ -704,8 +708,12 @@ impl FilterListManager for FilterListManagerImpl {
         entity.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
         entity.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
         entity.license = parser.get_metadata(KnownMetadataProperty::License);
-        entity.set_is_user_title(Some(is_user_title));
-        entity.set_is_user_description(Some(is_user_description));
+        if is_user_title {
+            entity.set_is_user_title(is_user_title);
+        }
+        if is_user_description {
+            entity.set_is_user_description(is_user_description);
+        }
 
         self.connection_manager
             .execute_db(move |mut connection: Connection| {
@@ -1728,8 +1736,8 @@ mod tests {
                     .unwrap()
                     .unwrap();
 
-                assert_eq!(filters[0].is_user_title(), Some(true));
-                assert_eq!(filters[0].is_user_description(), Some(false));
+                assert!(filters[0].is_user_title());
+                assert!(!filters[0].is_user_description());
 
                 Ok(())
             })
@@ -1758,8 +1766,8 @@ mod tests {
                     .unwrap()
                     .unwrap();
 
-                assert_eq!(filters[0].is_user_title(), Some(false));
-                assert_eq!(filters[0].is_user_description(), Some(true));
+                assert!(!filters[0].is_user_title());
+                assert!(filters[0].is_user_description());
 
                 Ok(())
             })
@@ -1803,7 +1811,7 @@ mod tests {
                     .unwrap()
                     .unwrap();
 
-                assert_eq!(filters[0].is_user_title(), Some(true));
+                assert!(filters[0].is_user_title());
 
                 Ok(())
             })
