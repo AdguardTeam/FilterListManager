@@ -592,12 +592,15 @@ impl FilterListManager for FilterListManagerImpl {
                     .map_err(FLMError::from_database)?;
 
                 if count > 0 {
+                    let is_title_set_by_user = !title.is_empty();
+
                     with_transaction(&mut conn, move |transaction: &Transaction| {
-                        filter_repository.update_custom_filter_metadata(
+                        filter_repository.update_user_metadata_for_custom_filter(
                             transaction,
                             filter_id,
                             title.as_str(),
                             is_trusted,
+                            is_title_set_by_user,
                         )
                     })
                 } else {

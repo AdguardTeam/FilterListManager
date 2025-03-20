@@ -340,12 +340,20 @@ impl FilterRepository {
         })
     }
 
-    pub(crate) fn update_custom_filter_metadata(
+    /// Update user defined metadata for custom_filter
+    ///
+    /// * `transaction` - Outer transaction
+    /// * `filter_id` - ID
+    /// * `title` - New title
+    /// * `is_trusted` - Is this filter trusted
+    /// * `is_title_set_by_user` - This title strictly set by user (true); or can be changed during update (false)
+    pub(crate) fn update_user_metadata_for_custom_filter(
         &self,
         transaction: &Transaction,
         filter_id: FilterId,
         title: &str,
         is_trusted: bool,
+        is_user_title: bool,
     ) -> rusqlite::Result<bool> {
         let mut statement = transaction.prepare(
             r"
@@ -354,12 +362,7 @@ impl FilterRepository {
             SET
                 title=:title,
                 is_trusted=:is_trusted,
-                is_user_title=
-                    CASE 
-                        WHEN :title = '' 
-                        THEN (SELECT [is_user_title] FROM [filter] WHERE [filter_id]=:filter_id) 
-                        ELSE 1
-                    END             
+                is_user_title=:is_user_title
             WHERE
                 filter_id=:filter_id
         ",
@@ -369,6 +372,7 @@ impl FilterRepository {
             ":title": title,
             ":is_trusted": is_trusted,
             ":filter_id": filter_id,
+            ":is_user_title": is_user_title
         })?;
 
         Ok(usize > 0)
@@ -674,10 +678,11 @@ mod tests {
                 assert_eq!(inserted_filter.title, "Custom filter".to_string());
 
                 with_transaction(&mut connection, |transaction: &Transaction| {
-                    filter_repository.update_custom_filter_metadata(
+                    filter_repository.update_user_metadata_for_custom_filter(
                         transaction,
                         filter_id,
                         &new_title,
+                        true,
                         true,
                     )
                 })
