@@ -1,308 +1,351 @@
-ï»¿using System.Collections.Generic;
-using AdGuard.FilterListManager.MarshalLogic;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using AdGuard.FilterListManager.Api;
+using AdGuard.FilterListManager.Api.Exceptions;
+using AdGuard.FilterListManager.RustInterface;
+using AdGuard.Utils.Base.Logging;
+using AdGuard.Utils.Serializers;
+using FilterListManager;
+using Google.Protobuf;
 
 namespace AdGuard.FilterListManager
 {
-    /// <summary>
-    /// Main <see cref="IFilterListManager"/> implementation.
-    /// </summary>
-    /// <seealso cref="FfiObject{THandle}" />
-    /// <seealso cref="IFilterListManager" />
-    public class FilterListManager : FfiObject<FilterListManagerSafeHandle>, IFilterListManager
+    public class FilterListManager : IFilterListManager
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FilterListManager"/> class.
-        /// </summary>
-        /// <param name="pointer">The pointer.</param>
-        public FilterListManager(FilterListManagerSafeHandle pointer)
-            : base(pointer) { }
+        private IntPtr m_FLMHandle;
+        private readonly ISerializer<byte[]> m_Serializer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterListManager"/> class.
+        /// Spawns a struct of Filter List Manager public constants 
         /// </summary>
-        /// <param name="configuration">The configuration.</param>
-        public FilterListManager(Configuration configuration)
-            : this(
-                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_constructor_filterlistmanager_new(
-                            FfiConverterTypeConfiguration.Instance.Lower(configuration),
-                            ref status
-                        )
-                )
-            )
-        { }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public bool ChangeLocale(string suggestedLocale)
+        /// <returns></returns>
+        public static FLMConstants SpawnDefaultConstants()
         {
-            return FfiConverterBoolean.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_change_locale(
-                            GetHandle(),
-                            FfiConverterString.Instance.Lower(suggestedLocale),
-                            ref status
-                        )
-                )
-            );
+            return ProtobufInterop.flm_get_constants();
         }
-        
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public long DeleteCustomFilterLists(List<int> ids)
+
+        public FilterListManager(ISerializer<byte[]> serializer)
         {
-            return FfiConverterInt64.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_delete_custom_filter_lists(
-                            GetHandle(),
-                            FfiConverterSequenceInt32.Instance.Lower(ids),
-                            ref status
-                        )
-                )
-            );
+            m_Serializer = serializer;
+        }
+
+        #region IFilterListManager members
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public void Init(Configuration configuration)
+        {
+            IntPtr FlmInteropFunc(IntPtr pHandle, FfiMethod ffiMethod, IntPtr pInputData, ulong inputDataLength) =>
+                ProtobufInterop.flm_init_protobuf(pInputData, inputDataLength);
+            m_FLMHandle = CallRustHandle<AGOuterError>(configuration, FlmInteropFunc);
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        ///  header - crates/ffi/src/flm_native_interface.h
+        ///  swift.file - crates/ffi/src/platforms/apple/flmctest/flmctest/main.swift
+        ///  protobuf schema - crates/ffi/src/protobuf
         /// </summary>
-        public long EnableFilterLists(List<int> ids, bool isEnabled)
+        /// Spawns configuration for set up
+        public Configuration SpawnDefaultConfiguration()
         {
-            return FfiConverterInt64.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_enable_filter_lists(
-                            GetHandle(),
-                            FfiConverterSequenceInt32.Instance.Lower(ids),
-                            FfiConverterBoolean.Instance.Lower(isEnabled),
-                            ref status
-                        )
-                )
-            );
+            IntPtr FlmInteropFunc(IntPtr pHandle, FfiMethod ffiMethod, IntPtr pInputData, ulong inputDataLength) =>
+                ProtobufInterop.flm_default_configuration_protobuf();
+            EmptyRequest request = new EmptyRequest();
+            return CallRustMessage<Configuration>(request, FlmInteropFunc);
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
+        /// </summary>
+        public FullFilterList InstallCustomFilterList(
+            string downloadUrl,
+            bool isTrusted,
+            [Optional]
+            string title,
+            [Optional]
+            string description)
+        {
+            InstallCustomFilterListRequest request = new InstallCustomFilterListRequest
+            {
+                DownloadUrl = downloadUrl,
+                IsTrusted = isTrusted,
+                Title = title,
+                Description = description
+            };
+
+            InstallCustomFilterListResponse response =
+                CallRustMessage<InstallCustomFilterListResponse>(request);
+            return response.FilterList;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public long EnableFilterLists(IEnumerable<int> ids, bool isEnabled)
+        {
+            EnableFilterListsRequest request = new EnableFilterListsRequest
+            {
+                IsEnabled = isEnabled
+            };
+
+            request.Ids.AddRange(ids);
+            EnableFilterListsResponse response = CallRustMessage<EnableFilterListsResponse>(request);
+            return response.Count;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public long InstallFilterLists(IEnumerable<int> ids, bool isInstalled)
+        {
+            InstallFilterListsRequest request = new InstallFilterListsRequest
+            {
+                IsInstalled = isInstalled
+            };
+
+            request.Ids.AddRange(ids);
+            InstallFilterListsResponse response =
+                CallRustMessage<InstallFilterListsResponse>(request);
+            return response.Count;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public long DeleteCustomFilterLists(IEnumerable<int> ids)
+        {
+            DeleteCustomFilterListsRequest request = new DeleteCustomFilterListsRequest();
+            request.Ids.AddRange(ids);
+            DeleteCustomFilterListsResponse response =
+                CallRustMessage<DeleteCustomFilterListsResponse>(request);
+            return response.Count;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public FullFilterList GetFullFilterListById(int filterId)
+        {
+            GetFullFilterListByIdRequest request = new GetFullFilterListByIdRequest
+            {
+                Id = filterId
+            };
+
+            GetFullFilterListByIdResponse response = CallRustMessage<GetFullFilterListByIdResponse>(request);
+            return response.FilterList;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public IEnumerable<StoredFilterMetadata> GetStoredFiltersMetadata()
+        {
+            EmptyRequest request = new EmptyRequest();
+            GetStoredFiltersMetadataResponse response =
+                CallRustMessage<GetStoredFiltersMetadataResponse>(request);
+            return response.FilterLists;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public StoredFilterMetadata GetStoredFilterMetadataById(int filterId)
+        {
+            GetStoredFiltersMetadataByIdRequest request = new GetStoredFiltersMetadataByIdRequest
+            {
+                Id = filterId
+            };
+
+            GetStoredFilterMetadataByIdResponse response =
+                CallRustMessage<GetStoredFilterMetadataByIdResponse>(request);
+            return response.FilterList;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public void SaveCustomFilterRules(FilterListRules rules)
+        {
+            SaveCustomFilterRulesRequest request = new SaveCustomFilterRulesRequest
+            {
+                Rules = rules
+            };
+
+            CallRustMessage<EmptyResponse>(request);
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public void SaveDisabledRules(int filterId, IEnumerable<string> disabledRules)
+        {
+            SaveDisabledRulesRequest request = new SaveDisabledRulesRequest
+            {
+                FilterId = filterId
+            };
+
+            request.DisabledRules.AddRange(disabledRules);
+            CallRustMessage<EmptyResponse>(request);
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public UpdateResult UpdateFilters(
+            bool ignoreFiltersExpiration,
+            int looseTimeout,
+            bool ignoreFilterStatus)
+        {
+            UpdateFiltersRequest request = new UpdateFiltersRequest
+            {
+                IgnoreFiltersExpiration = ignoreFiltersExpiration,
+                LooseTimeout = looseTimeout,
+                IgnoreFiltersStatus = ignoreFilterStatus
+            };
+
+            UpdateFiltersResponse response = CallRustMessage<UpdateFiltersResponse>(request);
+            return response.Result;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public UpdateResult ForceUpdateFiltersByIds(IEnumerable<int> filterIds, int looseTimeout)
+        {
+            ForceUpdateFiltersByIdsRequest request = new ForceUpdateFiltersByIdsRequest
+            {
+                LooseTimeout = looseTimeout,
+            };
+
+            request.Ids.AddRange(filterIds);
+            ForceUpdateFiltersByIdsResponse response =
+                CallRustMessage<ForceUpdateFiltersByIdsResponse>(request);
+            return response.Result;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
         /// </summary>
         public FilterListMetadata FetchFilterListMetadata(string url)
         {
-            return FfiConverterTypeFilterListMetadata.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata(
-                            GetHandle(),
-                            FfiConverterString.Instance.Lower(url),
-                            ref status
-                        )
-                )
-            );
+            FetchFilterListMetadataRequest request = new FetchFilterListMetadataRequest
+            {
+                Url = url,
+            };
+
+            FetchFilterListMetadataResponse response =
+                CallRustMessage<FetchFilterListMetadataResponse>(request);
+            return response.Metadata;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
         public FilterListMetadataWithBody FetchFilterListMetadataWithBody(string url)
         {
-            return FfiConverterTypeFilterListMetadataWithBody.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_fetch_filter_list_metadata_with_body(
-                            GetHandle(),
-                            FfiConverterString.Instance.Lower(url),
-                            ref status
-                        )
-                )
-            );
+            FetchFilterListMetadataWithBodyRequest request = new FetchFilterListMetadataWithBodyRequest
+            {
+                Url = url,
+            };
+
+            FetchFilterListMetadataWithBodyResponse response =
+                CallRustMessage<FetchFilterListMetadataWithBodyResponse>(request);
+            return response.Metadata;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public UpdateResult ForceUpdateFiltersByIds(List<int> ids, int looseTimeout)
+        public void LiftUpDatabase()
         {
-            return FfiConverterOptionalTypeUpdateResult.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_force_update_filters_by_ids(
-                            GetHandle(),
-                            FfiConverterSequenceInt32.Instance.Lower(ids),
-                            FfiConverterInt32.Instance.Lower(looseTimeout),
-                            ref status
-                        )
-                )
-            );
+            EmptyRequest request = new EmptyRequest();
+            CallRustMessage<EmptyResponse>(request);
         }
 
-
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public List<ActiveRulesInfo> GetActiveRules()
+        public IEnumerable<FilterTag> GetAllTags()
         {
-            return FfiConverterSequenceTypeActiveRulesInfo.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_active_rules(
-                            GetHandle(),
-                            ref status
-                        )
-                )
-            );
+            EmptyRequest request = new EmptyRequest();
+            GetAllTagsResponse response = CallRustMessage<GetAllTagsResponse>(request);
+            return response.Tags;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public List<FilterGroup> GetAllGroups()
+        public IEnumerable<FilterGroup> GetAllGroups()
         {
-            return FfiConverterSequenceTypeFilterGroup.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_all_groups(
-                            GetHandle(),
-                            ref status
-                        )
-                )
-            );
+            EmptyRequest request = new EmptyRequest();
+            GetAllGroupsResponse response = CallRustMessage<GetAllGroupsResponse>(request);
+            return response.Groups;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public List<FilterTag> GetAllTags()
+        public bool ChangeLocale(string suggestedLocale)
         {
-            return FfiConverterSequenceTypeFilterTag.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_all_tags(
-                            GetHandle(),
-                            ref status
-                        )
-                )
-            );
+            ChangeLocaleRequest request = new ChangeLocaleRequest
+            {
+                SuggestedLocale = suggestedLocale
+            };
+
+            ChangeLocaleResponse response = CallRustMessage<ChangeLocaleResponse>(request);
+            return response.Success;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
+        /// </summary>
+        public void PullMetadata()
+        {
+            EmptyRequest request = new EmptyRequest();
+            CallRustMessage<EmptyResponse>(request);
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public bool UpdateCustomFilterMetadata(int filterId, string title, bool isTrusted)
+        {
+            UpdateCustomFilterMetadataRequest request = new UpdateCustomFilterMetadataRequest
+            {
+                FilterId = filterId,
+                Title = title,
+                IsTrusted = isTrusted
+            };
+
+            UpdateCustomFilterMetadataResponse response = CallRustMessage<UpdateCustomFilterMetadataResponse>(request);
+            return response.Success;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
         /// </summary>
         public string GetDatabasePath()
         {
-            return FfiConverterString.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_database_path(
-                            GetHandle(),
-                            ref status
-                        )
-                )
-            );
+            EmptyRequest request = new EmptyRequest();
+            GetDatabasePathResponse response = CallRustMessage<GetDatabasePathResponse>(request);
+            return response.Path;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public int? GetDatabaseVersion()
+        public int GetDatabaseVersion()
         {
-            return FfiConverterOptionalInt32.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_database_version(
-                            GetHandle(),
-                            ref status
-                        )
-                )
-            );
+            EmptyRequest request = new EmptyRequest();
+            GetDatabaseVersionResponse response = CallRustMessage<GetDatabaseVersionResponse>(request);
+            return response.Version;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public List<DisabledRulesRaw> GetDisabledRules(List<int> ids)
-        {
-            return FfiConverterSequenceTypeDisabledRulesRaw.Instance.Lift(
-                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_disabled_rules(
-                            GetHandle(), FfiConverterSequenceInt32.Instance.Lower(ids), ref status)
-                ));
-        }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public List<FilterListRulesRaw> GetFilterRulesAsStrings(List<int> ids)
-        {
-            return FfiConverterSequenceTypeFilterListRulesRaw.Instance.Lift(
-                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib
-                            .uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_filter_rules_as_strings(
-                                GetHandle(), FfiConverterSequenceInt32.Instance.Lower(ids), ref status)
-                ));
-        }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public FullFilterList GetFullFilterListById(int id)
-        {
-            return FfiConverterOptionalTypeFullFilterList.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_full_filter_list_by_id(
-                            GetHandle(),
-                            FfiConverterInt32.Instance.Lower(id),
-                            ref status
-                        )
-                )
-            );
-        }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public List<StoredFilterMetadata> GetStoredFiltersMetadata()
-        {
-            return FfiConverterSequenceTypeStoredFilterMetadata.Instance.Lift(
-                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib
-                            .uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_stored_filters_metadata(
-                                GetHandle(), ref status)
-                ));
-        }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public StoredFilterMetadata GetStoredFiltersMetadataById(int id)
-        {
-            return FfiConverterOptionalTypeStoredFilterMetadata.Instance.Lift(
-                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib
-                            .uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_stored_filters_metadata_by_id(GetHandle(), FfiConverterInt32.Instance.Lower(id), ref status)
-                ));
-        }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
         public FullFilterList InstallCustomFilterFromString(
             string downloadUrl,
@@ -310,210 +353,265 @@ namespace AdGuard.FilterListManager
             bool isEnabled,
             bool isTrusted,
             string filterBody,
+            [Optional]
             string customTitle,
-            string customDescription
-        )
+            [Optional]
+            string customDescription)
         {
-            return FfiConverterTypeFullFilterList.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_custom_filter_from_string(
-                            GetHandle(),
-                            FfiConverterString.Instance.Lower(downloadUrl),
-                            FfiConverterInt64.Instance.Lower(lastDownloadTime),
-                            FfiConverterBoolean.Instance.Lower(isEnabled),
-                            FfiConverterBoolean.Instance.Lower(isTrusted),
-                            FfiConverterString.Instance.Lower(filterBody),
-                            FfiConverterOptionalString.Instance.Lower(customTitle),
-                            FfiConverterOptionalString.Instance.Lower(customDescription),
-                            ref status
-                        )
-                )
-            );
+            InstallCustomFilterFromStringRequest request = new InstallCustomFilterFromStringRequest
+            {
+                DownloadUrl = downloadUrl,
+                LastDownloadTime = lastDownloadTime,
+                IsEnabled = isEnabled,
+                IsTrusted = isTrusted,
+                FilterBody = filterBody,
+                CustomTitle = customTitle,
+                CustomDescription = customDescription
+            };
+
+            InstallCustomFilterFromStringResponse response = CallRustMessage<InstallCustomFilterFromStringResponse>(request);
+            return response.FilterList;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public FullFilterList InstallCustomFilterList(
-            string downloadUrl,
-            bool isTrusted,
-            string title,
-            string description
-        )
+        public IEnumerable<ActiveRulesInfo> GetActiveRules()
         {
-            return FfiConverterTypeFullFilterList.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_custom_filter_list(
-                            GetHandle(),
-                            FfiConverterString.Instance.Lower(downloadUrl),
-                            FfiConverterBoolean.Instance.Lower(isTrusted),
-                            FfiConverterOptionalString.Instance.Lower(title),
-                            FfiConverterOptionalString.Instance.Lower(description),
-                            ref status
-                        )
-                )
-            );
+            EmptyRequest request = new EmptyRequest();
+            GetActiveRulesResponse response = CallRustMessage<GetActiveRulesResponse>(request);
+            return response.Rules;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public long InstallFilterLists(List<int> ids, bool isInstalled)
+        public IEnumerable<FilterListRulesRaw> GetFilterRulesAsStrings(IEnumerable<int> filterIds)
         {
-            return FfiConverterInt64.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_install_filter_lists(
-                            GetHandle(),
-                            FfiConverterSequenceInt32.Instance.Lower(ids),
-                            FfiConverterBoolean.Instance.Lower(isInstalled),
-                            ref status
-                        )
-                )
-            );
+            GetFilterRulesAsStringsRequest request = new GetFilterRulesAsStringsRequest();
+            request.Ids.AddRange(filterIds);
+            GetFilterRulesAsStringsResponse response = CallRustMessage<GetFilterRulesAsStringsResponse>(request);
+            return response.RulesList;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public void PullMetadata()
-        {
-            UniffiHelpers.RustCallWithError(
-                FfiConverterTypeAgOuterException.Instance,
-                (ref RustCallStatus status) =>
-                    UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_pull_metadata(
-                        GetHandle(),
-                        ref status
-                    )
-            );
-        }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public void SaveCustomFilterRules(FilterListRules rules)
-        {
-            UniffiHelpers.RustCallWithError(
-                FfiConverterTypeAgOuterException.Instance,
-                (ref RustCallStatus status) =>
-                    UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_custom_filter_rules(
-                        GetHandle(),
-                        FfiConverterTypeFilterListRules.Instance.Lower(rules),
-                        ref status
-                    )
-            );
-        }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public void SaveDisabledRules(int filterId, List<string> disabledRules)
-        {
-            UniffiHelpers.RustCallWithError(
-                FfiConverterTypeAgOuterException.Instance,
-                (ref RustCallStatus status) =>
-                    UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_disabled_rules(
-                        GetHandle(),
-                        FfiConverterInt32.Instance.Lower(filterId),
-                        FfiConverterSequenceString.Instance.Lower(disabledRules),
-                        ref status
-                    )
-            );
-        }
-
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
         public void SaveRulesToFileBlob(int filterId, string filePath)
         {
-            UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance, (ref RustCallStatus status) =>
-                UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_save_rules_to_file_blob(
-                    GetHandle(), FfiConverterInt32.Instance.Lower(filterId),
-                    FfiConverterString.Instance.Lower(filePath), ref status)
-            );
+            SaveRulesToFileBlobRequest request = new SaveRulesToFileBlobRequest
+            {
+                FilterId = filterId,
+                FilePath = filePath
+            };
+
+            CallRustMessage<EmptyResponse>(request);
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public bool UpdateCustomFilterMetadata(int filterId, string title, bool isTrusted)
+        public IEnumerable<DisabledRulesRaw> GetDisabledRules(IEnumerable<int> filterIds)
         {
-            return FfiConverterBoolean.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_custom_filter_metadata(
-                            GetHandle(),
-                            FfiConverterInt32.Instance.Lower(filterId),
-                            FfiConverterString.Instance.Lower(title),
-                            FfiConverterBoolean.Instance.Lower(isTrusted),
-                            ref status
-                        )
-                )
-            );
+            GetDisabledRulesRequest request = new GetDisabledRulesRequest();
+            request.Ids.AddRange(filterIds);
+            GetDisabledRulesResponse response = CallRustMessage<GetDisabledRulesResponse>(request);
+            return response.RulesRaw;
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public UpdateResult UpdateFilters(
-            bool ignoreFiltersExpiration,
-            int looseTimeout,
-            bool ignoreFiltersStatus
-        )
+        public void SetProxyMode(string customProxyAddr, RawRequestProxyMode proxyMode)
         {
-            return FfiConverterOptionalTypeUpdateResult.Instance.Lift(
-                UniffiHelpers.RustCallWithError(
-                    FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_update_filters(
-                            GetHandle(),
-                            FfiConverterBoolean.Instance.Lower(ignoreFiltersExpiration),
-                            FfiConverterInt32.Instance.Lower(looseTimeout),
-                            FfiConverterBoolean.Instance.Lower(ignoreFiltersStatus),
-                            ref status
-                        )
-                )
-            );
+            SetProxyModeRequest request = new SetProxyModeRequest
+            {
+                CustomProxyAddr = customProxyAddr,
+                Mode = proxyMode
+            };
+
+            CallRustMessage<EmptyResponse>(request);
         }
 
         /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
+        /// <inheritdoc/>
         /// </summary>
-        public void LiftUpDatabase()
+        public IEnumerable<RulesCountByFilter> GetRulesCount(IEnumerable<int> filterIds)
         {
-            UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance, (ref RustCallStatus status) =>
-                UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_lift_up_database(
-                    GetHandle(),
-                    ref status)
-            );
+            GetRulesCountRequest request = new GetRulesCountRequest();
+            request.Ids.AddRange(filterIds);
+            GetRulesCountResponse response = CallRustMessage<GetRulesCountResponse>(request);
+            return response.RulesCountByFilter;
         }
 
-        /// <exception cref="AgOuterException"></exception>
-        public void SetProxyMode(RequestProxyMode requestProxyMode)
+        #endregion
+
+
+        #region Helpers
+
+        private IntPtr CallRustHandle<TOutMessage>(
+            IMessage inMessage,
+            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc,
+            [CallerMemberName] string ffiMethodName = null)
+            where TOutMessage : IMessage, IAGOuterError
         {
-            UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance, (ref RustCallStatus status) =>
-                UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_set_proxy_mode(GetHandle(),
-                    FfiConverterTypeRequestProxyMode.Instance.Lower(requestProxyMode), ref status)
-            );
+            CallRust(
+                m_FLMHandle,
+                inMessage,
+                out TOutMessage _,
+                out IntPtr outHandle,
+                flmInteropFunc,
+                ffiMethodName);
+            return outHandle;
         }
 
-        /// <summary>
-        ///<inheritdoc cref="IFilterListManager"/>
-        /// </summary>
-        public List<RulesCountByFilter> GetRulesCount(List<int> ids)
+        private TOutMessage CallRustMessage<TOutMessage>(
+            IMessage inMessage,
+            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc,
+            [CallerMemberName] string ffiMethodName = null)
+            where TOutMessage : IMessage, IAGOuterError
         {
-            return FfiConverterSequenceTypeRulesCountByFilter.Instance.Lift(
-                UniffiHelpers.RustCallWithError(FfiConverterTypeAgOuterException.Instance,
-                    (ref RustCallStatus status) =>
-                        UniFfiLib.uniffi_filter_list_manager_ffi_fn_method_filterlistmanager_get_rules_count(
-                            GetHandle(), FfiConverterSequenceInt32.Instance.Lower(ids), ref status)
-                ));
+            CallRust(
+                m_FLMHandle,
+                inMessage,
+                out TOutMessage outMessage,
+                out IntPtr _,
+                flmInteropFunc,
+                ffiMethodName);
+            return outMessage;
         }
+
+        private TOutMessage CallRustMessage<TOutMessage>(
+            IMessage inMessage,
+            [CallerMemberName] string ffiMethodName = null)
+            where TOutMessage : IMessage, IAGOuterError
+        {
+            CallRust(
+                m_FLMHandle,
+                inMessage,
+                out TOutMessage outMessage,
+                out IntPtr _,
+                ProtobufInterop.flm_call_protobuf,
+                ffiMethodName);
+            return outMessage;
+        }
+
+        private void CallRust<TOutMessage>(
+            IntPtr flmHandle,
+            IMessage inMessage,
+            out TOutMessage outMessage,
+            out IntPtr outHandle,
+            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc,
+            [CallerMemberName] string ffiMethodName = null)
+            where TOutMessage : IMessage, IAGOuterError
+        {
+            string errorTemplate = $"Cannot call RUST method \"{ffiMethodName}\"";
+            FfiMethod ffiMethod = GetFfiMethod(ffiMethodName);
+            if (flmHandle == IntPtr.Zero &&
+                // only two methods below can be invoked correctly without set flmHandle before
+                ffiMethod != FfiMethod.SpawnDefaultConfiguration &&
+                ffiMethod != FfiMethod.Init)
+            {
+                string errorMessage = $"instance must be initialized with \"{nameof(Init)}\" before invocation";
+                Logger.Error(errorTemplate);
+                throw new FilterListManagerNotInitializedException(errorMessage);
+            }
+
+            try
+            {
+                outMessage = default;
+                outHandle = default;
+                byte[] args = inMessage?.ToByteArray() ?? new byte[0];
+                RustResponseResult rustResponseResult = ProtobufBridge.CallRust(flmHandle, ffiMethod, args, flmInteropFunc);
+                TOutMessage response = default;
+                switch (rustResponseResult.Discriminant)
+                {
+                    case RustResponseType.RustBuffer:
+                        {
+                            response = m_Serializer.DeserializeObject<TOutMessage>(rustResponseResult.Buffer);
+                            outMessage = response;
+                            break;
+                        }
+                    case RustResponseType.FLMHandlePointer:
+                        {
+                            outHandle = rustResponseResult.HandlePointer;
+                            break;
+                        }
+                    default:
+                        {
+                            string errorMessage = $"Invalid discriminant {rustResponseResult.Discriminant} was obtained while method {ffiMethodName} called";
+                            throw new FilterListManagerInvalidDiscriminantException(errorMessage);
+                        }
+                }
+
+                if (response?.Error != null)
+                {
+                    throw new AgOuterException(response.Error);
+                }
+
+                // special case ià response represents AGOuterError explicitly.
+                // This case is actual when ffiMethodName is looking for the RustResponseType.FLMHandlePointer
+                // in the answer
+                if (response is AGOuterError responseAgOuterError)
+                {
+                    throw new AgOuterException(responseAgOuterError);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new FilterListManagerCommonException(errorTemplate, ex);
+            }
+        }
+
+        private FfiMethod GetFfiMethod(string methodName)
+        {
+            if (!Enum.TryParse(methodName, out FfiMethod method))
+            {
+                throw new InvalidCastException($"Failed to parse {methodName}");
+            }
+
+            Logger.Verbose("Parsed method: {0}->{1}",
+                methodName,
+                method);
+            return method;
+        }
+
+        #endregion
+
+        #region IDisposable members
+
+        ~FilterListManager()
+        {
+            Dispose(false);
+        }
+
+        private void ReleaseManagedResources()
+        {
+            m_FLMHandle = IntPtr.Zero;
+        }
+
+        private void ReleaseUnmanagedResources()
+        {
+            ProtobufInterop.flm_free_handle(m_FLMHandle);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ReleaseManagedResources();
+            }
+
+            ReleaseUnmanagedResources();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+
+        #endregion
     }
 }

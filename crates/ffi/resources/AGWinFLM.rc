@@ -12,7 +12,7 @@ BEGIN
                 BLOCK "040904b0"
                 BEGIN
                         VALUE "FileDescription", "AdGuard Filter List Manager for Windows"
-                        VALUE "LegalCopyright", "(C) 2009-2024 Adguard Software Ltd"
+                        VALUE "LegalCopyright", "(C) 2009-2025 Adguard Software Ltd"
                         VALUE "CompanyName", "Adguard Software Ltd"
                         VALUE "ProductName", "AdGuard Filter List Manager for Windows"
                         VALUE "FileVersion", "1.1.20"

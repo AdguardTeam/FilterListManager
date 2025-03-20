@@ -12,7 +12,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         {
             return new RulesCountByFilter(
                 filterId: FfiConverterInt32.Instance.Read(stream),
-                rulesCount: FfiConverterString.Instance.Read(stream)
+                rulesCount: FfiConverterInt32.Instance.Read(stream)
             );
         }
 

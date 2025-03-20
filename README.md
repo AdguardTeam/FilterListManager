@@ -33,7 +33,7 @@ Install [rust][rust].
 
 ### Requirements
 
-Rust 1.75 (versions 1.76+ don't support Windows 7)
+Rust 1.85+
 
 ### Linters
 

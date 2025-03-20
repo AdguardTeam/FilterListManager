@@ -232,5 +232,3 @@ impl FilterListManager {
         block(value).map_err(AGOuterError::from)
     }
 }
-
-uniffi::include_scaffolding!("flm_ffi");

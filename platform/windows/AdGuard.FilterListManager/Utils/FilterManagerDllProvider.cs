@@ -11,47 +11,47 @@ namespace AdGuard.FilterListManager.Utils
     /// </summary>
     public class FilterManagerDllProvider : LibsDllProviderBase
     {
-        private const string WIN32_DLL_NAME = @"x86\" + Constants.RUST_DLL_NAME;
-        private const string WIN64_DLL_NAME = @"x64\" + Constants.RUST_DLL_NAME;
-        private const string ARM64_DLL_NAME = @"arm64\" + Constants.RUST_DLL_NAME;
+        private const string Win32DllName = @"x86\" + Constants.FLM_DLL_NAME;
+        private const string Win64DllName = @"x64\" + Constants.FLM_DLL_NAME;
+        private const string Arm64DllName = @"arm64\" + Constants.FLM_DLL_NAME;
 
-        private static readonly Dictionary<ArchitectureLocal, string> DLL_PATHS_MAP =
+        private static readonly Dictionary<ArchitectureLocal, string> DllPathsMap =
             new Dictionary<ArchitectureLocal, string>
             {
                 {
                     ArchitectureLocal.X86,
                         Path.Combine(
                             AppDomain.CurrentDomain.BaseDirectory,
-                            WIN32_DLL_NAME)
+                            Win32DllName)
                 },
                 {
                     ArchitectureLocal.X64,
                         Path.Combine(
                             AppDomain.CurrentDomain.BaseDirectory,
-                            WIN64_DLL_NAME)
+                            Win64DllName)
                 },
                 {
                     ArchitectureLocal.Arm,
                         Path.Combine(
                             AppDomain.CurrentDomain.BaseDirectory,
-                            WIN32_DLL_NAME)
+                            Win32DllName)
                 },
                 {
                     ArchitectureLocal.Arm64,
                         Path.Combine(
                             AppDomain.CurrentDomain.BaseDirectory,
-                            ARM64_DLL_NAME)
+                            Arm64DllName)
                 }
             };
 
         /// <summary>
         /// Native libs DLL provider
         /// </summary>
-        public FilterManagerDllProvider() : base(DLL_PATHS_MAP)
+        public FilterManagerDllProvider() : base(DllPathsMap)
         {
         }
 
-        private static readonly Lazy<FilterManagerDllProvider> LAZY =
+        private static readonly Lazy<FilterManagerDllProvider> Lazy =
             new Lazy<FilterManagerDllProvider>(() => new FilterManagerDllProvider());
 
         #region Singleton
@@ -61,7 +61,7 @@ namespace AdGuard.FilterListManager.Utils
         /// </summary>
         public static ILibsDllProvider Instance
         {
-            get { return LAZY.Value; }
+            get { return Lazy.Value; }
         }
 
         #endregion

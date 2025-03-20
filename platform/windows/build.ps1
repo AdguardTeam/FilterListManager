@@ -9,26 +9,34 @@ $FILES = @(
     "AdGuardFLM.pdb"
 )
 
+$CONFIGS = @(
+    "Release",
+    "Debug"
+)
+
 Function CopyToTestsBuildFolder {
     Write-Output "Copying files...";
     foreach ($arch in $ARCH_TO_FOLDER_MAP.Keys) {
-       foreach ($file in $FILES) {
+       foreach ($file in $FILES) {     
         $folder = $ARCH_TO_FOLDER_MAP[$arch]
         $srcPath = "target\$arch\release\$file"
-        $destPath = "platform\windows\build\bin\Release\$folder\$file"
-        
-        $destDir = Split-Path -Path $destPath -Parent
-        if (!(Test-Path -Path $destDir)) {
-            New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+
+        foreach ($config in $CONFIGS) {
+            $destPath = "platform\windows\build\bin\$config\$folder\$file"
+            
+            $destDir = Split-Path -Path $destPath -Parent
+            if (!(Test-Path -Path $destDir)) {
+                New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+            }
+            
+            Copy-Item -Path $srcPath -Destination $destPath
+            if (!$?) {
+                Write-Error "Failed to copy file from $srcPath to $destPath"
+                exit 1
+            }
+            
+            Write-Output "Copied: $srcPath to: $destPath"
         }
-        
-        Copy-Item -Path $srcPath -Destination $destPath
-        if (!$?) {
-            Write-Error "Failed to copy file from $srcPath to $destPath"
-            exit 1
-        }
-        
-        Write-Output "Copied: $srcPath to: $destPath"
        }
     }
 
@@ -84,7 +92,41 @@ Function ReplaceRcVersion {
     return $Line
 }
 
-function SetAdapterVersion {
+# Generates C# code from Protobuf definitions
+Function GenerateProtobufBindings {
+    Write-Output "Generating Protobuf bindings..."
+        
+    $protosDir = Join-Path $PSScriptRoot "..\..\crates\ffi\src\protobuf" | Resolve-Path
+    
+    # Output directory for generated C# files
+    $outputDir = "platform\windows\AdGuard.FilterListManager\ProtobufGenerated"
+    
+    # Create output directory if it doesn't exist
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Force -Path $outputDir
+    }
+    
+    # Check if protoc is installed
+    try {
+        $protocVersion = (& protoc --version)
+        Write-Output "Using protoc version: $protocVersion"
+    }
+    catch {
+        Write-Error "protoc is not installed or not in PATH. Please install Protocol Buffers compiler."
+        exit 1
+    }
+
+    protoc --csharp_out="$outputDir" -I="$protosDir" filters.proto flm_interface.proto misc_models.proto configuration.proto outer_error.proto
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to generate Protobuf bindings for $protoFile"
+        exit 1
+    }
+    
+    Write-Output "Protobuf bindings generated successfully"
+}
+
+Function SetAdapterVersion {
     
     $jsonFilePath = "platform\windows\AdGuard.FilterListManager\AdGuard.FilterListManager.schema.json";
 
@@ -125,8 +167,7 @@ function SetNativeVersion {
     Write-Host "Native version $rcVersion is updated";
 }
 
-Function RustBuild {
-    $rust_version = (& cargo -V);
+Function RustBuild {    
     try {
         SetNativeVersion;
         SetAdapterVersion;
@@ -146,7 +187,9 @@ Function RustBuild {
     & cargo build --release --lib --package adguard-flm-ffi --target aarch64-pc-windows-msvc --features rusqlite-bundled
     RenameOutFile "aarch64-pc-windows-msvc"
 
-    CopyToTestsBuildFolder;
+    # Generate Protobuf bindings
+    GenerateProtobufBindings;
 
+    CopyToTestsBuildFolder;
     Write-Output "Executing method RustBuild has been completed successfully";
 }

@@ -3,14 +3,15 @@
 ### Requirements
 
 - `Rust` - [See how to install](https://www.rust-lang.org/tools/install)
-- `cargo` 1.75. Versions 1.76+ don't support Windows 7. [See for more info](https://blog.rust-lang.org/2023/08/24/Rust-1.72.0.html#future-windows-compatibility)
-- `uniffi-bindgen-cs` - [See how to install](https://github.com/NordSecurity/uniffi-bindgen-cs)
-- `Visual studio build tools` - [See how to install](https://visualstudio.microsoft.com/ru/downloads/#build-tools-for-visual-studio-2022) and add build tools to path
+- `cargo` comes with Rust, the current version is 1.85.
+- `protoc` the current version is 30.1 - [See how to install](https://grpc.io/docs/protoc-installation/)
+- `Visual studio build tools` - [See how to install](https://visualstudio.microsoft.com/ru/downloads/#build-tools-for-visual-studio-2022) 
 
-First run
+Make sure that all these tools are available in your `PATH` environment variable.
+
+First run (from the repository folder)
 
 ```cmd
-cargo install uniffi-bindgen-cs --git https://github.com/NordSecurity/uniffi-bindgen-cs --tag v0.8.0+v0.25.0
 rustup target add i686-pc-windows-msvc
 rustup target add x86_64-pc-windows-msvc
 rustup target add aarch64-pc-windows-msvc
@@ -20,28 +21,20 @@ rustup target add aarch64-pc-windows-msvc
 
 Run from the repository folder
 
-```cmd
-cargo build --release --package adguard-flm-ffi --target i686-pc-windows-msvc --features rusqlite-bundled
-cargo build --release --package adguard-flm-ffi --target x86_64-pc-windows-msvc --features rusqlite-bundled
-cargo build --release --package adguard-flm-ffi --target aarch64-pc-windows-msvc --features rusqlite-bundled
+```powershell
+. ./build.ps1
+RustBuild
 ```
 
 The result files will be in `target\[x86_64-pc-windows-msvc|i686-pc-windows-msvc|aarch64-pc-windows-msvc]\release`.
 
 ### Build C# adapter
 
-Run this script to generate bindings for the current version:
-
-```cmd
-platform\windows\generate_bindings.bat
-
-```
-
-It saves the result to `platform\windows\AdGuard.FilterListManager\flm_ffi.cs.txt`.
-Git will show the differences with the previous version. Change the adapter code according to this. We cannot use the generated bindings directly because this tool doesn't support early versions of C# from .NET 4.5 that we use. Resharper or Rider can help with the code refactoring here.
-When the refactoring is done, check the tests and the adapter is ready to pack&deploy.
+Check the protobuf files in and correct them if needed.
 
 Go to `platform\windows` and build `AdGuard.FilterListManager\AdGuard.FilterListManager.csproj`. Unit tests are in `AdGuard.FilterListManager.Test\AdGuard.FilterListManager.Test.csproj`
+
+Examine `windows_adapter.yaml` file to see how we build it on Bamboo.
 
 ### Nuget
 

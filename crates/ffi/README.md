@@ -31,8 +31,10 @@ platform/apple/Scripts/build.sh
 
 ### Windows
 
-See readme for uniffi-based build [on GitHub](https://github.com/AdguardTeam/FilterListManager/blob/master/platform/windows/README_WIN.md)
-or protobuf-based [here](./src/platforms/windows/README_WIN.md)
+See readme for uniffi-based build [on GitHub](https://github.com/AdguardTeam/FilterListManager/blob/master/platform/windows/uniffi/README_WIN.md) or [here](./platform/windows/uniffi/README_WIN.md)
+Protobuf-based project is [here](./platform/windows/README_WIN.md)
+
+We declare uniffi-based build as an obsolete. So it was moved to `./src/platforms/windows/uniffi` and will be removed in 2.0 version. We also keep sample of protobuf-based adapter [here](./crates/ffi/src/platforms/windows/README_WIN.md). It will be removed in 2.0 version too.
 
 ## FFI-specific symbols
 

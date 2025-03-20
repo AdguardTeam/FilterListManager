@@ -12,7 +12,10 @@
     <projectUrl>https://github.com/AdguardTeam/FilterListManager</projectUrl>
     <iconUrl>https://uploads.adguard.org/AG-FilterListManager.png</iconUrl>    
     <dependencies>
+        <!-- We use id string + Version to set actual reference lib version (see GetDependencyVersionCsProj in private repo for more information) -->
         <dependency id="Adguard.Utils.Base" version="$AdguardUtilsBaseVersion$" />
+        <dependency id="Adguard.Utils" version="$AdguardUtilsVersion$" />
+        <dependency id="Google.Protobuf" version="3.28.2" />
     </dependencies>
   </metadata>
   <files>

@@ -394,3 +394,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+!AdGuard.Utils.Base.dll
+!AdGuard.Utils.dll

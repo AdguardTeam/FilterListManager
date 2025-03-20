@@ -1,9 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using AdGuard.FilterListManager.MarshalLogic;
+using System.IO;
+using AdGuard.FilterListManager.RustInterface;
 using AdGuard.FilterListManager.Utils;
+using AdGuard.Utils.Base.Files;
+using AdGuard.Utils.Base.Logging.TraceListeners;
+using AdGuard.Utils.Base.Logging;
+using AdGuard.Utils.Serializers;
+using FilterListManager;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
+using Logger = AdGuard.Utils.Base.Logging.Logger;
 
 namespace AdGuard.FilterListManager.Test
 {
@@ -12,9 +19,8 @@ namespace AdGuard.FilterListManager.Test
     /// </summary>
     public class FilterListTests
     {
-        private readonly string m_CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private const int REQUEST_TIMEOUT_MS = 60 * 1000;
-
+        private readonly string m_CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
         /// <summary>
         /// The main setup of the test.
         /// </summary>
@@ -23,6 +29,7 @@ namespace AdGuard.FilterListManager.Test
         {
             string coreLibsDllPath = FilterManagerDllProvider.Instance.LibsDllPath;
             Console.WriteLine($"Rust library path is {coreLibsDllPath}");
+            FileUtils.DeleteQuietly(Path.Combine(m_CurrentDirectory, "agflm_standard.db"));
         }
 
         /// <summary>
@@ -31,44 +38,88 @@ namespace AdGuard.FilterListManager.Test
         [Test]
         public void CommonTest()
         {
-            Configuration cfg = Constants.GetDefaultConfiguration();
-            cfg.MetadataUrl = "https://filters.adtidy.org/windows/filters.json";
-            cfg.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
-            cfg.Locale = "en-us";
-            cfg.WorkingDirectory = m_CurrentDirectory;
-            cfg.DefaultFilterListExpiresPeriodSec = 10;
-            cfg.AutoLiftUpDatabase = true;
-            cfg.AppName = "AdGuard.FilterListManager.Test";
-            cfg.Version = "1.0";
+            ITraceListener traceListener = new TestContextTraceListener(TestExecutionContext.CurrentContext);
+            Logger.SetCustomListener(traceListener);
+            Logger.Info("Hello, I'm filter list manager");
+            Logger.Level = LogLevel.Trace;
+            ISerializer<byte[]> serializer = new ProtobufSerializer();
+            using (IFilterListManager flm = new FilterListManager(serializer))
+            {
+                Configuration configuration = flm.SpawnDefaultConfiguration();
+                configuration.MetadataUrl = "https://filters.adtidy.org/windows/filters.json";
+                configuration.MetadataLocalesUrl = "https://filters.adtidy.org/windows/filters_i18n.json";
+                configuration.AutoLiftUpDatabase = true;
+                configuration.AppName = "AdGuard.FilterListManager.Test";
+                configuration.Version = "1.0";
+                configuration.DefaultFilterListExpiresPeriodSec = 10;
+                flm.Init(configuration);
+                flm.PullMetadata();
+                flm.UpdateFilters(false, REQUEST_TIMEOUT_MS, false);
 
-            IFilterListManager manager = new FilterListManager(
-                cfg);
+                flm.EnableFilterLists(new[] { 1, 2, 255 }, true);
+                FullFilterList customFilter = flm.InstallCustomFilterFromString(
+                    string.Empty,
+                    1000000000,
+                    true,
+                    true,
+                    "custom filter string body",
+                    "custom title",
+                    "Desc");
+                bool localeResult = flm.ChangeLocale("ru_RU");
+                //flm.LiftUpDatabase();
+                flm.EnableFilterLists(new[] { 1, 2, 255 }, true);
+                flm.InstallFilterLists(new[] { 1, 2, 255 }, true);
+                IEnumerable<RulesCountByFilter> rulesCount = flm.GetRulesCount(new[] { 1, 2, 255 });
 
-            manager.SetProxyMode(new RequestProxyMode.UseSystemProxy());
-            manager.PullMetadata();
-            List<StoredFilterMetadata> metas = manager.GetStoredFiltersMetadata();
-            Assert.IsTrue(metas.Count > 0);
+                FilterListRules rules1 = new FilterListRules
+                {
+                    FilterId = customFilter.Id
+                };
+                rules1.Rules.AddRange(new[] { "hello", "world" });
+                flm.SaveCustomFilterRules(rules1);
+                flm.SaveDisabledRules(customFilter.Id, new[] { "world" });
+                IEnumerable<DisabledRulesRaw> disabledRules1 =
+                    flm.GetDisabledRules(new[] { customFilter.Id });
+                IEnumerable<FilterTag> tags = flm.GetAllTags();
+                IEnumerable<FilterGroup> groups = flm.GetAllGroups();
+                IEnumerable<StoredFilterMetadata> storedFiltersMetadata = flm.GetStoredFiltersMetadata();
+                StoredFilterMetadata filterMetadata = flm.GetStoredFilterMetadataById(customFilter.Id);
 
-            StoredFilterMetadata firstFilter = metas.FirstOrDefault(a => a.Id == 1);
-            Assert.IsNotNull(firstFilter);
-            StoredFilterMetadata meta = manager.GetStoredFiltersMetadataById(firstFilter.Id);
-            Assert.IsNotNull(meta);
-            List<FilterGroup> groups = manager.GetAllGroups();
-            Assert.IsTrue(groups.Count > 0);
-            List<ActiveRulesInfo> rules = manager.GetActiveRules();
-            Assert.IsTrue(rules.Count > 0);
-            
-            var rulesIds = new List<int> { firstFilter.Id };
-            manager.InstallFilterLists(rulesIds, true);
-            manager.UpdateFilters(true, REQUEST_TIMEOUT_MS, true);
-            List<FilterListRulesRaw> rulesRaw = manager.GetFilterRulesAsStrings(rulesIds);
-            Assert.IsTrue(rulesRaw.Count > 0);
+                flm.GetFilterRulesAsStrings(new[] { customFilter.Id });
+                string blobPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "flmtest_2.txt");
+                FileUtils.Touch(blobPath);
+                flm.SaveRulesToFileBlob(customFilter.Id, blobPath);
+                flm.GetFullFilterListById(customFilter.Id);
+                flm.ForceUpdateFiltersByIds(new[] { 1, 2 }, REQUEST_TIMEOUT_MS);
+                customFilter = flm.InstallCustomFilterList(
+                    "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt",
+                    true,
+                    "title",
+                    "description");
+                flm.UpdateCustomFilterMetadata(
+                    customFilter.Id,
+                    "new title",
+                       true);
+                FilterListMetadata filterListMetadata =
+                    flm.FetchFilterListMetadata("https://filters.adtidy.org/extension/safari/filters/101.txt");
+                FilterListMetadataWithBody filterListMetadataWithBody =
+                    flm.FetchFilterListMetadataWithBody("https://filters.adtidy.org/extension/safari/filters/101.txt");
+                flm.GetActiveRules();
+                flm.DeleteCustomFilterLists(new[] { customFilter.Id });
+                string path = flm.GetDatabasePath();
+                int version = flm.GetDatabaseVersion();
+                flm.SetProxyMode("https://127.0.0.1:8080", RawRequestProxyMode.NoProxy);
 
-            manager.GetDisabledRules(rulesIds);
-            Assert.IsTrue(rulesRaw.Count > 0);
+                FLMConstants constants = FilterListManager.SpawnDefaultConstants();
 
-            FilterListManagerConstants constants = Constants.GetConstantsStructure();
-            Assert.IsTrue(constants.UserRulesId < 0);
+                Assert.AreEqual(-2147483648, constants.UserRulesId, "UserRulesId must be equal to int::min");
+                Assert.AreEqual(-2147483648, constants.CustomGroupId, "CustomGroupId must be equal to int::min");
+                Assert.AreEqual(0, constants.SpecialGroupId, "SpecialGroupId must be zero");
+                Assert.AreEqual(-2_000_000_000, constants.SmallestFilterId, "UserRulesId must be two billions");
+                Assert.IsTrue(filterListMetadataWithBody.Metadata.Homepage.Length > 0, "Metadata Homepage must be non-empty");
+
+                Logger.Info("All Ok!");
+            }
         }
     }
 }
