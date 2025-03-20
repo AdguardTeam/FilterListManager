@@ -19,6 +19,7 @@ use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::manager::update_filters_action::update_filters_action;
 use crate::storage::blob::write_to_stream;
+use crate::storage::entities::filter_entity::DEFAULT_IS_USER_TITLE_VALUE;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
 use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
@@ -149,37 +150,24 @@ impl FilterListManager for FilterListManagerImpl {
             _ => Utc::now().timestamp(),
         };
 
-        let new_title;
-        let is_user_title;
-
-        match title {
-            Some(title) => {
-                new_title = title;
-                is_user_title = true;
-            }
-            None => {
-                new_title = parser.get_metadata(KnownMetadataProperty::Title);
-                is_user_title = false;
-            }
+        let (processed_title, is_user_title) = match title {
+            Some(title_candidate) if title_candidate.len() > 0 => (title_candidate, true),
+            _ => (parser.get_metadata(KnownMetadataProperty::Title), false),
         };
 
-        let new_description;
-        let is_user_description;
-
-        match description {
-            Some(description) => {
-                new_description = description;
-                is_user_description = true;
+        let (processed_description, is_user_description) = match description {
+            Some(description_candidate) if description_candidate.len() > 0 => {
+                (description_candidate, true)
             }
-            None => {
-                new_description = parser.get_metadata(KnownMetadataProperty::Description);
-                is_user_description = false;
-            }
+            _ => (
+                parser.get_metadata(KnownMetadataProperty::Description),
+                false,
+            ),
         };
 
         let mut entity = FilterEntity::default();
-        entity.title = new_title;
-        entity.description = new_description;
+        entity.title = processed_title;
+        entity.description = processed_description;
         entity.last_update_time = time_updated;
         entity.last_download_time = Utc::now().timestamp();
         entity.download_url = normalized_url;
@@ -190,12 +178,8 @@ impl FilterListManager for FilterListManagerImpl {
         entity.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
         entity.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
         entity.license = parser.get_metadata(KnownMetadataProperty::License);
-        if is_user_title {
-            entity.set_is_user_title(is_user_title);
-        }
-        if is_user_description {
-            entity.set_is_user_description(is_user_description);
-        }
+        entity.set_is_user_title(is_user_title);
+        entity.set_is_user_description(is_user_description);
 
         self.connection_manager
             .execute_db(move |mut connection: Connection| {
@@ -670,37 +654,24 @@ impl FilterListManager for FilterListManagerImpl {
             _ => Utc::now().timestamp(),
         };
 
-        let new_title;
-        let is_user_title;
-
-        match custom_title {
-            Some(title) => {
-                new_title = title;
-                is_user_title = true;
-            }
-            None => {
-                new_title = parser.get_metadata(KnownMetadataProperty::Title);
-                is_user_title = false;
-            }
+        let (processed_title, is_user_title) = match custom_title {
+            Some(title_candidate) if title_candidate.len() > 0 => (title_candidate, true),
+            _ => (parser.get_metadata(KnownMetadataProperty::Title), false),
         };
 
-        let new_description;
-        let is_user_description;
-
-        match custom_description {
-            Some(description) => {
-                new_description = description;
-                is_user_description = true;
+        let (processed_description, is_user_description) = match custom_description {
+            Some(description_candidate) if description_candidate.len() > 0 => {
+                (description_candidate, true)
             }
-            None => {
-                new_description = parser.get_metadata(KnownMetadataProperty::Description);
-                is_user_description = false;
-            }
+            _ => (
+                parser.get_metadata(KnownMetadataProperty::Description),
+                false,
+            ),
         };
 
         let mut entity = FilterEntity::default();
-        entity.title = new_title;
-        entity.description = new_description;
+        entity.title = processed_title;
+        entity.description = processed_description;
         entity.last_update_time = time_updated;
         entity.last_download_time = last_download_time;
         entity.download_url = normalized_url;
@@ -711,12 +682,8 @@ impl FilterListManager for FilterListManagerImpl {
         entity.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
         entity.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
         entity.license = parser.get_metadata(KnownMetadataProperty::License);
-        if is_user_title {
-            entity.set_is_user_title(is_user_title);
-        }
-        if is_user_description {
-            entity.set_is_user_description(is_user_description);
-        }
+        entity.set_is_user_title(is_user_title);
+        entity.set_is_user_description(is_user_description);
 
         self.connection_manager
             .execute_db(move |mut connection: Connection| {

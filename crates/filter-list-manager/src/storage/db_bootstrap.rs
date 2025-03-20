@@ -27,6 +27,8 @@ fn make_user_rules_filter_entity() -> FilterEntity {
     user_rules_entity.is_enabled = true;
     user_rules_entity.version = String::from("1.0.0.0");
     user_rules_entity.is_trusted = true;
+    user_rules_entity.set_is_user_title(true);
+    user_rules_entity.set_is_user_description(true);
 
     user_rules_entity
 }
