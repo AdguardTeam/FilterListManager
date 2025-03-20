@@ -93,9 +93,11 @@ let flm = FilterListManagerImpl::new(configuration);
 // in the configuration.
 // In addition, this method applies migrations that have not yet been applied.
 // See the lift_up_database method for details on "lifting" a database.
+// Note, should be used once a week or less.
 flm.pull_metadata();
 
 // Then, downloads the contents of the filters.
+// Note, should be used once an hour or less.
 flm.update_filters(true, 0, true);
 ```
 
@@ -127,7 +129,10 @@ The method “raises” the state of the database to the working state.
 
 ### Usage notes
 Starting with version `0.7.1` the database is “uplifted” automatically when the filter_list_manager constructor is called. 
-To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.
+To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.\
+**Note: methods `flm.update_filters()`, `flm.force_update_filters_by_ids()`\
+should be used once an hour or less, method `flm.pull_metadata()`\
+should be used once a week or less**.
 
 #### Storage notes. Important
 **Database lifting**\
@@ -135,7 +140,6 @@ If you have disabled automatic lifting, you must invoke it yourself after each l
 
 `SQLITE_BUSY` Error\
 The library ensures that when using a single [FLM](./src/manager/filter_list_manager_impl.rs) instance for a single database file (also, by default, a [database type](./src/manager/models/configuration/filter_list_type.rs)) in a multithreaded environment, database queries will not return [SQLITE_BUSY](https://www.sqlite.org/rescode.html#busy) errors.
----
 
 ### Operations with custom filters
 

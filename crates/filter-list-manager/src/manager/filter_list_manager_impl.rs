@@ -1194,7 +1194,7 @@ mod tests {
         );
         assert_eq!(
             filter.download_url.as_str(),
-            "https://filters.adtidy.org/extension/safari/filters/257_optimized.txt"
+            "https://example.org/extension/safari/filters/257_optimized.txt"
         );
         assert!(filter.subscription_url.len() > 0);
         assert!(filter.download_url.len() > 0);
@@ -1542,18 +1542,13 @@ mod tests {
 
     #[test]
     fn test_change_locale() {
-        let source = DbConnectionManager::factory_test().unwrap();
-        spawn_test_db_with_metadata(&source);
-
         let mut conf = Configuration::default();
-        conf.metadata_url = "https://filters.adtidy.org/extension/safari/filters.json".to_string();
-        conf.metadata_locales_url =
-            "https://filters.adtidy.org/windows/filters_i18n.json".to_string();
         conf.app_name = "FlmApp".to_string();
         conf.version = "1.2.3".to_string();
-
         let mut flm = FilterListManagerImpl::new(conf).unwrap();
-        flm.pull_metadata().unwrap();
+
+        let source = &flm.connection_manager;
+        spawn_test_db_with_metadata(source);
 
         let mut res = flm.change_locale("ru".to_string()).unwrap();
         assert!(res);

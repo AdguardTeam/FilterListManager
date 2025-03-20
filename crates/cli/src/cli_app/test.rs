@@ -17,7 +17,7 @@ fn install_lists() {
     for n in 1..max_lists {
         manager
             .install_custom_filter_list(
-                format!("https://filters.adtidy.org/mac_v2/filters/{}.txt", n),
+                format!("https://example.org/mac_v2/filters/{}.txt", n),
                 true,
                 None,
                 None,
@@ -63,9 +63,9 @@ fn gets_filter_list() {
 fn update_filters() {
     let start = Instant::now();
     let mut conf = Configuration::default();
-    conf.metadata_url = "https://filters.adtidy.org/extension/safari/filters.json".to_string();
+    conf.metadata_url = "https://example.org/extension/safari/filters.json".to_string();
     conf.metadata_locales_url =
-        "https://filters.adtidy.org/extension/safari/filters_i18n.json".to_string();
+        "https://example.org/extension/safari/filters_i18n.json".to_string();
     conf.app_name = "FlmApp".to_string();
     conf.version = "1.2.3".to_string();
 

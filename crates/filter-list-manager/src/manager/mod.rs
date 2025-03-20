@@ -154,6 +154,8 @@ pub trait FilterListManager {
     ///
     /// Returns [`Err`] if you can not get records from db, or common error
     /// encountered.
+    ///
+    /// Note: should be used once an hour or less.
     fn update_filters(
         &self,
         ignore_filters_expiration: bool,
@@ -170,6 +172,8 @@ pub trait FilterListManager {
     /// * `ids` - List of [`FilterId`].
     /// * `loose_timeout` - See [`FilterListManager::update_filters`]
     ///   `loose_timeout` parameter for explanation.
+    ///
+    /// Note: should be used once an hour or less.
     fn force_update_filters_by_ids(
         &self,
         ids: Vec<FilterId>,
@@ -230,6 +234,8 @@ pub trait FilterListManager {
     /// 6. Fill in new groups/tags/locales.
     /// 7. Fill in our updated filters along with the raw filters from the
     /// index.
+    ///
+    /// Note: should be used once a week or less.
     fn pull_metadata(&self) -> FLMResult<()>;
 
     /// Updates custom filter data.
