@@ -19,7 +19,6 @@ use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::manager::update_filters_action::update_filters_action;
 use crate::storage::blob::write_to_stream;
-use crate::storage::entities::filter_entity::DEFAULT_IS_USER_TITLE_VALUE;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
 use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
