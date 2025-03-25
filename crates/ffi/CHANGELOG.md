@@ -4,10 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.7.3] - 2025-03-25
+
+### Fixed
+- `update_filters`, `force_update_filters_by_ids` methods should not fetch indexes for diff update
+
+[1.7.3]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.7.0...ffi-1.7.3
+
 ## [1.7.0] - 2025-03-20
 
 ### Changed
 - Windows protobuf-based adapter is default now. UNFFI one is obsolete and moved to `platform/windows/uniffi`
+
+[1.7.0]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.6.3...ffi-1.7.0
 
 ## [1.6.3] - 2025-03-19
 

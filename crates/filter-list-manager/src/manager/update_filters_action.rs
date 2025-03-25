@@ -51,25 +51,15 @@ pub(super) fn update_filters_action(
     let mut filter_entities: Vec<FilterEntity> = Vec::with_capacity(records.len());
     let mut rule_entities: Vec<RulesListEntity> = Vec::with_capacity(records.len());
 
-    let start_time = Instant::now();
-    let is_use_timeout = loose_timeout > 0;
-
     let mut update_result = UpdateResult {
         updated_list: vec![],
         remaining_filters_count: 0,
         filters_errors: vec![],
     };
 
-    let mut has_at_least_one_index_filter = false;
     let filter_ids = records
         .iter()
-        .filter_map(|filter| {
-            if !filter.is_custom() {
-                has_at_least_one_index_filter = true;
-            }
-
-            filter.filter_id
-        })
+        .filter_map(|filter| filter.filter_id)
         .collect::<Vec<FilterId>>();
 
     let (mut diff_updates_map, mut rules_map, mut disabled_rules_map) = db_connection_manager
@@ -87,21 +77,10 @@ pub(super) fn update_filters_action(
 
     let shared_http_client = BlockingClient::new(configuration)?;
 
-    // Parsers with successful filter downloads
-    let mut successful_parsers_with_result: Vec<(FilterId, FilterParser)> =
-        Vec::with_capacity(filter_entities.len() / 2);
-
-    let last_index_filter_versions = get_latest_filters_versions(
-        has_at_least_one_index_filter,
-        &shared_http_client,
-        configuration.metadata_url.as_str(),
-    )?;
-
-    // Put here processed_filters
-    let mut diff_path_entities: Vec<DiffUpdateEntity> = vec![];
-    let rows_count = records.len();
+    let mut parsers: Vec<(FilterId, FilterEntity, FilterParser)> = vec![];
+    let mut should_get_latest_filters_versions: bool = false;
     let batch_patches_container = BatchPatchesContainer::factory();
-    for (index, filter) in records.into_iter().enumerate() {
+    for filter in records {
         if !ignore_filters_status && !filter.is_enabled {
             continue;
         }
@@ -125,17 +104,6 @@ pub(super) fn update_filters_action(
             }
         };
 
-        if let Some(new_version) = last_index_filter_versions.get(&filter_id) {
-            if !filter.version.is_empty() && &filter.version == new_version &&
-                // Extra spike, 'cause we may already have metadata, but not the filters
-                // This stupid spike is here, 'cause we MIGHT fall in situation,
-                // when filter metadata.version is provided, it is up-to-date, BUT empty rules object is saved
-                rules_map.get(&filter_id).map(|old_rules| !old_rules.is_empty()).unwrap_or_default()
-            {
-                continue;
-            }
-        }
-
         let build_parser_result = build_parser(
             ignore_filters_expiration,
             filter_id,
@@ -149,24 +117,67 @@ pub(super) fn update_filters_action(
         );
 
         let mut parser = match build_parser_result {
-            Ok(Some(parser)) => parser,
-            Ok(None) => {
-                // Not ready for update
-                continue;
-            }
-            Err(err) => {
-                // An error occurred
+            // An error occurred
+            Err(why) => {
                 update_result.filters_errors.push(UpdateFilterError {
                     filter_id,
-                    message: err.to_string(),
+                    message: why.to_string(),
                 });
 
                 continue;
+            }
+
+            // Not ready for update
+            Ok((None, _)) => {
+                continue;
+            }
+
+            Ok((Some(filter_parser), filter_will_use_diff_update)) => {
+                // Should check index for new versions
+                if !filter_will_use_diff_update && !filter.is_custom() {
+                    should_get_latest_filters_versions = true;
+                }
+
+                filter_parser
             }
         };
 
         if !filter.is_custom() {
             parser.should_skip_checksum_validation(false);
+        }
+
+        parsers.push((filter_id, filter, parser));
+    }
+
+    // Get latest filters versions
+    // only if at least one index filter is present,
+    // and it is not used diff update
+    let last_index_filter_versions = get_latest_filters_versions(
+        should_get_latest_filters_versions,
+        &shared_http_client,
+        configuration.metadata_url.as_str(),
+    )?;
+
+    // Parsers with successful filter downloads
+    let mut successful_parsers_with_result: Vec<(FilterId, FilterParser)> =
+        Vec::with_capacity(filter_entities.len() / 2);
+
+    let start_time = Instant::now();
+    let is_use_timeout = loose_timeout > 0;
+
+    // Put here processed_filters
+    let mut diff_path_entities: Vec<DiffUpdateEntity> = vec![];
+    let rows_count = parsers.len();
+    for (index, (filter_id, filter, mut parser)) in parsers.into_iter().enumerate() {
+        if let Some(new_version) = last_index_filter_versions.get(&filter_id) {
+            if !filter.version.is_empty() && &filter.version == new_version &&
+                // Extra spike, 'cause we may already have metadata, but not the filters
+                // This stupid spike is here, 'cause we MIGHT fall in situation,
+                // when filter metadata.version is provided, it is up-to-date, BUT empty rules object is saved
+                rules_map.get(&filter_id).map(|old_rules| !old_rules.is_empty()).unwrap_or_default()
+            {
+                continue;
+            }
         }
 
         if let Err(err) = parser.parse_from_url(&filter.download_url) {
@@ -304,17 +315,19 @@ fn build_parser<'h: 'p, 'p>(
     batch_patches_container: &Rc<RefCell<BatchPatchesContainer>>,
     filter: &FilterEntity,
     shared_http_client: &'h BlockingClient,
-) -> FLMResult<Option<FilterParser<'p>>> {
+) -> FLMResult<(Option<FilterParser<'p>>, bool)> {
     let expires_duration = configuration.resolve_right_expires_value(filter.expires) as i64;
 
     let ready_for_full_update = current_time > filter.last_download_time + expires_duration;
 
+    let mut filter_will_use_diff_update: bool = false;
+
     // We force full filter update through http or filter is ready for full update
     if ignore_filters_expiration || ready_for_full_update {
-        return Ok(Some(FilterParser::factory(
-            configuration,
-            shared_http_client,
-        )));
+        return Ok((
+            Some(FilterParser::factory(configuration, shared_http_client)),
+            filter_will_use_diff_update,
+        ));
     }
 
     if let Some(diff_update_info) = diff_updates_map.remove(&filter_id) {
@@ -330,10 +343,15 @@ fn build_parser<'h: 'p, 'p>(
                         shared_http_client,
                     );
 
-                    Ok(Some(FilterParser::with_custom_provider(
-                        heap(provider),
-                        configuration,
-                    )))
+                    filter_will_use_diff_update = true;
+
+                    Ok((
+                        Some(FilterParser::with_custom_provider(
+                            heap(provider),
+                            configuration,
+                        )),
+                        filter_will_use_diff_update,
+                    ))
                 }
                 None => FLMError::make_err(
                     "Strange behaviour. Cannot get filter contents from database",
@@ -342,26 +360,28 @@ fn build_parser<'h: 'p, 'p>(
         }
     }
 
-    Ok(None)
+    Ok((None, filter_will_use_diff_update))
 }
 
-/// Gets latest filters versions
+/// Gets the latest versions of index filters from the server
 fn get_latest_filters_versions(
-    has_at_least_one_index_filter: bool,
+    should_get_latest_filters_versions: bool,
     shared_http_client: &BlockingClient,
     metadata_url: &str,
 ) -> FLMResult<HashMap<FilterId, String>> {
-    let mut last_index_filter_versions = HashMap::new();
-    if has_at_least_one_index_filter {
-        let index = fetch_json_by_scheme::<IndexEntity>(
-            metadata_url,
-            get_scheme(metadata_url).into(),
-            shared_http_client,
-        )?;
+    if !should_get_latest_filters_versions {
+        return Ok(HashMap::new());
+    }
 
-        for entity in index.filters {
-            last_index_filter_versions.insert(entity.filterId, entity.version);
-        }
+    let index = fetch_json_by_scheme::<IndexEntity>(
+        metadata_url,
+        get_scheme(metadata_url).into(),
+        shared_http_client,
+    )?;
+
+    let mut last_index_filter_versions = HashMap::with_capacity(index.filters.len());
+    for entity in index.filters {
+        last_index_filter_versions.insert(entity.filterId, entity.version);
     }
 
     Ok(last_index_filter_versions)
