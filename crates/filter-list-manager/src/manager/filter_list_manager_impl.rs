@@ -149,18 +149,24 @@ impl FilterListManager for FilterListManagerImpl {
             _ => Utc::now().timestamp(),
         };
 
-        let new_title = match title {
-            Some(title) => title,
-            None => parser.get_metadata(KnownMetadataProperty::Title),
+        let (processed_title, is_user_title) = match title {
+            Some(title_candidate) if title_candidate.len() > 0 => (title_candidate, true),
+            _ => (parser.get_metadata(KnownMetadataProperty::Title), false),
         };
-        let new_description = match description {
-            Some(description) => description,
-            None => parser.get_metadata(KnownMetadataProperty::Description),
+
+        let (processed_description, is_user_description) = match description {
+            Some(description_candidate) if description_candidate.len() > 0 => {
+                (description_candidate, true)
+            }
+            _ => (
+                parser.get_metadata(KnownMetadataProperty::Description),
+                false,
+            ),
         };
 
         let mut entity = FilterEntity::default();
-        entity.title = new_title;
-        entity.description = new_description;
+        entity.title = processed_title;
+        entity.description = processed_description;
         entity.last_update_time = time_updated;
         entity.last_download_time = Utc::now().timestamp();
         entity.download_url = normalized_url;
@@ -171,6 +177,8 @@ impl FilterListManager for FilterListManagerImpl {
         entity.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
         entity.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
         entity.license = parser.get_metadata(KnownMetadataProperty::License);
+        entity.set_is_user_title(is_user_title);
+        entity.set_is_user_description(is_user_description);
 
         self.connection_manager
             .execute_db(move |mut connection: Connection| {
@@ -567,12 +575,15 @@ impl FilterListManager for FilterListManagerImpl {
                     .map_err(FLMError::from_database)?;
 
                 if count > 0 {
+                    let is_title_set_by_user = !title.is_empty();
+
                     with_transaction(&mut conn, move |transaction: &Transaction| {
-                        filter_repository.update_custom_filter_metadata(
+                        filter_repository.update_user_metadata_for_custom_filter(
                             transaction,
                             filter_id,
                             title.as_str(),
                             is_trusted,
+                            is_title_set_by_user,
                         )
                     })
                 } else {
@@ -642,18 +653,24 @@ impl FilterListManager for FilterListManagerImpl {
             _ => Utc::now().timestamp(),
         };
 
-        let new_title = match custom_title {
-            Some(title) => title,
-            None => parser.get_metadata(KnownMetadataProperty::Title),
+        let (processed_title, is_user_title) = match custom_title {
+            Some(title_candidate) if title_candidate.len() > 0 => (title_candidate, true),
+            _ => (parser.get_metadata(KnownMetadataProperty::Title), false),
         };
-        let new_description = match custom_description {
-            Some(description) => description,
-            None => parser.get_metadata(KnownMetadataProperty::Description),
+
+        let (processed_description, is_user_description) = match custom_description {
+            Some(description_candidate) if description_candidate.len() > 0 => {
+                (description_candidate, true)
+            }
+            _ => (
+                parser.get_metadata(KnownMetadataProperty::Description),
+                false,
+            ),
         };
 
         let mut entity = FilterEntity::default();
-        entity.title = new_title;
-        entity.description = new_description;
+        entity.title = processed_title;
+        entity.description = processed_description;
         entity.last_update_time = time_updated;
         entity.last_download_time = last_download_time;
         entity.download_url = normalized_url;
@@ -664,6 +681,8 @@ impl FilterListManager for FilterListManagerImpl {
         entity.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
         entity.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
         entity.license = parser.get_metadata(KnownMetadataProperty::License);
+        entity.set_is_user_title(is_user_title);
+        entity.set_is_user_description(is_user_description);
 
         self.connection_manager
             .execute_db(move |mut connection: Connection| {
@@ -1645,5 +1664,200 @@ mod tests {
             rules_count_by_filter[0].rules_count,
             user_rules_count_result
         );
+    }
+
+    #[test]
+    fn test_install_custom_filter_sets_is_user_title_and_description_flags() {
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+
+        let flm = FilterListManagerImpl::new(conf).unwrap();
+
+        let source = &flm.connection_manager;
+        spawn_test_db_with_metadata(source);
+
+        // sets is_user_title flag
+        let installed_filter_list = flm
+            .install_custom_filter_list(
+                "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt".to_string(),
+                true,
+                Some("title".to_string()),
+                None,
+            )
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue(
+                            "filter_id",
+                            installed_filter_list.id.into(),
+                        )),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert!(filters[0].is_user_title());
+                assert!(!filters[0].is_user_description());
+
+                Ok(())
+            })
+            .unwrap();
+
+        // sets is_user_description flag
+        let installed_filter_list = flm
+            .install_custom_filter_list(
+                "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt".to_string(),
+                true,
+                None,
+                Some("description".to_string()),
+            )
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue(
+                            "filter_id",
+                            installed_filter_list.id.into(),
+                        )),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert!(!filters[0].is_user_title());
+                assert!(filters[0].is_user_description());
+
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    #[test]
+    fn test_update_custom_filter_metadata_sets_is_user_title_flag() {
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+
+        let flm = FilterListManagerImpl::new(conf).unwrap();
+
+        let source = &flm.connection_manager;
+        spawn_test_db_with_metadata(source);
+
+        // sets is_user_title flag
+        let installed_filter_list = flm
+            .install_custom_filter_list(
+                "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt".to_string(),
+                true,
+                None,
+                None,
+            )
+            .unwrap();
+
+        flm.update_custom_filter_metadata(installed_filter_list.id, "title".to_string(), true)
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue(
+                            "filter_id",
+                            installed_filter_list.id.into(),
+                        )),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert!(filters[0].is_user_title());
+
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    #[test]
+    fn test_update_filters_must_not_update_title_and_description() {
+        let mut conf = Configuration::default();
+        conf.metadata_url = "https://filters.adtidy.org/extension/safari/filters.json".to_string();
+        conf.metadata_locales_url =
+            "https://filters.adtidy.org/windows/filters_i18n.json".to_string();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+
+        let flm = FilterListManagerImpl::new(conf).unwrap();
+
+        let source = &flm.connection_manager;
+        spawn_test_db_with_metadata(source);
+
+        // must not update title
+        let installed_filter_list = flm
+            .install_custom_filter_list(
+                "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt".to_string(),
+                true,
+                Some("title".to_string()),
+                None,
+            )
+            .unwrap();
+
+        flm.update_filters(false, 0, false).unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue(
+                            "filter_id",
+                            installed_filter_list.id.into(),
+                        )),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert_eq!(filters[0].title, "title");
+                assert_ne!(filters[0].description, "description");
+
+                Ok(filters)
+            })
+            .unwrap();
+
+        // must not update description
+        let installed_filter_list = flm
+            .install_custom_filter_list(
+                "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt".to_string(),
+                true,
+                None,
+                Some("description".to_string()),
+            )
+            .unwrap();
+
+        flm.update_filters(false, 0, false).unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue(
+                            "filter_id",
+                            installed_filter_list.id.into(),
+                        )),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert_ne!(filters[0].title, "title");
+                assert_eq!(filters[0].description, "description");
+
+                Ok(filters)
+            })
+            .unwrap();
     }
 }

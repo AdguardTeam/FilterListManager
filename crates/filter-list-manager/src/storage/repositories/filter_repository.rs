@@ -1,6 +1,7 @@
 use crate::manager::models::FilterId;
 use crate::storage::db_bootstrap::get_bootstrapped_filter_id;
 use crate::storage::entities::db_metadata_entity::DBMetadataEntity;
+use crate::storage::entities::filter_inner_flag_entity::FilterInnerFlagEntity;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::BulkDeleteRepository;
 use crate::storage::sql_generators::operator::SQLOperator;
@@ -35,7 +36,9 @@ const BASIC_SELECT_SQL: &str = r"
         f.subscription_url,
         f.is_enabled,
         f.is_installed,
-        f.is_trusted
+        f.is_trusted,
+        f.is_user_title,
+        f.is_user_description
     FROM
         [filter] f
 ";
@@ -122,7 +125,7 @@ impl FilterRepository {
         transaction: &Transaction,
         entity: FilterEntity,
     ) -> Result<FilterEntity, Error> {
-        let last_insert_id = self.insert_internal(transaction, &[entity])?;
+        let last_insert_id = self.insert_internal(transaction, &[entity], HashMap::new())?;
 
         let mut sql = String::from(BASIC_SELECT_SQL);
         sql += "WHERE f.filter_id=?";
@@ -333,15 +336,25 @@ impl FilterRepository {
             is_enabled: row.get(14)?,
             is_installed: row.get(15)?,
             is_trusted: row.get(16)?,
+            is_user_title: row.get(17)?,
+            is_user_description: row.get(18)?,
         })
     }
 
-    pub(crate) fn update_custom_filter_metadata(
+    /// Update user defined metadata for custom_filter
+    ///
+    /// * `transaction` - Outer transaction
+    /// * `filter_id` - ID
+    /// * `title` - New title
+    /// * `is_trusted` - Is this filter trusted
+    /// * `is_title_set_by_user` - This title strictly set by user (true); or can be changed during update (false)
+    pub(crate) fn update_user_metadata_for_custom_filter(
         &self,
         transaction: &Transaction,
         filter_id: FilterId,
         title: &str,
         is_trusted: bool,
+        is_user_title: bool,
     ) -> rusqlite::Result<bool> {
         let mut statement = transaction.prepare(
             r"
@@ -349,7 +362,8 @@ impl FilterRepository {
                 [filter]
             SET
                 title=:title,
-                is_trusted=:is_trusted
+                is_trusted=:is_trusted,
+                is_user_title=:is_user_title
             WHERE
                 filter_id=:filter_id
         ",
@@ -359,15 +373,59 @@ impl FilterRepository {
             ":title": title,
             ":is_trusted": is_trusted,
             ":filter_id": filter_id,
+            ":is_user_title": is_user_title
         })?;
 
         Ok(usize > 0)
+    }
+
+    /// Selects inner flags for filters
+    fn select_filter_inner_flag(
+        &self,
+        transaction: &Transaction<'_>,
+        entities: &[FilterEntity],
+    ) -> rusqlite::Result<HashMap<FilterId, FilterInnerFlagEntity>> {
+        let mut sql = String::from(
+            r"
+            SELECT
+                filter_id,
+                is_user_title,
+                is_user_description
+            FROM
+                [filter]
+            WHERE ",
+        );
+
+        let ids: Vec<FilterId> = entities
+            .iter()
+            .filter_map(|entity| entity.filter_id)
+            .collect();
+
+        sql += build_in_clause("filter_id", ids.len()).as_str();
+
+        let mut statement = transaction.prepare(sql.as_str())?;
+
+        let mut rows = statement.query(params_from_iter(ids))?;
+
+        let mut out: HashMap<FilterId, FilterInnerFlagEntity> = HashMap::new();
+        while let Some(row) = rows.next()? {
+            let entity: FilterInnerFlagEntity = FilterInnerFlagEntity {
+                filter_id: row.get(0)?,
+                is_user_title: row.get(1)?,
+                is_user_description: row.get(2)?,
+            };
+
+            out.insert(entity.filter_id, entity);
+        }
+
+        Ok(out)
     }
 
     fn insert_internal(
         &self,
         transaction: &Transaction<'_>,
         entities: &[FilterEntity],
+        filter_inner_flag_entities: HashMap<FilterId, FilterInnerFlagEntity>,
     ) -> rusqlite::Result<i64> {
         let mut custom_filters_count: FilterId = 0;
         for entity in entities.iter() {
@@ -419,7 +477,9 @@ impl FilterRepository {
                     subscription_url,
                     is_enabled,
                     is_installed,
-                    is_trusted
+                    is_trusted,
+                    is_user_title,
+                    is_user_description
                 ) VALUES (
                     :filter_id,
                     :group_id,
@@ -437,7 +497,9 @@ impl FilterRepository {
                     :subscription_url,
                     :is_enabled,
                     :is_installed,
-                    :is_trusted
+                    :is_trusted,
+                    :is_user_title,
+                    :is_user_description
                 )",
         )?;
 
@@ -455,6 +517,24 @@ impl FilterRepository {
                     }
                 }
             };
+
+            let is_user_title = entity.is_user_title.or_else(|| {
+                filter_id
+                    .as_ref()
+                    .and_then(|id| filter_inner_flag_entities.get(id).map(|e| e.is_user_title))
+                    .flatten()
+            });
+
+            let is_user_description = entity.is_user_description.or_else(|| {
+                filter_id
+                    .as_ref()
+                    .and_then(|id| {
+                        filter_inner_flag_entities
+                            .get(id)
+                            .map(|e| e.is_user_description)
+                    })
+                    .flatten()
+            });
 
             statement.execute(named_params! {
                 ":filter_id": filter_id,
@@ -474,6 +554,8 @@ impl FilterRepository {
                 ":is_enabled": entity.is_enabled,
                 ":is_installed": entity.is_installed,
                 ":is_trusted": entity.is_trusted,
+                ":is_user_title": is_user_title,
+                ":is_user_description": is_user_description,
             })?;
         }
 
@@ -495,7 +577,9 @@ impl Repository<FilterEntity> for FilterRepository {
         transaction: &Transaction<'_>,
         entities: &[FilterEntity],
     ) -> Result<(), Error> {
-        self.insert_internal(transaction, entities).map(|_| ())
+        let filter_inner_flag_entities = self.select_filter_inner_flag(transaction, entities)?;
+        self.insert_internal(transaction, entities, filter_inner_flag_entities)
+            .map(|_| ())
     }
 
     /// Do not clear filters repository
@@ -548,6 +632,8 @@ mod tests {
                 expires: 0,
                 homepage: "".to_string(),
                 is_installed: false,
+                is_user_title: None,
+                is_user_description: None,
             };
 
             source
@@ -619,6 +705,8 @@ mod tests {
                 expires: 0,
                 homepage: "".to_string(),
                 is_installed: false,
+                is_user_title: None,
+                is_user_description: None,
             };
 
             source
@@ -654,10 +742,11 @@ mod tests {
                 assert_eq!(inserted_filter.title, "Custom filter".to_string());
 
                 with_transaction(&mut connection, |transaction: &Transaction| {
-                    filter_repository.update_custom_filter_metadata(
+                    filter_repository.update_user_metadata_for_custom_filter(
                         transaction,
                         filter_id,
                         &new_title,
+                        true,
                         true,
                     )
                 })
@@ -765,6 +854,111 @@ mod tests {
                 for selected_filter in selected_filters {
                     assert!(selected_filter.is_installed);
                 }
+
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    #[test]
+    fn test_insert_must_not_update_is_user_title_and_description_columns() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        spawn_test_db_with_metadata(&source);
+
+        let filter_id = -10011;
+
+        // insert new filter
+        let mut filter_entity = FilterEntity::default();
+        filter_entity.filter_id = Some(filter_id);
+
+        source
+            .execute_db(|mut conn: Connection| {
+                with_transaction(&mut conn, |tx: &Transaction| {
+                    FilterRepository::new().insert(tx, &[filter_entity])
+                })
+                .unwrap();
+                Ok(())
+            })
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert!(!filters[0].is_user_title());
+                assert!(!filters[0].is_user_description());
+
+                Ok(())
+            })
+            .unwrap();
+
+        let filter_id = -10012;
+
+        // insert new filter with flags
+        let mut filter_entity = FilterEntity::default();
+        filter_entity.filter_id = Some(filter_id);
+        filter_entity.set_is_user_title(true);
+        filter_entity.set_is_user_description(true);
+
+        source
+            .execute_db(|mut conn: Connection| {
+                with_transaction(&mut conn, |tx: &Transaction| {
+                    FilterRepository::new().insert(tx, &[filter_entity])
+                })
+                .unwrap();
+                Ok(())
+            })
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert!(filters[0].is_user_title());
+                assert!(filters[0].is_user_description());
+
+                Ok(())
+            })
+            .unwrap();
+
+        // insert existed filter
+        let mut filter_entity = FilterEntity::default();
+        filter_entity.filter_id = Some(filter_id);
+
+        source
+            .execute_db(|mut conn: Connection| {
+                with_transaction(&mut conn, |tx: &Transaction| {
+                    FilterRepository::new().insert(tx, &[filter_entity])
+                })
+                .unwrap();
+                Ok(())
+            })
+            .unwrap();
+
+        source
+            .execute_db(|conn: Connection| {
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                    )
+                    .unwrap()
+                    .unwrap();
+
+                assert!(filters[0].is_user_title());
+                assert!(filters[0].is_user_description());
 
                 Ok(())
             })

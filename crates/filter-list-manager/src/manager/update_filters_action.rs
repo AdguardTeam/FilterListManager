@@ -263,8 +263,12 @@ pub(super) fn update_filters_action(
             // Should update `parsed info` only for custom filters
             if filter.is_custom() {
                 filter.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
-                filter.title = parser.get_metadata(KnownMetadataProperty::Title);
-                filter.description = parser.get_metadata(KnownMetadataProperty::Description);
+                if !filter.is_user_title() {
+                    filter.title = parser.get_metadata(KnownMetadataProperty::Title);
+                }
+                if !filter.is_user_description() {
+                    filter.description = parser.get_metadata(KnownMetadataProperty::Description);
+                }
             }
 
             filter.version = parser.get_metadata(KnownMetadataProperty::Version);
