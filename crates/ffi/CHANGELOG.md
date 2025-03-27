@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Fixed
 - `get_stored_filters_metadata_by_id` method name
+- `get_full_filter_list_by_id`, `fetch_filter_list_metadata`, `fetch_filter_list_metadata_with_body` methods names for apple platform
 
 [1.8.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.7.4...ffi-1.8.1
 

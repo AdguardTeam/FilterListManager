@@ -44,7 +44,7 @@ public protocol FLMFacadeProtocol {
 
     func deleteCustomFilterLists(ids: [Int32]) throws -> Int64
 
-    func getFullFilterListsById(id: Int32) throws -> FilterListManager_FullFilterList
+    func getFullFilterListById(id: Int32) throws -> FilterListManager_FullFilterList
 
     func getStoredFiltersMetadata() throws -> [FilterListManager_StoredFilterMetadata]
 
@@ -62,9 +62,9 @@ public protocol FLMFacadeProtocol {
 
     func forceUpdateFiltersByIds(ids: [Int32], looseTimeout: Int32) throws -> FilterListManager_UpdateResult
 
-    func fetchFiltersListMetadata(url: String) throws -> FilterListManager_FilterListMetadata
+    func fetchFilterListMetadata(url: String) throws -> FilterListManager_FilterListMetadata
 
-    func fetchFiltersListMetadataWithBody(url: String) throws -> FilterListManager_FilterListMetadataWithBody
+    func fetchFilterListMetadataWithBody(url: String) throws -> FilterListManager_FilterListMetadataWithBody
 
     func liftUpDatabase() throws
 
@@ -241,7 +241,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.count
     }
 
-    public func getFullFilterListsById(id: Int32) throws -> FilterListManager_FullFilterList {
+    public func getFullFilterListById(id: Int32) throws -> FilterListManager_FullFilterList {
         var message = FilterListManager_GetFullFilterListByIdRequest()
         message.id = id
 
@@ -272,8 +272,8 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_GetStoredFiltersMetadataByIdRequest()
         message.id = id
 
-        let bytes = try callRust(method: GetStoredFilterMetadataById, message: message)
-        let response = try FilterListManager_GetStoredFilterMetadataByIdResponse(serializedBytes: bytes)
+        let bytes = try callRust(method: GetStoredFiltersMetadataById, message: message)
+        let response = try FilterListManager_GetStoredFiltersMetadataByIdResponse(serializedBytes: bytes)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -338,7 +338,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.result
     }
 
-    public func fetchFiltersListMetadata(url: String) throws -> FilterListManager_FilterListMetadata {
+    public func fetchFilterListMetadata(url: String) throws -> FilterListManager_FilterListMetadata {
         var message = FilterListManager_FetchFilterListMetadataRequest()
         message.url = url
 
@@ -352,7 +352,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.metadata
     }
 
-    public func fetchFiltersListMetadataWithBody(url: String) throws -> FilterListManager_FilterListMetadataWithBody {
+    public func fetchFilterListMetadataWithBody(url: String) throws -> FilterListManager_FilterListMetadataWithBody {
         var message = FilterListManager_FetchFilterListMetadataWithBodyRequest()
         message.url = url
 
