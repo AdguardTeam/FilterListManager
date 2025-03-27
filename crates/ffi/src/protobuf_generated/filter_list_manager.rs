@@ -681,7 +681,7 @@ pub struct GetStoredFiltersMetadataResponse {
     pub error: ::core::option::Option<AgOuterError>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetStoredFilterMetadataByIdResponse {
+pub struct GetStoredFiltersMetadataByIdResponse {
     #[prost(message, optional, tag = "1")]
     pub filter_list: ::core::option::Option<StoredFilterMetadata>,
     #[prost(message, optional, tag = "2")]

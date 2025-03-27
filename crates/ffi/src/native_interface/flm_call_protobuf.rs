@@ -12,8 +12,8 @@ use crate::protobuf_generated::filter_list_manager::{
     GetAllGroupsResponse, GetAllTagsResponse, GetDatabasePathResponse, GetDatabaseVersionResponse,
     GetDisabledRulesRequest, GetDisabledRulesResponse, GetFilterRulesAsStringsRequest,
     GetFilterRulesAsStringsResponse, GetFullFilterListByIdRequest, GetRulesCountRequest,
-    GetRulesCountResponse, GetStoredFilterMetadataByIdResponse,
-    GetStoredFiltersMetadataByIdRequest, GetStoredFiltersMetadataResponse,
+    GetRulesCountResponse, GetStoredFiltersMetadataByIdRequest,
+    GetStoredFiltersMetadataByIdResponse, GetStoredFiltersMetadataResponse,
     InstallCustomFilterFromStringRequest, InstallCustomFilterFromStringResponse,
     InstallCustomFilterListRequest, InstallCustomFilterListResponse, InstallFilterListsRequest,
     InstallFilterListsResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
@@ -35,7 +35,7 @@ pub enum FFIMethod {
     DeleteCustomFilterLists,
     GetFullFilterListById,
     GetStoredFiltersMetadata,
-    GetStoredFilterMetadataById,
+    GetStoredFiltersMetadataById,
     SaveCustomFilterRules,
     SaveDisabledRules,
     UpdateFilters,
@@ -191,15 +191,15 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethod::GetStoredFilterMetadataById => {
+        FFIMethod::GetStoredFiltersMetadataById => {
             let request = decode_input_request!(GetStoredFiltersMetadataByIdRequest);
 
             match flm_handle.flm.get_stored_filters_metadata_by_id(request.id) {
-                Ok(value) => GetStoredFilterMetadataByIdResponse {
+                Ok(value) => GetStoredFiltersMetadataByIdResponse {
                     filter_list: value.map(Into::into),
                     error: None,
                 },
-                Err(why) => GetStoredFilterMetadataByIdResponse {
+                Err(why) => GetStoredFiltersMetadataByIdResponse {
                     filter_list: None,
                     error: Some(why.into()),
                 },

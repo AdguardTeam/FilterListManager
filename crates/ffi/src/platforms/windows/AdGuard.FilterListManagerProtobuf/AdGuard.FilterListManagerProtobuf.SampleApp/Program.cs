@@ -62,7 +62,7 @@ namespace AdGuard.FilterListManagerProtobuf.SampleApp
                 IEnumerable<FilterTag> tags = flm.GetAllTags();
                 IEnumerable<FilterGroup> groups = flm.GetAllGroups();
                 IEnumerable<StoredFilterMetadata> storedFiltersMetadata = flm.GetStoredFiltersMetadata();
-                StoredFilterMetadata filterMetadata = flm.GetStoredFilterMetadataById(customFilter.Id);
+                StoredFilterMetadata filterMetadata = flm.GetStoredFiltersMetadataById(customFilter.Id);
                 IEnumerable<RulesCountByFilter> rulesCount = flm.GetRulesCount(new[] { customFilter.Id });
 
                 flm.GetFilterRulesAsStrings(new[] { customFilter.Id });

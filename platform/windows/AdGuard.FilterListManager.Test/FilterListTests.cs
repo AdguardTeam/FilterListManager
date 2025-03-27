@@ -83,7 +83,7 @@ namespace AdGuard.FilterListManager.Test
                 IEnumerable<FilterTag> tags = flm.GetAllTags();
                 IEnumerable<FilterGroup> groups = flm.GetAllGroups();
                 IEnumerable<StoredFilterMetadata> storedFiltersMetadata = flm.GetStoredFiltersMetadata();
-                StoredFilterMetadata filterMetadata = flm.GetStoredFilterMetadataById(customFilter.Id);
+                StoredFilterMetadata filterMetadata = flm.GetStoredFiltersMetadataById(customFilter.Id);
 
                 flm.GetFilterRulesAsStrings(new[] { customFilter.Id });
                 string blobPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "flmtest_2.txt");

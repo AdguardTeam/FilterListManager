@@ -139,7 +139,7 @@ message GetStoredFiltersMetadataResponse {
   optional AGOuterError error = 2;
 }
 
-message GetStoredFilterMetadataByIdResponse {
+message GetStoredFiltersMetadataByIdResponse {
   StoredFilterMetadata filter_list = 1;
   optional AGOuterError error = 2;
 }

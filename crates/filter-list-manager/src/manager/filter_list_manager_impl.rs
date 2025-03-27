@@ -76,7 +76,7 @@ impl FilterListManagerImpl {
         })
     }
 
-    fn get_stored_filter_metadata_list_internal(
+    fn get_stored_filters_metadata_list_internal(
         &self,
         where_clause: Option<SQLOperator>,
     ) -> FLMResult<Vec<StoredFilterMetadata>> {
@@ -362,14 +362,14 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_stored_filters_metadata(&self) -> FLMResult<Vec<StoredFilterMetadata>> {
-        self.get_stored_filter_metadata_list_internal(None)
+        self.get_stored_filters_metadata_list_internal(None)
     }
 
-    fn get_stored_filter_metadata_by_id(
+    fn get_stored_filters_metadata_by_id(
         &self,
         filter_id: FilterId,
     ) -> FLMResult<Option<StoredFilterMetadata>> {
-        let mut vec = self.get_stored_filter_metadata_list_internal(Some(
+        let mut vec = self.get_stored_filters_metadata_list_internal(Some(
             SQLOperator::FieldEqualValue("filter_id", filter_id.into()),
         ))?;
 

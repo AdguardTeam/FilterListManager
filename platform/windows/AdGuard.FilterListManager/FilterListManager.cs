@@ -152,15 +152,15 @@ namespace AdGuard.FilterListManager
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public StoredFilterMetadata GetStoredFilterMetadataById(int filterId)
+        public StoredFilterMetadata GetStoredFiltersMetadataById(int filterId)
         {
             GetStoredFiltersMetadataByIdRequest request = new GetStoredFiltersMetadataByIdRequest
             {
                 Id = filterId
             };
 
-            GetStoredFilterMetadataByIdResponse response =
-                CallRustMessage<GetStoredFilterMetadataByIdResponse>(request);
+            GetStoredFiltersMetadataByIdResponse response =
+                CallRustMessage<GetStoredFiltersMetadataByIdResponse>(request);
             return response.FilterList;
         }
 
@@ -549,7 +549,7 @@ namespace AdGuard.FilterListManager
                     throw new AgOuterException(response.Error);
                 }
 
-                // special case i‡ response represents AGOuterError explicitly.
+                // special case i–∞ response represents AGOuterError explicitly.
                 // This case is actual when ffiMethodName is looking for the RustResponseType.FLMHandlePointer
                 // in the answer
                 if (response is AGOuterError responseAgOuterError)

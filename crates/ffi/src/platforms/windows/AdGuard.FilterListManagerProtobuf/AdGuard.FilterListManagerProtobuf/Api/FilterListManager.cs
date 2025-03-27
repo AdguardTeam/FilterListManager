@@ -151,15 +151,15 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public StoredFilterMetadata GetStoredFilterMetadataById(int filterId)
+        public StoredFilterMetadata GetStoredFiltersMetadataById(int filterId)
         {
             GetStoredFiltersMetadataByIdRequest request = new GetStoredFiltersMetadataByIdRequest
             {
                 Id = filterId
             };
 
-            GetStoredFilterMetadataByIdResponse response = 
-                CallRustMessage<GetStoredFilterMetadataByIdResponse>(request);
+            GetStoredFiltersMetadataByIdResponse response = 
+                CallRustMessage<GetStoredFiltersMetadataByIdResponse>(request);
             return response.FilterList;
         }
         

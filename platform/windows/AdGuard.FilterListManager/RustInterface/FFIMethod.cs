@@ -8,7 +8,7 @@
         DeleteCustomFilterLists,
         GetFullFilterListById,
         GetStoredFiltersMetadata,
-        GetStoredFilterMetadataById,
+        GetStoredFiltersMetadataById,
         SaveCustomFilterRules,
         SaveDisabledRules,
         UpdateFilters,

@@ -106,7 +106,7 @@ pub trait FilterListManager {
 
     /// Returns stored filter metadata by  [`FilterId`]. This is the lightweight counterpart of `.get_full_filter_list_by_id(filter_id)`
     /// Fields [`title`, `description`] will be localised with selected [`Locale`].
-    fn get_stored_filter_metadata_by_id(
+    fn get_stored_filters_metadata_by_id(
         &self,
         filter_id: FilterId,
     ) -> FLMResult<Option<StoredFilterMetadata>>;

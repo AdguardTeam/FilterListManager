@@ -67,7 +67,7 @@ impl FilterListManager {
         &self,
         filter_id: FilterId,
     ) -> AGResult<Option<StoredFilterMetadata>> {
-        self.wrap(move |flm| flm.get_stored_filter_metadata_by_id(filter_id))
+        self.wrap(move |flm| flm.get_stored_filters_metadata_by_id(filter_id))
     }
 
     pub fn save_custom_filter_rules(&self, rules: FilterListRules) -> AGResult<()> {

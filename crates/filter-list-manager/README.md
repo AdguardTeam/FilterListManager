@@ -235,7 +235,7 @@ flm.get_stored_filters_metadata();
 
 // Retrieves a filter metadata by its ID from the database **without** its rules.
 // Returns Optional<StoredFilterMetadata>.
-flm.get_stored_filter_metadata_by_id(id /* FilterId */);
+flm.get_stored_filters_metadata_by_id(id /* FilterId */);
 
 // Retrieves a list of FilterListRulesRaw by IDs.
 // This method acts in the same way as the `IN` database operator. Only found entities will be returned

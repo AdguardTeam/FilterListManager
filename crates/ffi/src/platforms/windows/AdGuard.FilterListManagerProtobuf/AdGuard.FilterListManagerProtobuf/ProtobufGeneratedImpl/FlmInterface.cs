@@ -41,7 +41,7 @@ namespace FilterListManager
     {
     }
     
-    public partial class GetStoredFilterMetadataByIdResponse : IAGOuterError
+    public partial class GetStoredFiltersMetadataByIdResponse : IAGOuterError
     {
     }
     

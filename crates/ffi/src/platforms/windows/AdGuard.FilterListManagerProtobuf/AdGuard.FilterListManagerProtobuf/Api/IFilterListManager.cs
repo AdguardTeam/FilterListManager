@@ -88,7 +88,7 @@ namespace AdGuard.FilterListManagerProtobuf.Api
         /// Returns stored filter metadata by  [`FilterId`]. This is the lightweight counterpart of `.get_full_filter_list_by_id(filter_id)`
         /// Fields [`title`, `description`] will be localised with selected [`Locale`].
         /// </summary>
-        StoredFilterMetadata GetStoredFilterMetadataById(int filterId);
+        StoredFilterMetadata GetStoredFiltersMetadataById(int filterId);
         
         /// <summary>
         /// Save custom filter list rules. Note that `filter.time_updated` will be updated too.

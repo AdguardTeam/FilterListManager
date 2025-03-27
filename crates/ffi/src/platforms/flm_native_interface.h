@@ -18,7 +18,7 @@ typedef enum FFIMethod {
     DeleteCustomFilterLists,
     GetFullFilterListById,
     GetStoredFiltersMetadata,
-    GetStoredFilterMetadataById,
+    GetStoredFiltersMetadataById,
     SaveCustomFilterRules,
     SaveDisabledRules,
     UpdateFilters,
