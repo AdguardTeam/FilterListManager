@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.7.6] - 2025-03-28
+
+### Fixed
+- Bamboo increments custom version
+
+[1.7.6]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.7.5...ffi-1.7.6
+
 ## [1.7.5] - 2025-03-26
 
 ### Add

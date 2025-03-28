@@ -47,12 +47,29 @@ if [ "${bamboo_repository_branch_name}" != "master" ]; then
   exit 0
 fi
 
-if [ ${bamboo_adguard_flm_custom_version} = "none" ]; then
-  bamboo_adguard_flm_custom_version=
-fi
-
-if [ ${bamboo_ffi_custom_version} = "none" ]; then
-  bamboo_ffi_custom_version=
+# Determines flm/ffi custom version
+if [ ${bamboo_adguard_flm_custom_version} = "none" ] || [ ${bamboo_ffi_custom_version} = "none" ]; then
+  FLM_CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/filter-list-manager/Cargo.toml)
+  FFI_CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)
+  git checkout -b head_1 HEAD~1
+  FLM_PREV_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/filter-list-manager/Cargo.toml)
+  FFI_PREV_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)
+  git checkout @{-1}
+  git branch -D head_1
+  if [ ${bamboo_adguard_flm_custom_version} = "none" ]; then
+    if [ $FLM_CURRENT_VERSION != $FLM_PREV_VERSION ]; then
+      bamboo_adguard_flm_custom_version=$FLM_CURRENT_VERSION
+    else
+      bamboo_adguard_flm_custom_version=
+    fi
+  fi
+  if [ ${bamboo_ffi_custom_version} = "none" ]; then
+    if [ $FFI_CURRENT_VERSION != $FFI_PREV_VERSION ]; then
+      bamboo_ffi_custom_version=$FFI_CURRENT_VERSION
+    else
+      bamboo_ffi_custom_version=
+    fi
+  fi
 fi
 
 # Check if there are any changes in the `filter-list-manager` crate
