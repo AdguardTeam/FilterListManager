@@ -1,10 +1,11 @@
 use crate::storage::entities::filter_filter_tag_entity::FilterFilterTagEntity;
+#[cfg(test)]
+use crate::storage::entities::hydrate::Hydrate;
 use crate::storage::repositories::{BulkDeleteRepository, Repository};
 use crate::FilterId;
-use rusqlite::{named_params, Transaction};
-
 #[cfg(test)]
-use rusqlite::{Connection, Row};
+use rusqlite::Connection;
+use rusqlite::{named_params, Transaction};
 
 /// Repository for (filter <- tag) relations filter_id <- tag_id
 pub(crate) struct FilterFilterTagRepository;
@@ -82,7 +83,7 @@ impl FilterFilterTagRepository {
 
         let mut statement = conn.prepare(sql.as_str())?;
 
-        let rows = statement.query_map(params, FilterFilterTagRepository::hydrate)?;
+        let rows = statement.query_map(params, FilterFilterTagEntity::hydrate)?;
 
         let mut results = Vec::new();
         for row in rows {
@@ -90,12 +91,5 @@ impl FilterFilterTagRepository {
         }
 
         Ok(results)
-    }
-
-    fn hydrate(row: &Row) -> rusqlite::Result<FilterFilterTagEntity> {
-        Ok(FilterFilterTagEntity {
-            tag_id: row.get(0)?,
-            filter_id: row.get(1)?,
-        })
     }
 }

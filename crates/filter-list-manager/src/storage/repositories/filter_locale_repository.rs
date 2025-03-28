@@ -1,8 +1,9 @@
 use crate::manager::models::FilterId;
 use crate::storage::entities::filter_locale_entity::FilterLocaleEntity;
+use crate::storage::entities::hydrate::Hydrate;
 use crate::storage::repositories::Repository;
 use rusqlite::Result;
-use rusqlite::{named_params, Connection, Error, Row, Transaction};
+use rusqlite::{named_params, Connection, Error, Transaction};
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
@@ -30,7 +31,7 @@ impl FilterLocaleRepository {
         ",
         )?;
 
-        let rows = statement.query_map((), FilterLocaleRepository::hydrate)?;
+        let rows = statement.query_map((), FilterLocaleEntity::hydrate)?;
 
         let mut results = HashMap::new();
         for row in rows {
@@ -45,14 +46,6 @@ impl FilterLocaleRepository {
         }
 
         Ok(results)
-    }
-
-    /// Returns filled entity from row
-    fn hydrate(row: &Row) -> Result<FilterLocaleEntity> {
-        Ok(FilterLocaleEntity {
-            filter_id: row.get(0)?,
-            lang: row.get(1)?,
-        })
     }
 }
 

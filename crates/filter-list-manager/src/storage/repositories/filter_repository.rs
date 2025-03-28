@@ -1,16 +1,15 @@
 use crate::manager::models::FilterId;
 use crate::storage::db_bootstrap::get_bootstrapped_filter_id;
 use crate::storage::entities::db_metadata_entity::DBMetadataEntity;
-use crate::storage::entities::filter_inner_flag_entity::FilterInnerFlagEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
+use crate::storage::entities::filter::filter_inner_flag_entity::FilterInnerFlagEntity;
+use crate::storage::entities::hydrate::Hydrate;
 use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
-use crate::storage::repositories::BulkDeleteRepository;
+use crate::storage::repositories::{BulkDeleteRepository, Repository};
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::utils::{build_in_clause, process_where_clause};
 use crate::utils::memory::heap;
-use crate::{
-    storage::{entities::filter_entity::FilterEntity, repositories::Repository},
-    MAXIMUM_CUSTOM_FILTER_ID, MINIMUM_CUSTOM_FILTER_ID,
-};
+use crate::{MAXIMUM_CUSTOM_FILTER_ID, MINIMUM_CUSTOM_FILTER_ID};
 use rusqlite::types::Type;
 use rusqlite::{
     named_params, params_from_iter, Connection, Error, OptionalExtension, Row, Transaction,
@@ -54,6 +53,7 @@ const BASIC_COUNT_SQL: &str = r"
 /// Database name as a constant
 pub(crate) const FILTER_TABLE_NAME: &str = "filter";
 
+/// Repository for filter table
 pub(crate) struct FilterRepository;
 
 /// Cooked SQL Operators and variable selects
@@ -130,7 +130,7 @@ impl FilterRepository {
         let mut sql = String::from(BASIC_SELECT_SQL);
         sql += "WHERE f.filter_id=?";
 
-        transaction.query_row(sql.as_str(), [last_insert_id], FilterRepository::hydrate)
+        transaction.query_row(sql.as_str(), [last_insert_id], FilterEntity::hydrate)
     }
 
     pub(crate) fn toggle_filter_lists(
@@ -263,7 +263,7 @@ impl FilterRepository {
         let mut statement = conn.prepare(sql.as_str())?;
 
         let Some(rows) = statement
-            .query_map(params, FilterRepository::hydrate)
+            .query_map(params, FilterEntity::hydrate)
             .optional()?
         else {
             return Ok(None);
@@ -294,7 +294,7 @@ impl FilterRepository {
         let mut statement = conn.prepare(sql.as_str())?;
         let mut map = HashMap::new();
 
-        let rows = statement.query_map(params, FilterRepository::hydrate)?;
+        let rows = statement.query_map(params, FilterEntity::hydrate)?;
 
         for row in rows {
             let tmp = row?;
@@ -314,31 +314,6 @@ impl FilterRepository {
         }
 
         Ok(map)
-    }
-
-    /// Returns filled entity from row
-    fn hydrate(row: &Row) -> rusqlite::Result<FilterEntity> {
-        Ok(FilterEntity {
-            filter_id: row.get(0)?,
-            group_id: row.get(1)?,
-            version: row.get(2)?,
-            last_update_time: row.get(3)?,
-            last_download_time: row.get(4)?,
-            display_number: row.get(5)?,
-            title: row.get(6)?,
-            description: row.get(7)?,
-            homepage: row.get(8)?,
-            license: row.get(9)?,
-            checksum: row.get(10)?,
-            expires: row.get(11)?,
-            download_url: row.get(12)?,
-            subscription_url: row.get(13)?,
-            is_enabled: row.get(14)?,
-            is_installed: row.get(15)?,
-            is_trusted: row.get(16)?,
-            is_user_title: row.get(17)?,
-            is_user_description: row.get(18)?,
-        })
     }
 
     /// Update user defined metadata for custom_filter
@@ -594,7 +569,7 @@ impl BulkDeleteRepository<FilterEntity, FilterId> for FilterRepository {
 
 #[cfg(test)]
 mod tests {
-    use crate::storage::entities::filter_entity::FilterEntity;
+    use crate::storage::entities::filter::filter_entity::FilterEntity;
     use crate::storage::repositories::filter_repository::FilterRepository;
     use crate::storage::repositories::Repository;
     use crate::storage::sql_generators::operator::SQLOperator;

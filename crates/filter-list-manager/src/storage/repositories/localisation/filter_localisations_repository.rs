@@ -1,5 +1,5 @@
 use crate::manager::models::configuration::Locale;
-use crate::storage::entities::filter_entity::FilterEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::storage::entities::localisation::filter_localisation_entity::FilterLocalisationEntity;
 use crate::storage::repositories::Repository;
 use crate::storage::utils::build_in_clause;

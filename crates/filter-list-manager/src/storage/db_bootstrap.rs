@@ -1,9 +1,9 @@
 use crate::storage::constants::{
     CUSTOM_FILTERS_GROUP_ID, SERVICE_GROUP_ID, USER_RULES_FILTER_LIST_ID,
 };
-use crate::storage::entities::filter_entity::FilterEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::storage::entities::filter_group_entity::FilterGroupEntity;
-use crate::storage::entities::rules_list_entity::RulesListEntity;
+use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;

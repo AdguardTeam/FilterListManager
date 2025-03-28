@@ -1,6 +1,7 @@
 //! Filter list manager library main facade interface.
 pub mod filter_list_manager_impl;
 pub(crate) mod filter_lists_builder;
+pub mod managers;
 pub mod models;
 mod update_filters_action;
 

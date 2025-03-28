@@ -1,7 +1,10 @@
 use crate::manager::models::configuration::Locale;
 use crate::storage::entities::filter_group_entity::FilterGroupEntity;
+use crate::storage::entities::hydrate::Hydrate;
 use crate::storage::repositories::Repository;
-use rusqlite::{named_params, Connection, Result, Row, Transaction};
+#[cfg(test)]
+use rusqlite::Row;
+use rusqlite::{named_params, Connection, Result, Transaction};
 #[cfg(test)]
 use std::collections::HashMap;
 
@@ -75,7 +78,7 @@ impl FilterGroupRepository {
         let mut out: Vec<Out> = vec![];
         let mut rows = statement.query([locale])?;
         while let Some(row) = rows.next()? {
-            out.push(block(FilterGroupRepository::hydrate(row)?));
+            out.push(block(FilterGroupEntity::hydrate(row)?));
         }
 
         Ok(out)
@@ -89,14 +92,6 @@ impl FilterGroupRepository {
         statement.execute(())?;
 
         Ok(())
-    }
-
-    fn hydrate(row: &Row) -> Result<FilterGroupEntity> {
-        Ok(FilterGroupEntity {
-            group_id: row.get(0)?,
-            name: row.get(1)?,
-            display_number: row.get(2)?,
-        })
     }
 }
 

@@ -10,7 +10,7 @@ use tests_db::TestsDb;
 
 use crate::filters::indexes::indexes_processor::IndexesProcessor;
 use crate::io::http::blocking_client::BlockingClient;
-use crate::storage::entities::filter_entity::FilterEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::DbConnectionManager;
 use crate::{Configuration, FLMError};

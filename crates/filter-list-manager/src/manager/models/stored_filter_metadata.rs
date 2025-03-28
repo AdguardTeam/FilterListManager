@@ -1,6 +1,6 @@
 //! lightweight analog of [`crate::FullFilterList`] without filter contents
 
-use crate::storage::entities::filter_entity::FilterEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::{FilterId, FilterTag};
 
 /// The lightweight analog of [`crate::FullFilterList`] without filter contents

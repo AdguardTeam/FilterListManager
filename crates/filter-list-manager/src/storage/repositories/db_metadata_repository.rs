@@ -1,5 +1,6 @@
 use crate::storage::entities::db_metadata_entity::DBMetadataEntity;
-use rusqlite::{named_params, Connection, OptionalExtension, Row, Transaction};
+use crate::storage::entities::hydrate::Hydrate;
+use rusqlite::{named_params, Connection, OptionalExtension, Transaction};
 
 /// Repository for `metadata` table. We store here misc app settings.
 pub(crate) struct DBMetadataRepository;
@@ -19,7 +20,7 @@ impl DBMetadataRepository {
         )?;
 
         let row = statement
-            .query_row((), DBMetadataRepository::hydrate)
+            .query_row((), DBMetadataEntity::hydrate)
             .optional()?;
 
         Ok(row)
@@ -53,12 +54,5 @@ impl DBMetadataRepository {
         })?;
 
         Ok(())
-    }
-
-    pub(crate) fn hydrate(row: &Row) -> rusqlite::Result<DBMetadataEntity> {
-        Ok(DBMetadataEntity {
-            version: row.get(0)?,
-            custom_filters_autoincrement_value: row.get(1)?,
-        })
     }
 }

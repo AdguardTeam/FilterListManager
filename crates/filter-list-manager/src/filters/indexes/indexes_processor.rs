@@ -3,7 +3,7 @@ use crate::filters::indexes::index_consistency_checker::check_consistency;
 use crate::io::http::async_client::AsyncHTTPClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_scheme, read_file_by_url};
-use crate::storage::entities::filter_entity::FilterEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::storage::entities::filter_filter_tag_entity::FilterFilterTagEntity;
 use crate::storage::entities::filter_locale_entity::FilterLocaleEntity;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
@@ -384,7 +384,7 @@ impl<'a> IndexesProcessor<'a> {
 #[cfg(test)]
 mod tests {
     use crate::filters::indexes::indexes_processor::IndexesProcessor;
-    use crate::storage::entities::rules_list_entity::RulesListEntity;
+    use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
     use crate::storage::repositories::filter_filter_tag_repository::FilterFilterTagRepository;
     use crate::storage::repositories::filter_group_repository::FilterGroupRepository;
     use crate::storage::repositories::filter_repository::FilterRepository;

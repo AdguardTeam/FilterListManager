@@ -5,7 +5,7 @@ use chrono::Utc;
 use serde::Deserialize;
 
 use crate::storage::entities::{
-    filter_entity::FilterEntity, filter_filter_tag_entity::FilterFilterTagEntity,
+    filter::filter_entity::FilterEntity, filter_filter_tag_entity::FilterFilterTagEntity,
     filter_locale_entity::FilterLocaleEntity,
 };
 

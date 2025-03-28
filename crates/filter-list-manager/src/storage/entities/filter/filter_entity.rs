@@ -1,4 +1,7 @@
+use rusqlite::{Result, Row};
+
 use crate::manager::models::FilterId;
+use crate::storage::entities::hydrate::Hydrate;
 use crate::CUSTOM_FILTERS_GROUP_ID;
 
 /// Default value for [filter].[is_user_title] column.
@@ -7,6 +10,7 @@ pub(crate) const DEFAULT_IS_USER_TITLE_VALUE: bool = false;
 /// Default value for [filter].[is_user_description] column.
 pub(crate) const DEFAULT_IS_USER_DESCRIPTION_VALUE: bool = false;
 
+/// Entity for filter table
 #[derive(Clone)]
 #[cfg_attr(test, derive(Debug))]
 pub(crate) struct FilterEntity {
@@ -83,5 +87,31 @@ impl Default for FilterEntity {
             is_user_title: None,
             is_user_description: None,
         }
+    }
+}
+
+impl Hydrate for FilterEntity {
+    fn hydrate(row: &Row) -> Result<FilterEntity> {
+        Ok(FilterEntity {
+            filter_id: row.get(0)?,
+            group_id: row.get(1)?,
+            version: row.get(2)?,
+            last_update_time: row.get(3)?,
+            last_download_time: row.get(4)?,
+            display_number: row.get(5)?,
+            title: row.get(6)?,
+            description: row.get(7)?,
+            homepage: row.get(8)?,
+            license: row.get(9)?,
+            checksum: row.get(10)?,
+            expires: row.get(11)?,
+            download_url: row.get(12)?,
+            subscription_url: row.get(13)?,
+            is_enabled: row.get(14)?,
+            is_installed: row.get(15)?,
+            is_trusted: row.get(16)?,
+            is_user_title: row.get(17)?,
+            is_user_description: row.get(18)?,
+        })
     }
 }

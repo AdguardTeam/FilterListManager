@@ -1,8 +1,9 @@
-use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
-use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::manager::models::FilterId;
 use crate::storage::blob::BlobHandleImpl;
-use crate::storage::entities::rules_list_entity::RulesListEntity;
+use crate::storage::entities::hydrate::Hydrate;
+use crate::storage::entities::rules_list::disabled_rules_entity::DisabledRulesEntity;
+use crate::storage::entities::rules_list::rules_count_entity::RulesCountEntity;
+use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 use crate::storage::repositories::{BulkDeleteRepository, Repository};
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::utils::{build_in_clause, process_where_clause};
@@ -27,6 +28,7 @@ const BASIC_SELECT_SQL: &str = r"
         [rules_list]
 ";
 
+/// Repository for rules_list table
 pub(crate) struct RulesListRepository;
 
 impl RulesListRepository {
@@ -108,7 +110,7 @@ impl RulesListRepository {
         let params = process_where_clause(&mut sql, where_clause)?;
         let mut statement = conn.prepare(sql.as_str())?;
 
-        let rows = statement.query_map(params, RulesListRepository::hydrate)?;
+        let rows = statement.query_map(params, RulesListEntity::hydrate)?;
 
         let mut results = HashMap::new();
         for row in rows {
@@ -164,7 +166,7 @@ impl RulesListRepository {
         let mut statement = connection.prepare(sql.as_str())?;
 
         let option = statement
-            .query_map(params, RulesListRepository::hydrate)
+            .query_map(params, RulesListEntity::hydrate)
             .optional()?;
 
         let Some(rows) = option else {
@@ -181,15 +183,6 @@ impl RulesListRepository {
         }
 
         Ok(Some(results))
-    }
-
-    pub(crate) fn hydrate(row: &Row) -> Result<RulesListEntity> {
-        Ok(RulesListEntity {
-            filter_id: row.get(0)?,
-            text: row.get(1)?,
-            disabled_text: row.get(2)?,
-            rules_count: row.get(3)?,
-        })
     }
 
     pub(crate) fn get_blob_handle_and_disabled_rules<'a>(
@@ -228,7 +221,7 @@ impl RulesListRepository {
         &self,
         connection: &Connection,
         ids: &[FilterId],
-    ) -> Result<Vec<DisabledRulesRaw>> {
+    ) -> Result<Vec<DisabledRulesEntity>> {
         let mut sql = String::from(
             r"
             SELECT
@@ -245,15 +238,15 @@ impl RulesListRepository {
         let mut statement = connection.prepare(sql.as_str())?;
 
         let mut out = vec![];
-        let Some(mut rows) = statement.query(params).optional()? else {
+        let Some(rows) = statement
+            .query_map(params, DisabledRulesEntity::hydrate)
+            .optional()?
+        else {
             return Ok(out);
         };
 
-        while let Some(row) = rows.next()? {
-            out.push(DisabledRulesRaw {
-                filter_id: row.get(0)?,
-                text: row.get(1)?,
-            })
+        for row in rows {
+            out.push(row?);
         }
 
         Ok(out)
@@ -263,7 +256,7 @@ impl RulesListRepository {
         &self,
         connection: &Connection,
         ids: &[FilterId],
-    ) -> Result<Vec<RulesCountByFilter>> {
+    ) -> Result<Vec<RulesCountEntity>> {
         let mut sql = String::from(
             r"
             SELECT
@@ -280,15 +273,15 @@ impl RulesListRepository {
         let mut statement = connection.prepare(sql.as_str())?;
 
         let mut out = vec![];
-        let Some(mut rows) = statement.query(params).optional()? else {
+        let Some(rows) = statement
+            .query_map(params, RulesCountEntity::hydrate)
+            .optional()?
+        else {
             return Ok(out);
         };
 
-        while let Some(row) = rows.next()? {
-            out.push(RulesCountByFilter {
-                filter_id: row.get(0)?,
-                rules_count: row.get(1)?,
-            })
+        for row in rows {
+            out.push(row?);
         }
 
         Ok(out)

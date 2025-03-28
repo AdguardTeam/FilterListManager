@@ -1,4 +1,5 @@
 use crate::storage::entities::diff_update_entity::DiffUpdateEntity;
+use crate::storage::entities::hydrate::Hydrate;
 use crate::storage::repositories::Repository;
 use crate::storage::utils::build_in_clause;
 use crate::FilterId;
@@ -42,14 +43,7 @@ impl DiffUpdateRepository {
         while let Some(row) = rows.next()? {
             let filter_id: FilterId = row.get(0)?;
 
-            out.insert(
-                filter_id,
-                DiffUpdateEntity {
-                    filter_id,
-                    next_path: row.get(1)?,
-                    next_check_time: row.get(2)?,
-                },
-            );
+            out.insert(filter_id, DiffUpdateEntity::hydrate(row)?);
         }
 
         // Cuz will use .keys() after, which have O(capacity), not O(len)

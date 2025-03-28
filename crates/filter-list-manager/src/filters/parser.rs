@@ -14,7 +14,7 @@ use crate::io::http::blocking_client::BlockingClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_authority, get_scheme};
 use crate::manager::models::FilterId;
-use crate::storage::entities::rules_list_entity::RulesListEntity;
+use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 use crate::Configuration;
 use include_processor::get_include_path;
 use nom::Slice;

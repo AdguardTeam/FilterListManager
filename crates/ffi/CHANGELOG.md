@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.7.5] - 2025-03-26
+
+### Add
+- Service layer between manager and storage
+
+[1.7.5]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.7.4...ffi-1.7.5
+
 ## [1.7.4] - 2025-03-25
 
 ### Fixed

@@ -1,7 +1,11 @@
+use rusqlite::{Result, Row};
+
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::FilterId;
+use crate::storage::entities::hydrate::Hydrate;
 
+/// Entity for rules_list table
 #[derive(Clone)]
 #[cfg_attr(test, derive(Debug, Eq, PartialEq))]
 pub(crate) struct RulesListEntity {
@@ -9,6 +13,17 @@ pub(crate) struct RulesListEntity {
     pub(crate) text: String,
     pub(crate) disabled_text: String,
     pub(crate) rules_count: i32,
+}
+
+impl Hydrate for RulesListEntity {
+    fn hydrate(row: &Row) -> Result<RulesListEntity> {
+        Ok(RulesListEntity {
+            filter_id: row.get(0)?,
+            text: row.get(1)?,
+            disabled_text: row.get(2)?,
+            rules_count: row.get(3)?,
+        })
+    }
 }
 
 impl From<RulesListEntity> for FilterListRules {

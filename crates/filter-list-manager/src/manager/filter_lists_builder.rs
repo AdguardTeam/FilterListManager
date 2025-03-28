@@ -1,6 +1,6 @@
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::full_filter_list::FullFilterList;
-use crate::storage::entities::filter_entity::FilterEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::storage::repositories::filter_locale_repository::FilterLocaleRepository;
 use crate::storage::repositories::filter_tag_repository::FilterTagRepository;
 use crate::storage::repositories::localisation::filter_localisations_repository::FilterLocalisationRepository;

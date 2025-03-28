@@ -2,7 +2,7 @@
 use super::filter_tag::FilterTag;
 use super::FilterId;
 use crate::manager::models::filter_list_rules::FilterListRules;
-use crate::storage::entities::filter_entity::FilterEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::StoredFilterMetadata;
 
 /// FullFilterList represents a filter list and all its associated metadata.

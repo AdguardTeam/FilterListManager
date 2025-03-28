@@ -1,5 +1,6 @@
 use crate::manager::models::FilterId;
 use crate::storage::entities::filter_tag_entity::FilterTagEntity;
+use crate::storage::entities::hydrate::Hydrate;
 use crate::storage::repositories::Repository;
 use rusqlite::{named_params, Connection, Error, Result, Row, Transaction};
 use std::collections::hash_map::Entry;
@@ -81,18 +82,10 @@ impl FilterTagRepository {
 
         let mut rows = statement.query(())?;
         while let Some(row) = rows.next()? {
-            out.push(block(FilterTagRepository::hydrate(row)?));
+            out.push(block(FilterTagEntity::hydrate(row)?));
         }
 
         Ok(out)
-    }
-
-    #[inline]
-    fn hydrate(row: &Row) -> Result<FilterTagEntity> {
-        Ok(FilterTagEntity {
-            tag_id: row.get(0)?,
-            keyword: row.get(1)?,
-        })
     }
 }
 

@@ -1,6 +1,6 @@
+use crate::manager::managers::rules_list_manager::RulesListManager;
 use crate::manager::models::FilterId;
-use crate::storage::entities::rules_list_entity::RulesListEntity;
-use crate::storage::services::rules_list_service::RulesListService;
+use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 
 /// Used for rules lines collection, then turns to string joined with new lines
 #[derive(Default)]
@@ -38,7 +38,7 @@ impl RuleLinesCollector {
     }
 
     pub fn increment_rules_count(&mut self, line: &str) {
-        self.rules_count += i32::from(RulesListService::new().is_line_is_rule(line))
+        self.rules_count += i32::from(RulesListManager::is_line_is_rule(line))
     }
 
     pub fn get_rules_count(&self) -> i32 {

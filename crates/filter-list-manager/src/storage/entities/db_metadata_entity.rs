@@ -1,5 +1,10 @@
+use rusqlite::{Result, Row};
+
 use crate::{FilterId, MAXIMUM_CUSTOM_FILTER_ID};
 
+use super::hydrate::Hydrate;
+
+/// Entity for metadata table
 pub(crate) struct DBMetadataEntity {
     /// Database version
     pub(crate) version: i32,
@@ -14,5 +19,14 @@ impl Default for DBMetadataEntity {
             version: 0,
             custom_filters_autoincrement_value: MAXIMUM_CUSTOM_FILTER_ID,
         }
+    }
+}
+
+impl Hydrate for DBMetadataEntity {
+    fn hydrate(row: &Row) -> Result<DBMetadataEntity> {
+        Ok(DBMetadataEntity {
+            version: row.get(0)?,
+            custom_filters_autoincrement_value: row.get(1)?,
+        })
     }
 }

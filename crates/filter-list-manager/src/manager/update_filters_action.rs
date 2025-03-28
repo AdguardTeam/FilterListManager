@@ -12,8 +12,8 @@ use crate::manager::filter_lists_builder::FullFilterListBuilder;
 use crate::manager::models::update_result::UpdateFilterError;
 use crate::manager::models::UpdateResult;
 use crate::storage::entities::diff_update_entity::DiffUpdateEntity;
-use crate::storage::entities::filter_entity::FilterEntity;
-use crate::storage::entities::rules_list_entity::RulesListEntity;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
+use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 use crate::storage::repositories::diff_updates_repository::{DiffUpdateRepository, DiffUpdatesMap};
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::repositories::rules_list_repository::{
@@ -394,8 +394,8 @@ fn get_latest_filters_versions(
 #[cfg(test)]
 mod tests {
     use super::update_filters_action;
-    use crate::storage::entities::filter_entity::FilterEntity;
-    use crate::storage::entities::rules_list_entity::RulesListEntity;
+    use crate::storage::entities::filter::filter_entity::FilterEntity;
+    use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
     use crate::storage::repositories::filter_repository::FilterRepository;
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::repositories::Repository;

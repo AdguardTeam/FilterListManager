@@ -1,5 +1,6 @@
 use crate::manager::models::FilterId;
 
+/// Entity for filter_localisation table
 pub(crate) struct FilterLocalisationEntity {
     pub(crate) filter_id: FilterId,
     pub(crate) lang: String,
