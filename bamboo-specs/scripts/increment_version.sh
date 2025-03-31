@@ -51,10 +51,10 @@ fi
 if [ ${bamboo_adguard_flm_custom_version} = "none" ] || [ ${bamboo_ffi_custom_version} = "none" ]; then
   FLM_CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/filter-list-manager/Cargo.toml)
   FFI_CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)
-  git checkout -b head_1 HEAD~1
+  git checkout -b head_1 master~1
   FLM_PREV_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/filter-list-manager/Cargo.toml)
   FFI_PREV_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)
-  git checkout @{-1}
+  git checkout master
   git branch -D head_1
   if [ ${bamboo_adguard_flm_custom_version} = "none" ]; then
     if [ $FLM_CURRENT_VERSION != $FLM_PREV_VERSION ]; then
