@@ -47,6 +47,13 @@ if [ "${bamboo_repository_branch_name}" != "master" ]; then
   exit 0
 fi
 
+# Configure git
+git config user.name "Bamboo"
+git config user.email "Bamboo"
+
+# Update the remote repository
+./git-scripts/git_kit.sh pull ${bamboo_planRepository_repositoryUrl}
+
 # Determines flm/ffi custom version
 if [ ${bamboo_adguard_flm_custom_version} = "none" ] || [ ${bamboo_ffi_custom_version} = "none" ]; then
   FLM_CURRENT_VERSION=$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/filter-list-manager/Cargo.toml)
@@ -97,12 +104,7 @@ fi
 echo "Incrementing the 'ffi' version..."
 increment_flm_ffi_version ${bamboo_ffi_custom_version}
 
-# Configure git
-git config user.name "Bamboo"
-git config user.email "Bamboo"
-
-# Update the remote repository
-./git-scripts/git_kit.sh pull ${bamboo_planRepository_repositoryUrl}
+# Reset before add
 git reset
 
 # Add the updated Cargo.toml files to the git index
