@@ -113,5 +113,5 @@ git add crates/ffi/Cargo.toml
 git add $HASH_FILE
 
 # Commit the changes
-git commit -m "skipci: Automatic version increment" || exit 1
+git commit -m "skipci: Automatic version increment" || true
 git push
