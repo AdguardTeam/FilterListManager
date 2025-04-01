@@ -11,7 +11,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
                 workingDirectory: FfiConverterOptionalString.Instance.Read(stream),
                 locale: FfiConverterString.Instance.Read(stream),
                 defaultFilterListExpiresPeriodSec: FfiConverterInt32.Instance.Read(stream),
-                compilerConditionalConstants: FfiConverterOptionalSequenceString.Instance.Read(stream),
+                compilerConditionalConstants: FfiConverterOptionalTypeCompilerConditionalConstants.Instance.Read(stream),
                 metadataUrl: FfiConverterString.Instance.Read(stream),
                 metadataLocalesUrl: FfiConverterString.Instance.Read(stream),
                 requestTimeoutMs: FfiConverterInt32.Instance.Read(stream),
@@ -28,7 +28,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
                    + FfiConverterOptionalString.Instance.AllocationSize(value.WorkingDirectory)
                    + FfiConverterString.Instance.AllocationSize(value.Locale)
                    + FfiConverterInt32.Instance.AllocationSize(value.DefaultFilterListExpiresPeriodSec)
-                   + FfiConverterOptionalSequenceString.Instance.AllocationSize(
+                   + FfiConverterOptionalTypeCompilerConditionalConstants.Instance.AllocationSize(
                        value.CompilerConditionalConstants
                    )
                    + FfiConverterString.Instance.AllocationSize(value.MetadataUrl)
@@ -46,7 +46,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             FfiConverterOptionalString.Instance.Write(value.WorkingDirectory, stream);
             FfiConverterString.Instance.Write(value.Locale, stream);
             FfiConverterInt32.Instance.Write(value.DefaultFilterListExpiresPeriodSec, stream);
-            FfiConverterOptionalSequenceString.Instance.Write(
+            FfiConverterOptionalTypeCompilerConditionalConstants.Instance.Write(
                 value.CompilerConditionalConstants,
                 stream
             );

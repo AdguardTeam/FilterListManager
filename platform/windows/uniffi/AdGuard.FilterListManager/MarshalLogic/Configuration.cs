@@ -26,7 +26,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
             string workingDirectory,
             string locale,
             int defaultFilterListExpiresPeriodSec,
-            List<string> compilerConditionalConstants,
+            List<CompilerConditionalConstants> compilerConditionalConstants,
             string metadataUrl,
             string metadataLocalesUrl,
             int requestTimeoutMs,
@@ -72,7 +72,7 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// <summary>
         /// Gets or sets the filter compiler conditional constants.
         /// </summary>
-        public List<string> CompilerConditionalConstants { get; set; }
+        public List<CompilerConditionalConstants> CompilerConditionalConstants { get; set; }
 
         /// <summary>
         /// Gets or sets the metadata URL where should we download the filter metadata.

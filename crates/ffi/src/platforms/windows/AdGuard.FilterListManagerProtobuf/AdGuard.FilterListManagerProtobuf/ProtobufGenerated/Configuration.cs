@@ -24,25 +24,30 @@ namespace FilterListManager {
     static ConfigurationReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChNjb25maWd1cmF0aW9uLnByb3RvEhNmaWx0ZXJfbGlzdF9tYW5hZ2VyIswD",
-            "Cg1Db25maWd1cmF0aW9uEj0KEGZpbHRlcl9saXN0X3R5cGUYASABKA4yIy5m",
-            "aWx0ZXJfbGlzdF9tYW5hZ2VyLkZpbHRlckxpc3RUeXBlEhkKEXdvcmtpbmdf",
-            "ZGlyZWN0b3J5GAIgASgJEg4KBmxvY2FsZRgDIAEoCRIuCiZkZWZhdWx0X2Zp",
-            "bHRlcl9saXN0X2V4cGlyZXNfcGVyaW9kX3NlYxgEIAEoBRImCh5jb21waWxl",
-            "cl9jb25kaXRpb25hbF9jb25zdGFudHMYBSADKAkSFAoMbWV0YWRhdGFfdXJs",
-            "GAYgASgJEhwKFG1ldGFkYXRhX2xvY2FsZXNfdXJsGAcgASgJEhoKEnJlcXVl",
-            "c3RfdGltZW91dF9tcxgIIAEoBRIdChVhdXRvX2xpZnRfdXBfZGF0YWJhc2UY",
-            "CSABKAgSRAoScmVxdWVzdF9wcm94eV9tb2RlGAogASgOMiguZmlsdGVyX2xp",
-            "c3RfbWFuYWdlci5SYXdSZXF1ZXN0UHJveHlNb2RlEiEKGXJlcXVlc3RfY3Vz",
-            "dG9tX3Byb3h5X2FkZHIYCyABKAkSEAoIYXBwX25hbWUYDCABKAkSDwoHdmVy",
-            "c2lvbhgNIAEoCSonCg5GaWx0ZXJMaXN0VHlwZRIMCghTVEFOREFSRBAAEgcK",
-            "A0ROUxABKk8KE1Jhd1JlcXVlc3RQcm94eU1vZGUSFAoQVVNFX1NZU1RFTV9Q",
-            "Uk9YWRAAEgwKCE5PX1BST1hZEAESFAoQVVNFX0NVU1RPTV9QUk9YWRACYgZw",
-            "cm90bzM="));
+            "ChNjb25maWd1cmF0aW9uLnByb3RvEhNmaWx0ZXJfbGlzdF9tYW5hZ2VyIkYK",
+            "HENvbXBpbGVyQ29uZGl0aW9uYWxDb25zdGFudHMSJgoeY29tcGlsZXJfY29u",
+            "ZGl0aW9uYWxfY29uc3RhbnRzGAEgAygJIsIECg1Db25maWd1cmF0aW9uEj0K",
+            "EGZpbHRlcl9saXN0X3R5cGUYASABKA4yIy5maWx0ZXJfbGlzdF9tYW5hZ2Vy",
+            "LkZpbHRlckxpc3RUeXBlEh4KEXdvcmtpbmdfZGlyZWN0b3J5GAIgASgJSACI",
+            "AQESDgoGbG9jYWxlGAMgASgJEi4KJmRlZmF1bHRfZmlsdGVyX2xpc3RfZXhw",
+            "aXJlc19wZXJpb2Rfc2VjGAQgASgFEl4KHmNvbXBpbGVyX2NvbmRpdGlvbmFs",
+            "X2NvbnN0YW50cxgFIAEoCzIxLmZpbHRlcl9saXN0X21hbmFnZXIuQ29tcGls",
+            "ZXJDb25kaXRpb25hbENvbnN0YW50c0gBiAEBEhQKDG1ldGFkYXRhX3VybBgG",
+            "IAEoCRIcChRtZXRhZGF0YV9sb2NhbGVzX3VybBgHIAEoCRIaChJyZXF1ZXN0",
+            "X3RpbWVvdXRfbXMYCCABKAUSHQoVYXV0b19saWZ0X3VwX2RhdGFiYXNlGAkg",
+            "ASgIEkQKEnJlcXVlc3RfcHJveHlfbW9kZRgKIAEoDjIoLmZpbHRlcl9saXN0",
+            "X21hbmFnZXIuUmF3UmVxdWVzdFByb3h5TW9kZRIhChlyZXF1ZXN0X2N1c3Rv",
+            "bV9wcm94eV9hZGRyGAsgASgJEhAKCGFwcF9uYW1lGAwgASgJEg8KB3ZlcnNp",
+            "b24YDSABKAlCFAoSX3dvcmtpbmdfZGlyZWN0b3J5QiEKH19jb21waWxlcl9j",
+            "b25kaXRpb25hbF9jb25zdGFudHMqJwoORmlsdGVyTGlzdFR5cGUSDAoIU1RB",
+            "TkRBUkQQABIHCgNETlMQASpPChNSYXdSZXF1ZXN0UHJveHlNb2RlEhQKEFVT",
+            "RV9TWVNURU1fUFJPWFkQABIMCghOT19QUk9YWRABEhQKEFVTRV9DVVNUT01f",
+            "UFJPWFkQAmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), typeof(global::FilterListManager.RawRequestProxyMode), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "CompilerConditionalConstants", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.CompilerConditionalConstants), global::FilterListManager.CompilerConditionalConstants.Parser, new[]{ "CompilerConditionalConstants_" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "CompilerConditionalConstants", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version" }, new[]{ "WorkingDirectory", "CompilerConditionalConstants" }, null, null, null)
           }));
     }
     #endregion
@@ -75,6 +80,187 @@ namespace FilterListManager {
   #endregion
 
   #region Messages
+  public sealed partial class CompilerConditionalConstants : pb::IMessage<CompilerConditionalConstants>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CompilerConditionalConstants> _parser = new pb::MessageParser<CompilerConditionalConstants>(() => new CompilerConditionalConstants());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CompilerConditionalConstants> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::FilterListManager.ConfigurationReflection.Descriptor.MessageTypes[0]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CompilerConditionalConstants() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CompilerConditionalConstants(CompilerConditionalConstants other) : this() {
+      compilerConditionalConstants_ = other.compilerConditionalConstants_.Clone();
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CompilerConditionalConstants Clone() {
+      return new CompilerConditionalConstants(this);
+    }
+
+    /// <summary>Field number for the "compiler_conditional_constants" field.</summary>
+    public const int CompilerConditionalConstants_FieldNumber = 1;
+    private static readonly pb::FieldCodec<string> _repeated_compilerConditionalConstants_codec
+        = pb::FieldCodec.ForString(10);
+    private readonly pbc::RepeatedField<string> compilerConditionalConstants_ = new pbc::RepeatedField<string>();
+    /// <summary>
+    /// List of literal constants for filters conditional compilation.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<string> CompilerConditionalConstants_ {
+      get { return compilerConditionalConstants_; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CompilerConditionalConstants);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CompilerConditionalConstants other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if(!compilerConditionalConstants_.Equals(other.compilerConditionalConstants_)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      hash ^= compilerConditionalConstants_.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      compilerConditionalConstants_.WriteTo(output, _repeated_compilerConditionalConstants_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      compilerConditionalConstants_.WriteTo(ref output, _repeated_compilerConditionalConstants_codec);
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      size += compilerConditionalConstants_.CalculateSize(_repeated_compilerConditionalConstants_codec);
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CompilerConditionalConstants other) {
+      if (other == null) {
+        return;
+      }
+      compilerConditionalConstants_.Add(other.compilerConditionalConstants_);
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            compilerConditionalConstants_.AddEntriesFrom(input, _repeated_compilerConditionalConstants_codec);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            compilerConditionalConstants_.AddEntriesFrom(ref input, _repeated_compilerConditionalConstants_codec);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
   public sealed partial class Configuration : pb::IMessage<Configuration>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
@@ -89,7 +275,7 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::FilterListManager.ConfigurationReflection.Descriptor.MessageTypes[0]; }
+      get { return global::FilterListManager.ConfigurationReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -113,7 +299,7 @@ namespace FilterListManager {
       workingDirectory_ = other.workingDirectory_;
       locale_ = other.locale_;
       defaultFilterListExpiresPeriodSec_ = other.defaultFilterListExpiresPeriodSec_;
-      compilerConditionalConstants_ = other.compilerConditionalConstants_.Clone();
+      compilerConditionalConstants_ = other.compilerConditionalConstants_ != null ? other.compilerConditionalConstants_.Clone() : null;
       metadataUrl_ = other.metadataUrl_;
       metadataLocalesUrl_ = other.metadataLocalesUrl_;
       requestTimeoutMs_ = other.requestTimeoutMs_;
@@ -145,7 +331,7 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "working_directory" field.</summary>
     public const int WorkingDirectoryFieldNumber = 2;
-    private string workingDirectory_ = "";
+    private string workingDirectory_;
     /// <summary>
     /// Absolute path for library working directory.
     /// This will be used for database operating.
@@ -154,10 +340,22 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string WorkingDirectory {
-      get { return workingDirectory_; }
+      get { return workingDirectory_ ?? ""; }
       set {
         workingDirectory_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
+    }
+    /// <summary>Gets whether the "working_directory" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool HasWorkingDirectory {
+      get { return workingDirectory_ != null; }
+    }
+    /// <summary>Clears the value of the "working_directory" field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearWorkingDirectory() {
+      workingDirectory_ = null;
     }
 
     /// <summary>Field number for the "locale" field.</summary>
@@ -196,16 +394,17 @@ namespace FilterListManager {
 
     /// <summary>Field number for the "compiler_conditional_constants" field.</summary>
     public const int CompilerConditionalConstantsFieldNumber = 5;
-    private static readonly pb::FieldCodec<string> _repeated_compilerConditionalConstants_codec
-        = pb::FieldCodec.ForString(42);
-    private readonly pbc::RepeatedField<string> compilerConditionalConstants_ = new pbc::RepeatedField<string>();
+    private global::FilterListManager.CompilerConditionalConstants compilerConditionalConstants_;
     /// <summary>
     /// List of literal constants for filters conditional compilation.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<string> CompilerConditionalConstants {
+    public global::FilterListManager.CompilerConditionalConstants CompilerConditionalConstants {
       get { return compilerConditionalConstants_; }
+      set {
+        compilerConditionalConstants_ = value;
+      }
     }
 
     /// <summary>Field number for the "metadata_url" field.</summary>
@@ -347,7 +546,7 @@ namespace FilterListManager {
       if (WorkingDirectory != other.WorkingDirectory) return false;
       if (Locale != other.Locale) return false;
       if (DefaultFilterListExpiresPeriodSec != other.DefaultFilterListExpiresPeriodSec) return false;
-      if(!compilerConditionalConstants_.Equals(other.compilerConditionalConstants_)) return false;
+      if (!object.Equals(CompilerConditionalConstants, other.CompilerConditionalConstants)) return false;
       if (MetadataUrl != other.MetadataUrl) return false;
       if (MetadataLocalesUrl != other.MetadataLocalesUrl) return false;
       if (RequestTimeoutMs != other.RequestTimeoutMs) return false;
@@ -364,10 +563,10 @@ namespace FilterListManager {
     public override int GetHashCode() {
       int hash = 1;
       if (FilterListType != global::FilterListManager.FilterListType.Standard) hash ^= FilterListType.GetHashCode();
-      if (WorkingDirectory.Length != 0) hash ^= WorkingDirectory.GetHashCode();
+      if (HasWorkingDirectory) hash ^= WorkingDirectory.GetHashCode();
       if (Locale.Length != 0) hash ^= Locale.GetHashCode();
       if (DefaultFilterListExpiresPeriodSec != 0) hash ^= DefaultFilterListExpiresPeriodSec.GetHashCode();
-      hash ^= compilerConditionalConstants_.GetHashCode();
+      if (compilerConditionalConstants_ != null) hash ^= CompilerConditionalConstants.GetHashCode();
       if (MetadataUrl.Length != 0) hash ^= MetadataUrl.GetHashCode();
       if (MetadataLocalesUrl.Length != 0) hash ^= MetadataLocalesUrl.GetHashCode();
       if (RequestTimeoutMs != 0) hash ^= RequestTimeoutMs.GetHashCode();
@@ -398,7 +597,7 @@ namespace FilterListManager {
         output.WriteRawTag(8);
         output.WriteEnum((int) FilterListType);
       }
-      if (WorkingDirectory.Length != 0) {
+      if (HasWorkingDirectory) {
         output.WriteRawTag(18);
         output.WriteString(WorkingDirectory);
       }
@@ -410,7 +609,10 @@ namespace FilterListManager {
         output.WriteRawTag(32);
         output.WriteInt32(DefaultFilterListExpiresPeriodSec);
       }
-      compilerConditionalConstants_.WriteTo(output, _repeated_compilerConditionalConstants_codec);
+      if (compilerConditionalConstants_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(CompilerConditionalConstants);
+      }
       if (MetadataUrl.Length != 0) {
         output.WriteRawTag(50);
         output.WriteString(MetadataUrl);
@@ -457,7 +659,7 @@ namespace FilterListManager {
         output.WriteRawTag(8);
         output.WriteEnum((int) FilterListType);
       }
-      if (WorkingDirectory.Length != 0) {
+      if (HasWorkingDirectory) {
         output.WriteRawTag(18);
         output.WriteString(WorkingDirectory);
       }
@@ -469,7 +671,10 @@ namespace FilterListManager {
         output.WriteRawTag(32);
         output.WriteInt32(DefaultFilterListExpiresPeriodSec);
       }
-      compilerConditionalConstants_.WriteTo(ref output, _repeated_compilerConditionalConstants_codec);
+      if (compilerConditionalConstants_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(CompilerConditionalConstants);
+      }
       if (MetadataUrl.Length != 0) {
         output.WriteRawTag(50);
         output.WriteString(MetadataUrl);
@@ -515,7 +720,7 @@ namespace FilterListManager {
       if (FilterListType != global::FilterListManager.FilterListType.Standard) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) FilterListType);
       }
-      if (WorkingDirectory.Length != 0) {
+      if (HasWorkingDirectory) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(WorkingDirectory);
       }
       if (Locale.Length != 0) {
@@ -524,7 +729,9 @@ namespace FilterListManager {
       if (DefaultFilterListExpiresPeriodSec != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(DefaultFilterListExpiresPeriodSec);
       }
-      size += compilerConditionalConstants_.CalculateSize(_repeated_compilerConditionalConstants_codec);
+      if (compilerConditionalConstants_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(CompilerConditionalConstants);
+      }
       if (MetadataUrl.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(MetadataUrl);
       }
@@ -564,7 +771,7 @@ namespace FilterListManager {
       if (other.FilterListType != global::FilterListManager.FilterListType.Standard) {
         FilterListType = other.FilterListType;
       }
-      if (other.WorkingDirectory.Length != 0) {
+      if (other.HasWorkingDirectory) {
         WorkingDirectory = other.WorkingDirectory;
       }
       if (other.Locale.Length != 0) {
@@ -573,7 +780,12 @@ namespace FilterListManager {
       if (other.DefaultFilterListExpiresPeriodSec != 0) {
         DefaultFilterListExpiresPeriodSec = other.DefaultFilterListExpiresPeriodSec;
       }
-      compilerConditionalConstants_.Add(other.compilerConditionalConstants_);
+      if (other.compilerConditionalConstants_ != null) {
+        if (compilerConditionalConstants_ == null) {
+          CompilerConditionalConstants = new global::FilterListManager.CompilerConditionalConstants();
+        }
+        CompilerConditionalConstants.MergeFrom(other.CompilerConditionalConstants);
+      }
       if (other.MetadataUrl.Length != 0) {
         MetadataUrl = other.MetadataUrl;
       }
@@ -630,7 +842,10 @@ namespace FilterListManager {
             break;
           }
           case 42: {
-            compilerConditionalConstants_.AddEntriesFrom(input, _repeated_compilerConditionalConstants_codec);
+            if (compilerConditionalConstants_ == null) {
+              CompilerConditionalConstants = new global::FilterListManager.CompilerConditionalConstants();
+            }
+            input.ReadMessage(CompilerConditionalConstants);
             break;
           }
           case 50: {
@@ -697,7 +912,10 @@ namespace FilterListManager {
             break;
           }
           case 42: {
-            compilerConditionalConstants_.AddEntriesFrom(ref input, _repeated_compilerConditionalConstants_codec);
+            if (compilerConditionalConstants_ == null) {
+              CompilerConditionalConstants = new global::FilterListManager.CompilerConditionalConstants();
+            }
+            input.ReadMessage(CompilerConditionalConstants);
             break;
           }
           case 50: {

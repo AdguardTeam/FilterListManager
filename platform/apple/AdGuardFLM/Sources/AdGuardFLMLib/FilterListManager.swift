@@ -44,11 +44,11 @@ public protocol FLMFacadeProtocol {
 
     func deleteCustomFilterLists(ids: [Int32]) throws -> Int64
 
-    func getFullFilterListsById(id: Int32) throws -> FilterListManager_FullFilterList
+    func getFullFilterListsById(id: Int32) throws -> FilterListManager_FullFilterList?
 
     func getStoredFiltersMetadata() throws -> [FilterListManager_StoredFilterMetadata]
 
-    func getStoredFiltersMetadataById(id: Int32) throws -> FilterListManager_StoredFilterMetadata
+    func getStoredFiltersMetadataById(id: Int32) throws -> FilterListManager_StoredFilterMetadata?
 
     func saveCustomFilterRules(rules: FilterListManager_FilterListRules) throws
 
@@ -58,9 +58,9 @@ public protocol FLMFacadeProtocol {
         ignoreFiltersExpiration: Bool,
         looseTimeout: Int32,
         ignoreFiltersStatus: Bool
-    ) throws -> FilterListManager_UpdateResult
+    ) throws -> FilterListManager_UpdateResult?
 
-    func forceUpdateFiltersByIds(ids: [Int32], looseTimeout: Int32) throws -> FilterListManager_UpdateResult
+    func forceUpdateFiltersByIds(ids: [Int32], looseTimeout: Int32) throws -> FilterListManager_UpdateResult?
 
     func fetchFiltersListMetadata(url: String) throws -> FilterListManager_FilterListMetadata
 
@@ -241,7 +241,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.count
     }
 
-    public func getFullFilterListsById(id: Int32) throws -> FilterListManager_FullFilterList {
+    public func getFullFilterListsById(id: Int32) throws -> FilterListManager_FullFilterList? {
         var message = FilterListManager_GetFullFilterListByIdRequest()
         message.id = id
 
@@ -252,7 +252,7 @@ public class FLMFacade: FLMFacadeProtocol {
             throw AGOuterError(from: response.error)
         }
 
-        return response.filterList
+        return response.hasFilterList ? response.filterList : nil
     }
 
     public func getStoredFiltersMetadata() throws -> [FilterListManager_StoredFilterMetadata] {
@@ -268,7 +268,7 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.filterLists
     }
 
-    public func getStoredFiltersMetadataById(id: Int32) throws -> FilterListManager_StoredFilterMetadata {
+    public func getStoredFiltersMetadataById(id: Int32) throws -> FilterListManager_StoredFilterMetadata? {
         var message = FilterListManager_GetStoredFiltersMetadataByIdRequest()
         message.id = id
 
@@ -279,7 +279,7 @@ public class FLMFacade: FLMFacadeProtocol {
             throw AGOuterError(from: response.error)
         }
 
-        return response.filterList
+        return response.hasFilterList ? response.filterList : nil
     }
 
     public func saveCustomFilterRules(rules: FilterListManager_FilterListRules) throws {
@@ -307,7 +307,7 @@ public class FLMFacade: FLMFacadeProtocol {
         }
     }
 
-    public func updateFilters(ignoreFiltersExpiration: Bool, looseTimeout: Int32, ignoreFiltersStatus: Bool) throws -> FilterListManager_UpdateResult {
+    public func updateFilters(ignoreFiltersExpiration: Bool, looseTimeout: Int32, ignoreFiltersStatus: Bool) throws -> FilterListManager_UpdateResult? {
         var message = FilterListManager_UpdateFiltersRequest()
         message.ignoreFiltersExpiration = ignoreFiltersExpiration
         message.ignoreFiltersStatus = ignoreFiltersStatus
@@ -320,10 +320,10 @@ public class FLMFacade: FLMFacadeProtocol {
             throw AGOuterError(from: response.error)
         }
 
-        return response.result
+        return response.hasResult ? response.result : nil
     }
 
-    public func forceUpdateFiltersByIds(ids: [Int32], looseTimeout: Int32) throws -> FilterListManager_UpdateResult {
+    public func forceUpdateFiltersByIds(ids: [Int32], looseTimeout: Int32) throws -> FilterListManager_UpdateResult? {
         var message = FilterListManager_ForceUpdateFiltersByIdsRequest()
         message.ids = ids
         message.looseTimeout = looseTimeout
@@ -335,7 +335,7 @@ public class FLMFacade: FLMFacadeProtocol {
             throw AGOuterError(from: response.error)
         }
 
-        return response.result
+        return response.hasResult ? response.result : nil
     }
 
     public func fetchFiltersListMetadata(url: String) throws -> FilterListManager_FilterListMetadata {

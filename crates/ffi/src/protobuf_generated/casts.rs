@@ -9,6 +9,20 @@ use adguard_flm::{
     UpdateResult,
 };
 
+impl From<Vec<String>> for filter_list_manager::CompilerConditionalConstants {
+    fn from(value: Vec<String>) -> Self {
+        Self {
+            compiler_conditional_constants: value,
+        }
+    }
+}
+
+impl From<filter_list_manager::CompilerConditionalConstants> for Vec<String> {
+    fn from(value: filter_list_manager::CompilerConditionalConstants) -> Self {
+        value.compiler_conditional_constants
+    }
+}
+
 impl From<Configuration> for filter_list_manager::Configuration {
     fn from(value: Configuration) -> Self {
         let mut proxy_addr = String::new();
@@ -23,17 +37,17 @@ impl From<Configuration> for filter_list_manager::Configuration {
             }
         };
 
+        let compiler_conditional_constants = value.compiler_conditional_constants.map(Into::into);
+
         Self {
             filter_list_type: match value.filter_list_type {
                 FilterListType::STANDARD => filter_list_manager::FilterListType::Standard as i32,
                 FilterListType::DNS => filter_list_manager::FilterListType::Dns as i32,
             },
-            working_directory: value.working_directory.unwrap_or_default(),
+            working_directory: value.working_directory,
             locale: value.locale,
             default_filter_list_expires_period_sec: value.default_filter_list_expires_period_sec,
-            compiler_conditional_constants: value
-                .compiler_conditional_constants
-                .unwrap_or_default(),
+            compiler_conditional_constants,
             metadata_url: value.metadata_url,
             metadata_locales_url: value.metadata_locales_url,
             request_timeout_ms: value.request_timeout_ms,
@@ -48,17 +62,7 @@ impl From<Configuration> for filter_list_manager::Configuration {
 
 impl From<filter_list_manager::Configuration> for Configuration {
     fn from(val: filter_list_manager::Configuration) -> Self {
-        let working_directory = if val.working_directory.is_empty() {
-            None
-        } else {
-            Some(val.working_directory)
-        };
-
-        let compiler_conditional_constants = if val.compiler_conditional_constants.is_empty() {
-            None
-        } else {
-            Some(val.compiler_conditional_constants)
-        };
+        let compiler_conditional_constants = val.compiler_conditional_constants.map(Into::into);
 
         Configuration {
             filter_list_type: match val.filter_list_type {
@@ -66,7 +70,7 @@ impl From<filter_list_manager::Configuration> for Configuration {
                 0 => FilterListType::STANDARD,
                 _ => unimplemented!(), // TODO: how it will fail in compile time?
             },
-            working_directory,
+            working_directory: val.working_directory,
             locale: val.locale,
             default_filter_list_expires_period_sec: val.default_filter_list_expires_period_sec,
             compiler_conditional_constants,

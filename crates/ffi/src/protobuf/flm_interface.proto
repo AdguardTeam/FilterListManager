@@ -140,22 +140,22 @@ message GetStoredFiltersMetadataResponse {
 }
 
 message GetStoredFilterMetadataByIdResponse {
-  StoredFilterMetadata filter_list = 1;
+  optional StoredFilterMetadata filter_list = 1;
   optional AGOuterError error = 2;
 }
 
 message GetFullFilterListByIdResponse {
-  FullFilterList filter_list = 1;
+  optional FullFilterList filter_list = 1;
   optional AGOuterError error = 2;
 }
 
 message UpdateFiltersResponse {
-  UpdateResult result = 1;
+  optional UpdateResult result = 1;
   optional AGOuterError error = 2;
 }
 
 message ForceUpdateFiltersByIdsResponse {
-  UpdateResult result = 1;
+  optional UpdateResult result = 1;
   optional AGOuterError error = 2;
 }
 

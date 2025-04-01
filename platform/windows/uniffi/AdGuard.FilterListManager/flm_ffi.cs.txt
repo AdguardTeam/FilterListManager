@@ -1730,12 +1730,38 @@ class FfiConverterTypeActiveRulesInfo: FfiConverterRustBuffer<ActiveRulesInfo> {
 
 
 
+internal record CompilerConditionalConstants (
+    List<String> @compilerConditionalConstants
+) {
+}
+
+class FfiConverterTypeCompilerConditionalConstants: FfiConverterRustBuffer<CompilerConditionalConstants> {
+    public static FfiConverterTypeCompilerConditionalConstants INSTANCE = new FfiConverterTypeCompilerConditionalConstants();
+
+    public override CompilerConditionalConstants Read(BigEndianStream stream) {
+        return new CompilerConditionalConstants(
+            @compilerConditionalConstants: FfiConverterSequenceString.INSTANCE.Read(stream)
+        );
+    }
+
+    public override int AllocationSize(CompilerConditionalConstants value) {
+        return
+            FfiConverterSequenceString.INSTANCE.AllocationSize(value.@compilerConditionalConstants);
+    }
+
+    public override void Write(CompilerConditionalConstants value, BigEndianStream stream) {
+            FfiConverterSequenceString.INSTANCE.Write(value.@compilerConditionalConstants, stream);
+    }
+}
+
+
+
 internal record Configuration (
     FilterListType @filterListType, 
     String? @workingDirectory, 
     String @locale, 
     int @defaultFilterListExpiresPeriodSec, 
-    List<String>? @compilerConditionalConstants, 
+    CompilerConditionalConstants? @compilerConditionalConstants, 
     String @metadataUrl, 
     String @metadataLocalesUrl, 
     int @requestTimeoutMs, 
@@ -1755,7 +1781,7 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             @workingDirectory: FfiConverterOptionalString.INSTANCE.Read(stream),
             @locale: FfiConverterString.INSTANCE.Read(stream),
             @defaultFilterListExpiresPeriodSec: FfiConverterInt32.INSTANCE.Read(stream),
-            @compilerConditionalConstants: FfiConverterOptionalSequenceString.INSTANCE.Read(stream),
+            @compilerConditionalConstants: FfiConverterOptionalTypeCompilerConditionalConstants.INSTANCE.Read(stream),
             @metadataUrl: FfiConverterString.INSTANCE.Read(stream),
             @metadataLocalesUrl: FfiConverterString.INSTANCE.Read(stream),
             @requestTimeoutMs: FfiConverterInt32.INSTANCE.Read(stream),
@@ -1772,7 +1798,7 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterOptionalString.INSTANCE.AllocationSize(value.@workingDirectory) +
             FfiConverterString.INSTANCE.AllocationSize(value.@locale) +
             FfiConverterInt32.INSTANCE.AllocationSize(value.@defaultFilterListExpiresPeriodSec) +
-            FfiConverterOptionalSequenceString.INSTANCE.AllocationSize(value.@compilerConditionalConstants) +
+            FfiConverterOptionalTypeCompilerConditionalConstants.INSTANCE.AllocationSize(value.@compilerConditionalConstants) +
             FfiConverterString.INSTANCE.AllocationSize(value.@metadataUrl) +
             FfiConverterString.INSTANCE.AllocationSize(value.@metadataLocalesUrl) +
             FfiConverterInt32.INSTANCE.AllocationSize(value.@requestTimeoutMs) +
@@ -1787,7 +1813,7 @@ class FfiConverterTypeConfiguration: FfiConverterRustBuffer<Configuration> {
             FfiConverterOptionalString.INSTANCE.Write(value.@workingDirectory, stream);
             FfiConverterString.INSTANCE.Write(value.@locale, stream);
             FfiConverterInt32.INSTANCE.Write(value.@defaultFilterListExpiresPeriodSec, stream);
-            FfiConverterOptionalSequenceString.INSTANCE.Write(value.@compilerConditionalConstants, stream);
+            FfiConverterOptionalTypeCompilerConditionalConstants.INSTANCE.Write(value.@compilerConditionalConstants, stream);
             FfiConverterString.INSTANCE.Write(value.@metadataUrl, stream);
             FfiConverterString.INSTANCE.Write(value.@metadataLocalesUrl, stream);
             FfiConverterInt32.INSTANCE.Write(value.@requestTimeoutMs, stream);
@@ -2748,6 +2774,37 @@ class FfiConverterOptionalString: FfiConverterRustBuffer<String?> {
 
 
 
+class FfiConverterOptionalTypeCompilerConditionalConstants: FfiConverterRustBuffer<CompilerConditionalConstants?> {
+    public static FfiConverterOptionalTypeCompilerConditionalConstants INSTANCE = new FfiConverterOptionalTypeCompilerConditionalConstants();
+
+    public override CompilerConditionalConstants? Read(BigEndianStream stream) {
+        if (stream.ReadByte() == 0) {
+            return null;
+        }
+        return FfiConverterTypeCompilerConditionalConstants.INSTANCE.Read(stream);
+    }
+
+    public override int AllocationSize(CompilerConditionalConstants? value) {
+        if (value == null) {
+            return 1;
+        } else {
+            return 1 + FfiConverterTypeCompilerConditionalConstants.INSTANCE.AllocationSize((CompilerConditionalConstants)value);
+        }
+    }
+
+    public override void Write(CompilerConditionalConstants? value, BigEndianStream stream) {
+        if (value == null) {
+            stream.WriteByte(0);
+        } else {
+            stream.WriteByte(1);
+            FfiConverterTypeCompilerConditionalConstants.INSTANCE.Write((CompilerConditionalConstants)value, stream);
+        }
+    }
+}
+
+
+
+
 class FfiConverterOptionalTypeFilterListRules: FfiConverterRustBuffer<FilterListRules?> {
     public static FfiConverterOptionalTypeFilterListRules INSTANCE = new FfiConverterOptionalTypeFilterListRules();
 
@@ -2865,37 +2922,6 @@ class FfiConverterOptionalTypeUpdateResult: FfiConverterRustBuffer<UpdateResult?
         } else {
             stream.WriteByte(1);
             FfiConverterTypeUpdateResult.INSTANCE.Write((UpdateResult)value, stream);
-        }
-    }
-}
-
-
-
-
-class FfiConverterOptionalSequenceString: FfiConverterRustBuffer<List<String>?> {
-    public static FfiConverterOptionalSequenceString INSTANCE = new FfiConverterOptionalSequenceString();
-
-    public override List<String>? Read(BigEndianStream stream) {
-        if (stream.ReadByte() == 0) {
-            return null;
-        }
-        return FfiConverterSequenceString.INSTANCE.Read(stream);
-    }
-
-    public override int AllocationSize(List<String>? value) {
-        if (value == null) {
-            return 1;
-        } else {
-            return 1 + FfiConverterSequenceString.INSTANCE.AllocationSize((List<String>)value);
-        }
-    }
-
-    public override void Write(List<String>? value, BigEndianStream stream) {
-        if (value == null) {
-            stream.WriteByte(0);
-        } else {
-            stream.WriteByte(1);
-            FfiConverterSequenceString.INSTANCE.Write((List<String>)value, stream);
         }
     }
 }

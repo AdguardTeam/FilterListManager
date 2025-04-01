@@ -99,6 +99,19 @@ public enum FilterListManager_RawRequestProxyMode: SwiftProtobuf.Enum, Swift.Cas
 
 }
 
+public struct FilterListManager_CompilerConditionalConstants: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// List of literal constants for filters conditional compilation.
+  public var compilerConditionalConstants: [String] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct FilterListManager_Configuration: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -109,7 +122,14 @@ public struct FilterListManager_Configuration: Sendable {
   /// Absolute path for library working directory.
   /// This will be used for database operating.
   /// If value is "None", `cwd` will be used.
-  public var workingDirectory: String = String()
+  public var workingDirectory: String {
+    get {return _workingDirectory ?? String()}
+    set {_workingDirectory = newValue}
+  }
+  /// Returns true if `workingDirectory` has been explicitly set.
+  public var hasWorkingDirectory: Bool {return self._workingDirectory != nil}
+  /// Clears the value of `workingDirectory`. Subsequent reads from it will return its default value.
+  public mutating func clearWorkingDirectory() {self._workingDirectory = nil}
 
   /// Locale that needs to be used to extract localized names and descriptions.
   /// Locale `en-GB` will be normalized to internal `en_GB` representation.
@@ -122,7 +142,14 @@ public struct FilterListManager_Configuration: Sendable {
   public var defaultFilterListExpiresPeriodSec: Int32 = 0
 
   /// List of literal constants for filters conditional compilation.
-  public var compilerConditionalConstants: [String] = []
+  public var compilerConditionalConstants: FilterListManager_CompilerConditionalConstants {
+    get {return _compilerConditionalConstants ?? FilterListManager_CompilerConditionalConstants()}
+    set {_compilerConditionalConstants = newValue}
+  }
+  /// Returns true if `compilerConditionalConstants` has been explicitly set.
+  public var hasCompilerConditionalConstants: Bool {return self._compilerConditionalConstants != nil}
+  /// Clears the value of `compilerConditionalConstants`. Subsequent reads from it will return its default value.
+  public mutating func clearCompilerConditionalConstants() {self._compilerConditionalConstants = nil}
 
   /// URL of the index (filters.json) file.
   public var metadataURL: String = String()
@@ -151,6 +178,9 @@ public struct FilterListManager_Configuration: Sendable {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
+
+  fileprivate var _workingDirectory: String? = nil
+  fileprivate var _compilerConditionalConstants: FilterListManager_CompilerConditionalConstants? = nil
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -170,6 +200,38 @@ extension FilterListManager_RawRequestProxyMode: SwiftProtobuf._ProtoNameProvidi
     1: .same(proto: "NO_PROXY"),
     2: .same(proto: "USE_CUSTOM_PROXY"),
   ]
+}
+
+extension FilterListManager_CompilerConditionalConstants: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".CompilerConditionalConstants"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "compiler_conditional_constants"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedStringField(value: &self.compilerConditionalConstants) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.compilerConditionalConstants.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.compilerConditionalConstants, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: FilterListManager_CompilerConditionalConstants, rhs: FilterListManager_CompilerConditionalConstants) -> Bool {
+    if lhs.compilerConditionalConstants != rhs.compilerConditionalConstants {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
 }
 
 extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -197,10 +259,10 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularEnumField(value: &self.filterListType) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.workingDirectory) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self._workingDirectory) }()
       case 3: try { try decoder.decodeSingularStringField(value: &self.locale) }()
       case 4: try { try decoder.decodeSingularInt32Field(value: &self.defaultFilterListExpiresPeriodSec) }()
-      case 5: try { try decoder.decodeRepeatedStringField(value: &self.compilerConditionalConstants) }()
+      case 5: try { try decoder.decodeSingularMessageField(value: &self._compilerConditionalConstants) }()
       case 6: try { try decoder.decodeSingularStringField(value: &self.metadataURL) }()
       case 7: try { try decoder.decodeSingularStringField(value: &self.metadataLocalesURL) }()
       case 8: try { try decoder.decodeSingularInt32Field(value: &self.requestTimeoutMs) }()
@@ -215,21 +277,25 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if self.filterListType != .standard {
       try visitor.visitSingularEnumField(value: self.filterListType, fieldNumber: 1)
     }
-    if !self.workingDirectory.isEmpty {
-      try visitor.visitSingularStringField(value: self.workingDirectory, fieldNumber: 2)
-    }
+    try { if let v = self._workingDirectory {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    } }()
     if !self.locale.isEmpty {
       try visitor.visitSingularStringField(value: self.locale, fieldNumber: 3)
     }
     if self.defaultFilterListExpiresPeriodSec != 0 {
       try visitor.visitSingularInt32Field(value: self.defaultFilterListExpiresPeriodSec, fieldNumber: 4)
     }
-    if !self.compilerConditionalConstants.isEmpty {
-      try visitor.visitRepeatedStringField(value: self.compilerConditionalConstants, fieldNumber: 5)
-    }
+    try { if let v = self._compilerConditionalConstants {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+    } }()
     if !self.metadataURL.isEmpty {
       try visitor.visitSingularStringField(value: self.metadataURL, fieldNumber: 6)
     }
@@ -259,10 +325,10 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
 
   public static func ==(lhs: FilterListManager_Configuration, rhs: FilterListManager_Configuration) -> Bool {
     if lhs.filterListType != rhs.filterListType {return false}
-    if lhs.workingDirectory != rhs.workingDirectory {return false}
+    if lhs._workingDirectory != rhs._workingDirectory {return false}
     if lhs.locale != rhs.locale {return false}
     if lhs.defaultFilterListExpiresPeriodSec != rhs.defaultFilterListExpiresPeriodSec {return false}
-    if lhs.compilerConditionalConstants != rhs.compilerConditionalConstants {return false}
+    if lhs._compilerConditionalConstants != rhs._compilerConditionalConstants {return false}
     if lhs.metadataURL != rhs.metadataURL {return false}
     if lhs.metadataLocalesURL != rhs.metadataLocalesURL {return false}
     if lhs.requestTimeoutMs != rhs.requestTimeoutMs {return false}

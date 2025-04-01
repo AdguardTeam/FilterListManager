@@ -17,13 +17,18 @@ enum RawRequestProxyMode {
   USE_CUSTOM_PROXY = 2;
 }
 
+message CompilerConditionalConstants {
+  // List of literal constants for filters conditional compilation.
+  repeated string compiler_conditional_constants = 1;
+}
+
 message Configuration {
   FilterListType filter_list_type = 1;
 
   // Absolute path for library working directory.
   // This will be used for database operating.
   // If value is "None", `cwd` will be used.
-  string working_directory = 2;
+  optional string working_directory = 2;
 
   // Locale that needs to be used to extract localized names and descriptions.
   // Locale `en-GB` will be normalized to internal `en_GB` representation.
@@ -36,7 +41,7 @@ message Configuration {
   int32 default_filter_list_expires_period_sec = 4;
 
   // List of literal constants for filters conditional compilation.
-  repeated string compiler_conditional_constants = 5;
+  optional CompilerConditionalConstants compiler_conditional_constants = 5;
 
   // URL of the index (filters.json) file.
   string metadata_url = 6;

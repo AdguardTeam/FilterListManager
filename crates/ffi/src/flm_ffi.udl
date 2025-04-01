@@ -139,12 +139,16 @@ interface RequestProxyMode {
     UseCustomProxy(string addr);
 };
 
+dictionary CompilerConditionalConstants {
+    sequence<string> compiler_conditional_constants;
+};
+
 dictionary Configuration {
     FilterListType filter_list_type;
     string? working_directory;
     string locale;
     i32 default_filter_list_expires_period_sec;
-    sequence<string>? compiler_conditional_constants;
+    CompilerConditionalConstants? compiler_conditional_constants;
     string metadata_url;
     string metadata_locales_url;
     i32 request_timeout_ms;

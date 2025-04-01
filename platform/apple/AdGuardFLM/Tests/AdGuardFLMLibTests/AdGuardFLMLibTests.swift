@@ -12,6 +12,7 @@ final class AdGuardFLMLibTests: XCTestCase {
         configuration.metadataURL = "https://filters.adtidy.org/extension/safari/filters.json"
         configuration.metadataLocalesURL = "https://filters.adtidy.org/extension/safari/filters_i18n.json"
         configuration.workingDirectory = "."
+        configuration.compilerConditionalConstants.compilerConditionalConstants = ["const1", "const2"]
 
         return configuration
     }
@@ -45,7 +46,7 @@ final class AdGuardFLMLibTests: XCTestCase {
         )
 
         let filter = try flm.getFullFilterListsById(id: 1)
-        NSLog("[Default locale] Filter with id 1 has title \(filter.title)")
+        NSLog("[Default locale] Filter with id 1 has title \(String(describing: filter?.title))")
 
         let locale_result = try flm.changeLocale(suggestedLocale: Locale(identifier: "ru_RU"))
         NSLog("Changing locale result: \(locale_result)")
