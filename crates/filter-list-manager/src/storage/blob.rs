@@ -58,7 +58,7 @@ where
         // Read the buffer
         let bytes_read = blob.read_at(&mut buffer, offset)?;
         if bytes_read == 0 {
-            if !accumulator.is_empty() {
+            if !accumulator.is_empty() && !disabled_rules_set.contains(&accumulator) {
                 stream.write(&accumulator).map_err(FLMError::from_io)?;
             }
 
@@ -164,5 +164,18 @@ mod tests {
             test_string.as_str(),
             " This line won't be removed; \n\n\n123456890"
         )
+    }
+
+    #[test]
+    fn test_write_to_stream_all_disabled_rules() {
+        let text = "Hello world!\n Hello world, again and again\n00";
+        let disabled_rules = HashSet::from([
+            b"Hello world!".to_vec(),
+            b" Hello world, again and again".to_vec(),
+            b"00".to_vec(),
+        ]);
+
+        let test_string = write_to_stream_test_internal(text, disabled_rules);
+        assert!(test_string.is_empty())
     }
 }
