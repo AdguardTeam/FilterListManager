@@ -2362,7 +2362,9 @@ class FfiConverterTypeStoredFilterMetadata: FfiConverterRustBuffer<StoredFilterM
 
 internal record UpdateFilterError (
     int @filterId, 
-    String @message
+    String @message, 
+    String? @filterUrl, 
+    String? @httpClientError
 ) {
 }
 
@@ -2372,19 +2374,25 @@ class FfiConverterTypeUpdateFilterError: FfiConverterRustBuffer<UpdateFilterErro
     public override UpdateFilterError Read(BigEndianStream stream) {
         return new UpdateFilterError(
             @filterId: FfiConverterInt32.INSTANCE.Read(stream),
-            @message: FfiConverterString.INSTANCE.Read(stream)
+            @message: FfiConverterString.INSTANCE.Read(stream),
+            @filterUrl: FfiConverterOptionalString.INSTANCE.Read(stream),
+            @httpClientError: FfiConverterOptionalString.INSTANCE.Read(stream)
         );
     }
 
     public override int AllocationSize(UpdateFilterError value) {
         return
             FfiConverterInt32.INSTANCE.AllocationSize(value.@filterId) +
-            FfiConverterString.INSTANCE.AllocationSize(value.@message);
+            FfiConverterString.INSTANCE.AllocationSize(value.@message) +
+            FfiConverterOptionalString.INSTANCE.AllocationSize(value.@filterUrl) +
+            FfiConverterOptionalString.INSTANCE.AllocationSize(value.@httpClientError);
     }
 
     public override void Write(UpdateFilterError value, BigEndianStream stream) {
             FfiConverterInt32.INSTANCE.Write(value.@filterId, stream);
             FfiConverterString.INSTANCE.Write(value.@message, stream);
+            FfiConverterOptionalString.INSTANCE.Write(value.@filterUrl, stream);
+            FfiConverterOptionalString.INSTANCE.Write(value.@httpClientError, stream);
     }
 }
 

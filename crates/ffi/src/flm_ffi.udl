@@ -114,6 +114,8 @@ dictionary FilterListRulesRaw {
 dictionary UpdateFilterError {
     i32 filter_id;
     string message;
+    string? filter_url;
+    string? http_client_error;
 };
 
 dictionary UpdateResult {

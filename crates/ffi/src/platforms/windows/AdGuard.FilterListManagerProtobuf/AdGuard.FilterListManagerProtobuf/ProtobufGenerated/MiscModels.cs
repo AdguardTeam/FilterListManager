@@ -31,14 +31,16 @@ namespace FilterListManager {
             "ASADKAsyIy5maWx0ZXJfbGlzdF9tYW5hZ2VyLkZ1bGxGaWx0ZXJMaXN0Eh8K",
             "F3JlbWFpbmluZ19maWx0ZXJzX2NvdW50GAIgASgFEj4KDmZpbHRlcnNfZXJy",
             "b3JzGAMgAygLMiYuZmlsdGVyX2xpc3RfbWFuYWdlci5VcGRhdGVGaWx0ZXJF",
-            "cnJvciI3ChFVcGRhdGVGaWx0ZXJFcnJvchIRCglmaWx0ZXJfaWQYASABKAUS",
-            "DwoHbWVzc2FnZRgCIAEoCWIGcHJvdG8z"));
+            "cnJvciKVAQoRVXBkYXRlRmlsdGVyRXJyb3ISEQoJZmlsdGVyX2lkGAEgASgF",
+            "Eg8KB21lc3NhZ2UYAiABKAkSFwoKZmlsdGVyX3VybBgDIAEoCUgAiAEBEh4K",
+            "EWh0dHBfY2xpZW50X2Vycm9yGAQgASgJSAGIAQFCDQoLX2ZpbHRlcl91cmxC",
+            "FAoSX2h0dHBfY2xpZW50X2Vycm9yYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::FilterListManager.FiltersReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.ActiveRulesInfo), global::FilterListManager.ActiveRulesInfo.Parser, new[]{ "FilterId", "GroupId", "IsTrusted", "Rules" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.UpdateResult), global::FilterListManager.UpdateResult.Parser, new[]{ "UpdatedList", "RemainingFiltersCount", "FiltersErrors" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.UpdateFilterError), global::FilterListManager.UpdateFilterError.Parser, new[]{ "FilterId", "Message" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.UpdateFilterError), global::FilterListManager.UpdateFilterError.Parser, new[]{ "FilterId", "Message", "FilterUrl", "HttpClientError" }, new[]{ "FilterUrl", "HttpClientError" }, null, null, null)
           }));
     }
     #endregion
@@ -641,6 +643,8 @@ namespace FilterListManager {
     public UpdateFilterError(UpdateFilterError other) : this() {
       filterId_ = other.filterId_;
       message_ = other.message_;
+      filterUrl_ = other.filterUrl_;
+      httpClientError_ = other.httpClientError_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -680,6 +684,60 @@ namespace FilterListManager {
       }
     }
 
+    /// <summary>Field number for the "filter_url" field.</summary>
+    public const int FilterUrlFieldNumber = 3;
+    private string filterUrl_;
+    /// <summary>
+    /// Filter url
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string FilterUrl {
+      get { return filterUrl_ ?? ""; }
+      set {
+        filterUrl_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+    /// <summary>Gets whether the "filter_url" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool HasFilterUrl {
+      get { return filterUrl_ != null; }
+    }
+    /// <summary>Clears the value of the "filter_url" field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearFilterUrl() {
+      filterUrl_ = null;
+    }
+
+    /// <summary>Field number for the "http_client_error" field.</summary>
+    public const int HttpClientErrorFieldNumber = 4;
+    private string httpClientError_;
+    /// <summary>
+    /// Http client error
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string HttpClientError {
+      get { return httpClientError_ ?? ""; }
+      set {
+        httpClientError_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+    /// <summary>Gets whether the "http_client_error" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool HasHttpClientError {
+      get { return httpClientError_ != null; }
+    }
+    /// <summary>Clears the value of the "http_client_error" field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearHttpClientError() {
+      httpClientError_ = null;
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -697,6 +755,8 @@ namespace FilterListManager {
       }
       if (FilterId != other.FilterId) return false;
       if (Message != other.Message) return false;
+      if (FilterUrl != other.FilterUrl) return false;
+      if (HttpClientError != other.HttpClientError) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -706,6 +766,8 @@ namespace FilterListManager {
       int hash = 1;
       if (FilterId != 0) hash ^= FilterId.GetHashCode();
       if (Message.Length != 0) hash ^= Message.GetHashCode();
+      if (HasFilterUrl) hash ^= FilterUrl.GetHashCode();
+      if (HasHttpClientError) hash ^= HttpClientError.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -732,6 +794,14 @@ namespace FilterListManager {
         output.WriteRawTag(18);
         output.WriteString(Message);
       }
+      if (HasFilterUrl) {
+        output.WriteRawTag(26);
+        output.WriteString(FilterUrl);
+      }
+      if (HasHttpClientError) {
+        output.WriteRawTag(34);
+        output.WriteString(HttpClientError);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -750,6 +820,14 @@ namespace FilterListManager {
         output.WriteRawTag(18);
         output.WriteString(Message);
       }
+      if (HasFilterUrl) {
+        output.WriteRawTag(26);
+        output.WriteString(FilterUrl);
+      }
+      if (HasHttpClientError) {
+        output.WriteRawTag(34);
+        output.WriteString(HttpClientError);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -765,6 +843,12 @@ namespace FilterListManager {
       }
       if (Message.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
+      }
+      if (HasFilterUrl) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(FilterUrl);
+      }
+      if (HasHttpClientError) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(HttpClientError);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -783,6 +867,12 @@ namespace FilterListManager {
       }
       if (other.Message.Length != 0) {
         Message = other.Message;
+      }
+      if (other.HasFilterUrl) {
+        FilterUrl = other.FilterUrl;
+      }
+      if (other.HasHttpClientError) {
+        HttpClientError = other.HttpClientError;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -807,6 +897,14 @@ namespace FilterListManager {
             Message = input.ReadString();
             break;
           }
+          case 26: {
+            FilterUrl = input.ReadString();
+            break;
+          }
+          case 34: {
+            HttpClientError = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -828,6 +926,14 @@ namespace FilterListManager {
           }
           case 18: {
             Message = input.ReadString();
+            break;
+          }
+          case 26: {
+            FilterUrl = input.ReadString();
+            break;
+          }
+          case 34: {
+            HttpClientError = input.ReadString();
             break;
           }
         }

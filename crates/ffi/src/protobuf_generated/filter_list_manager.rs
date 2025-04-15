@@ -512,6 +512,12 @@ pub struct UpdateFilterError {
     /// Filter error converted to a string. For debugging purposes
     #[prost(string, tag = "2")]
     pub message: ::prost::alloc::string::String,
+    /// Filter url
+    #[prost(string, optional, tag = "3")]
+    pub filter_url: ::core::option::Option<::prost::alloc::string::String>,
+    /// Http client error
+    #[prost(string, optional, tag = "4")]
+    pub http_client_error: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InstallCustomFilterListRequest {

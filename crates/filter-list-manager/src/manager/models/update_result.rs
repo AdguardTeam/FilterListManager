@@ -20,4 +20,8 @@ pub struct UpdateFilterError {
     pub filter_id: FilterId,
     /// Filter error converted to a string. For debugging purposes
     pub message: String,
+    /// Filter url
+    pub filter_url: Option<String>,
+    /// Http client error
+    pub http_client_error: Option<String>,
 }

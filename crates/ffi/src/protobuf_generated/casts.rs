@@ -271,6 +271,8 @@ impl From<UpdateFilterError> for filter_list_manager::UpdateFilterError {
         Self {
             filter_id: value.filter_id,
             message: value.message,
+            filter_url: value.filter_url,
+            http_client_error: value.http_client_error,
         }
     }
 }

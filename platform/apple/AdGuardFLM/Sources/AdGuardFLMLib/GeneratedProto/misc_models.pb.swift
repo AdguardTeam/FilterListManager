@@ -75,9 +75,32 @@ public struct FilterListManager_UpdateFilterError: Sendable {
   /// Filter error converted to a string. For debugging purposes
   public var message: String = String()
 
+  /// Filter url
+  public var filterURL: String {
+    get {return _filterURL ?? String()}
+    set {_filterURL = newValue}
+  }
+  /// Returns true if `filterURL` has been explicitly set.
+  public var hasFilterURL: Bool {return self._filterURL != nil}
+  /// Clears the value of `filterURL`. Subsequent reads from it will return its default value.
+  public mutating func clearFilterURL() {self._filterURL = nil}
+
+  /// Http client error
+  public var httpClientError: String {
+    get {return _httpClientError ?? String()}
+    set {_httpClientError = newValue}
+  }
+  /// Returns true if `httpClientError` has been explicitly set.
+  public var hasHTTPClientError: Bool {return self._httpClientError != nil}
+  /// Clears the value of `httpClientError`. Subsequent reads from it will return its default value.
+  public mutating func clearHTTPClientError() {self._httpClientError = nil}
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
+
+  fileprivate var _filterURL: String? = nil
+  fileprivate var _httpClientError: String? = nil
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -183,6 +206,8 @@ extension FilterListManager_UpdateFilterError: SwiftProtobuf.Message, SwiftProto
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_id"),
     2: .same(proto: "message"),
+    3: .standard(proto: "filter_url"),
+    4: .standard(proto: "http_client_error"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -193,24 +218,38 @@ extension FilterListManager_UpdateFilterError: SwiftProtobuf.Message, SwiftProto
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.message) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self._filterURL) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self._httpClientError) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if self.filterID != 0 {
       try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     if !self.message.isEmpty {
       try visitor.visitSingularStringField(value: self.message, fieldNumber: 2)
     }
+    try { if let v = self._filterURL {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._httpClientError {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 4)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: FilterListManager_UpdateFilterError, rhs: FilterListManager_UpdateFilterError) -> Bool {
     if lhs.filterID != rhs.filterID {return false}
     if lhs.message != rhs.message {return false}
+    if lhs._filterURL != rhs._filterURL {return false}
+    if lhs._httpClientError != rhs._httpClientError {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

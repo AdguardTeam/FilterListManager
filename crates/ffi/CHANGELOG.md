@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.9.0] - 2025-04-14
+
+### Add
+- filter_url, http_client_error fields to `UdpateFilterError` 
+
+[1.9.0]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.8.0...ffi-1.9.0
+
 ## [1.8.0] - 2025-03-31
 
 ### Fixed

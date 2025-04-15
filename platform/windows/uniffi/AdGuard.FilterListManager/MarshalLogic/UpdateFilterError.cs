@@ -10,20 +10,34 @@ namespace AdGuard.FilterListManager.MarshalLogic
         /// </summary>
         /// <param name="filterId">The filter identifier.</param>
         /// <param name="message">The message of the error.</param>
-        public UpdateFilterError(int filterId, string message)
+        /// <param name="filterUrl">The filter URL.</param>
+        /// <param name="httpClientError">The HTTP client error.</param>
+        public UpdateFilterError(int filterId, string message, string filterUrl, string httpClientError)
         {
-            this.filterId = filterId;
-            this.message = message;
+            FilterId = filterId;
+            Message = message;
+            FilterUrl = filterUrl;
+            HttpClientError = httpClientError;
         }
 
         /// <summary>
-        /// Gets or sets the filter identifier.
+        /// Gets the filter identifier.
         /// </summary>
-        public int filterId { get; set; }
+        public int FilterId { get; }
 
         /// <summary>
-        /// Gets or sets the message of the error.
+        /// Gets the message of the error.
         /// </summary>
-        public string message { get; set; }
+        public string Message { get; }
+
+        /// <summary>
+        /// Gets the filter URL.
+        /// </summary>
+        public string FilterUrl { get; }
+
+        /// <summary>
+        /// Gets the HTTP client error.
+        /// </summary>
+        public string HttpClientError { get; }
     }
 }

@@ -94,10 +94,9 @@ pub(super) fn update_filters_action(
             None => {
                 update_result.filters_errors.push(UpdateFilterError {
                     filter_id: 0,
-                    message: format!(
-                        "Cannot get filter contents from database for filter with url: {}",
-                        filter.download_url
-                    ),
+                    message: "Cannot get filter contents from database".to_string(),
+                    filter_url: Some(filter.download_url),
+                    http_client_error: None,
                 });
 
                 continue;
@@ -122,6 +121,8 @@ pub(super) fn update_filters_action(
                 update_result.filters_errors.push(UpdateFilterError {
                     filter_id,
                     message: why.to_string(),
+                    filter_url: Some(filter.download_url),
+                    http_client_error: None,
                 });
 
                 continue;
@@ -186,6 +187,10 @@ pub(super) fn update_filters_action(
                 update_result.filters_errors.push(UpdateFilterError {
                     filter_id,
                     message: err.to_string(),
+                    filter_url: Some(filter.download_url),
+                    http_client_error: Some(err.error)
+                        .filter(|e| matches!(e, FilterParserError::Network(_)))
+                        .map(|e| e.to_string()),
                 });
             }
 
@@ -224,6 +229,8 @@ pub(super) fn update_filters_action(
                         "Filter with id: {} is gone from database while updating",
                         filter_id
                     ),
+                    filter_url: None,
+                    http_client_error: None,
                 });
 
                 continue;
@@ -241,6 +248,8 @@ pub(super) fn update_filters_action(
                     Err(why) => update_result.filters_errors.push(UpdateFilterError {
                         filter_id,
                         message: why.to_string(),
+                        filter_url: Some(filter.download_url.clone()),
+                        http_client_error: None,
                     }),
                     _ => {}
                 }
@@ -704,6 +713,7 @@ mod tests {
         let third_filter_id = -100011;
         let fourth_filter_id = -100012;
         let fifth_filter_id = 5;
+        let sixth_filter_id = 6;
 
         let user_rules_count_new = 2;
 
@@ -778,6 +788,11 @@ mod tests {
         });
         filter5.download_url = download_url5.to_string();
 
+        let mut filter6 = FilterEntity::default();
+        filter6.filter_id = Some(sixth_filter_id);
+        filter6.is_enabled = true;
+        filter6.download_url = String::from("https://123");
+
         let filters_repo = FilterRepository::new();
         let rules_repo = RulesListRepository::new();
 
@@ -785,7 +800,10 @@ mod tests {
             .execute_db(|mut connection: Connection| {
                 let tx = connection.transaction().unwrap();
                 filters_repo
-                    .insert(&tx, &vec![filter1, filter2, filter3, filter4, filter5])
+                    .insert(
+                        &tx,
+                        &vec![filter1, filter2, filter3, filter4, filter5, filter6],
+                    )
                     .unwrap();
 
                 rules_repo
@@ -819,7 +837,7 @@ mod tests {
             })
             .unwrap();
 
-        assert_eq!(installed_filters.len(), 5);
+        assert_eq!(installed_filters.len(), 6);
 
         // Write new data into all filters
         let (_, new_rules1) = write_rules(RulesListEntity {
@@ -864,8 +882,10 @@ mod tests {
             .map(|item| item.id)
             .collect::<Vec<FilterId>>();
 
-        // No errors here
-        assert!(result.filters_errors.is_empty());
+        // Update filter error for filter 6
+        assert_eq!(result.filters_errors.len(), 1);
+        assert!(result.filters_errors[0].filter_url.is_some());
+        assert!(result.filters_errors[0].http_client_error.is_some());
 
         // All filters were updated
         assert_eq!(updated_ids.len(), 5);

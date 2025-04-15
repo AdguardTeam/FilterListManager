@@ -38,4 +38,10 @@ message UpdateFilterError {
 
   // Filter error converted to a string. For debugging purposes
   string message = 2;
+
+  // Filter url
+  optional string filter_url = 3;
+
+  // Http client error
+  optional string http_client_error = 4;
 }

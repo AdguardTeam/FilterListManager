@@ -17,24 +17,24 @@ namespace AdGuard.FilterListManager.MarshalLogic
             int remainingFiltersCount,
             List<UpdateFilterError> filtersErrors)
         {
-            this.updatedList = updatedList;
-            this.remainingFiltersCount = remainingFiltersCount;
-            this.filtersErrors = filtersErrors;
+            UpdatedList = updatedList;
+            RemainingFiltersCount = remainingFiltersCount;
+            FiltersErrors = filtersErrors;
         }
 
         /// <summary>
-        /// Gets or sets the list of updated filters.
+        /// Gets the list of updated filters.
         /// </summary>
-        public List<FullFilterList> updatedList { get; set; }
+        public List<FullFilterList> UpdatedList { get; }
 
         /// <summary>
-        /// Gets or sets the remaining filters count.
+        /// Gets the remaining filters count.
         /// </summary>
-        public int remainingFiltersCount { get; set; }
+        public int RemainingFiltersCount { get; }
 
         /// <summary>
-        /// Gets or sets the filters errors.
+        /// Gets the filters errors.
         /// </summary>
-        public List<UpdateFilterError> filtersErrors { get; set; }
+        public List<UpdateFilterError> FiltersErrors { get; }
     }
 }
