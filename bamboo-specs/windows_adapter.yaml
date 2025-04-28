@@ -43,7 +43,7 @@ Default Job:
       scripts:
       - |-
         
-        . "${bamboo.root_folder}\build.ps1"
+        . "${bamboo.root_folder}\Scripts\build_adapter.ps1"
         RustBuild
       
         . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
@@ -83,17 +83,17 @@ Default Job:
   - system.builder.msbuild.MSBuild v15.0 (32bit)
 variables:
   build_configuration: Release
-  build_folder: platform\windows\build\bin\Release
+  build_folder: crates\ffi\src\platforms\windows\build\bin\Release
   build_platform: AnyCPU
   channel: release
   code_coverage_threshold_percent: '1'
   define_constants: BUILD=Release
-  deploy_folder: platform\windows\adguard-windows-private\bamboo-specs
+  deploy_folder: crates\ffi\src\platforms\windows\adguard-windows-private\bamboo-specs
   use_force_master: 'false'
-  private_repo_path: platform/windows/adguard-windows-private
+  private_repo_path: crates/ffi/src/platforms/windows/adguard-windows-private
   deploy_script: "main_deploy.ps1"
   # opencover: opencover.xml
-  root_folder: platform/windows
+  root_folder: crates/ffi/src/platforms/windows
   skip_signing_libs: $False
   private_repo_hash: latest
 notifications: []

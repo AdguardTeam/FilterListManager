@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\common.props" />
+  <Import Project="..\filter.targets" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net45</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <Version>0.9.0</Version>
+    <RootNamespace>AdGuard.FilterListManager.SampleApp</RootNamespace>
+    <Authors>Adguard Software Ltd</Authors>
+    <Copyright>© Adguard Software Ltd 2009-2025</Copyright>
+    <Product>AdGuard Filter List Manager for Windows</Product>
+    <AssemblyTitle>C# AdGuard FLM adapter sample app</AssemblyTitle>
+    <ApplicationIcon>..\AdGuardFilterListManager.ico</ApplicationIcon>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="AdGuard.Utils">
+      <HintPath>..\libs\AdGuard.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="AdGuard.Utils.Base">
+      <HintPath>..\libs\AdGuard.Utils.Base.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AdGuard.FilterListManager\AdGuard.FilterListManagerOpen.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.28.2" />
+    <PackageReference Include="System.Buffers" Version="4.4.0" />
+    <PackageReference Include="System.Memory" Version="4.5.3" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <Content Include="..\AdGuardFilterListManager.ico">
+      <Link>AdGuardFilterListManager.ico</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
