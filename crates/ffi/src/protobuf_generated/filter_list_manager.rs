@@ -519,6 +519,29 @@ pub struct UpdateFilterError {
     #[prost(string, optional, tag = "4")]
     pub http_client_error: ::core::option::Option<::prost::alloc::string::String>,
 }
+/// Information about filter movement during index metadata update
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct MovedFilterInfo {
+    /// / Previous id of the filter
+    #[prost(int32, tag = "1")]
+    pub previous_id: i32,
+    /// / New id of the filter
+    #[prost(int32, tag = "2")]
+    pub new_id: i32,
+}
+/// Result of index metadata update
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PullMetadataResult {
+    /// List of filters added in the update
+    #[prost(int32, repeated, tag = "1")]
+    pub added_filters: ::prost::alloc::vec::Vec<i32>,
+    /// List of filters removed in the update
+    #[prost(int32, repeated, tag = "2")]
+    pub removed_filters: ::prost::alloc::vec::Vec<i32>,
+    /// List of filters moved in the update
+    #[prost(message, repeated, tag = "3")]
+    pub moved_filters: ::prost::alloc::vec::Vec<MovedFilterInfo>,
+}
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InstallCustomFilterListRequest {
     #[prost(string, tag = "1")]
@@ -810,6 +833,13 @@ pub struct GetDisabledRulesResponse {
 pub struct GetRulesCountResponse {
     #[prost(message, repeated, tag = "1")]
     pub rules_count_by_filter: ::prost::alloc::vec::Vec<RulesCountByFilter>,
+    #[prost(message, optional, tag = "2")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PullMetadataResponse {
+    #[prost(message, optional, tag = "1")]
+    pub result: ::core::option::Option<PullMetadataResult>,
     #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }

@@ -267,8 +267,8 @@ pub use crate::manager::models::FilterId;
 pub use crate::manager::models::FilterListMetadata;
 pub use crate::manager::models::FilterListMetadataWithBody;
 pub use crate::manager::models::FullFilterList;
-pub use crate::manager::models::PullMetadataResult;
 pub use crate::manager::models::UpdateResult;
+pub use crate::manager::models::{MovedFilterInfo, PullMetadataResult};
 pub use crate::manager::FilterListManager;
 pub use crate::storage::constants::*;
 

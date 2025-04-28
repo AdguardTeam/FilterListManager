@@ -224,6 +224,11 @@ message GetRulesCountResponse {
   optional AGOuterError error = 2;
 }
 
+message PullMetadataResponse {
+  PullMetadataResult result = 1;
+  optional AGOuterError error = 2;
+}
+
 message EmptyResponse {
   optional AGOuterError error = 1;
 }

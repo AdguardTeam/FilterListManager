@@ -45,3 +45,24 @@ message UpdateFilterError {
   // Http client error
   optional string http_client_error = 4;
 }
+
+// Information about filter movement during index metadata update
+message MovedFilterInfo {
+  /// Previous id of the filter
+  int32 previous_id = 1;
+
+  /// New id of the filter
+  int32 new_id = 2;
+}
+
+// Result of index metadata update
+message PullMetadataResult {
+  // List of filters added in the update
+  repeated int32 added_filters = 1;
+
+  // List of filters removed in the update
+  repeated int32 removed_filters = 2;
+
+  // List of filters moved in the update
+  repeated MovedFilterInfo moved_filters = 3;
+}

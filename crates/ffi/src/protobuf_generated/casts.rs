@@ -5,8 +5,8 @@ use crate::protobuf_generated::filter_list_manager;
 use adguard_flm::{
     ActiveRulesInfo, Configuration, DisabledRulesRaw, FilterGroup, FilterListMetadata,
     FilterListMetadataWithBody, FilterListRules, FilterListRulesRaw, FilterListType, FilterTag,
-    FullFilterList, RequestProxyMode, RulesCountByFilter, StoredFilterMetadata, UpdateFilterError,
-    UpdateResult,
+    FullFilterList, MovedFilterInfo, PullMetadataResult, RequestProxyMode, RulesCountByFilter,
+    StoredFilterMetadata, UpdateFilterError, UpdateResult,
 };
 
 impl From<Vec<String>> for filter_list_manager::CompilerConditionalConstants {
@@ -399,6 +399,25 @@ impl From<RulesCountByFilter> for filter_list_manager::RulesCountByFilter {
         Self {
             filter_id: value.filter_id,
             rules_count: value.rules_count,
+        }
+    }
+}
+
+impl From<MovedFilterInfo> for filter_list_manager::MovedFilterInfo {
+    fn from(value: MovedFilterInfo) -> Self {
+        Self {
+            previous_id: value.previous_id,
+            new_id: value.new_id,
+        }
+    }
+}
+
+impl From<PullMetadataResult> for filter_list_manager::PullMetadataResult {
+    fn from(value: PullMetadataResult) -> Self {
+        Self {
+            added_filters: value.added_filters,
+            removed_filters: value.removed_filters,
+            moved_filters: value.moved_filters.into_iter().map(Into::into).collect(),
         }
     }
 }
