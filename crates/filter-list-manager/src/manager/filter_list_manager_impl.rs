@@ -11,7 +11,7 @@ use super::managers::rules_list_manager::RulesListManager;
 use super::managers::streaming_rules_manager::StreamingRulesManager;
 use super::models::{
     configuration::Configuration, FilterId, FilterListMetadata, FilterListMetadataWithBody,
-    FullFilterList, UpdateResult,
+    FullFilterList, PullMetadataResult, UpdateResult,
 };
 use crate::manager::models::active_rules_info::ActiveRulesInfo;
 use crate::manager::models::configuration::request_proxy_mode::RequestProxyMode;
@@ -227,11 +227,8 @@ impl FilterListManager for FilterListManagerImpl {
         Ok(is_changed)
     }
 
-    fn pull_metadata(&self) -> FLMResult<()> {
-        let _ =
-            FilterUpdateManager::new().pull_metadata(&self.connection_manager, &self.configuration);
-
-        Ok(())
+    fn pull_metadata(&self) -> FLMResult<PullMetadataResult> {
+        FilterUpdateManager::new().pull_metadata(&self.connection_manager, &self.configuration)
     }
 
     fn update_custom_filter_metadata(

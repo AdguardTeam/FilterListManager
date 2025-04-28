@@ -3,6 +3,7 @@ use crate::filters::indexes::index_consistency_checker::check_consistency;
 use crate::io::http::async_client::AsyncHTTPClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_scheme, read_file_by_url};
+use crate::manager::models::{MovedFilterInfo, PullMetadataResult};
 use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::storage::entities::filter_filter_tag_entity::FilterFilterTagEntity;
 use crate::storage::entities::filter_locale_entity::FilterLocaleEntity;
@@ -56,7 +57,11 @@ impl<'a> IndexesProcessor<'a> {
     /// * `index_url` - Remote server URL of filters index
     /// * `index_locales_url` - Remote server URL of filters index localisation info
     /// * `with_filters` - Filters from index will be downloaded after
-    pub fn sync_metadata(&mut self, index_url: &str, index_locales_url: &str) -> FLMResult<()> {
+    pub fn sync_metadata(
+        &mut self,
+        index_url: &str,
+        index_locales_url: &str,
+    ) -> FLMResult<PullMetadataResult> {
         let async_rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
@@ -87,12 +92,13 @@ impl IndexesProcessor<'_> {
         &mut self,
         conn: &mut Connection,
         filters_from_storage: Vec<FilterEntity>,
-    ) -> FLMResult<()> {
+    ) -> FLMResult<PullMetadataResult> {
         let mut filters_must_be_deleted: Vec<FilterId> = vec![];
         let mut new_or_updated_filters: Vec<FilterEntity> = vec![];
         let mut tags_of_filters: Vec<Vec<FilterFilterTagEntity>> = vec![];
         let mut locales_of_filters: Vec<Vec<FilterLocaleEntity>> = vec![];
-        let mut filters_map: HashMap<FilterId, FilterEntity> = HashMap::new();
+        let mut index_filters_map: HashMap<FilterId, FilterEntity> = HashMap::new();
+        let mut out = PullMetadataResult::new();
 
         let index = self.exchange_index()?;
 
@@ -106,7 +112,7 @@ impl IndexesProcessor<'_> {
 
             tags_of_filters.push(storage_entities.tags);
             locales_of_filters.push(storage_entities.locales);
-            filters_map.insert(filter_id, storage_entities.filter);
+            index_filters_map.insert(filter_id, storage_entities.filter);
         }
 
         for mut filter in filters_from_storage {
@@ -130,7 +136,7 @@ impl IndexesProcessor<'_> {
                 continue;
             }
 
-            if let Some(filter_from_index) = filters_map.remove(&filter_id) {
+            if let Some(filter_from_index) = index_filters_map.remove(&filter_id) {
                 filter.display_number = filter_from_index.display_number;
                 filter.title = filter_from_index.title;
                 filter.description = filter_from_index.description;
@@ -144,14 +150,24 @@ impl IndexesProcessor<'_> {
             } else {
                 // If filter is not in index
                 if filter.is_enabled {
+                    // Filter id will be updated right before insert
                     filter.group_id = CUSTOM_FILTERS_GROUP_ID;
-                    filter.filter_id = None;
 
                     new_or_updated_filters.push(filter);
+                } else {
+                    // Filter will just be removed, not moved
+                    out.removed_filters.push(filter_id);
                 }
 
                 filters_must_be_deleted.push(filter_id);
             }
+        }
+
+        // Add new filters
+        for (filter_id, filter) in index_filters_map {
+            // Filter id will be updated right before insert
+            new_or_updated_filters.push(filter);
+            out.added_filters.push(filter_id);
         }
 
         let (transaction, _) = spawn_transaction(conn, |transaction: &Transaction| {
@@ -196,7 +212,24 @@ impl IndexesProcessor<'_> {
             group_repo.insert(transaction, &index.groups)?;
             tags_repo.insert(transaction, &index.tags)?;
 
-            filter_repository.insert(transaction, &new_or_updated_filters)?;
+            filter_repository.insert_with_chosen_filters_callback(
+                transaction,
+                &new_or_updated_filters,
+                |entity_will_insert, chosen_id| {
+                    // Has both ids
+                    if let Some((previous_id, next_id)) = entity_will_insert
+                        .filter_id
+                        .as_ref()
+                        .zip(chosen_id.as_ref())
+                    {
+                        // They aren't equal, so filter was moved
+                        if previous_id != next_id {
+                            out.moved_filters
+                                .push(MovedFilterInfo::new(previous_id.clone(), next_id.clone()));
+                        }
+                    }
+                },
+            )?;
 
             Ok(())
         })
@@ -207,14 +240,17 @@ impl IndexesProcessor<'_> {
 
         transaction.commit().map_err(FLMError::from_database)?;
 
-        Ok(())
+        Ok(out)
     }
 
     /// Saves new indexes on empty database
-    fn save_indices_on_empty_database(&mut self, conn: &mut Connection) -> FLMResult<()> {
+    fn save_indices_on_empty_database(
+        &mut self,
+        conn: &mut Connection,
+    ) -> FLMResult<PullMetadataResult> {
         let index = self.exchange_index()?;
 
-        let (transaction, _) = spawn_transaction(conn, |transaction: &Transaction| {
+        let (transaction, added_filters) = spawn_transaction(conn, |transaction: &Transaction| {
             FilterGroupRepository::new().insert(transaction, &index.groups)?;
 
             FilterTagRepository::new().insert(transaction, &index.tags)?;
@@ -236,6 +272,11 @@ impl IndexesProcessor<'_> {
                 tags.push(storage_entities.tags);
             }
 
+            let added_filters = filters
+                .iter()
+                .filter_map(|filter| filter.filter_id)
+                .collect::<Vec<FilterId>>();
+
             filter_repository.insert(transaction, &filters)?;
 
             let flattened_locales = locales
@@ -250,14 +291,14 @@ impl IndexesProcessor<'_> {
                 .collect::<Vec<FilterFilterTagEntity>>();
             FilterFilterTagRepository::new().insert(transaction, &flattened_tags)?;
 
-            Ok(filters)
+            Ok(added_filters)
         })
         .map_err(FLMError::from_database)?;
 
         self.save_index_localisations(&transaction)?;
         transaction.commit().map_err(FLMError::from_database)?;
 
-        Ok(())
+        Ok(PullMetadataResult::new_with_added_filters(added_filters))
     }
 }
 
@@ -377,7 +418,7 @@ impl<'a> IndexesProcessor<'a> {
     }
 
     pub(crate) fn fill_empty_db(&mut self, conn: &mut Connection) -> FLMResult<()> {
-        self.save_indices_on_empty_database(conn)
+        self.save_indices_on_empty_database(conn).map(|_| ())
     }
 }
 
@@ -629,8 +670,15 @@ mod tests {
             let mut second_indexes =
                 IndexesProcessor::factory(&connection_manager, &Configuration::default()).unwrap();
 
-            let (index_second, index_localisation_second) =
+            let (mut index_second, index_localisation_second) =
                 build_filters_indices_fixtures().unwrap();
+
+            // Should deprecate here as well
+            let deprecated = index_second
+                .filters
+                .iter_mut()
+                .find(|e| e.filterId == DEPRECATED_FILTER_ID);
+            deprecated.unwrap().deprecated = true;
 
             second_indexes.loaded_index = Some(index_second);
             second_indexes.loaded_index_i18n = Some(index_localisation_second);

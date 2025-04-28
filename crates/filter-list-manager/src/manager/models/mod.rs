@@ -10,6 +10,7 @@ pub mod filter_list_rules_raw;
 pub mod filter_tag;
 pub mod flm_error;
 pub mod full_filter_list;
+pub mod pull_metadata_result;
 pub mod rules_count_by_filter;
 pub mod stored_filter_metadata;
 pub mod update_result;
@@ -20,6 +21,7 @@ pub use self::filter_list_metadata_with_body::FilterListMetadataWithBody;
 pub use self::filter_list_rules_raw::FilterListRulesRaw;
 pub use self::flm_error::FLMError;
 pub use self::full_filter_list::FullFilterList;
+pub use self::pull_metadata_result::{MovedFilterInfo, PullMetadataResult};
 pub use self::update_result::UpdateResult;
 
 /// Filter list id type alias

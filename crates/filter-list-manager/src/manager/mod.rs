@@ -14,7 +14,7 @@ use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
-use crate::manager::models::UpdateResult;
+use crate::manager::models::{PullMetadataResult, UpdateResult};
 use crate::{FLMResult, StoredFilterMetadata};
 use models::configuration::Configuration;
 use models::filter_list_metadata::FilterListMetadata;
@@ -237,7 +237,7 @@ pub trait FilterListManager {
     /// index.
     ///
     /// Note: should be used once a week or less.
-    fn pull_metadata(&self) -> FLMResult<()>;
+    fn pull_metadata(&self) -> FLMResult<PullMetadataResult>;
 
     /// Updates custom filter data.
     ///

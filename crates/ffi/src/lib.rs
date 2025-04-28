@@ -132,7 +132,7 @@ impl FilterListManager {
         self.wrap_mut(move |mut flm| flm.change_locale(suggested_locale))
     }
 
-    pub fn pull_metadata(&self) -> AGResult<()> {
+    pub fn pull_metadata(&self) -> AGResult<PullMetadataResult> {
         self.wrap(|flm| flm.pull_metadata())
     }
 
