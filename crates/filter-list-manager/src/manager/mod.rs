@@ -237,6 +237,10 @@ pub trait FilterListManager {
     /// index.
     ///
     /// Note: should be used once a week or less.
+    ///
+    /// # Returns
+    ///
+    /// [`PullMetadataResult`] - the result of index metadata update
     fn pull_metadata(&self) -> FLMResult<PullMetadataResult>;
 
     /// Updates custom filter data.
