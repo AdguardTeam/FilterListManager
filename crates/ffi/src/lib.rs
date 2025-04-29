@@ -3,7 +3,6 @@ mod native_interface;
 pub mod outer_error;
 mod protobuf_generated;
 mod result;
-mod top_level;
 
 pub use crate::models::FilterListManagerConstants;
 use crate::outer_error::AGOuterError;
@@ -14,7 +13,6 @@ use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 // Re-export native structs and functions
 pub use crate::native_interface::*;
-pub use crate::top_level::*;
 
 pub struct FilterListManager {
     flm: RwLock<FilterListManagerImpl>,
