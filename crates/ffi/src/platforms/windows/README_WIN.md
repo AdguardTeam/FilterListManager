@@ -22,8 +22,14 @@ rustup target add aarch64-pc-windows-msvc
 Run from the repository folder
 
 ```powershell
-. ./Scripts/build_adapter.ps1
+. ./crates/ffi/src/platforms/windows/Scripts/build_adapter.ps1
 RustBuild
+```
+
+If you only want to generate protobuf files you can run 
+
+```powershell
+./crates/ffi/src/platforms/windows/Scripts/generate_protobuf.ps1
 ```
 
 The result files will be in `target\[x86_64-pc-windows-msvc|i686-pc-windows-msvc|aarch64-pc-windows-msvc]\release`.
