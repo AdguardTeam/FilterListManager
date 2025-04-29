@@ -26,6 +26,12 @@ Run from the repository folder
 RustBuild
 ```
 
+If you only want to generate protobuf files you can run 
+
+```powershell
+./crates/ffi/src/platforms/windows/Scripts/generate_protobuf.ps1
+```
+
 The result files will be in `target\[x86_64-pc-windows-msvc|i686-pc-windows-msvc|aarch64-pc-windows-msvc]\release`.
 Check the protobuf files in and correct them if needed.
 

@@ -14,6 +14,7 @@ namespace AdGuard.FilterListManager
 {
     public class FilterListManager : IFilterListManager
     {
+        // ReSharper disable once InconsistentNaming
         private IntPtr m_FLMHandle;
         private readonly ISerializer<byte[]> m_Serializer;
 
@@ -528,21 +529,21 @@ namespace AdGuard.FilterListManager
                 switch (rustResponseResult.Discriminant)
                 {
                     case RustResponseType.RustBuffer:
-                        {
-                            response = m_Serializer.DeserializeObject<TOutMessage>(rustResponseResult.Buffer);
-                            outMessage = response;
-                            break;
-                        }
+                    {
+                        response = m_Serializer.DeserializeObject<TOutMessage>(rustResponseResult.Buffer);
+                        outMessage = response;
+                        break;
+                    }
                     case RustResponseType.FLMHandlePointer:
-                        {
-                            outHandle = rustResponseResult.HandlePointer;
-                            break;
-                        }
+                    {
+                        outHandle = rustResponseResult.HandlePointer;
+                        break;
+                    }
                     default:
-                        {
-                            string errorMessage = $"Invalid discriminant {rustResponseResult.Discriminant} was obtained while method {ffiMethodName} called";
-                            throw new FilterListManagerInvalidDiscriminantException(errorMessage);
-                        }
+                    {
+                        string errorMessage = $"Invalid discriminant {rustResponseResult.Discriminant} was obtained while method {ffiMethodName} called";
+                        throw new FilterListManagerInvalidDiscriminantException(errorMessage);
+                    }
                 }
 
                 if (response?.Error != null)
@@ -550,7 +551,7 @@ namespace AdGuard.FilterListManager
                     throw new AgOuterException(response.Error);
                 }
 
-                // special case iа response represents AGOuterError explicitly.
+                // special case is response represents AGOuterError explicitly.
                 // This case is actual when ffiMethodName is looking for the RustResponseType.FLMHandlePointer
                 // in the answer
                 if (response is AGOuterError responseAgOuterError)
