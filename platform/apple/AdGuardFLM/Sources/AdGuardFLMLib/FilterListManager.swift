@@ -74,7 +74,7 @@ public protocol FLMFacadeProtocol {
 
     func changeLocale(suggestedLocale: Locale) throws -> Bool
 
-    func pullMetadata() throws
+    func pullMetadata() throws -> FilterListManager_PullMetadataResult
 
     func updateCustomFilterMetadata(id: Int32, title: String, isTrusted: Bool) throws -> Bool
 
@@ -417,15 +417,17 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.success
     }
 
-    public func pullMetadata() throws {
+    public func pullMetadata() throws -> FilterListManager_PullMetadataResult {
         let message = FilterListManager_EmptyRequest()
 
         let bytes = try callRust(method: PullMetadata, message: message)
-        let response = try FilterListManager_EmptyResponse(serializedBytes: bytes)
+        let response = try FilterListManager_PullMetadataResponse(serializedBytes: bytes)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
         }
+
+        return response.result
     }
 
     public func updateCustomFilterMetadata(id: Int32, title: String, isTrusted: Bool) throws -> Bool {

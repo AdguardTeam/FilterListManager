@@ -36,7 +36,10 @@ final class AdGuardFLMLibTests: XCTestCase {
 
         conf.version = "1.2.3"
         let flm = try FLMFacade(configuration: conf)
-        try flm.pullMetadata()
+
+        let result = try flm.pullMetadata()
+        XCTAssertNotNil(result.addedFilters.count)
+
         XCTAssertNoThrow(
             try flm.updateFilters(
                 ignoreFiltersExpiration: false,
