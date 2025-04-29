@@ -172,7 +172,7 @@ namespace AdGuard.FilterListManager
         FilterListMetadataWithBody FetchFilterListMetadataWithBody(string url);
 
         /// <summary>
-        /// The method “raises” the state of the database to the working state.
+        /// The method â€œraisesâ€ the state of the database to the working state.
         ///
         /// **If the database doesn't exist:**
         /// - Creates database
@@ -256,7 +256,7 @@ namespace AdGuard.FilterListManager
         /// 6. Fill in new groups/tags/locales.
         /// 7. Fill in our updated filters along with the raw filters from the index.
         /// </summary>
-        void PullMetadata();
+        PullMetadataResult PullMetadata();
 
         /// <summary>
         /// Updates custom filter data.

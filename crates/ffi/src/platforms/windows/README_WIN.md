@@ -22,7 +22,7 @@ rustup target add aarch64-pc-windows-msvc
 Run from the repository folder
 
 ```powershell
-. ./Scripts/build_adapter.ps1
+. ./crates/ffi/src/platforms/windows/Scripts/build_adapter.ps1
 RustBuild
 ```
 

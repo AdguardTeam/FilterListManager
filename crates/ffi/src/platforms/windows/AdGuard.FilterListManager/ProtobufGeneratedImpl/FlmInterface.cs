@@ -20,6 +20,10 @@ namespace FilterListManager
     {
         public AGOuterError Error { get; set; }
     }
+    
+    public partial class PullMetadataResponse : IAGOuterError
+    {
+    }
 
     public partial class InstallCustomFilterListResponse : IAGOuterError
     {
