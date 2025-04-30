@@ -147,10 +147,10 @@ public class FLMFacade: FLMFacadeProtocol {
         self.flm_handle = OpaquePointer(response.pointee.result_data)
     }
 
-    private func callRust(method: FFIMethod, message: Message) throws -> Data {
+    private func callRust<T: SwiftProtobuf.Message>(method: FFIMethod, message: Message) throws -> T {
         var data = try message.serializedData()
 
-        return try data.withUnsafeMutableBytes { argsPointer in
+        let bytes = try data.withUnsafeMutableBytes { argsPointer in
             let ptr = argsPointer.baseAddress
             let ptr_len = argsPointer.count
 
@@ -173,6 +173,8 @@ public class FLMFacade: FLMFacadeProtocol {
 
             return Data(bytes: rustResponsePtr.pointee.result_data, count: rustResponsePtr.pointee.result_data_len)
         }
+
+        return try T(serializedBytes: bytes)
     }
 
     public func installCustomFilterList(downloadUrl: String, isTrusted: Bool, title: String?, description: String?) throws -> FilterListManager_FullFilterList {
@@ -187,8 +189,7 @@ public class FLMFacade: FLMFacadeProtocol {
             message.description_p = desc
         }
 
-        let bytes = try callRust(method: InstallCustomFilterList, message: message)
-        let response = try FilterListManager_InstallCustomFilterListResponse(serializedBytes: bytes)
+        let response: FilterListManager_InstallCustomFilterListResponse = try callRust(method: InstallCustomFilterList, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -202,8 +203,7 @@ public class FLMFacade: FLMFacadeProtocol {
         message.ids = ids
         message.isEnabled = isEnabled
 
-        let bytes = try callRust(method: EnableFilterLists, message: message)
-        let response = try FilterListManager_EnableFilterListsResponse(serializedBytes: bytes)
+        let response: FilterListManager_EnableFilterListsResponse = try callRust(method: EnableFilterLists, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -217,8 +217,7 @@ public class FLMFacade: FLMFacadeProtocol {
         message.ids = ids
         message.isInstalled = isInstalled
 
-        let bytes = try callRust(method: InstallFilterLists, message: message)
-        let response = try FilterListManager_InstallFilterListsResponse(serializedBytes: bytes)
+        let response: FilterListManager_InstallFilterListsResponse = try callRust(method: InstallFilterLists, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -231,8 +230,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_DeleteCustomFilterListsRequest()
         message.ids = ids
 
-        let bytes = try callRust(method: DeleteCustomFilterLists, message: message)
-        let response = try FilterListManager_DeleteCustomFilterListsResponse(serializedBytes: bytes)
+        let response: FilterListManager_DeleteCustomFilterListsResponse = try callRust(method: DeleteCustomFilterLists, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -245,8 +243,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_GetFullFilterListByIdRequest()
         message.id = id
 
-        let bytes = try callRust(method: GetFullFilterListById, message: message)
-        let response = try FilterListManager_GetFullFilterListByIdResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetFullFilterListByIdResponse = try callRust(method: GetFullFilterListById, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -258,8 +255,7 @@ public class FLMFacade: FLMFacadeProtocol {
     public func getStoredFiltersMetadata() throws -> [FilterListManager_StoredFilterMetadata] {
         let message = FilterListManager_EmptyRequest()
 
-        let bytes = try callRust(method: GetStoredFiltersMetadata, message: message)
-        let response = try FilterListManager_GetStoredFiltersMetadataResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetStoredFiltersMetadataResponse = try callRust(method: GetStoredFiltersMetadata, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -272,8 +268,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_GetStoredFiltersMetadataByIdRequest()
         message.id = id
 
-        let bytes = try callRust(method: GetStoredFilterMetadataById, message: message)
-        let response = try FilterListManager_GetStoredFilterMetadataByIdResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetStoredFilterMetadataByIdResponse = try callRust(method: GetStoredFilterMetadataById, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -286,8 +281,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_SaveCustomFilterRulesRequest()
         message.rules = rules
 
-        let bytes = try callRust(method: SaveCustomFilterRules, message: message)
-        let response = try FilterListManager_EmptyResponse(serializedBytes: bytes)
+        let response: FilterListManager_EmptyResponse = try callRust(method: SaveCustomFilterRules, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -299,8 +293,7 @@ public class FLMFacade: FLMFacadeProtocol {
         message.disabledRules = disabledRules
         message.filterID = id
 
-        let bytes = try callRust(method: SaveDisabledRules, message: message)
-        let response = try FilterListManager_EmptyResponse(serializedBytes: bytes)
+        let response: FilterListManager_EmptyResponse = try callRust(method: SaveDisabledRules, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -313,8 +306,7 @@ public class FLMFacade: FLMFacadeProtocol {
         message.ignoreFiltersStatus = ignoreFiltersStatus
         message.looseTimeout = looseTimeout
 
-        let bytes = try callRust(method: UpdateFilters, message: message)
-        let response = try FilterListManager_UpdateFiltersResponse(serializedBytes: bytes)
+        let response: FilterListManager_UpdateFiltersResponse = try callRust(method: UpdateFilters, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -328,8 +320,7 @@ public class FLMFacade: FLMFacadeProtocol {
         message.ids = ids
         message.looseTimeout = looseTimeout
 
-        let bytes = try callRust(method: ForceUpdateFiltersByIds, message: message)
-        let response = try FilterListManager_ForceUpdateFiltersByIdsResponse(serializedBytes: bytes)
+        let response: FilterListManager_ForceUpdateFiltersByIdsResponse = try callRust(method: ForceUpdateFiltersByIds, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -342,8 +333,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_FetchFilterListMetadataRequest()
         message.url = url
 
-        let bytes = try callRust(method: FetchFilterListMetadata, message: message)
-        let response = try FilterListManager_FetchFilterListMetadataResponse(serializedBytes: bytes)
+        let response: FilterListManager_FetchFilterListMetadataResponse = try callRust(method: FetchFilterListMetadata, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -356,8 +346,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_FetchFilterListMetadataWithBodyRequest()
         message.url = url
 
-        let bytes = try callRust(method: FetchFilterListMetadataWithBody, message: message)
-        let response = try FilterListManager_FetchFilterListMetadataWithBodyResponse(serializedBytes: bytes)
+        let response: FilterListManager_FetchFilterListMetadataWithBodyResponse = try callRust(method: FetchFilterListMetadataWithBody, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -369,8 +358,7 @@ public class FLMFacade: FLMFacadeProtocol {
     public func liftUpDatabase() throws {
         let message = FilterListManager_EmptyRequest()
 
-        let bytes = try callRust(method: LiftUpDatabase, message: message)
-        let response = try FilterListManager_EmptyResponse(serializedBytes: bytes)
+        let response: FilterListManager_EmptyResponse = try callRust(method: LiftUpDatabase, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -380,8 +368,7 @@ public class FLMFacade: FLMFacadeProtocol {
     public func getAllTags() throws -> [FilterListManager_FilterTag] {
         let message = FilterListManager_EmptyRequest()
 
-        let bytes = try callRust(method: GetAllTags, message: message)
-        let response = try FilterListManager_GetAllTagsResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetAllTagsResponse = try callRust(method: GetAllTags, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -393,8 +380,7 @@ public class FLMFacade: FLMFacadeProtocol {
     public func getAllGroups() throws -> [FilterListManager_FilterGroup] {
         let message = FilterListManager_EmptyRequest()
 
-        let bytes = try callRust(method: GetAllGroups, message: message)
-        let response = try FilterListManager_GetAllGroupsResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetAllGroupsResponse = try callRust(method: GetAllGroups, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -407,8 +393,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_ChangeLocaleRequest()
         message.suggestedLocale = suggestedLocale.identifier
 
-        let bytes = try callRust(method: ChangeLocale, message: message)
-        let response = try FilterListManager_ChangeLocaleResponse(serializedBytes: bytes)
+        let response: FilterListManager_ChangeLocaleResponse = try callRust(method: ChangeLocale, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -420,8 +405,7 @@ public class FLMFacade: FLMFacadeProtocol {
     public func pullMetadata() throws -> FilterListManager_PullMetadataResult {
         let message = FilterListManager_EmptyRequest()
 
-        let bytes = try callRust(method: PullMetadata, message: message)
-        let response = try FilterListManager_PullMetadataResponse(serializedBytes: bytes)
+        let response: FilterListManager_PullMetadataResponse = try callRust(method: PullMetadata, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -436,8 +420,7 @@ public class FLMFacade: FLMFacadeProtocol {
         message.title = title
         message.isTrusted = isTrusted
 
-        let bytes = try callRust(method: UpdateCustomFilterMetadata, message: message)
-        let response = try FilterListManager_UpdateCustomFilterMetadataResponse(serializedBytes: bytes)
+        let response: FilterListManager_UpdateCustomFilterMetadataResponse = try callRust(method: UpdateCustomFilterMetadata, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -449,9 +432,7 @@ public class FLMFacade: FLMFacadeProtocol {
     public func getDatabasePath() throws -> String {
         let message = FilterListManager_EmptyRequest()
 
-        let bytes = try callRust(method: GetDatabasePath, message: message)
-
-        let response = try FilterListManager_GetDatabasePathResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetDatabasePathResponse = try callRust(method: GetDatabasePath, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -463,8 +444,7 @@ public class FLMFacade: FLMFacadeProtocol {
     public func getDatabaseVersion() throws -> Int32 {
         let message = FilterListManager_EmptyRequest()
 
-        let bytes = try callRust(method: GetDatabaseVersion, message: message)
-        let response = try FilterListManager_GetDatabaseVersionResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetDatabaseVersionResponse = try callRust(method: GetDatabaseVersion, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -495,8 +475,7 @@ public class FLMFacade: FLMFacadeProtocol {
             message.customDescription = description
         }
 
-        let bytes = try callRust(method: InstallCustomFilterFromString, message: message)
-        let response = try FilterListManager_InstallCustomFilterFromStringResponse(serializedBytes: bytes)
+        let response: FilterListManager_InstallCustomFilterFromStringResponse = try callRust(method: InstallCustomFilterFromString, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -508,8 +487,7 @@ public class FLMFacade: FLMFacadeProtocol {
     public func getActiveRules() throws -> [FilterListManager_ActiveRulesInfo] {
         let message = FilterListManager_EmptyRequest()
 
-        let bytes = try callRust(method: GetActiveRules, message: message)
-        let response = try FilterListManager_GetActiveRulesResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetActiveRulesResponse = try callRust(method: GetActiveRules, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -522,8 +500,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_GetFilterRulesAsStringsRequest()
         message.ids = ids
 
-        let bytes = try callRust(method: GetFilterRulesAsStrings, message: message)
-        let response = try FilterListManager_GetFilterRulesAsStringsResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetFilterRulesAsStringsResponse = try callRust(method: GetFilterRulesAsStrings, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -537,8 +514,7 @@ public class FLMFacade: FLMFacadeProtocol {
         message.filterID = id
         message.filePath = filePath
 
-        let bytes = try callRust(method: SaveRulesToFileBlob, message: message)
-        let response = try FilterListManager_EmptyResponse(serializedBytes: bytes)
+        let response: FilterListManager_EmptyResponse = try callRust(method: SaveRulesToFileBlob, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -549,8 +525,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_GetDisabledRulesRequest()
         message.ids = ids
 
-        let bytes = try callRust(method: GetDisabledRules, message: message)
-        let response = try FilterListManager_GetDisabledRulesResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetDisabledRulesResponse = try callRust(method: GetDisabledRules, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -564,8 +539,7 @@ public class FLMFacade: FLMFacadeProtocol {
         message.mode = mode
         message.customProxyAddr = custom_addr ?? ""
 
-        let bytes = try callRust(method: SetProxyMode, message: message)
-        let response = try FilterListManager_EmptyResponse(serializedBytes: bytes)
+        let response: FilterListManager_EmptyResponse = try callRust(method: SetProxyMode, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)
@@ -576,8 +550,7 @@ public class FLMFacade: FLMFacadeProtocol {
         var message = FilterListManager_GetRulesCountRequest()
         message.ids = ids
 
-        let bytes = try callRust(method: GetRulesCount, message: message)
-        let response = try FilterListManager_GetRulesCountResponse(serializedBytes: bytes)
+        let response: FilterListManager_GetRulesCountResponse = try callRust(method: GetRulesCount, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)

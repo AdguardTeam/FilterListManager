@@ -1,0 +1,59 @@
+---
+version: 2
+plan:
+  project-key: CL
+  key: FLMCBFM
+  name: Filter List Manager - Check build for macOS
+
+stages:
+  - Default Stage:
+      manual: false
+      final: false
+      jobs:
+        - Default Job
+
+Default Job:
+  key: JOB1
+  tasks:
+    - checkout:
+        repository: core-libs/filter-list-manager
+        force-clean-build: 'true'
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            ./bamboo-specs/scripts/xcframework_build.sh
+        description: Prepare XCFramework
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            swift build --package-path crates/ffi/src/platforms/apple/AdGuardFLM
+        description: Build package
+  requirements:
+    - ephemeral
+    - image: registry.int.agrd.dev/macos/sequoia-build-agent-xcode16.1:latest
+  artifacts:
+    - name: AdGuardFLM.xcframework.zip
+      location: crates/ffi/src/platforms/apple/build/framework/AdGuardFLM.xcframework.zip
+      pattern: AdGuardFLM.xcframework.zip
+      shared: false
+      required: true
+
+repositories:
+  - core-libs/filter-list-manager:
+      scope: global
+
+branches:
+  create: for-pull-request
+  delete:
+    after-deleted-days: 7
+    after-inactive-days: 30
+  link-to-jira: true
+
+notifications: [ ]
+labels: [ ]
+
+other:
+  concurrent-build-plugin: system-default
+

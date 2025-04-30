@@ -2,7 +2,7 @@
 
 set -exf
 
-BUILD_FRAMEWORK_FOLDER_PATH="platform/apple/build/framework"
+BUILD_FRAMEWORK_FOLDER_PATH="crates/ffi/src/platforms/apple/build/framework"
 
 rm "${BUILD_FRAMEWORK_FOLDER_PATH}/AdGuardFLM.xcframework.zip" | true
 

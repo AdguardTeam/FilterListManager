@@ -2,6 +2,6 @@
 
 set -e
 
-arch -arm64 ./platform/apple/Scripts/configure.sh
+./crates/ffi/src/platforms/apple/Scripts/configure.sh
 
-arch -arm64 ./platform/apple/Scripts/build.sh
+./crates/ffi/src/platforms/apple/Scripts/build.sh

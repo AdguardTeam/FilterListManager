@@ -2,7 +2,7 @@
 
 set -exf
 
-BUILD_ROOT_PATH="platform/apple/build"
+BUILD_ROOT_PATH="crates/ffi/src/platforms/apple/build"
 FWK_BUILD_ROOT="${BUILD_ROOT_PATH}/framework"
 
 export CARGO_TARGET_DIR="${BUILD_ROOT_PATH}/target"

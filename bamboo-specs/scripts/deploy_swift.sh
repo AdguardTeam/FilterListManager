@@ -58,7 +58,7 @@ PODSPEC=$(cat << EOF
 EOF
 )
 
-cd platform/apple/build/framework
+cd crates/ffi/src/platforms/apple/build/framework
 
 cp -r ../../AdGuardFLM/Sources/AdGuardFLMLib Sources
 
