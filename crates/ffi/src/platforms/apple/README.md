@@ -11,8 +11,8 @@ After changing rust interface you should:
 ### Requirements
 
 - `Rust` - [See how to install](https://www.rust-lang.org/tools/install)
-- `cargo` comes with Rust, the current version is 1.85.
-- `protoc` the current version is 29.3 - [See how to install](https://grpc.io/docs/protoc-installation/)
+- `cargo` comes with Rust, the current version is 1.85
+- `buf` version 1.53.0 - [See how to install](https://buf.build/docs/cli/installation/)
 
 Make sure that all these tools are available in your `PATH` environment variable.
 
@@ -24,10 +24,10 @@ First run (from the repository root folder)
 
 ### Available scripts
 
-`Scripts/configure` - configure rust before first build\
-`Scripts/generate_proto` - regenerate Swift-protobuf counterpart\
-`Script/build` - build .xcframework for Apple OSs\
-`Script/archive_framework` - archive framework, puts it to build folder
+- `Scripts/configure` - configure rust before first build
+- `Scripts/generate_proto` - regenerate Swift-protobuf counterpart
+- `Script/build` - build .xcframework for Apple OSs
+- `Script/archive_framework` - archive framework, puts it to build folder
 
 ### Build Rust part
 
