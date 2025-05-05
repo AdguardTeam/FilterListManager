@@ -80,7 +80,7 @@ if [ ${bamboo_adguard_flm_custom_version} = "none" ] || [ ${bamboo_ffi_custom_ve
 fi
 
 # Check if there are any changes in the `filter-list-manager` crate
-HASH_FILE="platform/flm_version_hash.hash"
+HASH_FILE="bamboo-specs/hashes/flm_version_hash.hash"
 OBSERVED_DIR="crates/filter-list-manager"
 
 # Get the hash of the current state of the `filter-list-manager` crate
