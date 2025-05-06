@@ -3,6 +3,8 @@
 ---
 !include 'apple_adapter.yaml'
 ---
+!include 'android_adapter.yaml'
+---
 !include 'increment_version.yaml'
 ---
 !include 'cargo_publish.yaml'

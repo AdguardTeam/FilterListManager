@@ -23,6 +23,7 @@ enum_stringify = "0.6.0"
 default = ["adguard-flm/default"]
 rusqlite-bundled = ["adguard-flm/rusqlite-bundled"]
 rustls-tls = ["adguard-flm/rustls-tls"]
+win-res = []
 
 [build-dependencies]
 windres = "0.2"

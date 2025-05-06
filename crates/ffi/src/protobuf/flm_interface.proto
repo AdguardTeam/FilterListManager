@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package filter_list_manager;
 
+option java_multiple_files = true;
+option java_package = "com.adguard.flm.protobuf";
+option java_outer_classname = "FlmInterfaceProto";
+
 import "configuration.proto";
 import "outer_error.proto";
 import "filters.proto";

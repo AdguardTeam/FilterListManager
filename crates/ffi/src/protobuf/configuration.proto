@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package filter_list_manager;
 
+option java_multiple_files = true;
+option java_package = "com.adguard.flm.protobuf";
+option java_outer_classname = "ConfigurationProto";
+
 enum FilterListType {
   STANDARD = 0;
   DNS = 1;
