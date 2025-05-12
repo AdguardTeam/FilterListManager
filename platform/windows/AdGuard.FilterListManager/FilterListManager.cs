@@ -446,7 +446,6 @@ namespace AdGuard.FilterListManager
 
         #endregion
 
-
         #region Helpers
 
         private IntPtr CallRustHandle<TOutMessage>(
@@ -496,7 +495,18 @@ namespace AdGuard.FilterListManager
             return outMessage;
         }
 
-        protected virtual void OnRustCall<TOutMessage>(Func<TOutMessage> methodBody, string ffiMethodName) where TOutMessage : IMessage, IAGOuterError
+        /// <summary>
+        /// Executes a RUST method and handles the outcome, including errors, for the given function delegate.
+        /// For error handling in the calling program.
+        /// </summary>
+        /// <typeparam name="TOutMessage">The type of the output message that implements both IMessage and IAGOuterError.</typeparam>
+        /// <param name="methodBody">A delegate function representing the RUST method to be called.</param>
+        /// <param name="ffiMethodName">The name of the RUST FFI method being invoked.</param>
+        /// <exception cref="AgOuterException">Thrown when the RUST response contains an error.</exception>
+        /// <exception cref="FilterListManagerCommonException">Thrown when there is an exception during RUST method invocation.</exception>
+        protected virtual void OnRustCall<TOutMessage>(
+            Func<TOutMessage> methodBody, string ffiMethodName)
+            where TOutMessage : IMessage, IAGOuterError
         {
             try
             {
