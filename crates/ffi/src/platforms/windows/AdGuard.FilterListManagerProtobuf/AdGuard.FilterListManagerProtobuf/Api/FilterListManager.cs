@@ -445,7 +445,6 @@ namespace AdGuard.FilterListManagerProtobuf.Api
 
         #endregion
 
-
         #region Helpers
 
         private IntPtr CallRustHandle<TOutMessage>(
@@ -494,6 +493,43 @@ namespace AdGuard.FilterListManagerProtobuf.Api
                 ffiMethodName);
             return outMessage;
         }
+
+        /// <summary>
+        /// Executes a RUST method and handles the outcome, including errors, for the given function delegate.
+        /// For error handling in the calling program.
+        /// </summary>
+        /// <typeparam name="TOutMessage">The type of the output message that implements both IMessage and IAGOuterError.</typeparam>
+        /// <param name="methodBody">A delegate function representing the RUST method to be called.</param>
+        /// <param name="ffiMethodName">The name of the RUST FFI method being invoked.</param>
+        /// <exception cref="AgOuterException">Thrown when the RUST response contains an error.</exception>
+        /// <exception cref="FilterListManagerCommonException">Thrown when there is an exception during RUST method invocation.</exception>
+        protected virtual void OnRustCall<TOutMessage>(
+            Func<TOutMessage> methodBody, string ffiMethodName)
+            where TOutMessage : IMessage, IAGOuterError
+        {
+            try
+            {
+                TOutMessage response = methodBody();
+                if (response?.Error != null)
+                {
+                    throw new AgOuterException(response.Error);
+                }
+
+                // special case is response represents AGOuterError explicitly.
+                // This case is actual when ffiMethodName is looking for the RustResponseType.FLMHandlePointer
+                // in the answer
+                if (response is AGOuterError responseAgOuterError)
+                {
+                    throw new AgOuterException(responseAgOuterError);
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorTemplate =
+                    $"Cannot call RUST method \"{ffiMethodName}\"";
+                throw new FilterListManagerCommonException(errorTemplate, ex);
+            }
+        }
         
         private void CallRust<TOutMessage>(
             IntPtr flmHandle,
@@ -504,62 +540,60 @@ namespace AdGuard.FilterListManagerProtobuf.Api
             [CallerMemberName] string ffiMethodName = null)
             where TOutMessage : IMessage, IAGOuterError
         {
-            string errorTemplate = $"Cannot call RUST method \"{ffiMethodName}\"";
+            string errorTemplate =
+                $"Cannot call RUST method \"{ffiMethodName}\"";
             FfiMethod ffiMethod = GetFfiMethod(ffiMethodName);
-            if (flmHandle == IntPtr.Zero && 
+            if (flmHandle == IntPtr.Zero &&
                 // only two methods below can be invoked correctly without set flmHandle before
-                ffiMethod != FfiMethod.SpawnDefaultConfiguration && 
+                ffiMethod != FfiMethod.SpawnDefaultConfiguration &&
                 ffiMethod != FfiMethod.Init)
             {
-                string errorMessage = $"instance must be initialized with \"{nameof(Init)}\" before invocation";
+                string errorMessage =
+                    $"instance must be initialized with \"{nameof(Init)}\" before invocation";
                 Logger.Error(errorTemplate);
                 throw new FilterListManagerNotInitializedException(errorMessage);
             }
 
-            try
+            outMessage = default;
+            outHandle = default;
+            TOutMessage messageLocal = default;
+            IntPtr handleLocal = default;
+            OnRustCall(() =>
             {
-                outMessage = default;
-                outHandle = default;
                 byte[] args = inMessage?.ToByteArray() ?? new byte[0];
-                RustResponseResult rustResponseResult = ProtobufBridge.CallRust(flmHandle, ffiMethod, args, flmInteropFunc);
+                RustResponseResult rustResponseResult = ProtobufBridge.CallRust(flmHandle,
+                    ffiMethod, args, flmInteropFunc);
+
                 TOutMessage response = default;
                 switch (rustResponseResult.Discriminant)
                 {
                     case RustResponseType.RustBuffer:
-                    {
-                        response = m_Serializer.DeserializeObject<TOutMessage>(rustResponseResult.Buffer);
-                        outMessage = response;
-                        break;
-                    }
+                        {
+                            response =
+                                m_Serializer.DeserializeObject<TOutMessage>(
+                                    rustResponseResult.Buffer);
+                            messageLocal = response;
+                            break;
+                        }
                     case RustResponseType.FLMHandlePointer:
-                    {
-                        outHandle = rustResponseResult.HandlePointer;
-                        break;
-                    }
+                        {
+                            handleLocal = rustResponseResult.HandlePointer;
+                            break;
+                        }
                     default:
-                    {
-                        string errorMessage = $"Invalid discriminant {rustResponseResult.Discriminant} was obtained while method {ffiMethodName} called";
-                        throw new FilterListManagerInvalidDiscriminantException(errorMessage);
-                    }
+                        {
+                            string errorMessage =
+                                $"Invalid discriminant {rustResponseResult.Discriminant} was obtained while method {ffiMethodName} called";
+                            throw new FilterListManagerInvalidDiscriminantException(
+                                errorMessage);
+                        }
                 }
-                
-                if (response?.Error != null)
-                {
-                    throw new AgOuterException(response.Error);
-                }
-                
-                // special case iа response represents AGOuterError explicitly.
-                // This case is actual when ffiMethodName is looking for the RustResponseType.FLMHandlePointer
-                // in the answer
-                if (response is AGOuterError responseAgOuterError)
-                {
-                    throw new AgOuterException(responseAgOuterError);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new FilterListManagerCommonException(errorTemplate, ex);
-            }
+
+                return response;
+            }, ffiMethodName);
+
+            outMessage = messageLocal;
+            outHandle = handleLocal;
         }
 
         private FfiMethod GetFfiMethod(string methodName)
