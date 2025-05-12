@@ -496,60 +496,17 @@ namespace AdGuard.FilterListManager
             return outMessage;
         }
 
-        private void CallRust<TOutMessage>(
-            IntPtr flmHandle,
-            IMessage inMessage,
-            out TOutMessage outMessage,
-            out IntPtr outHandle,
-            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc,
-            [CallerMemberName] string ffiMethodName = null)
-            where TOutMessage : IMessage, IAGOuterError
+        protected virtual void OnRustCall<TOutMessage>(Func<TOutMessage> methodBody, string ffiMethodName) where TOutMessage : IMessage, IAGOuterError
         {
-            string errorTemplate = $"Cannot call RUST method \"{ffiMethodName}\"";
-            FfiMethod ffiMethod = GetFfiMethod(ffiMethodName);
-            if (flmHandle == IntPtr.Zero &&
-                // only two methods below can be invoked correctly without set flmHandle before
-                ffiMethod != FfiMethod.SpawnDefaultConfiguration &&
-                ffiMethod != FfiMethod.Init)
-            {
-                string errorMessage = $"instance must be initialized with \"{nameof(Init)}\" before invocation";
-                Logger.Error(errorTemplate);
-                throw new FilterListManagerNotInitializedException(errorMessage);
-            }
-
             try
             {
-                outMessage = default;
-                outHandle = default;
-                byte[] args = inMessage?.ToByteArray() ?? new byte[0];
-                RustResponseResult rustResponseResult = ProtobufBridge.CallRust(flmHandle, ffiMethod, args, flmInteropFunc);
-                TOutMessage response = default;
-                switch (rustResponseResult.Discriminant)
-                {
-                    case RustResponseType.RustBuffer:
-                        {
-                            response = m_Serializer.DeserializeObject<TOutMessage>(rustResponseResult.Buffer);
-                            outMessage = response;
-                            break;
-                        }
-                    case RustResponseType.FLMHandlePointer:
-                        {
-                            outHandle = rustResponseResult.HandlePointer;
-                            break;
-                        }
-                    default:
-                        {
-                            string errorMessage = $"Invalid discriminant {rustResponseResult.Discriminant} was obtained while method {ffiMethodName} called";
-                            throw new FilterListManagerInvalidDiscriminantException(errorMessage);
-                        }
-                }
-
+                TOutMessage response = methodBody();
                 if (response?.Error != null)
                 {
                     throw new AgOuterException(response.Error);
                 }
 
-                // special case ià response represents AGOuterError explicitly.
+                // special case is response represents AGOuterError explicitly.
                 // This case is actual when ffiMethodName is looking for the RustResponseType.FLMHandlePointer
                 // in the answer
                 if (response is AGOuterError responseAgOuterError)
@@ -559,8 +516,75 @@ namespace AdGuard.FilterListManager
             }
             catch (Exception ex)
             {
+                string errorTemplate =
+                    $"Cannot call RUST method \"{ffiMethodName}\"";
                 throw new FilterListManagerCommonException(errorTemplate, ex);
             }
+        }
+
+        private void CallRust<TOutMessage>(
+            IntPtr flmHandle,
+            IMessage inMessage,
+            out TOutMessage outMessage,
+            out IntPtr outHandle,
+            Func<IntPtr, FfiMethod, IntPtr, ulong, IntPtr> flmInteropFunc,
+            [CallerMemberName] string ffiMethodName = null)
+            where TOutMessage : IMessage, IAGOuterError
+        {
+            string errorTemplate =
+                $"Cannot call RUST method \"{ffiMethodName}\"";
+            FfiMethod ffiMethod = GetFfiMethod(ffiMethodName);
+            if (flmHandle == IntPtr.Zero &&
+                // only two methods below can be invoked correctly without set flmHandle before
+                ffiMethod != FfiMethod.SpawnDefaultConfiguration &&
+                ffiMethod != FfiMethod.Init)
+            {
+                string errorMessage =
+                    $"instance must be initialized with \"{nameof(Init)}\" before invocation";
+                Logger.Error(errorTemplate);
+                throw new FilterListManagerNotInitializedException(errorMessage);
+            }
+
+            outMessage = default;
+            outHandle = default;
+            TOutMessage messageLocal = default;
+            IntPtr handleLocal = default;
+            OnRustCall(() =>
+            {
+                byte[] args = inMessage?.ToByteArray() ?? new byte[0];
+                RustResponseResult rustResponseResult = ProtobufBridge.CallRust(flmHandle,
+                    ffiMethod, args, flmInteropFunc);
+
+                TOutMessage response = default;
+                switch (rustResponseResult.Discriminant)
+                {
+                    case RustResponseType.RustBuffer:
+                        {
+                            response =
+                                m_Serializer.DeserializeObject<TOutMessage>(
+                                    rustResponseResult.Buffer);
+                            messageLocal = response;
+                            break;
+                        }
+                    case RustResponseType.FLMHandlePointer:
+                        {
+                            handleLocal = rustResponseResult.HandlePointer;
+                            break;
+                        }
+                    default:
+                        {
+                            string errorMessage =
+                                $"Invalid discriminant {rustResponseResult.Discriminant} was obtained while method {ffiMethodName} called";
+                            throw new FilterListManagerInvalidDiscriminantException(
+                                errorMessage);
+                        }
+                }
+
+                return response;
+            }, ffiMethodName);
+
+            outMessage = messageLocal;
+            outHandle = handleLocal;
         }
 
         private FfiMethod GetFfiMethod(string methodName)
