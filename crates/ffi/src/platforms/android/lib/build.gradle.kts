@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-version = "2.0.0"
+version = "2.0-SNAPSHOT"
 
 base {
     archivesName = "adguard-flm"
@@ -49,7 +49,7 @@ android {
     sourceSets["main"].proto {
         this.srcDirs("../../../protobuf")
     }
-    ndkVersion = "26.2.11394342"
+    ndkVersion = "28.1.13356709"
 }
 
 protobuf {

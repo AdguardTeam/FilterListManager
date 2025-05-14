@@ -13,7 +13,7 @@ stages:
 Default Job:
   key: JOB1
   docker:
-    image: adguard/core-libs:2.5
+    image: adguard/core-libs:2.6
     volumes:
       ${bamboo.working.directory}: ${bamboo.working.directory}
       ${bamboo.tmp.directory}: ${bamboo.tmp.directory}
@@ -26,11 +26,17 @@ Default Job:
       interpreter: SHELL
       scripts:
       - |-
+        #!/bin/bash
+        set -e -x
+        VER="$(sed -ne 's/^ *version = \"\(.*\)\"/\1/p' crates/ffi/Cargo.toml)"
+
         cd crates/ffi/src/platforms/android
         cat > lib/publishing.gradle.kts << EOF
         //// This script should be applied to a project that already has the maven-publish plugin applied
         //// It configures the publishing repositories for the project
         import org.gradle.api.publish.PublishingExtension
+
+        project.version = "${VER}"
 
         (project.extensions.findByName("publishing") as? PublishingExtension)?.apply {
             repositories {
