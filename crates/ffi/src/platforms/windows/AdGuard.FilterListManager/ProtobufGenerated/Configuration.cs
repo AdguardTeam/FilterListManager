@@ -42,7 +42,8 @@ namespace FilterListManager {
             "b25kaXRpb25hbF9jb25zdGFudHMqJwoORmlsdGVyTGlzdFR5cGUSDAoIU1RB",
             "TkRBUkQQABIHCgNETlMQASpPChNSYXdSZXF1ZXN0UHJveHlNb2RlEhQKEFVT",
             "RV9TWVNURU1fUFJPWFkQABIMCghOT19QUk9YWRABEhQKEFVTRV9DVVNUT01f",
-            "UFJPWFkQAmIGcHJvdG8z"));
+            "UFJPWFkQAkIwChhjb20uYWRndWFyZC5mbG0ucHJvdG9idWZCEkNvbmZpZ3Vy",
+            "YXRpb25Qcm90b1ABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), typeof(global::FilterListManager.RawRequestProxyMode), }, null, new pbr::GeneratedClrTypeInfo[] {

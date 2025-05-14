@@ -595,7 +595,7 @@ pub struct GetFullFilterListByIdRequest {
     pub id: i32,
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
-pub struct GetStoredFiltersMetadataByIdRequest {
+pub struct GetStoredFilterMetadataByIdRequest {
     #[prost(int32, tag = "1")]
     pub id: i32,
 }

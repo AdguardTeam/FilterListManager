@@ -61,8 +61,9 @@ namespace FilterListManager {
             "bnNlGBIgASgJEhAKCGNoZWNrc3VtGBMgASgJEhEKCWxhbmd1YWdlcxgUIAMo",
             "CRI4CgVydWxlcxgVIAEoCzIkLmZpbHRlcl9saXN0X21hbmFnZXIuRmlsdGVy",
             "TGlzdFJ1bGVzSACIAQFCCAoGX3J1bGVzIjwKElJ1bGVzQ291bnRCeUZpbHRl",
-            "chIRCglmaWx0ZXJfaWQYASABKAUSEwoLcnVsZXNfY291bnQYAiABKAViBnBy",
-            "b3RvMw=="));
+            "chIRCglmaWx0ZXJfaWQYASABKAUSEwoLcnVsZXNfY291bnQYAiABKAVCKgoY",
+            "Y29tLmFkZ3VhcmQuZmxtLnByb3RvYnVmQgxGaWx0ZXJzUHJvdG9QAWIGcHJv",
+            "dG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {

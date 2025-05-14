@@ -48,7 +48,7 @@ final class AdGuardFLMLibTests: XCTestCase {
             )
         )
 
-        let filter = try flm.getFullFilterListsById(id: 1)
+        let filter = try flm.getFullFilterListById(id: 1)
         NSLog("[Default locale] Filter with id 1 has title \(String(describing: filter?.title))")
 
         let locale_result = try flm.changeLocale(suggestedLocale: Locale(identifier: "ru_RU"))
@@ -132,11 +132,11 @@ final class AdGuardFLMLibTests: XCTestCase {
 
         NSLog("Custom filter metadata was updated")
 
-        let filterMetadata = try flm.fetchFiltersListMetadata(url: "https://filters.adtidy.org/extension/safari/filters/101.txt")
+        let filterMetadata = try flm.fetchFilterListMetadata(url: "https://filters.adtidy.org/extension/safari/filters/101.txt")
 
         NSLog("Got remote metadata. Homepage: \(filterMetadata.homepage)")
 
-        let filterMetadataWithBody = try flm.fetchFiltersListMetadataWithBody(url: "https://filters.adtidy.org/extension/safari/filters/101.txt")
+        let filterMetadataWithBody = try flm.fetchFilterListMetadataWithBody(url: "https://filters.adtidy.org/extension/safari/filters/101.txt")
 
         NSLog("Got remote metadata with body. Homepage: \(filterMetadataWithBody.metadata.homepage)")
 

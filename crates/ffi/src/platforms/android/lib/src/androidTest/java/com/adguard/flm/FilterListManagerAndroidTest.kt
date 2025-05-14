@@ -171,7 +171,7 @@ class FilterListManagerAndroidTest {
             assertEquals("Custom filter title should match", "Test Filter", customFilter.title)
 
             // Test getting filter by ID
-            val retrievedFilter = flm.getFullFilterListsById(customFilter.id)
+            val retrievedFilter = flm.getFullFilterListById(customFilter.id)
             assertNotNull("Retrieved filter should not be null", retrievedFilter)
             assertEquals("Retrieved filter ID should match", customFilter.id, retrievedFilter!!.id)
 

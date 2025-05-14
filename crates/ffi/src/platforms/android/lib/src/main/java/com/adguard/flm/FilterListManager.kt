@@ -374,7 +374,7 @@ constructor(configuration: Configuration)
      * @throws FilterListManagerException If there's an error retrieving data from the database.
      */
     @Throws(FilterListManagerException::class)
-    fun getFullFilterListsById(id: Int): FullFilterList? {
+    fun getFullFilterListById(id: Int): FullFilterList? {
         val request = getFullFilterListByIdRequest {
             this.id = id
         }
@@ -420,8 +420,8 @@ constructor(configuration: Configuration)
      * @throws FilterListManagerException If there's an error retrieving data from the database.
      */
     @Throws(FilterListManagerException::class)
-    fun getStoredFiltersMetadataById(id: Int): StoredFilterMetadata? {
-        val request = getStoredFiltersMetadataByIdRequest {
+    fun getStoredFilterMetadataById(id: Int): StoredFilterMetadata? {
+        val request = getStoredFilterMetadataByIdRequest {
             this.id = id
         }
 

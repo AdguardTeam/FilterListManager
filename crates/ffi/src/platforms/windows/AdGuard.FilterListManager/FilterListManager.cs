@@ -155,7 +155,7 @@ namespace AdGuard.FilterListManager
         /// </summary>
         public StoredFilterMetadata GetStoredFilterMetadataById(int filterId)
         {
-            GetStoredFiltersMetadataByIdRequest request = new GetStoredFiltersMetadataByIdRequest
+            GetStoredFilterMetadataByIdRequest request = new GetStoredFilterMetadataByIdRequest
             {
                 Id = filterId
             };

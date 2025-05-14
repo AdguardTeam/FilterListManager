@@ -12,13 +12,13 @@ use crate::protobuf_generated::filter_list_manager::{
     GetAllGroupsResponse, GetAllTagsResponse, GetDatabasePathResponse, GetDatabaseVersionResponse,
     GetDisabledRulesRequest, GetDisabledRulesResponse, GetFilterRulesAsStringsRequest,
     GetFilterRulesAsStringsResponse, GetFullFilterListByIdRequest, GetRulesCountRequest,
-    GetRulesCountResponse, GetStoredFilterMetadataByIdResponse,
-    GetStoredFiltersMetadataByIdRequest, GetStoredFiltersMetadataResponse,
-    InstallCustomFilterFromStringRequest, InstallCustomFilterFromStringResponse,
-    InstallCustomFilterListRequest, InstallCustomFilterListResponse, InstallFilterListsRequest,
-    InstallFilterListsResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
-    SaveRulesToFileBlobRequest, SetProxyModeRequest, UpdateCustomFilterMetadataRequest,
-    UpdateCustomFilterMetadataResponse, UpdateFiltersRequest, UpdateFiltersResponse,
+    GetRulesCountResponse, GetStoredFilterMetadataByIdRequest, GetStoredFilterMetadataByIdResponse,
+    GetStoredFiltersMetadataResponse, InstallCustomFilterFromStringRequest,
+    InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
+    InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
+    SaveCustomFilterRulesRequest, SaveDisabledRulesRequest, SaveRulesToFileBlobRequest,
+    SetProxyModeRequest, UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse,
+    UpdateFiltersRequest, UpdateFiltersResponse,
 };
 use adguard_flm::RequestProxyMode;
 use enum_stringify::EnumStringify;
@@ -192,9 +192,9 @@ pub unsafe extern "C" fn flm_call_protobuf(
         }
         .encode(&mut out_bytes_buffer),
         FFIMethod::GetStoredFilterMetadataById => {
-            let request = decode_input_request!(GetStoredFiltersMetadataByIdRequest);
+            let request = decode_input_request!(GetStoredFilterMetadataByIdRequest);
 
-            match flm_handle.flm.get_stored_filters_metadata_by_id(request.id) {
+            match flm_handle.flm.get_stored_filter_metadata_by_id(request.id) {
                 Ok(value) => GetStoredFilterMetadataByIdResponse {
                     filter_list: value.map(Into::into),
                     error: None,

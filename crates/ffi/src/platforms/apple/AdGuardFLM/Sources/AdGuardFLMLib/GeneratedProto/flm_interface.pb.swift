@@ -148,7 +148,7 @@ public struct FilterListManager_GetFullFilterListByIdRequest: Sendable {
   public init() {}
 }
 
-public struct FilterListManager_GetStoredFiltersMetadataByIdRequest: Sendable {
+public struct FilterListManager_GetStoredFilterMetadataByIdRequest: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1251,8 +1251,8 @@ extension FilterListManager_GetFullFilterListByIdRequest: SwiftProtobuf.Message,
   }
 }
 
-extension FilterListManager_GetStoredFiltersMetadataByIdRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".GetStoredFiltersMetadataByIdRequest"
+extension FilterListManager_GetStoredFilterMetadataByIdRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetStoredFilterMetadataByIdRequest"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
   ]
@@ -1276,7 +1276,7 @@ extension FilterListManager_GetStoredFiltersMetadataByIdRequest: SwiftProtobuf.M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: FilterListManager_GetStoredFiltersMetadataByIdRequest, rhs: FilterListManager_GetStoredFiltersMetadataByIdRequest) -> Bool {
+  public static func ==(lhs: FilterListManager_GetStoredFilterMetadataByIdRequest, rhs: FilterListManager_GetStoredFilterMetadataByIdRequest) -> Bool {
     if lhs.id != rhs.id {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

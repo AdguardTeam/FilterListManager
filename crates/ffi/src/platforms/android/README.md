@@ -218,7 +218,7 @@ flm.getFullFilterLists()
 
 // Retrieves a filter metadata by its ID from the database **with** its rules
 // Returns Optional<FullFilterList>
-flm.getFullFilterListsById(id)
+flm.getFullFilterListById(id)
 
 // Retrieves all enabled filters as ActiveRulesInfo
 flm.getActiveRules()
@@ -229,7 +229,7 @@ flm.getStoredFiltersMetadata()
 
 // Retrieves a filter metadata by its ID from the database **without** its rules
 // Returns Optional<StoredFilterMetadata>
-flm.getStoredFiltersMetadataById(id)
+flm.getStoredFilterMetadataById(id)
 ```
 
 ### Getting constants

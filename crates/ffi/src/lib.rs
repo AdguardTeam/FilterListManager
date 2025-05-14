@@ -61,7 +61,7 @@ impl FilterListManager {
         self.wrap(|flm| flm.get_stored_filters_metadata())
     }
 
-    pub fn get_stored_filters_metadata_by_id(
+    pub fn get_stored_filter_metadata_by_id(
         &self,
         filter_id: FilterId,
     ) -> AGResult<Option<StoredFilterMetadata>> {

@@ -48,7 +48,7 @@ message GetFullFilterListByIdRequest {
   int32 id = 1;
 }
 
-message GetStoredFiltersMetadataByIdRequest {
+message GetStoredFilterMetadataByIdRequest {
   int32 id = 1;
 }
 
