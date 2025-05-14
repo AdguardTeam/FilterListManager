@@ -11,7 +11,7 @@ namespace AdGuard.FilterListManager.Api.Exceptions
         /// Creates an instance of <see cref="FilterListManagerBaseException"/> according to the passed parameters
         /// </summary>
         /// <param name="errorMessage">Error message</param>
-        public FilterListManagerBaseException(string errorMessage) 
+        protected FilterListManagerBaseException(string errorMessage) 
             : base(errorMessage) {}
         
         /// <summary>
@@ -19,7 +19,7 @@ namespace AdGuard.FilterListManager.Api.Exceptions
         /// </summary>
         /// <param name="errorMessage">Error message</param>
         /// <param name="innerException">Inner exception</param>
-        public FilterListManagerBaseException(string errorMessage, Exception innerException) 
+        protected FilterListManagerBaseException(string errorMessage, Exception innerException) 
             : base(errorMessage, innerException) {}
     }
 }

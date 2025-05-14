@@ -21,6 +21,8 @@ namespace AdGuard.FilterListManager.Test
     {
         private const int REQUEST_TIMEOUT_MS = 60 * 1000;
         private readonly string m_CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        private ProtobufSerializer m_Serializer;
+
         /// <summary>
         /// The main setup of the test.
         /// </summary>
@@ -30,6 +32,33 @@ namespace AdGuard.FilterListManager.Test
             string coreLibsDllPath = FilterManagerDllProvider.Instance.LibsDllPath;
             Console.WriteLine($"Rust library path is {coreLibsDllPath}");
             FileUtils.DeleteQuietly(Path.Combine(m_CurrentDirectory, "agflm_standard.db"));
+            ITraceListener traceListener = new TestContextTraceListener(TestExecutionContext.CurrentContext);
+            Logger.SetCustomListener(traceListener);
+            Logger.Info("Hello, I'm filter list manager");
+            Logger.Level = LogLevel.Trace;
+            m_Serializer = new ProtobufSerializer();
+        }
+
+        /// <summary>
+        /// Example of a test.
+        /// </summary>
+        [Test]
+        public void ErrorHandlingTest()
+        {
+            using (IFilterListManager flm = new LocalFilterListManager(m_Serializer))
+            {
+                Configuration configuration = flm.SpawnDefaultConfiguration();
+                configuration.MetadataUrl =
+                    "https://filters.adtidy.org/windows/filters.json";
+                configuration.MetadataLocalesUrl =
+                    "https://filters.adtidy.org/windows/filters_i18n.json";
+                configuration.AutoLiftUpDatabase = true;
+                configuration.AppName = "AdGuard.FilterListManager.Test";
+                configuration.Version = "1.0";
+                configuration.DefaultFilterListExpiresPeriodSec = 10;
+                flm.Init(configuration);
+                flm.PullMetadata();
+            }
         }
 
         /// <summary>
@@ -38,12 +67,7 @@ namespace AdGuard.FilterListManager.Test
         [Test]
         public void CommonTest()
         {
-            ITraceListener traceListener = new TestContextTraceListener(TestExecutionContext.CurrentContext);
-            Logger.SetCustomListener(traceListener);
-            Logger.Info("Hello, I'm filter list manager");
-            Logger.Level = LogLevel.Trace;
-            ISerializer<byte[]> serializer = new ProtobufSerializer();
-            using (IFilterListManager flm = new FilterListManager(serializer))
+            using (IFilterListManager flm = new FilterListManager(m_Serializer))
             {
                 Configuration configuration = flm.SpawnDefaultConfiguration();
                 configuration.MetadataUrl = "https://filters.adtidy.org/windows/filters.json";

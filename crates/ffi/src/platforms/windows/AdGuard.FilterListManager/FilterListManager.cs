@@ -12,6 +12,12 @@ using Google.Protobuf;
 
 namespace AdGuard.FilterListManager
 {
+    /// <summary>
+    /// Represents a manager responsible for handling various filter list operations,
+    /// including initialization, updating, enabling, disabling, and managing custom
+    /// filter rules. This class implements the <see cref="IFilterListManager"/> interface
+    /// and provides a comprehensive set of methods for interacting with filter lists.
+    /// </summary>
     public class FilterListManager : IFilterListManager
     {
         // ReSharper disable once InconsistentNaming
@@ -21,12 +27,16 @@ namespace AdGuard.FilterListManager
         /// <summary>
         /// Spawns a struct of Filter List Manager public constants 
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The default <see cref="FLMConstants"/> containing pre-defined configuration values.</returns>
         public static FLMConstants SpawnDefaultConstants()
         {
             return ProtobufInterop.flm_get_constants();
         }
 
+       /// <summary>
+       /// Initializes a new instance of <see cref="FilterListManager"/> class.
+       /// </summary>
+       /// <param name="serializer">Serializer to work with Protobuf messages between Rust and C#</param>
         public FilterListManager(ISerializer<byte[]> serializer)
         {
             m_Serializer = serializer;
@@ -448,7 +458,6 @@ namespace AdGuard.FilterListManager
 
         #endregion
 
-
         #region Helpers
 
         private IntPtr CallRustHandle<TOutMessage>(
@@ -498,7 +507,34 @@ namespace AdGuard.FilterListManager
             return outMessage;
         }
 
-        private void CallRust<TOutMessage>(
+        /// <summary>
+        /// Calls a Rust method via the Filter List Manager interface. This ensures integration
+        /// with the Rust core by passing method parameters and processing the results or errors.
+        /// When overriden can be used to handle all the Rust calls in this adapter.
+        /// </summary>
+        /// <param name="flmHandle">A handle to the Filter List Manager instance in memory
+        /// that allows communication with Rust.</param>
+        /// <param name="inMessage">The protobuf input message that contains the parameters necessary
+        /// to execute the Rust method.</param>
+        /// <param name="outMessage">The protobuf output message that receives the response
+        /// from the Rust method.</param>
+        /// <param name="outHandle">A handle to the output data, which may be used for further processing
+        /// or cleanup.</param>
+        /// <param name="flmInteropFunc">A function pointer used to interact with the FFI (Foreign Function Interface)
+        /// to invoke the Rust method with required parameters.</param>
+        /// <param name="ffiMethodName">The name of the FFI method being invoked, typically inferred
+        /// from the caller member name unless explicitly provided.</param>
+        /// <typeparam name="TOutMessage">The type of the output message, which must implement both
+        /// <see cref="IMessage"/> and <see cref="IAGOuterError"/> interfaces.</typeparam>
+        /// <exception cref="FilterListManagerNotInitializedException">Thrown when the Filter List Manager is not
+        /// initialized, but the method requires an initialized instance.</exception>
+        /// <exception cref="FilterListManagerInvalidDiscriminantException">Thrown when the discriminant value for
+        /// the data or operation is invalid or unrecognized.</exception>
+        /// <exception cref="AgOuterException">Thrown when there is an outer exception returned by the Rust core
+        /// or during interoperation with the FFI.</exception>
+        /// <exception cref="FilterListManagerCommonException">Thrown for common errors encountered within the
+        /// Filter List Manager during method execution.</exception>
+        protected virtual void CallRust<TOutMessage>(
             IntPtr flmHandle,
             IMessage inMessage,
             out TOutMessage outMessage,
@@ -507,11 +543,12 @@ namespace AdGuard.FilterListManager
             [CallerMemberName] string ffiMethodName = null)
             where TOutMessage : IMessage, IAGOuterError
         {
-            string errorTemplate = $"Cannot call RUST method \"{ffiMethodName}\"";
+            string errorTemplate =
+                $"Cannot call RUST method \"{ffiMethodName}\"";
             FfiMethod ffiMethod = GetFfiMethod(ffiMethodName);
             if (flmHandle == IntPtr.Zero &&
                 // only two methods below can be invoked correctly without set flmHandle before
-                ffiMethod != FfiMethod.SpawnDefaultConfiguration &&
+                ffiMethod != FfiMethod.SpawnDefaultConfiguration && 
                 ffiMethod != FfiMethod.Init)
             {
                 string errorMessage = $"instance must be initialized with \"{nameof(Init)}\" before invocation";
@@ -545,13 +582,13 @@ namespace AdGuard.FilterListManager
                         throw new FilterListManagerInvalidDiscriminantException(errorMessage);
                     }
                 }
-
+                
                 if (response?.Error != null)
                 {
                     throw new AgOuterException(response.Error);
                 }
-
-                // special case is response represents AGOuterError explicitly.
+                
+                // Special case when response represents AGOuterError explicitly.
                 // This case is actual when ffiMethodName is looking for the RustResponseType.FLMHandlePointer
                 // in the answer
                 if (response is AGOuterError responseAgOuterError)
