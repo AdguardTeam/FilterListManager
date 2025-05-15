@@ -300,16 +300,18 @@ constructor(configuration: Configuration)
      * Note: Should be used once a week or less frequently.
      * This method uses the locale previously set via [changeLocale].
      *
+     * @return Number of added, removed and moved filters.
      * @throws FilterListManagerException If it fails to update filter tags and groups in DB, or if it fails to download the metadata file.
      */
     @Throws(FilterListManagerException::class)
-    fun pullMetadata() {
+    fun pullMetadata(): PullMetadataResult {
         val request = emptyRequest {}
 
-        call(FFIMethod.PullMetadata, request).use { result ->
-            EmptyResponse.parseFrom(result.resultData).let { response ->
-                if (response.hasError()) {
-                    throw FilterListManagerException(response.error)
+        return call(FFIMethod.PullMetadata, request).use { result ->
+            PullMetadataResponse.parseFrom(result.resultData).let { response ->
+                when {
+                    response.hasError() -> throw FilterListManagerException(response.error)
+                    else -> response.result
                 }
             }
         }
