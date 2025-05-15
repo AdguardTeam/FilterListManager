@@ -16,9 +16,9 @@ use crate::protobuf_generated::filter_list_manager::{
     GetStoredFiltersMetadataResponse, InstallCustomFilterFromStringRequest,
     InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
     InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
-    SaveCustomFilterRulesRequest, SaveDisabledRulesRequest, SaveRulesToFileBlobRequest,
-    SetProxyModeRequest, UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse,
-    UpdateFiltersRequest, UpdateFiltersResponse,
+    PullMetadataResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
+    SaveRulesToFileBlobRequest, SetProxyModeRequest, UpdateCustomFilterMetadataRequest,
+    UpdateCustomFilterMetadataResponse, UpdateFiltersRequest, UpdateFiltersResponse,
 };
 use adguard_flm::RequestProxyMode;
 use enum_stringify::EnumStringify;
@@ -357,8 +357,15 @@ pub unsafe extern "C" fn flm_call_protobuf(
                 success
             )
         }
-        FFIMethod::PullMetadata => EmptyResponse {
-            error: flm_handle.flm.pull_metadata().err().map(Into::into),
+        FFIMethod::PullMetadata => match flm_handle.flm.pull_metadata() {
+            Ok(value) => PullMetadataResponse {
+                result: Some(value.into()),
+                error: None,
+            },
+            Err(why) => PullMetadataResponse {
+                result: None,
+                error: Some(why.into()),
+            },
         }
         .encode(&mut out_bytes_buffer),
         FFIMethod::UpdateCustomFilterMetadata => {
