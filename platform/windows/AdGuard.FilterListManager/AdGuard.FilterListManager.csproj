@@ -45,7 +45,7 @@
     <Compile Include="**/*.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Adguard.Utils.Base" Version="1.0.90" />    
+    <PackageReference Include="Adguard.Utils.Base" Version="1.1.94" />    
     <PackageReference Include="Adguard.Utils" Version="2.4.232" />
     <PackageReference Include="Google.Protobuf" Version="3.28.2" />
     <PackageReference Include="System.Buffers" Version="4.4.0" />
