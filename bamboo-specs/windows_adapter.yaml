@@ -28,8 +28,8 @@ Default Job:
       interpreter: WINDOWS_POWER_SHELL
       scripts:
       - |-
-        . "${bamboo.local_helper_scripts}"
-        CheckoutPrivateRepoHashLocal "${bamboo.private_repo_hash}"
+        . "${bamboo.helper_scripts}"
+        CheckoutRepoHash ${bamboo.private_repo_path} "${bamboo.private_repo_hash}"
   - script:
       interpreter: WINDOWS_POWER_SHELL
       description: Set first project to update
@@ -74,7 +74,7 @@ Default Job:
       description: Main deploy
       scripts:
       - |-
-        . "${bamboo.deploy_folder}\main_deploy.ps1";
+        . "${bamboo.deploy_folder}\${bamboo.deploy_script}";
         MainDeploy "${bamboo.build_folder}" "$Env:bamboo_windowsCertStoragePassword" ${bamboo.skip_signing_libs};
       environment: use_force_master="${bamboo.use_force_master}"   
   artifacts:
@@ -95,6 +95,7 @@ variables:
   channel: release
   code_coverage_threshold_percent: '1'
   define_constants: BUILD=Release
+  helper_scripts: platform\windows\Scripts\helper_scripts.ps1
   deploy_folder: platform\windows\adguard-windows-private\bamboo-specs
   use_force_master: 'false'
   private_repo_path: platform/windows/adguard-windows-private
