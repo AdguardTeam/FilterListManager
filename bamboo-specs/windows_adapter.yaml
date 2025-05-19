@@ -24,6 +24,13 @@ Default Job:
       path: ${bamboo.private_repo_path}
       force-clean-build: 'true'
   - script:
+      description: Checkout private repository hash
+      interpreter: WINDOWS_POWER_SHELL
+      scripts:
+      - |-
+        . "${bamboo.local_helper_scripts}"
+        CheckoutPrivateRepoHashLocal "${bamboo.private_repo_hash}"
+  - script:
       interpreter: WINDOWS_POWER_SHELL
       description: Set first project to update
       scripts:
