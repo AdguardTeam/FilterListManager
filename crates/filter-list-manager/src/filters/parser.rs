@@ -46,7 +46,7 @@ pub(crate) struct FilterParser<'a> {
     conditional_nesting_level: ConditionalNestingLevel,
     condition_disabled_at_nesting: ConditionalNestingLevel,
     nesting_stack: Vec<ConditionalNestingLevel>,
-    boolean_expression_parser: BooleanExpressionParser,
+    boolean_expression_parser: BooleanExpressionParser<'a>,
     metadata_collector: MetadataCollector,
     rule_lines_collector: RuleLinesCollector,
     filter_downloader: Box<dyn FilterContentsProvider + 'a>,
@@ -56,7 +56,7 @@ pub(crate) struct FilterParser<'a> {
 
 impl<'a> FilterParser<'a> {
     pub(crate) fn new(
-        boolean_expression_parser: BooleanExpressionParser,
+        boolean_expression_parser: BooleanExpressionParser<'a>,
         filter_downloader: Box<dyn FilterContentsProvider + 'a>,
     ) -> Self {
         Self {
@@ -74,11 +74,11 @@ impl<'a> FilterParser<'a> {
 
     /// Basic factory
     pub(crate) fn factory(
-        configuration: &Configuration,
+        configuration: &'a Configuration,
         shared_http_client: &'a BlockingClient,
     ) -> Self {
         Self::new(
-            BooleanExpressionParser::new(configuration.compiler_conditional_constants.clone()),
+            BooleanExpressionParser::new(&configuration.filters_compilation_policy),
             Box::new(IOProvider::new(shared_http_client)),
         )
     }
@@ -86,10 +86,10 @@ impl<'a> FilterParser<'a> {
     /// Constructor for custom [`FilterContentsProvider`]
     pub(crate) fn with_custom_provider(
         filter_downloader: Box<dyn FilterContentsProvider + 'a>,
-        configuration: &Configuration,
+        configuration: &'a Configuration,
     ) -> Self {
         Self::new(
-            BooleanExpressionParser::new(configuration.compiler_conditional_constants.clone()),
+            BooleanExpressionParser::new(&configuration.filters_compilation_policy),
             filter_downloader,
         )
     }
@@ -491,11 +491,9 @@ mod tests {
     use crate::utils::memory::heap;
     use crate::Configuration;
 
-    impl FilterParser<'_> {
-        pub(crate) fn test_factory() -> Self {
-            let conf = Configuration::default();
-
-            Self::factory(&conf, &SHARED_TEST_BLOCKING_HTTP_CLIENT)
+    impl<'a> FilterParser<'a> {
+        pub(crate) fn test_factory(conf: &'a Configuration) -> Self {
+            Self::factory(conf, &SHARED_TEST_BLOCKING_HTTP_CLIENT)
         }
     }
 
@@ -513,7 +511,8 @@ mod tests {
         !this works
         !#endif
         ";
-        let mut parser = FilterParser::test_factory();
+        let conf = Configuration::default();
+        let mut parser = FilterParser::test_factory(&conf);
 
         for (index, line) in test_filter.lines().enumerate() {
             let result = parser.process_conditional_directive(line.trim());
@@ -607,7 +606,8 @@ mod tests {
 ghj
         !#endif";
 
-        let mut parser = FilterParser::test_factory();
+        let conf = Configuration::default();
+        let mut parser = FilterParser::test_factory(&conf);
 
         let mut error_encountered = false;
         for (idx, line) in test_filter.lines().enumerate() {
@@ -628,7 +628,8 @@ ghj
 def
         !#endif";
 
-        let mut parser = FilterParser::test_factory();
+        let conf = Configuration::default();
+        let mut parser = FilterParser::test_factory(&conf);
 
         let mut error_encountered = false;
         for (idx, line) in test_filter.lines().enumerate() {
@@ -650,7 +651,8 @@ abc
     !#endif
 !#endif";
 
-        let mut parser = FilterParser::test_factory();
+        let conf = Configuration::default();
+        let mut parser = FilterParser::test_factory(&conf);
 
         let mut error_encountered = false;
         for (idx, line) in test_filter.lines().enumerate() {
@@ -679,7 +681,8 @@ abc
         !#endif
         ";
 
-        let mut parser = FilterParser::test_factory();
+        let conf = Configuration::default();
+        let mut parser = FilterParser::test_factory(&conf);
 
         for (idx, line) in test_filter.lines().enumerate() {
             parser.parse_line(line, idx).unwrap();
@@ -697,7 +700,8 @@ abc
     fn test_empty_if() {
         let test_filter = "!#if ";
 
-        let mut parser = FilterParser::test_factory();
+        let conf = Configuration::default();
+        let mut parser = FilterParser::test_factory(&conf);
 
         let result = parser.parse_line(test_filter, 0).err().unwrap();
 
@@ -708,7 +712,8 @@ abc
     fn test_invalid_boolean_expression() {
         let test_filter = "!#if (&&";
 
-        let mut parser = FilterParser::test_factory();
+        let conf = Configuration::default();
+        let mut parser = FilterParser::test_factory(&conf);
 
         let result = parser.parse_line(test_filter, 0).err().unwrap();
         assert_eq!(result.error, FilterParserError::InvalidBooleanExpression);

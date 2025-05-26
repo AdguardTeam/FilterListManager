@@ -318,17 +318,17 @@ pub(super) fn update_filters_action(
 
 /// Parsers factory logic
 #[inline]
-fn build_parser<'h: 'p, 'p>(
+fn build_parser<'deps: 'parser, 'parser>(
     ignore_filters_expiration: bool,
     filter_id: FilterId,
-    configuration: &Configuration,
+    configuration: &'deps Configuration,
     diff_updates_map: &mut DiffUpdatesMap,
     current_time: i64,
     rules_map: &mut MapFilterIdOnRulesString,
     batch_patches_container: &Rc<RefCell<BatchPatchesContainer>>,
     filter: &FilterEntity,
-    shared_http_client: &'h BlockingClient,
-) -> FLMResult<(Option<FilterParser<'p>>, bool)> {
+    shared_http_client: &'deps BlockingClient,
+) -> FLMResult<(Option<FilterParser<'parser>>, bool)> {
     let expires_duration = configuration.resolve_right_expires_value(filter.expires) as i64;
 
     let ready_for_full_update = current_time > filter.last_download_time + expires_duration;
