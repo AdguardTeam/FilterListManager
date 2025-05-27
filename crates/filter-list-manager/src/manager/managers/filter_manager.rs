@@ -74,8 +74,14 @@ impl FilterManager {
         entity.last_download_time = last_download_time;
         entity.is_enabled = is_enabled;
 
-        let (inserted_entity, rule_entity): (FilterEntity, RulesListEntity) =
-            self.install_custom_filter_list(connection_manager, diff_path, entity, rule_entity)?;
+        let (inserted_entity, rule_entity): (FilterEntity, RulesListEntity) = self
+            .install_custom_filter_list(
+                connection_manager,
+                diff_path,
+                entity,
+                rule_entity,
+                parser.is_directives_encountered(),
+            )?;
 
         let full_filter_list: FullFilterList =
             self.make_full_filter_list(download_url, inserted_entity, rule_entity)?;
@@ -113,8 +119,14 @@ impl FilterManager {
                 description,
             )?;
 
-        let (inserted_entity, rule_entity): (FilterEntity, RulesListEntity) =
-            self.install_custom_filter_list(connection_manager, diff_path, entity, rule_entity)?;
+        let (inserted_entity, rule_entity): (FilterEntity, RulesListEntity) = self
+            .install_custom_filter_list(
+                connection_manager,
+                diff_path,
+                entity,
+                rule_entity,
+                parser.is_directives_encountered(),
+            )?;
 
         let full_filter_list: FullFilterList =
             self.make_full_filter_list(download_url, inserted_entity, rule_entity)?;
@@ -423,6 +435,7 @@ impl FilterManager {
         diff_path: String,
         entity: FilterEntity,
         mut rule_entity: RulesListEntity,
+        is_directives_encountered: bool,
     ) -> FLMResult<(FilterEntity, RulesListEntity)> {
         let (inserted_entity, rule_entity): (FilterEntity, RulesListEntity) = connection_manager
             .execute_db(move |mut conn: Connection| {
@@ -440,7 +453,7 @@ impl FilterManager {
                     Some(filter_id) => filter_id,
                 };
 
-                if !diff_path.is_empty() {
+                if !diff_path.is_empty() && !is_directives_encountered {
                     if let Some(entity) =
                         process_diff_path(filter_id, diff_path).map_err(FLMError::from_display)?
                     {

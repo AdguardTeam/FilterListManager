@@ -4,16 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [1.9.1] - 2025-05-27
+## [1.9.2] - 2025-05-27
 
 ### Fixed
-- Temporary: Diff updates were disabled for filters lists with directives
+- Diff updates were _completely_ disabled for filters lists with directives
 
-[1.9.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.9.0...ffi-1.9.1
+[1.9.2]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.9.1...ffi-1.9.2
 
 ## [1.9.0] - 2025-04-14
 
-### Add
+### Added
 - filter_url, http_client_error fields to `UdpateFilterError` 
 
 [1.9.0]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.8.0...ffi-1.9.0
@@ -34,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [1.7.5] - 2025-03-26
 
-### Add
+### Added
 - Service layer between manager and storage
 
 [1.7.5]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.7.4...ffi-1.7.5

@@ -97,7 +97,7 @@ let flm = FilterListManagerImpl::new(configuration);
 flm.pull_metadata();
 
 // Then, downloads the contents of the filters.
-// !Note! should be used no more than once an hour.
+// Note, should be used once an hour or less.
 flm.update_filters(true, 0, true);
 ```
 
@@ -131,8 +131,8 @@ The method “raises” the state of the database to the working state.
 Starting with version `0.7.1` the database is “uplifted” automatically when the filter_list_manager constructor is called. 
 To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.\
 **Note: methods `flm.update_filters()`, `flm.force_update_filters_by_ids()`\
-should be used no more than once an hour, method `flm.pull_metadata()`\
-should be used no more than once a week or less**.
+should be used once an hour or less, method `flm.pull_metadata()`\
+should be used once a week or less**.
 
 #### Storage notes. Important
 **Database lifting**\

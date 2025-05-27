@@ -29,7 +29,7 @@ use chrono::{DateTime, ParseError, Utc};
 use rusqlite::types::Value;
 use rusqlite::{Connection, Transaction};
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::rc::Rc;
 use std::str::FromStr;
 use std::time::Instant;
@@ -37,7 +37,6 @@ use std::time::Instant;
 /// Tries to update passed filters
 pub(super) fn update_filters_action(
     records: Vec<FilterEntity>,
-    filters_with_directives: HashSet<FilterId>,
     db_connection_manager: &DbConnectionManager,
     ignore_filters_expiration: bool,
     ignore_filters_status: bool,
@@ -104,9 +103,6 @@ pub(super) fn update_filters_action(
             }
         };
 
-        // Special spike for filters with directives, these shouldn't be updated through diff updates
-        let filter_has_directives = filters_with_directives.contains(&filter_id);
-
         let build_parser_result = build_parser(
             ignore_filters_expiration,
             filter_id,
@@ -117,7 +113,6 @@ pub(super) fn update_filters_action(
             &batch_patches_container,
             &filter,
             &shared_http_client,
-            filter_has_directives,
         );
 
         let mut parser = match build_parser_result {
@@ -247,7 +242,7 @@ pub(super) fn update_filters_action(
             };
 
             let diff_path = parser.get_metadata(KnownMetadataProperty::DiffPath);
-            if !diff_path.is_empty() {
+            if !diff_path.is_empty() && !parser.is_directives_encountered() {
                 match process_diff_path(filter_id, diff_path) {
                     Ok(Some(entity)) => diff_path_entities.push(entity),
                     Err(why) => update_result.filters_errors.push(UpdateFilterError {
@@ -333,7 +328,6 @@ fn build_parser<'h: 'p, 'p>(
     batch_patches_container: &Rc<RefCell<BatchPatchesContainer>>,
     filter: &FilterEntity,
     shared_http_client: &'h BlockingClient,
-    filter_has_directives: bool,
 ) -> FLMResult<(Option<FilterParser<'p>>, bool)> {
     let expires_duration = configuration.resolve_right_expires_value(filter.expires) as i64;
 
@@ -342,7 +336,7 @@ fn build_parser<'h: 'p, 'p>(
     let mut filter_will_use_diff_update: bool = false;
 
     // We force full filter update through http or filter is ready for full update
-    if filter_has_directives || ignore_filters_expiration || ready_for_full_update {
+    if ignore_filters_expiration || ready_for_full_update {
         return Ok((
             Some(FilterParser::factory(configuration, shared_http_client)),
             filter_will_use_diff_update,
@@ -419,7 +413,6 @@ mod tests {
     use crate::{Configuration, FilterId};
     use chrono::Utc;
     use rusqlite::Connection;
-    use std::collections::HashSet;
     use std::{env, thread};
     use url::Url;
 
@@ -608,16 +601,8 @@ mod tests {
             .unwrap()
             .to_string();
 
-        let result = update_filters_action(
-            installed_filters,
-            HashSet::new(),
-            &source,
-            false,
-            false,
-            0,
-            &conf,
-        )
-        .unwrap();
+        let result =
+            update_filters_action(installed_filters, &source, false, false, 0, &conf).unwrap();
 
         let updated_ids = result
             .updated_list
@@ -888,16 +873,8 @@ mod tests {
             .unwrap()
             .to_string();
 
-        let result = update_filters_action(
-            installed_filters,
-            HashSet::new(),
-            &source,
-            true,
-            true,
-            0,
-            &conf,
-        )
-        .unwrap();
+        let result =
+            update_filters_action(installed_filters, &source, true, true, 0, &conf).unwrap();
 
         let updated_ids = result
             .updated_list

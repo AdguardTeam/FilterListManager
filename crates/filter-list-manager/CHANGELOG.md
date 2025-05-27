@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] - 2025-05-27
+
+### Fixed
+- Diff updates were _completely_ disabled for filters lists with directives.
+
+[1.7.2]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.7.1...flm-1.7.2
+
 ## [1.7.1] - 2025-05-27
 
 ### Fixed
@@ -14,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.7.0] - 2025-04-14
 
-### Add
+### Added
 - filter_url, http_client_error fields to `UdpateFilterError` 
 
 [1.7.0]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.6.8...flm-1.7.0
@@ -35,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.6.6] - 2025-03-26
 
-### Add
+### Added
 - Service layer between manager and storage
 
 [1.6.6]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.6.5...flm-1.6.6

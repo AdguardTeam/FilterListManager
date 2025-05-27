@@ -52,6 +52,7 @@ pub(crate) struct FilterParser<'a> {
     filter_downloader: Box<dyn FilterContentsProvider + 'a>,
     filters_cursor: Vec<FilterCursor>,
     should_skip_checksum_validation: bool,
+    is_directives_encountered: bool,
 }
 
 impl<'a> FilterParser<'a> {
@@ -69,6 +70,7 @@ impl<'a> FilterParser<'a> {
             filter_downloader,
             filters_cursor: vec![],
             should_skip_checksum_validation: true,
+            is_directives_encountered: false,
         }
     }
 
@@ -97,6 +99,11 @@ impl<'a> FilterParser<'a> {
     /// This parser should skip checksum validation
     pub(crate) fn should_skip_checksum_validation(&mut self, value: bool) {
         self.should_skip_checksum_validation = value;
+    }
+
+    /// Returns `true` if directives encountered in the filter contents
+    pub(crate) fn is_directives_encountered(&self) -> bool {
+        self.is_directives_encountered
     }
 
     /// Parses filter from root url
@@ -253,6 +260,8 @@ impl<'a> FilterParser<'a> {
         line: &str,
     ) -> Result<bool, FilterParserErrorContext> {
         if line.starts_with(DIRECTIVE_IF) {
+            self.is_directives_encountered = true;
+
             let directive_expression = line.slice(DIRECTIVE_IF.len()..);
             if directive_expression.is_empty() {
                 return self.build_error_with_context(FilterParserError::EmptyIf);
@@ -277,6 +286,7 @@ impl<'a> FilterParser<'a> {
 
             return Ok(true);
         } else if line.starts_with(DIRECTIVE_ELSE) {
+            self.is_directives_encountered = true;
             // Has no nesting level, or we're trying to process else twice on the same level
             if self.conditional_nesting_level == 0
                 || self
@@ -299,6 +309,7 @@ impl<'a> FilterParser<'a> {
 
             return Ok(true);
         } else if line.starts_with(DIRECTIVE_ENDIF) {
+            self.is_directives_encountered = true;
             if self.condition_disabled_at_nesting == self.conditional_nesting_level {
                 self.condition_disabled_at_nesting = 0;
             }
@@ -328,6 +339,7 @@ impl<'a> FilterParser<'a> {
     /// Processes [`DIRECTIVE_INCLUDE`]
     fn process_include(&mut self, line: &str) -> Result<bool, FilterParserErrorContext> {
         if line.starts_with(DIRECTIVE_INCLUDE) {
+            self.is_directives_encountered = true;
             let include_path_result =
                 get_include_path(line).or_else(|why| self.build_error_with_context(why))?;
 
