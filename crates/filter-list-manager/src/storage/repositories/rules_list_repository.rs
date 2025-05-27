@@ -11,7 +11,7 @@ use rusqlite::{
     named_params, params_from_iter, Connection, Error, OptionalExtension, Row, Transaction,
 };
 use rusqlite::{DatabaseName, Result};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub(crate) type MapFilterIdOnRulesList = HashMap<FilterId, RulesListEntity>;
 
@@ -215,6 +215,49 @@ impl RulesListRepository {
         )?;
 
         Ok((disabled_rules, BlobHandleImpl::new(blob)))
+    }
+
+    /// Gets filter ids for filters with compilation directives
+    pub(crate) fn select_filter_ids_by_rules_with_directives(
+        &self,
+        connection: &Connection,
+        filter_ids: &[FilterId],
+    ) -> Result<HashSet<FilterId>> {
+        let mut sql = String::from(
+            r"
+            SELECT
+                filter_id
+            FROM
+                [rules_list]
+            WHERE
+                (
+                    rules_text LIKE '%!#include%' 
+                    OR rules_text LIKE '%!#if%' 
+                    OR rules_text LIKE '%!#else%'
+                    OR rules_text LIKE '%!#endif%'
+                )",
+        );
+
+        if !filter_ids.is_empty() {
+            sql += format!(" AND {}", build_in_clause("filter_id", filter_ids.len())).as_str();
+        }
+
+        let params = params_from_iter(filter_ids);
+        let mut statement = connection.prepare(sql.as_str())?;
+
+        let mut out = HashSet::new();
+        let Some(rows) = statement
+            .query_map(params, |row: &Row| row.get(0))
+            .optional()?
+        else {
+            return Ok(out);
+        };
+
+        for id in rows {
+            out.insert(id?);
+        }
+
+        Ok(out)
     }
 
     pub(crate) fn get_disabled_rules_by_ids(
