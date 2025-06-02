@@ -49,12 +49,14 @@ Default Job:
       description: Main build
       scripts:
       - |-
+
+        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        VersionIncrement "${Env:bamboo_planRepository_repositoryUrl}";
         
         . "${bamboo.root_folder}\build.ps1"
         RustBuild
       
         . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
-        VersionIncrement "${Env:bamboo_planRepository_repositoryUrl}";
         MainBuild "${bamboo.build_configuration}" "${bamboo.define_constants}" "${bamboo.build_folder}";
       environment: channel="${bamboo.channel}" "use_force_master="${bamboo.use_force_master}"
   - script:
