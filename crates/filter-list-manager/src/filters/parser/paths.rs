@@ -1,4 +1,5 @@
 use crate::io::url_schemes::UrlSchemes;
+use crate::io::{get_authority, get_scheme};
 use crate::{FilterParserError, IOError};
 use std::path::{Path, PathBuf};
 use url::{ParseError, Url};
@@ -92,9 +93,79 @@ pub(crate) fn resolve_absolute_uri(
     Ok(resolved_url)
 }
 
+/// Tries to resolve included path from `parent_url` and `include_path`
+///
+/// # Failure
+///
+/// Returns [`FilterParserError::SchemeIsIncorrect`] if parent url and included url have different schemes
+pub(super) fn try_to_resolve_include_path_from_parent_url(
+    parent_url: &str,
+    include_path: &str,
+) -> Result<String, FilterParserError> {
+    let parent_scheme = get_scheme(parent_url);
+
+    match get_scheme(include_path) {
+        // If scheme is found, this is an absolute_path
+        Some(current_scheme_raw) => {
+            let current_scheme = UrlSchemes::from(current_scheme_raw);
+            let parent_scheme = UrlSchemes::from(parent_scheme);
+
+            // Can include only if the schemes match
+            if UrlSchemes::File == current_scheme && current_scheme != parent_scheme {
+                return Err(FilterParserError::SchemeIsIncorrect(String::from(
+                    "\"file\" scheme can be included only from \"file\" scheme",
+                )));
+            }
+
+            // Authorities must match for web schemes
+            if parent_scheme.is_web_scheme() {
+                compare_same_origin(parent_url, include_path, parent_scheme, current_scheme)?;
+            }
+
+            Ok(include_path.to_string())
+        }
+        // May be relative path
+        None => {
+            // Special case - anonymous protocol
+            if include_path.starts_with("//") {
+                let parent_scheme = parent_scheme.unwrap_or_default();
+                // Special-special case - third slash
+                let extra_slash = if parent_scheme == "file" && parent_url.starts_with("file:///") {
+                    "/"
+                } else {
+                    ""
+                };
+
+                // Parent url always has right scheme
+                Ok(format!("{}:{}{}", parent_scheme, extra_slash, include_path))
+            } else {
+                resolve_absolute_uri(parent_scheme.into(), parent_url, include_path)
+            }
+        }
+    }
+}
+
+/// Parent and child must have the same origin.
+pub(crate) fn compare_same_origin(
+    parent_url: &str,
+    child_url: &str,
+    parent_scheme: UrlSchemes,
+    child_scheme: UrlSchemes,
+) -> Result<(), FilterParserError> {
+    if parent_scheme == child_scheme && get_authority(parent_url) == get_authority(child_url) {
+        return Ok(());
+    }
+
+    FilterParserError::other_err_from_to_string(
+        "Included filter must have the same origin with the root filter",
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::{to_absolute_path, to_absolute_url};
+    use crate::filters::parser::paths::try_to_resolve_include_path_from_parent_url;
+    use crate::FilterParserError;
     use std::path::PathBuf;
 
     struct BuildAbsoluteUrlTestStruct(&'static str, &'static str, &'static str);
@@ -172,5 +243,62 @@ mod tests {
             let actual = to_absolute_url(root_filter.as_str(), value.as_str()).unwrap();
             assert_eq!(actual.to_string(), expected_urls[index])
         });
+    }
+
+    #[test]
+    fn test_include_path_resolving() {
+        [
+            (
+                "https://example.com/filters/safari/1.txt",
+                "https://example.com/filter1.txt",
+                Ok("https://example.com/filter1.txt".to_string()),
+            ),
+            (
+                "https://example.com/filters/safari/1.txt",
+                "ffwf",
+                Ok("https://example.com/filters/safari/ffwf".to_string()),
+            ),
+            (
+                "https://example.com/filters/safari/1.txt",
+                "../../global_filter.txt",
+                Ok("https://example.com/global_filter.txt".to_string()),
+            ),
+            (
+                "https://example.com/filters/safari/1.txt",
+                "../a/./b/c",
+                Ok("https://example.com/filters/a/b/c".to_string()),
+            ),
+            (
+                "https://example.com/filters/safari/1.txt",
+                "//example.com/filter.txt",
+                Ok("https://example.com/filter.txt".to_string()),
+            ),
+            (
+                "file:///C:/filters/safari/1.txt",
+                "//C:/same.scheme/filter.txt",
+                Ok("file:///C:/same.scheme/filter.txt".to_string()),
+            ),
+            (
+                "https://example.com/filters.txt",
+                "file://Volumes/osx/users/user/filters.txt",
+                Err(FilterParserError::SchemeIsIncorrect(
+                    "\"file\" scheme can be included only from \"file\" scheme".to_string(),
+                )),
+            ),
+            (
+                "https://example.com/filters/safari/1.txt",
+                "https://adguard.com/filter1.txt",
+                FilterParserError::other_err_from_to_string(
+                    "Included filter must have the same origin with the root filter",
+                ),
+            ),
+        ]
+        .into_iter()
+        .for_each(|(base_url, url_like_string, expected_result)| {
+            let method_result =
+                try_to_resolve_include_path_from_parent_url(base_url, url_like_string);
+
+            assert_eq!(method_result, expected_result);
+        })
     }
 }

@@ -8,7 +8,8 @@ Will use [grcov](https://github.com/mozilla/grcov)
 
 ```shell
 # Install llvm-tools
-rustup component add llvm-tools-preview
+rustup component add llvm-tools
+cargo install grcov
 ```
 
 ## Usage
@@ -18,7 +19,7 @@ rustup component add llvm-tools-preview
 find . -iname '*.profraw' -delete && (rm -r ./target/debug/coverage 2&>1 || true)
 
 # Export ENVS
-export CARGO_INCREMENTAL=0
+export CARGO_INCREMENTAL=0 # Might not be necessary.
 export RUSTFLAGS="-Cinstrument-coverage -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off"
 
 # ... run_tests ...

@@ -199,7 +199,7 @@ pub unsafe extern "C" fn flm_free_handle(handle: *mut FLMHandle) {
 }
 
 /// This represents short-circuit error for FFI processing. Returns as [`RustResponse`] with `.ffi_error = true`
-#[inline]
+#[cold]
 fn build_rust_response_error(
     error: Box<dyn std::error::Error>,
     mut rust_response: Box<RustResponse>,

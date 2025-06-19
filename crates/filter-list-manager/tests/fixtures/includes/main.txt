@@ -1,0 +1,32 @@
+! Title: Test AdGuard Filter for FiltersCompiler
+! Description: This filter is used for testing directive processing in FiltersCompiler
+! Version: 1.0.0
+! TimeUpdated: 2025-06-17T11:01:15+03:00
+! Homepage: https://example.org/test-filter
+! License: MIT
+
+! Basic blocking rules
+||example.com^$third-party
+||analytics.example.org^
+
+||all-adguard.example.com^
+
+! Test includes (note: these paths would need to exist for actual testing)
+
+!#if (test_include)
+!#include ./included_part.txt#hash1
+Should not be included
+!#else
+!#include ./included_part.txt#hash2
+!#endif
+
+!#include ./included_part.txt
+
+! Test recursive includes
+!#include ./included_part2.txt
+
+! Regular blocking rules after directives
+||example.net^$script
+@@||example.org^$document
+##.advert-banner
+example.com##.sponsored-content

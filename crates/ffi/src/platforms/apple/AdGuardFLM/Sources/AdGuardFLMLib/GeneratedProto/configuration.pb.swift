@@ -99,13 +99,13 @@ public enum FilterListManager_RawRequestProxyMode: SwiftProtobuf.Enum, Swift.Cas
 
 }
 
-public struct FilterListManager_CompilerConditionalConstants: Sendable {
+public struct FilterListManager_FiltersCompilationPolicy: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// List of literal constants for filters conditional compilation.
-  public var compilerConditionalConstants: [String] = []
+  public var constants: [String] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -141,15 +141,24 @@ public struct FilterListManager_Configuration: Sendable {
   /// Values < 3600 will be clamped to 3600.
   public var defaultFilterListExpiresPeriodSec: Int32 = 0
 
-  /// List of literal constants for filters conditional compilation.
-  public var compilerConditionalConstants: FilterListManager_CompilerConditionalConstants {
-    get {return _compilerConditionalConstants ?? FilterListManager_CompilerConditionalConstants()}
-    set {_compilerConditionalConstants = newValue}
+  /// Settings for filters compilation or collection from compiled parts.
+  /// 
+  /// ### Compilation
+  /// During the update, each filter will be "compiled" into main filter and its includes.
+  /// Main filter remains unchanged. But in includes, (include, if/else/endif) directives will be resolved, using this policy. 
+  /// Recursive includes will be inlined.
+  /// 
+  /// ### Collection
+  /// When you get filters, they will be collected from compiled parts (main filter + includes).
+  /// All directives in main filter will be resolved, using this policy, and includes will be injected. 
+  public var filtersCompilationPolicy: FilterListManager_FiltersCompilationPolicy {
+    get {return _filtersCompilationPolicy ?? FilterListManager_FiltersCompilationPolicy()}
+    set {_filtersCompilationPolicy = newValue}
   }
-  /// Returns true if `compilerConditionalConstants` has been explicitly set.
-  public var hasCompilerConditionalConstants: Bool {return self._compilerConditionalConstants != nil}
-  /// Clears the value of `compilerConditionalConstants`. Subsequent reads from it will return its default value.
-  public mutating func clearCompilerConditionalConstants() {self._compilerConditionalConstants = nil}
+  /// Returns true if `filtersCompilationPolicy` has been explicitly set.
+  public var hasFiltersCompilationPolicy: Bool {return self._filtersCompilationPolicy != nil}
+  /// Clears the value of `filtersCompilationPolicy`. Subsequent reads from it will return its default value.
+  public mutating func clearFiltersCompilationPolicy() {self._filtersCompilationPolicy = nil}
 
   /// URL of the index (filters.json) file.
   public var metadataURL: String = String()
@@ -180,7 +189,7 @@ public struct FilterListManager_Configuration: Sendable {
   public init() {}
 
   fileprivate var _workingDirectory: String? = nil
-  fileprivate var _compilerConditionalConstants: FilterListManager_CompilerConditionalConstants? = nil
+  fileprivate var _filtersCompilationPolicy: FilterListManager_FiltersCompilationPolicy? = nil
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -202,10 +211,10 @@ extension FilterListManager_RawRequestProxyMode: SwiftProtobuf._ProtoNameProvidi
   ]
 }
 
-extension FilterListManager_CompilerConditionalConstants: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".CompilerConditionalConstants"
+extension FilterListManager_FiltersCompilationPolicy: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".FiltersCompilationPolicy"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "compiler_conditional_constants"),
+    1: .same(proto: "constants"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -214,21 +223,21 @@ extension FilterListManager_CompilerConditionalConstants: SwiftProtobuf.Message,
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedStringField(value: &self.compilerConditionalConstants) }()
+      case 1: try { try decoder.decodeRepeatedStringField(value: &self.constants) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.compilerConditionalConstants.isEmpty {
-      try visitor.visitRepeatedStringField(value: self.compilerConditionalConstants, fieldNumber: 1)
+    if !self.constants.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.constants, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: FilterListManager_CompilerConditionalConstants, rhs: FilterListManager_CompilerConditionalConstants) -> Bool {
-    if lhs.compilerConditionalConstants != rhs.compilerConditionalConstants {return false}
+  public static func ==(lhs: FilterListManager_FiltersCompilationPolicy, rhs: FilterListManager_FiltersCompilationPolicy) -> Bool {
+    if lhs.constants != rhs.constants {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -241,7 +250,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     2: .standard(proto: "working_directory"),
     3: .same(proto: "locale"),
     4: .standard(proto: "default_filter_list_expires_period_sec"),
-    5: .standard(proto: "compiler_conditional_constants"),
+    5: .standard(proto: "filters_compilation_policy"),
     6: .standard(proto: "metadata_url"),
     7: .standard(proto: "metadata_locales_url"),
     8: .standard(proto: "request_timeout_ms"),
@@ -262,7 +271,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
       case 2: try { try decoder.decodeSingularStringField(value: &self._workingDirectory) }()
       case 3: try { try decoder.decodeSingularStringField(value: &self.locale) }()
       case 4: try { try decoder.decodeSingularInt32Field(value: &self.defaultFilterListExpiresPeriodSec) }()
-      case 5: try { try decoder.decodeSingularMessageField(value: &self._compilerConditionalConstants) }()
+      case 5: try { try decoder.decodeSingularMessageField(value: &self._filtersCompilationPolicy) }()
       case 6: try { try decoder.decodeSingularStringField(value: &self.metadataURL) }()
       case 7: try { try decoder.decodeSingularStringField(value: &self.metadataLocalesURL) }()
       case 8: try { try decoder.decodeSingularInt32Field(value: &self.requestTimeoutMs) }()
@@ -293,7 +302,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if self.defaultFilterListExpiresPeriodSec != 0 {
       try visitor.visitSingularInt32Field(value: self.defaultFilterListExpiresPeriodSec, fieldNumber: 4)
     }
-    try { if let v = self._compilerConditionalConstants {
+    try { if let v = self._filtersCompilationPolicy {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
     } }()
     if !self.metadataURL.isEmpty {
@@ -328,7 +337,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if lhs._workingDirectory != rhs._workingDirectory {return false}
     if lhs.locale != rhs.locale {return false}
     if lhs.defaultFilterListExpiresPeriodSec != rhs.defaultFilterListExpiresPeriodSec {return false}
-    if lhs._compilerConditionalConstants != rhs._compilerConditionalConstants {return false}
+    if lhs._filtersCompilationPolicy != rhs._filtersCompilationPolicy {return false}
     if lhs.metadataURL != rhs.metadataURL {return false}
     if lhs.metadataLocalesURL != rhs.metadataLocalesURL {return false}
     if lhs.requestTimeoutMs != rhs.requestTimeoutMs {return false}

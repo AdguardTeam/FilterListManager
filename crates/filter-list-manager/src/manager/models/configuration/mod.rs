@@ -38,7 +38,16 @@ pub struct Configuration {
     /// Default value: 86400
     /// Values < 3600 will be clamped to 3600
     pub default_filter_list_expires_period_sec: i32,
-    /// TODO:
+    /// Settings for filters compilation or collection from compiled parts.
+    ///
+    /// ### Compilation
+    /// During the update, each filter will be "compiled" into main filter and its includes.
+    /// Main filter remains unchanged. But in includes, (include, if/else/endif) directives will be resolved, using this policy.
+    /// Recursive includes will be inlined.
+    ///
+    /// ### Collection
+    /// When you get filters, they will be collected from compiled parts (main filter + includes).
+    /// All directives in main filter will be resolved, using this policy, and includes will be injected.
     pub filters_compilation_policy: FiltersCompilationPolicy,
     /// URL of the index (filters.json) file
     pub metadata_url: String,

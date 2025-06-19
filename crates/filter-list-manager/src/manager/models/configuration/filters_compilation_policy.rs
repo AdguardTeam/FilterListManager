@@ -1,5 +1,6 @@
 #[derive(Default)]
 pub struct FiltersCompilationPolicy {
+    /// List of constants for filters conditional compilation
     pub constants: Vec<String>,
 }
 

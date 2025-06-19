@@ -55,7 +55,6 @@ impl FilterListManager for FilterListManagerImpl {
         }))
     }
 
-    #[allow(clippy::field_reassign_with_default)]
     fn install_custom_filter_list(
         &self,
         download_url: String,
@@ -63,111 +62,80 @@ impl FilterListManager for FilterListManagerImpl {
         title: Option<String>,
         description: Option<String>,
     ) -> FLMResult<FullFilterList> {
-        let full_filter_list: FullFilterList = FilterManager::new()
-            .install_custom_filter_list_from_url(
-                &self.connection_manager,
-                &self.configuration,
-                download_url,
-                is_trusted,
-                title,
-                description,
-            )?;
-
-        Ok(full_filter_list)
+        FilterManager::new().install_custom_filter_list_from_url(
+            &self.connection_manager,
+            &self.configuration,
+            download_url,
+            is_trusted,
+            title,
+            description,
+        )
     }
 
     fn fetch_filter_list_metadata(&self, url: String) -> FLMResult<FilterListMetadata> {
-        let filter_list_metadata: FilterListMetadata =
-            FilterMetadataGrabber::new().fetch_filter_list_metadata(&self.configuration, url)?;
-
-        Ok(filter_list_metadata)
+        FilterMetadataGrabber::new().fetch_filter_list_metadata(&self.configuration, url)
     }
 
     fn fetch_filter_list_metadata_with_body(
         &self,
         url: String,
     ) -> FLMResult<FilterListMetadataWithBody> {
-        let filter_list_metadata_with_body: FilterListMetadataWithBody =
-            FilterMetadataGrabber::new()
-                .fetch_filter_list_metadata_with_body(&self.configuration, url)?;
-
-        Ok(filter_list_metadata_with_body)
+        FilterMetadataGrabber::new().fetch_filter_list_metadata_with_body(&self.configuration, url)
     }
 
     fn enable_filter_lists(&self, ids: Vec<FilterId>, is_enabled: bool) -> FLMResult<usize> {
-        let rows_updated: usize =
-            FilterManager::new().enable_filter_lists(&self.connection_manager, ids, is_enabled)?;
-
-        Ok(rows_updated)
+        FilterManager::new().enable_filter_lists(&self.connection_manager, ids, is_enabled)
     }
 
     fn install_filter_lists(&self, ids: Vec<FilterId>, is_installed: bool) -> FLMResult<usize> {
-        let rows_updated: usize = FilterManager::new().install_filter_lists(
-            &self.connection_manager,
-            ids,
-            is_installed,
-        )?;
-
-        Ok(rows_updated)
+        FilterManager::new().install_filter_lists(&self.connection_manager, ids, is_installed)
     }
 
     fn delete_custom_filter_lists(&self, ids: Vec<FilterId>) -> FLMResult<usize> {
-        let rows_updated: usize =
-            FilterManager::new().delete_custom_filter_lists(&self.connection_manager, ids)?;
-
-        Ok(rows_updated)
+        FilterManager::new().delete_custom_filter_lists(&self.connection_manager, ids)
     }
 
     fn get_all_tags(&self) -> FLMResult<Vec<FilterTag>> {
-        let all_tags: Vec<FilterTag> =
-            FilterTagManager::new().get_all_tags(&self.connection_manager)?;
-
-        Ok(all_tags)
+        FilterTagManager::new().get_all_tags(&self.connection_manager)
     }
 
     fn get_all_groups(&self) -> FLMResult<Vec<FilterGroup>> {
-        let all_groups: Vec<FilterGroup> = FilterGroupManager::new()
-            .get_all_groups(&self.connection_manager, &self.configuration)?;
-
-        Ok(all_groups)
+        FilterGroupManager::new().get_all_groups(&self.connection_manager, &self.configuration)
     }
 
     fn get_full_filter_list_by_id(&self, filter_id: FilterId) -> FLMResult<Option<FullFilterList>> {
-        let full_filter_list: Option<FullFilterList> = FilterManager::new()
-            .get_full_filter_list_by_id(
-                &self.connection_manager,
-                &self.configuration,
-                Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
-            )?;
-
-        Ok(full_filter_list)
+        FilterManager::new().get_full_filter_list_by_id(
+            &self.connection_manager,
+            &self.configuration,
+            Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+        )
     }
 
     fn get_stored_filters_metadata(&self) -> FLMResult<Vec<StoredFilterMetadata>> {
-        let stored_filters_metadata: Vec<StoredFilterMetadata> = FilterManager::new()
-            .get_stored_filters_metadata(&self.connection_manager, &self.configuration, None)?;
-
-        Ok(stored_filters_metadata)
+        FilterManager::new().get_stored_filters_metadata(
+            &self.connection_manager,
+            &self.configuration,
+            None,
+        )
     }
 
     fn get_stored_filter_metadata_by_id(
         &self,
         filter_id: FilterId,
     ) -> FLMResult<Option<StoredFilterMetadata>> {
-        let stored_filter_metadata: Option<StoredFilterMetadata> = FilterManager::new()
-            .get_stored_filter_metadata_by_id(
-                &self.connection_manager,
-                &self.configuration,
-                Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
-            )?;
-
-        Ok(stored_filter_metadata)
+        FilterManager::new().get_stored_filter_metadata_by_id(
+            &self.connection_manager,
+            &self.configuration,
+            Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+        )
     }
 
     fn save_custom_filter_rules(&self, rules: FilterListRules) -> FLMResult<()> {
-        let _ = RulesListManager::new().save_custom_filter_rules(&self.connection_manager, rules);
-
-        Ok(())
+        RulesListManager::new().save_custom_filter_rules(
+            &self.connection_manager,
+            &self.configuration,
+            rules,
+        )
     }
 
     fn save_disabled_rules(
@@ -175,13 +143,11 @@ impl FilterListManager for FilterListManagerImpl {
         filter_id: FilterId,
         disabled_rules: Vec<String>,
     ) -> FLMResult<()> {
-        let _ = RulesListManager::new().save_disabled_rules(
+        RulesListManager::new().save_disabled_rules(
             &self.connection_manager,
             filter_id,
             disabled_rules,
-        );
-
-        Ok(())
+        )
     }
 
     fn update_filters(
@@ -190,15 +156,13 @@ impl FilterListManager for FilterListManagerImpl {
         loose_timeout: i32,
         ignore_filters_status: bool,
     ) -> FLMResult<Option<UpdateResult>> {
-        let update_result: Option<UpdateResult> = FilterUpdateManager::new().update_filters(
+        FilterUpdateManager::new().update_filters(
             &self.connection_manager,
             &self.configuration,
             ignore_filters_expiration,
             loose_timeout,
             ignore_filters_status,
-        )?;
-
-        Ok(update_result)
+        )
     }
 
     fn force_update_filters_by_ids(
@@ -206,25 +170,20 @@ impl FilterListManager for FilterListManagerImpl {
         ids: Vec<FilterId>,
         loose_timeout: i32,
     ) -> FLMResult<Option<UpdateResult>> {
-        let update_result: Option<UpdateResult> = FilterUpdateManager::new()
-            .force_update_filters_by_ids(
-                &self.connection_manager,
-                &self.configuration,
-                ids,
-                loose_timeout,
-            )?;
-
-        Ok(update_result)
+        FilterUpdateManager::new().force_update_filters_by_ids(
+            &self.connection_manager,
+            &self.configuration,
+            ids,
+            loose_timeout,
+        )
     }
 
     fn change_locale(&mut self, suggested_locale: Locale) -> FLMResult<bool> {
-        let is_changed: bool = ConfigurationUpdateManager::new().change_locale(
+        ConfigurationUpdateManager::new().change_locale(
             &self.connection_manager,
             &mut self.configuration,
             suggested_locale,
-        )?;
-
-        Ok(is_changed)
+        )
     }
 
     fn pull_metadata(&self) -> FLMResult<PullMetadataResult> {
@@ -237,38 +196,28 @@ impl FilterListManager for FilterListManagerImpl {
         title: String,
         is_trusted: bool,
     ) -> FLMResult<bool> {
-        let is_updated: bool = FilterManager::new().update_custom_filter_metadata(
+        FilterManager::new().update_custom_filter_metadata(
             &self.connection_manager,
             filter_id,
             title,
             is_trusted,
-        )?;
-
-        Ok(is_updated)
+        )
     }
 
     fn get_database_path(&self) -> FLMResult<String> {
-        let database_path: String = DbManager::new().get_database_path(&self.connection_manager)?;
-
-        Ok(database_path)
+        DbManager::new().get_database_path(&self.connection_manager)
     }
 
     fn lift_up_database(&self) -> FLMResult<()> {
         // SAFETY: Safe, as long as the call to this function does not get inside the `execute_db` closure one way or another
         // @see DbConnectionManager
-        let _ = unsafe { self.connection_manager.lift_up_database() };
-
-        Ok(())
+        unsafe { self.connection_manager.lift_up_database() }
     }
 
     fn get_database_version(&self) -> FLMResult<Option<i32>> {
-        let version: Option<i32> =
-            DbManager::new().get_database_version(&self.connection_manager)?;
-
-        Ok(version)
+        DbManager::new().get_database_version(&self.connection_manager)
     }
 
-    #[allow(clippy::field_reassign_with_default)]
     fn install_custom_filter_from_string(
         &self,
         download_url: String,
@@ -293,20 +242,18 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_active_rules(&self) -> FLMResult<Vec<ActiveRulesInfo>> {
-        let active_rules: Vec<ActiveRulesInfo> =
-            RulesListManager::new().get_active_rules(&self.connection_manager)?;
-
-        Ok(active_rules)
+        RulesListManager::new().get_active_rules(&self.connection_manager, &self.configuration)
     }
 
     fn get_filter_rules_as_strings(
         &self,
         ids: Vec<FilterId>,
     ) -> FLMResult<Vec<FilterListRulesRaw>> {
-        let filter_rules: Vec<FilterListRulesRaw> =
-            RulesListManager::new().get_filter_rules_as_strings(&self.connection_manager, ids)?;
-
-        Ok(filter_rules)
+        RulesListManager::new().get_filter_rules_as_strings(
+            &self.connection_manager,
+            &self.configuration,
+            ids,
+        )
     }
 
     fn save_rules_to_file_blob<P: AsRef<Path>>(
@@ -314,33 +261,23 @@ impl FilterListManager for FilterListManagerImpl {
         filter_id: FilterId,
         file_path: P,
     ) -> FLMResult<()> {
-        let _ = StreamingRulesManager::new().save_rules_to_file_blob(
+        StreamingRulesManager::new().save_rules_to_file_blob(
             &self.connection_manager,
             filter_id,
             file_path,
-        );
-
-        Ok(())
+        )
     }
 
     fn get_disabled_rules(&self, ids: Vec<FilterId>) -> FLMResult<Vec<DisabledRulesRaw>> {
-        let disabled_rules: Vec<DisabledRulesRaw> =
-            RulesListManager::new().get_disabled_rules(&self.connection_manager, ids)?;
-
-        Ok(disabled_rules)
+        RulesListManager::new().get_disabled_rules(&self.connection_manager, ids)
     }
 
     fn set_proxy_mode(&mut self, mode: RequestProxyMode) -> () {
-        let _ = ConfigurationUpdateManager::new().set_proxy_mode(&mut self.configuration, mode);
-
-        ()
+        ConfigurationUpdateManager::new().set_proxy_mode(&mut self.configuration, mode)
     }
 
     fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>> {
-        let rules_count: Vec<RulesCountByFilter> =
-            RulesListManager::new().get_rules_count(&self.connection_manager, ids)?;
-
-        Ok(rules_count)
+        RulesListManager::new().get_rules_count(&self.connection_manager, ids)
     }
 }
 
@@ -356,7 +293,7 @@ mod tests {
     use crate::storage::DbConnectionManager;
     use crate::test_utils::spawn_test_db_with_metadata;
     use crate::{
-        Configuration, FilterId, FilterListManager, FilterListManagerImpl, FilterListRules,
+        string, Configuration, FilterId, FilterListManager, FilterListManagerImpl, FilterListRules,
         USER_RULES_FILTER_LIST_ID,
     };
     use chrono::{Duration, Utc};
@@ -903,11 +840,13 @@ mod tests {
                     let entities = ids
                         .clone()
                         .into_iter()
-                        .map(|id| RulesListEntity {
-                            filter_id: id,
-                            text: "example.com\nexample.org".to_string(),
-                            disabled_text: "example.com".to_string(),
-                            rules_count: 0,
+                        .map(|id| {
+                            RulesListEntity::with_disabled_text(
+                                id,
+                                string!("example.com\nexample.org"),
+                                string!("example.com"),
+                                0,
+                            )
                         })
                         .collect::<Vec<RulesListEntity>>();
 
@@ -990,19 +929,19 @@ mod tests {
 
         source
             .execute_db(|mut connection: Connection| {
-                let rules1 = RulesListEntity {
-                    filter_id: last_filter_id,
-                    text: "Text\nDisabled Text\n123".to_string(),
-                    disabled_text: "Disabled Text\n123".to_string(),
-                    rules_count: 0,
-                };
+                let rules1 = RulesListEntity::with_disabled_text(
+                    last_filter_id,
+                    string!("Text\nDisabled Text\n123"),
+                    string!("Disabled Text\n123"),
+                    0,
+                );
 
-                let rules2 = RulesListEntity {
-                    filter_id: first_filter_id,
-                    text: "Text2\nDisabled Text2".to_string(),
-                    disabled_text: "Disabled Text2".to_string(),
-                    rules_count: 0,
-                };
+                let rules2 = RulesListEntity::with_disabled_text(
+                    first_filter_id,
+                    string!("Text2\nDisabled Text2"),
+                    string!("Disabled Text2"),
+                    0,
+                );
 
                 let tx = connection.transaction().unwrap();
                 let repo = RulesListRepository::new();
@@ -1060,12 +999,11 @@ mod tests {
 
         source
             .execute_db(|mut connection: Connection| {
-                let rules = RulesListEntity {
-                    filter_id: USER_RULES_FILTER_LIST_ID,
-                    text: "".to_string(),
-                    disabled_text: "".to_string(),
-                    rules_count: user_rules_count_result,
-                };
+                let rules = RulesListEntity::new(
+                    USER_RULES_FILTER_LIST_ID,
+                    string!(),
+                    user_rules_count_result,
+                );
 
                 let tx = connection.transaction().unwrap();
                 let repo = RulesListRepository::new();

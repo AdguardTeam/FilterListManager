@@ -63,9 +63,9 @@ fn gets_filter_list() {
 fn update_filters() {
     let start = Instant::now();
     let mut conf = Configuration::default();
-    conf.metadata_url = "https://example.org/extension/safari/filters.json".to_string();
+    conf.metadata_url = "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/extension/chromium-mv3/filters.json".to_string();
     conf.metadata_locales_url =
-        "https://example.org/extension/safari/filters_i18n.json".to_string();
+        "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/extension/chromium-mv3/filters_i18n.json".to_string();
     conf.app_name = "FlmApp".to_string();
     conf.version = "1.2.3".to_string();
 
@@ -79,5 +79,5 @@ fn update_filters() {
 }
 
 pub(crate) fn test() {
-    println!("Ok");
+    update_filters();
 }

@@ -2,19 +2,23 @@ use chrono::Utc;
 use rusqlite::types::Value;
 use rusqlite::Connection;
 use rusqlite::Transaction;
+use std::collections::HashSet;
 
-use crate::storage::entities::filter::filter_entity::FilterEntity;
+use crate::filters::parser::filter_collector::FilterCollector;
+use crate::filters::parser::filter_compiler::FilterCompiler;
+use crate::filters::parser::filter_contents_provider::string_provider::StringProvider;
+use crate::filters::parser::is_rule_detector::is_line_is_rule;
+use crate::io::http::blocking_client::BlockingClient;
 use crate::storage::entities::rules_list::disabled_rules_entity::DisabledRulesEntity;
 use crate::storage::entities::rules_list::rules_count_entity::RulesCountEntity;
 use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
+use crate::storage::repositories::filter_includes_repository::FilterIncludesRepository;
 use crate::storage::repositories::filter_repository::FilterRepository;
-use crate::storage::repositories::rules_list_repository::MapFilterIdOnRulesList;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
 use crate::storage::repositories::Repository;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::with_transaction;
 use crate::storage::DbConnectionManager;
-use crate::ActiveRulesInfo;
 use crate::DisabledRulesRaw;
 use crate::FLMError;
 use crate::FLMResult;
@@ -22,12 +26,7 @@ use crate::FilterId;
 use crate::FilterListRules;
 use crate::FilterListRulesRaw;
 use crate::RulesCountByFilter;
-
-/// This marks line as "non-rule" line: comment, directive, etc.
-pub const NON_RULE_MARKER: char = '!';
-
-/// Also, comment line can start from "# " sequence
-pub const EXTRA_COMMENT_MARKER: &str = "# ";
+use crate::{ActiveRulesInfo, Configuration};
 
 /// Manager for rules list logic
 pub(crate) struct RulesListManager;
@@ -41,9 +40,10 @@ impl RulesListManager {
     pub(crate) fn get_active_rules(
         &self,
         connection_manager: &DbConnectionManager,
+        configuration: &Configuration,
     ) -> FLMResult<Vec<ActiveRulesInfo>> {
-        let (list, mut rules): (Vec<FilterEntity>, MapFilterIdOnRulesList) = connection_manager
-            .execute_db(|conn: Connection| {
+        let (list, mut rules, includes_list) =
+            connection_manager.execute_db(|conn: Connection| {
                 let enabled_filters = FilterRepository::new()
                     .select(
                         &conn,
@@ -59,46 +59,56 @@ impl RulesListManager {
                     .collect::<Vec<Value>>();
 
                 let map = RulesListRepository::new()
+                    .select_mapped(
+                        &conn,
+                        Some(SQLOperator::FieldIn("filter_id", filter_ids.clone())),
+                    )
+                    .map_err(FLMError::from_database)?;
+
+                let includes_list = FilterIncludesRepository::new()
                     .select_mapped(&conn, Some(SQLOperator::FieldIn("filter_id", filter_ids)))
                     .map_err(FLMError::from_database)?;
 
-                Ok((enabled_filters, map))
+                Ok((enabled_filters, map, includes_list))
             })?;
 
-        let active_rules: Vec<ActiveRulesInfo> = list
-            .into_iter()
-            .flat_map(|filter_entity: FilterEntity| {
-                if let Some(filter_id) = filter_entity.filter_id {
-                    if let Some(rule_entity) = rules.remove(&filter_id) {
-                        if rule_entity.filter_id == filter_id {
-                            let disabled_lines =
-                                rule_entity.disabled_text.lines().collect::<Vec<&str>>();
+        let mut active_rules: Vec<ActiveRulesInfo> = vec![];
+        for filter_entity in list {
+            if let Some(filter_id) = filter_entity.filter_id {
+                if let Some(mut rule_entity) = rules.remove(&filter_id) {
+                    if rule_entity.has_directives() {
+                        let (new_body, new_count) = FilterCollector::new(configuration)
+                            .collect_from_parts(
+                                &rule_entity,
+                                filter_entity.download_url.as_str(),
+                                includes_list.get(&filter_id),
+                            )
+                            .map_err(FLMError::from_parser_error)?;
 
-                            // Make a difference of rule_entity.text from rule_entity.disabled_text
-                            let filtered_rules = rule_entity
-                                .text
-                                .lines()
-                                .filter(|line| {
-                                    !disabled_lines
-                                        .iter()
-                                        .any(|line_from_disabled| line_from_disabled == line)
-                                })
-                                .map(ToString::to_string)
-                                .collect::<Vec<String>>();
-
-                            return Some(ActiveRulesInfo {
-                                filter_id,
-                                group_id: filter_entity.group_id,
-                                is_trusted: filter_entity.is_trusted,
-                                rules: filtered_rules,
-                            });
-                        }
+                        rule_entity.text = new_body;
+                        rule_entity.rules_count = new_count;
                     }
-                }
 
-                None
-            })
-            .collect();
+                    let disabled_lines =
+                        rule_entity.disabled_text.lines().collect::<HashSet<&str>>();
+
+                    // Make a difference of rule_entity.text from rule_entity.disabled_text
+                    let filtered_rules = rule_entity
+                        .text
+                        .lines()
+                        .filter(|line| !disabled_lines.contains(*line))
+                        .map(ToString::to_string)
+                        .collect::<Vec<String>>();
+
+                    active_rules.push(ActiveRulesInfo {
+                        filter_id,
+                        group_id: filter_entity.group_id,
+                        is_trusted: filter_entity.is_trusted,
+                        rules: filtered_rules,
+                    });
+                }
+            }
+        }
 
         Ok(active_rules)
     }
@@ -125,20 +135,55 @@ impl RulesListManager {
     pub(crate) fn get_filter_rules_as_strings(
         &self,
         connection_manager: &DbConnectionManager,
+        configuration: &Configuration,
         ids: Vec<FilterId>,
     ) -> FLMResult<Vec<FilterListRulesRaw>> {
-        let result: Option<Vec<RulesListEntity>> =
+        let (mut result, these_includes, download_urls) =
             connection_manager.execute_db(|conn: Connection| {
-                RulesListRepository::new()
-                    .select(
+                let download_urls_map = FilterRepository::new()
+                    .select_download_urls(&conn, ids.iter(), ids.len())
+                    .map_err(FLMError::from_database)?;
+
+                let values: Vec<Value> = ids.into_iter().map(Into::into).collect();
+
+                let includes = FilterIncludesRepository::new()
+                    .select_mapped(
                         &conn,
-                        Some(SQLOperator::FieldIn(
-                            "filter_id",
-                            ids.into_iter().map(Into::into).collect(),
-                        )),
+                        Some(SQLOperator::FieldIn("filter_id", values.clone())),
                     )
-                    .map_err(FLMError::from_database)
+                    .map_err(FLMError::from_database)?;
+
+                let rules = RulesListRepository::new()
+                    .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
+                    .map_err(FLMError::from_database)?;
+
+                Ok((rules, includes, download_urls_map))
             })?;
+
+        if let Some(ref mut rules) = result {
+            for rule in rules.iter_mut() {
+                if rule.has_directives() {
+                    if let Some(download_url) = download_urls.get(&rule.filter_id) {
+                        let mut collector = FilterCollector::new(configuration);
+                        let (new_body, new_count) = collector
+                            .collect_from_parts(
+                                &rule,
+                                download_url,
+                                these_includes.get(&rule.filter_id),
+                            )
+                            .map_err(FLMError::from_parser_error)?;
+
+                        rule.text = new_body;
+                        rule.rules_count = new_count;
+                    } else {
+                        return Err(FLMError::from_display(format!(
+                            "Could not find download url for {}",
+                            rule.filter_id
+                        )));
+                    }
+                }
+            }
+        }
 
         let filter_rules_as_string: Vec<FilterListRulesRaw> = result
             .unwrap_or_default()
@@ -156,9 +201,21 @@ impl RulesListManager {
         ids: Vec<FilterId>,
     ) -> FLMResult<Vec<RulesCountByFilter>> {
         let result: Vec<RulesCountEntity> = connection_manager.execute_db(|conn: Connection| {
-            RulesListRepository::new()
+            let mut rules_counts_in_rules = RulesListRepository::new()
                 .get_rules_count(&conn, &ids)
-                .map_err(FLMError::from_database)
+                .map_err(FLMError::from_database)?;
+
+            let rules_counts_in_includes = FilterIncludesRepository::new()
+                .get_rules_count_for_filters(&conn, &ids)
+                .map_err(FLMError::from_database)?;
+
+            rules_counts_in_rules.iter_mut().for_each(|entity| {
+                if let Some(rules_count) = rules_counts_in_includes.get(&entity.filter_id) {
+                    entity.rules_count += rules_count.to_owned();
+                }
+            });
+
+            Ok(rules_counts_in_rules)
         })?;
 
         let rules_count: Vec<RulesCountByFilter> = result.into_iter().map(Into::into).collect();
@@ -170,10 +227,12 @@ impl RulesListManager {
     pub(crate) fn save_custom_filter_rules(
         &self,
         connection_manager: &DbConnectionManager,
+        configuration: &Configuration,
         rules: FilterListRules,
     ) -> FLMResult<()> {
         let rules: FilterListRules = self.update_rules_count(rules);
-        let _ = connection_manager.execute_db(move |mut conn: Connection| {
+
+        connection_manager.execute_db(move |mut conn: Connection| {
             let filter_repository = FilterRepository::new();
 
             let result = filter_repository
@@ -185,16 +244,32 @@ impl RulesListManager {
 
             match result {
                 Some(mut filters) if !filters.is_empty() => {
-                    let _ = with_transaction(&mut conn, |tx: &Transaction| {
-                        // SAFETY: index "0" always present in this branch until condition
-                        // `!filters.is_empty()` is met.
-                        let filter = unsafe { filters.get_unchecked_mut(0) };
+                    let mut filter = filters.remove(0);
+                    let http_client = BlockingClient::new(configuration)?;
 
+                    let filter_id = rules.filter_id;
+                    let rules_entity = RulesListEntity::from(rules);
+                    let mut compiler = FilterCompiler::with_custom_provider(
+                        Box::new(StringProvider::new(rules_entity.text, &http_client)),
+                        configuration,
+                    );
+
+                    compiler
+                        .compile(&filter.download_url)
+                        .map_err(FLMError::from_parser_error)?;
+
+                    let mut entities = compiler.into_entities(filter_id);
+                    entities.rules_list_entity.disabled_text = rules_entity.disabled_text;
+
+                    // TODO: do we need to update metadata here?
+                    let _ = with_transaction(&mut conn, |tx: &Transaction| {
                         filter.last_update_time = Utc::now().timestamp();
 
-                        filter_repository.insert(tx, &filters)?;
+                        filter_repository.insert(tx, &[filter])?;
+                        FilterIncludesRepository::new()
+                            .replace_entities_for_filters(tx, &entities.filter_includes_entities)?;
 
-                        RulesListRepository::new().insert(tx, &[rules.into()])
+                        RulesListRepository::new().insert(tx, &[entities.rules_list_entity])
                     });
 
                     Ok(())
@@ -202,9 +277,7 @@ impl RulesListManager {
 
                 _ => Err(FLMError::EntityNotFound(rules.filter_id as i64)),
             }
-        })?;
-
-        Ok(())
+        })
     }
 
     /// Saves disabled rules
@@ -247,21 +320,12 @@ impl RulesListManager {
         let rules_count = rules
             .rules
             .iter()
-            .filter(|line| RulesListManager::is_line_is_rule(line))
+            .filter(|line| is_line_is_rule(line))
             .count() as i32;
 
         rules.rules_count = rules_count;
 
         rules
-    }
-}
-
-impl RulesListManager {
-    /// Determines if string is a rule
-    pub(crate) fn is_line_is_rule(line: &str) -> bool {
-        !(line.is_empty()
-            || line.starts_with(NON_RULE_MARKER)
-            || line.starts_with(EXTRA_COMMENT_MARKER))
     }
 }
 

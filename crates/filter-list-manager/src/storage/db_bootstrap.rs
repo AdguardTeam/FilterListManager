@@ -8,7 +8,7 @@ use crate::storage::repositories::filter_group_repository::FilterGroupRepository
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
 use crate::storage::repositories::Repository;
-use crate::FilterId;
+use crate::{string, FilterId};
 use rusqlite::Transaction;
 
 /// Returns the filter identifier added by default when the base is bootstrapped.
@@ -36,12 +36,7 @@ fn make_user_rules_filter_entity() -> FilterEntity {
 /// Creates an empty rule list for the user rules filter.
 /// This should not be deleted, as user rules are not set in the usual way when downloaded from the `download_url`.
 fn create_user_rules_rules_list_entity() -> RulesListEntity {
-    RulesListEntity {
-        filter_id: USER_RULES_FILTER_LIST_ID,
-        text: String::new(),
-        disabled_text: String::new(),
-        rules_count: 0,
-    }
+    RulesListEntity::new(USER_RULES_FILTER_LIST_ID, string!(), 0)
 }
 
 /// Creates a special group for custom filters.

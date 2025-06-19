@@ -8,6 +8,7 @@ const METADATA_SPLIT_TOKEN: char = ':';
 const MAX_METADATA_LINES: usize = 100;
 
 /// Collects metadata from given line
+#[derive(Clone)]
 pub(crate) struct MetadataCollector {
     values: HashMap<KnownMetadataProperty, String>,
     non_empty_lines: u32,
