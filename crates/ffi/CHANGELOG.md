@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [Unreleased]
+
+### Added
+- Kotlin for Android flm bindings
+
+### Changed
+- Update flm to 2.0.0-rc.1
+- Windows: change the way to handle FLM errors
+
+### Fixed
+- `get_filters_*` and `fetch_filter_*` methods names were corrected
+
+### Removed
+- Uniffi bindings and builds are completely removed
+
 ## [1.9.0] - 2025-04-14
 
 ### Add

@@ -3,6 +3,7 @@
 -- has_directives = 1 means that we will process filters in a regular way. No fast path
 ALTER TABLE [rules_list] ADD COLUMN [has_directives] BOOLEAN NOT NULL DEFAULT 1;
 
+-- Squashed includes for filters
 CREATE TABLE [filter_includes] (
     [row_id] INTEGER PRIMARY KEY,
     [filter_id] INTEGER NOT NULL,
