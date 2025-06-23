@@ -2,6 +2,7 @@
 
 use crate::outer_error::AGOuterError;
 use crate::protobuf_generated::filter_list_manager;
+use adguard_flm::manager::models::configuration::FiltersCompilationPolicy;
 use adguard_flm::{
     ActiveRulesInfo, Configuration, DisabledRulesRaw, FilterGroup, FilterListMetadata,
     FilterListMetadataWithBody, FilterListRules, FilterListRulesRaw, FilterListType, FilterTag,
@@ -9,17 +10,15 @@ use adguard_flm::{
     StoredFilterMetadata, UpdateFilterError, UpdateResult,
 };
 
-impl From<Vec<String>> for filter_list_manager::CompilerConditionalConstants {
+impl From<Vec<String>> for filter_list_manager::FiltersCompilationPolicy {
     fn from(value: Vec<String>) -> Self {
-        Self {
-            compiler_conditional_constants: value,
-        }
+        Self { constants: value }
     }
 }
 
-impl From<filter_list_manager::CompilerConditionalConstants> for Vec<String> {
-    fn from(value: filter_list_manager::CompilerConditionalConstants) -> Self {
-        value.compiler_conditional_constants
+impl From<filter_list_manager::FiltersCompilationPolicy> for Vec<String> {
+    fn from(value: filter_list_manager::FiltersCompilationPolicy) -> Self {
+        value.constants
     }
 }
 
@@ -37,7 +36,11 @@ impl From<Configuration> for filter_list_manager::Configuration {
             }
         };
 
-        let compiler_conditional_constants = value.compiler_conditional_constants.map(Into::into);
+        let filters_compilation_policy = if value.filters_compilation_policy.constants.is_empty() {
+            None
+        } else {
+            Some(value.filters_compilation_policy.into())
+        };
 
         Self {
             filter_list_type: match value.filter_list_type {
@@ -47,7 +50,7 @@ impl From<Configuration> for filter_list_manager::Configuration {
             working_directory: value.working_directory,
             locale: value.locale,
             default_filter_list_expires_period_sec: value.default_filter_list_expires_period_sec,
-            compiler_conditional_constants,
+            filters_compilation_policy,
             metadata_url: value.metadata_url,
             metadata_locales_url: value.metadata_locales_url,
             request_timeout_ms: value.request_timeout_ms,
@@ -62,7 +65,10 @@ impl From<Configuration> for filter_list_manager::Configuration {
 
 impl From<filter_list_manager::Configuration> for Configuration {
     fn from(val: filter_list_manager::Configuration) -> Self {
-        let compiler_conditional_constants = val.compiler_conditional_constants.map(Into::into);
+        let filters_compilation_policy: FiltersCompilationPolicy = val
+            .filters_compilation_policy
+            .map(Into::into)
+            .unwrap_or_default();
 
         Configuration {
             filter_list_type: match val.filter_list_type {
@@ -73,7 +79,7 @@ impl From<filter_list_manager::Configuration> for Configuration {
             working_directory: val.working_directory,
             locale: val.locale,
             default_filter_list_expires_period_sec: val.default_filter_list_expires_period_sec,
-            compiler_conditional_constants,
+            filters_compilation_policy,
             metadata_url: val.metadata_url,
             metadata_locales_url: val.metadata_locales_url,
             request_timeout_ms: val.request_timeout_ms,
@@ -418,6 +424,22 @@ impl From<PullMetadataResult> for filter_list_manager::PullMetadataResult {
             added_filters: value.added_filters,
             removed_filters: value.removed_filters,
             moved_filters: value.moved_filters.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+impl From<FiltersCompilationPolicy> for filter_list_manager::FiltersCompilationPolicy {
+    fn from(value: FiltersCompilationPolicy) -> Self {
+        Self {
+            constants: value.constants,
+        }
+    }
+}
+
+impl From<filter_list_manager::FiltersCompilationPolicy> for FiltersCompilationPolicy {
+    fn from(value: filter_list_manager::FiltersCompilationPolicy) -> Self {
+        Self {
+            constants: value.constants,
         }
     }
 }

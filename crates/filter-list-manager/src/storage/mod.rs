@@ -16,6 +16,7 @@ pub(crate) mod sql_generators;
 mod utils;
 
 pub use db_connection_manager::DbConnectionManager;
+pub use entities::hydrate::Hydrate;
 
 #[doc(hidden)]
 /// Make a block, wrapped with transaction

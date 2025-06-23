@@ -319,6 +319,45 @@ impl FilterRepository {
         Ok(map)
     }
 
+    /// Gets download urls mapped by [`FilterId`]
+    ///
+    /// * `conn` - Connection
+    /// * `ids` - iterator of proposed ['FilterId']
+    /// * `len` - iterator length
+    pub(crate) fn select_download_urls<'i>(
+        &self,
+        conn: &Connection,
+        ids: impl Iterator<Item = &'i FilterId>,
+        len: usize,
+    ) -> rusqlite::Result<HashMap<FilterId, String>> {
+        if len == 0 {
+            return Ok(HashMap::new());
+        }
+
+        let mut sql = String::from(
+            r"
+            SELECT
+                filter_id,
+                download_url
+            FROM
+                [filter]
+            WHERE ",
+        );
+
+        sql += build_in_clause("filter_id", len).as_str();
+
+        let mut statement = conn.prepare(sql.as_str())?;
+
+        let mut rows = statement.query(params_from_iter(ids))?;
+
+        let mut out = HashMap::new();
+        while let Some(row) = rows.next()? {
+            out.insert(row.get(0)?, row.get(1)?);
+        }
+
+        Ok(out)
+    }
+
     /// Update user defined metadata for custom_filter
     ///
     /// * `transaction` - Outer transaction

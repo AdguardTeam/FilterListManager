@@ -12,7 +12,8 @@ final class AdGuardFLMLibTests: XCTestCase {
         configuration.metadataURL = "https://filters.adtidy.org/extension/safari/filters.json"
         configuration.metadataLocalesURL = "https://filters.adtidy.org/extension/safari/filters_i18n.json"
         configuration.workingDirectory = "."
-        configuration.compilerConditionalConstants.compilerConditionalConstants = ["const1", "const2"]
+        configuration.filtersCompilationPolicy = FilterListManager_FiltersCompilationPolicy()
+        configuration.filtersCompilationPolicy.constants = ["const1", "const2"]
 
         return configuration
     }

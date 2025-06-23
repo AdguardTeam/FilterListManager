@@ -5,10 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `pull_metadata` now returns `PullMetadataResult`
+
+### Changed
+- Filters parsing changed to two-step process:
+  1. Filter compilation.
+  2. Filter collection.
+
+    #### Compilation
+    Compilation takes the *main filter body*, saves it **as is** into the `rules_list` table, and does not resolve any directives.
+   
+    _Includes_ are collected during compilation and saved into a separate `filter_includes` table.
+    All **recursive** includes are inlined during compilation, and all conditional directives in includes 
+    are resolved too.
+
+    #### Collection
+
+    Collection takes the **compiled** main filter from the `rules_list` table and includes from the `filter_includes` table.
+    All directives are resolved, and all includes are injected into the main filter body.
+    Collected filters are returned to the caller
+
 ## [1.7.0] - 2025-04-14
 
-### Add
-- filter_url, http_client_error fields to `UdpateFilterError` 
+### Added
+- filter_url, http_client_error fields to `UdpateFilterError`
 
 [1.7.0]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.6.8...flm-1.7.0
 
@@ -28,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.6.6] - 2025-03-26
 
-### Add
+### Added
 - Service layer between manager and storage
 
 [1.6.6]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.6.5...flm-1.6.6

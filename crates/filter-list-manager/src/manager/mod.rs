@@ -156,7 +156,7 @@ pub trait FilterListManager {
     /// Returns [`Err`] if you can not get records from db, or common error
     /// encountered.
     ///
-    /// Note: should be used once an hour or less.
+    /// Note: should be used no more than once an hour.
     fn update_filters(
         &self,
         ignore_filters_expiration: bool,
@@ -236,7 +236,7 @@ pub trait FilterListManager {
     /// 7. Fill in our updated filters along with the raw filters from the
     /// index.
     ///
-    /// Note: should be used once a week or less.
+    /// Note: should be used no more than once a week.
     ///
     /// # Returns
     ///

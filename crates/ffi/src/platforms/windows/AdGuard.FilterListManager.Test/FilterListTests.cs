@@ -56,6 +56,10 @@ namespace AdGuard.FilterListManager.Test
                 configuration.AppName = "AdGuard.FilterListManager.Test";
                 configuration.Version = "1.0";
                 configuration.DefaultFilterListExpiresPeriodSec = 10;
+                configuration.FiltersCompilationPolicy = new FiltersCompilationPolicy
+                {
+                    Constants = { "windows_is_the_best" }
+                };
                 flm.Init(configuration);
                 flm.PullMetadata();
             }
@@ -76,6 +80,10 @@ namespace AdGuard.FilterListManager.Test
                 configuration.AppName = "AdGuard.FilterListManager.Test";
                 configuration.Version = "1.0";
                 configuration.DefaultFilterListExpiresPeriodSec = 10;
+                configuration.FiltersCompilationPolicy = new FiltersCompilationPolicy
+                {
+                    Constants = { "windows_is_the_best" }
+                };
                 flm.Init(configuration);
                 flm.PullMetadata();
                 flm.UpdateFilters(false, REQUEST_TIMEOUT_MS, false);

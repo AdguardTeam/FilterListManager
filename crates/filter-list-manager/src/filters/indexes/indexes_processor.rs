@@ -438,8 +438,8 @@ mod tests {
     use crate::test_utils::tests_path;
     use crate::utils::memory::heap;
     use crate::{
-        Configuration, FLMError, FilterId, CUSTOM_FILTERS_GROUP_ID, MAXIMUM_CUSTOM_FILTER_ID,
-        MINIMUM_CUSTOM_FILTER_ID,
+        string, Configuration, FLMError, FilterId, CUSTOM_FILTERS_GROUP_ID,
+        MAXIMUM_CUSTOM_FILTER_ID, MINIMUM_CUSTOM_FILTER_ID,
     };
     use rand::seq::SliceRandom;
     use rand::{thread_rng, Rng};
@@ -632,12 +632,11 @@ mod tests {
                     new_chosen_filter.is_enabled = true;
 
                     with_transaction(&mut conn, |transaction| {
-                        let new_rules_entity = RulesListEntity {
-                            filter_id: new_chosen_filter.filter_id.clone().unwrap(),
-                            text: "".to_string(),
-                            disabled_text: "".to_string(),
-                            rules_count: 0,
-                        };
+                        let new_rules_entity = RulesListEntity::new(
+                            new_chosen_filter.filter_id.clone().unwrap(),
+                            string!(),
+                            0,
+                        );
 
                         let _ = &rules_repository
                             .insert(&transaction, &[new_rules_entity])

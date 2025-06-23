@@ -6,6 +6,7 @@ pub(crate) mod db_schema_repository;
 pub(crate) mod diff_updates_repository;
 pub(crate) mod filter_filter_tag_repository;
 pub(crate) mod filter_group_repository;
+pub(crate) mod filter_includes_repository;
 pub(crate) mod filter_locale_repository;
 pub(crate) mod filter_repository;
 pub(crate) mod filter_tag_repository;

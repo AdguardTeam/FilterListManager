@@ -90,6 +90,11 @@ impl FilterParserError {
     ) -> Result<R, FilterParserError> {
         Err(FilterParserError::InvalidChecksum(actual, expected))
     }
+
+    #[inline]
+    pub(crate) fn err<R>(self) -> Result<R, FilterParserError> {
+        Err(self)
+    }
 }
 
 impl From<ReadFilterFileError> for FilterParserError {
