@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0-rc.1] - 2025-06-23
 
 ### Added
 - `pull_metadata` now returns `PullMetadataResult`
@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     Collection takes the **compiled** main filter from the `rules_list` table and includes from the `filter_includes` table.
     All directives are resolved, and all includes are injected into the main filter body.
     Collected filters are returned to the caller
+
+[2.0.0-rc.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-1.7.0...flm-2.0.0-rc.1
 
 ## [1.7.0] - 2025-04-14
 
