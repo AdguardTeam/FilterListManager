@@ -24,6 +24,13 @@ Default Job:
       path: ${bamboo.private_repo_path}
       force-clean-build: 'true'
   - script:
+      description: Checkout private repository hash
+      interpreter: WINDOWS_POWER_SHELL
+      scripts:
+      - |-
+        . "${bamboo.helper_scripts}"
+        CheckoutRepoHash ${bamboo.private_repo_path} "${bamboo.private_repo_hash}"
+  - script:
       interpreter: WINDOWS_POWER_SHELL
       description: Set first project to update
       scripts:
@@ -42,12 +49,14 @@ Default Job:
       description: Main build
       scripts:
       - |-
+
+        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        VersionIncrement "${Env:bamboo_planRepository_repositoryUrl}";
         
         . "${bamboo.root_folder}\Scripts\build_adapter.ps1"
         RustBuild
       
         . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
-        VersionIncrement "${Env:bamboo_planRepository_repositoryUrl}";
         MainBuild "${bamboo.build_configuration}" "${bamboo.define_constants}" "${bamboo.build_folder}";
       environment: channel="${bamboo.channel}" "use_force_master="${bamboo.use_force_master}"
   - script:
@@ -67,7 +76,7 @@ Default Job:
       description: Main deploy
       scripts:
       - |-
-        . "${bamboo.deploy_folder}\main_deploy.ps1";
+        . "${bamboo.deploy_folder}\${bamboo.deploy_script}";
         MainDeploy "${bamboo.build_folder}" "$Env:bamboo_windowsCertStoragePassword" ${bamboo.skip_signing_libs};
       environment: use_force_master="${bamboo.use_force_master}"   
   artifacts:
