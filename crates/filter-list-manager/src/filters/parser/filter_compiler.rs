@@ -269,14 +269,14 @@ impl FilterCompiler<'_> {
             }));
         }
 
-        if self.conditional_directives_processor.process(line)? == true {
+        if self.conditional_directives_processor.process(line)? {
             self.directives_encountered = true;
             return Ok(ProcessedMainFilterLine::Skipped);
         }
 
         // We do not need check lines is capturing here, cause all lines should be processed
 
-        if self.metadata_collector.is_reached_eod == false {
+        if !self.metadata_collector.is_reached_eod {
             self.metadata_collector.parse_line(line, lineno);
         }
 

@@ -37,6 +37,7 @@ use std::str::FromStr;
 use std::time::Instant;
 
 /// Tries to update passed filters
+#[allow(clippy::unwrap_or_default)]
 pub(super) fn update_filters_action(
     records: Vec<FilterEntity>,
     db_connection_manager: &DbConnectionManager,
@@ -326,7 +327,7 @@ pub(super) fn update_filters_action(
         builder.set_rules_map(new_rules_map);
         builder.set_filters_includes_map(new_filters_includes_map);
 
-        builder.build_full_filter_lists(conn, filter_entities, &configuration)
+        builder.build_full_filter_lists(conn, filter_entities, configuration)
     })?;
 
     Ok(update_result)

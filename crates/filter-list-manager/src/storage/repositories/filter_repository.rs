@@ -452,6 +452,7 @@ impl FilterRepository {
         self.insert_internal(transaction, entities, flags, Some(Box::new(callback)))
     }
 
+    #[allow(clippy::manual_range_contains)]
     fn insert_internal<'c>(
         &self,
         transaction: &Transaction<'_>,

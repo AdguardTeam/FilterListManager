@@ -34,6 +34,7 @@ impl StreamingRulesManager {
         let mut handler = OpenOptions::new()
             .write(true)
             .create(true)
+            .truncate(true)
             .open(&file_path)
             .map_err(FLMError::from_io)?;
 
@@ -56,13 +57,11 @@ impl StreamingRulesManager {
 
                 Ok(())
             })
-            .map_err(|why| {
+            .inspect_err(|_| {
                 drop(handler);
                 if !file_already_exists {
                     fs::remove_file(&file_path).unwrap_or(());
                 }
-
-                why
             })
     }
 }

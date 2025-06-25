@@ -59,7 +59,7 @@ impl FilterMetadataGrabber {
 
         let metadata = compiler.clone_metadata();
         let compiled_filter_entities = compiler.into_entities(0);
-        let mut builder = FilterCollector::new(&configuration);
+        let mut builder = FilterCollector::new(configuration);
 
         let (filter_body, rules_count) = builder
             .collect(&compiled_filter_entities, &download_url)

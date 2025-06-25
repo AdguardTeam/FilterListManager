@@ -4,6 +4,7 @@ use adguard_flm::Configuration;
 use std::time::{Instant, SystemTime};
 
 #[allow(dead_code)]
+#[allow(clippy::field_reassign_with_default)]
 fn install_lists() {
     let start = SystemTime::now();
 
@@ -45,6 +46,7 @@ fn install_lists() {
 }
 
 #[allow(dead_code)]
+#[allow(clippy::field_reassign_with_default)]
 fn gets_filter_list() {
     let mut conf = Configuration::default();
     conf.app_name = "FlmApp".to_string();

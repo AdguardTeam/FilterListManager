@@ -225,7 +225,7 @@ impl IndexesProcessor<'_> {
                         // They aren't equal, so filter was moved
                         if previous_id != next_id {
                             out.moved_filters
-                                .push(MovedFilterInfo::new(previous_id.clone(), next_id.clone()));
+                                .push(MovedFilterInfo::new(*previous_id, *next_id));
                         }
                     }
                 },

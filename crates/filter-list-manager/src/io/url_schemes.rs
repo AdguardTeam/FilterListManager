@@ -35,7 +35,7 @@ impl From<&str> for UrlSchemes {
             "https" => UrlSchemes::Https,
             "http" => UrlSchemes::Http,
             "file" => UrlSchemes::File,
-            str if str.is_empty() => UrlSchemes::Empty,
+            "" => UrlSchemes::Empty,
             _ => UrlSchemes::Other,
         }
     }

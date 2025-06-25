@@ -220,7 +220,7 @@ fn build_rust_response_error(
     rust_response.result_data = Box::into_raw(vec.into_boxed_slice()) as *mut c_void;
     rust_response.response_type = RustResponseType::RustBuffer;
 
-    return Box::leak(rust_response);
+    Box::leak(rust_response)
 }
 
 /// Getter for the set of [`FilterListManager`] constants

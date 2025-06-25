@@ -338,7 +338,7 @@ impl FilterManager {
                         FullFilterListBuilder::new(&configuration.locale).build_full_filter_lists(
                             conn,
                             filters,
-                            &configuration,
+                            configuration,
                         )
                     })
                     .unwrap_or(Ok(vec![]))
@@ -394,12 +394,12 @@ impl FilterManager {
         };
 
         let (processed_title, is_user_title) = match title {
-            Some(title_candidate) if title_candidate.len() > 0 => (title_candidate, true),
+            Some(title_candidate) if !title_candidate.is_empty() => (title_candidate, true),
             _ => (compiler.get_metadata(KnownMetadataProperty::Title), false),
         };
 
         let (processed_description, is_user_description) = match description {
-            Some(description_candidate) if description_candidate.len() > 0 => {
+            Some(description_candidate) if !description_candidate.is_empty() => {
                 (description_candidate, true)
             }
             _ => (

@@ -137,7 +137,7 @@ impl<'out> BooleanExpressionParser<'out> {
         let (token, remainder) = self.take(expr);
 
         match token {
-            token if token.is_empty() => None,
+            "" => None,
             "!" => {
                 let inversion = self.term(remainder)?;
 
@@ -156,8 +156,7 @@ impl<'out> BooleanExpressionParser<'out> {
                     .policy
                     .constants
                     .iter()
-                    .find(|flag| flag.as_str() == token)
-                    .is_some();
+                    .any(|flag| flag.as_str() == token);
 
                 Some((token_exists, remainder))
             }

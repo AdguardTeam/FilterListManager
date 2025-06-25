@@ -110,9 +110,9 @@ pub struct FullFilterList {
     /// controlled by the caller.
     ///
     /// 1. If the filter list is disabled, it is not used by the filtering
-    /// engine (see `get_active_rules`).
+    ///    engine (see `get_active_rules`).
     /// 2. If the filter list is disabled, the library does not attempt to
-    /// download the filter updates.
+    ///    download the filter updates.
     pub is_enabled: bool,
     /// Indicates if the filter is installed or not. This field is purely
     /// metadata and is not used by the library itself. It is used in AdGuard

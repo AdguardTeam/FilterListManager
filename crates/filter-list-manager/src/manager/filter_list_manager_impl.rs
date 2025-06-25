@@ -272,7 +272,7 @@ impl FilterListManager for FilterListManagerImpl {
         RulesListManager::new().get_disabled_rules(&self.connection_manager, ids)
     }
 
-    fn set_proxy_mode(&mut self, mode: RequestProxyMode) -> () {
+    fn set_proxy_mode(&mut self, mode: RequestProxyMode) {
         ConfigurationUpdateManager::new().set_proxy_mode(&mut self.configuration, mode)
     }
 

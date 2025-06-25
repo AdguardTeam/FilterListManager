@@ -234,7 +234,7 @@ pub trait FilterListManager {
     /// 5. Remove old groups/tags/locales.
     /// 6. Fill in new groups/tags/locales.
     /// 7. Fill in our updated filters along with the raw filters from the
-    /// index.
+    ///    index.
     ///
     /// Note: should be used no more than once a week.
     ///

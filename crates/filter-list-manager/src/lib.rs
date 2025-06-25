@@ -133,6 +133,7 @@
 //!
 //! 1. **Index Filters** - Filters created by parsing the index (registry).
 //! 2. **Custom Filters** - Filters added (and edited) by the user using the
+//!
 //! library's methods.
 //! 3. **Special Filters** - Custom filters preconfigured by the library's scripts.
 //!

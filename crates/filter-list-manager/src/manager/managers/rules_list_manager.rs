@@ -167,7 +167,7 @@ impl RulesListManager {
                         let mut collector = FilterCollector::new(configuration);
                         let (new_body, new_count) = collector
                             .collect_from_parts(
-                                &rule,
+                                rule,
                                 download_url,
                                 these_includes.get(&rule.filter_id),
                             )
@@ -287,7 +287,7 @@ impl RulesListManager {
         filter_id: FilterId,
         disabled_rules: Vec<String>,
     ) -> FLMResult<()> {
-        let _ = connection_manager.execute_db(move |mut conn: Connection| {
+        connection_manager.execute_db(move |mut conn: Connection| {
             let rules_list_repository = RulesListRepository::new();
 
             let rules_lists_count = rules_list_repository
@@ -308,9 +308,7 @@ impl RulesListManager {
             });
 
             Ok(())
-        })?;
-
-        Ok(())
+        })
     }
 }
 

@@ -42,11 +42,11 @@ impl FilterUpdateManager {
 
         let update_result = update_filters_action(
             records,
-            &connection_manager,
+            connection_manager,
             true,
             true,
             loose_timeout,
-            &configuration,
+            configuration,
         )?;
 
         Ok(Some(update_result))
@@ -87,11 +87,11 @@ impl FilterUpdateManager {
 
         let update_result = update_filters_action(
             records,
-            &connection_manager,
+            connection_manager,
             ignore_filters_expiration,
             ignore_filters_status,
             loose_timeout,
-            &configuration,
+            configuration,
         )?;
 
         Ok(Some(update_result))

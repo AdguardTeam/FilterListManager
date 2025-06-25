@@ -72,7 +72,7 @@ impl<'a> FullFilterListBuilder<'a> {
                 // Append rules
                 if let Some(mut rules_entity) = rules_map.remove(filter_id) {
                     if rules_entity.has_directives() {
-                        let (text, lines_count) = FilterCollector::new(&conf)
+                        let (text, lines_count) = FilterCollector::new(conf)
                             .collect_from_parts(
                                 &rules_entity,
                                 stored_filter_metadata.download_url.as_str(),

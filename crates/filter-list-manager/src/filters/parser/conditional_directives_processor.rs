@@ -57,10 +57,7 @@ impl<'c> ConditionalDirectivesProcessor<'c> {
         } else if line.starts_with(DIRECTIVE_ELSE) {
             // Has no nesting level, or we're trying to process else twice on the same level
             if self.conditional_nesting_level == 0
-                || self
-                    .nesting_stack
-                    .last()
-                    .map_or(false, |level| level == &self.conditional_nesting_level)
+                || (self.nesting_stack.last() == Some(&self.conditional_nesting_level))
             {
                 return FilterParserError::UnbalancedElse.err();
             }
@@ -82,11 +79,7 @@ impl<'c> ConditionalDirectivesProcessor<'c> {
             }
 
             // Throw this level out of stack
-            if self
-                .nesting_stack
-                .last()
-                .map_or(false, |level| level == &self.conditional_nesting_level)
-            {
+            if self.nesting_stack.last() == Some(&self.conditional_nesting_level) {
                 self.nesting_stack.pop();
             }
 

@@ -65,7 +65,7 @@ impl<'c> FilterCollector<'c> {
                 continue;
             }
 
-            if self.conditional_directives_processor.is_capturing_lines() == false {
+            if !self.conditional_directives_processor.is_capturing_lines() {
                 continue;
             }
 

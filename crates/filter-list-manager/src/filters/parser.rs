@@ -1,18 +1,18 @@
 mod boolean_expression_parser;
 mod checksum_validator;
-pub(self) mod conditional_directives_processor;
+mod conditional_directives_processor;
 pub(crate) mod diff_updates;
 pub(crate) mod filter_collector;
 pub(crate) mod filter_compiler;
 pub(crate) mod filter_contents_provider;
-pub(self) mod filter_cursor;
+mod filter_cursor;
 mod include_processor;
 pub(crate) mod is_rule_detector;
 pub(crate) mod metadata;
 pub(crate) mod parser_error;
 mod paths;
 mod rcs_diff;
-pub(self) mod rule_lines_collector;
+mod rule_lines_collector;
 
 pub(crate) const DIRECTIVE_IF: &str = "!#if";
 pub(crate) const DIRECTIVE_ELSE: &str = "!#else";

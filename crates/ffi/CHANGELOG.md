@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.0.0-rc.2] - 2025-06-25
+
+### Changed
+- Apply clippy for workspace
+
+[2.0.0-rc.2]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.0.0-rc.1...ffi-2.0.0-rc.2
+
 ## [2.0.0-rc.1] - 2025-06-23
 
 ### Added
