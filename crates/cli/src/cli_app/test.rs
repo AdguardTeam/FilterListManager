@@ -72,10 +72,20 @@ fn update_filters() {
     conf.version = "1.2.3".to_string();
 
     let flm = FilterListManagerImpl::new(conf).unwrap();
-    //  flm.pull_metadata().unwrap();
+    flm.pull_metadata().unwrap();
     let updated = flm.update_filters(true, 0, true).unwrap().unwrap();
 
     println!("Updated filters count: {}", updated.updated_list.len());
+    updated.updated_list.iter().for_each(|f| {
+        println!("Updated filter: {}", f.id);
+    });
+
+    println!("Errors count: {}", updated.filters_errors.len());
+    if updated.filters_errors.len() > 0 {
+        updated.filters_errors.iter().for_each(|e| {
+            println!("Error: {}", e.message);
+        });
+    }
     println!("{}", "=".repeat(30));
     println!("Time elapsed: {:.2}", start.elapsed().as_secs_f32())
 }
