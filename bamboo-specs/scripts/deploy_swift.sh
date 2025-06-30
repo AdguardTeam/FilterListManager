@@ -3,12 +3,6 @@
 set -e
 set -x
 
-# Check that we are on the master branch
-if [ "${bamboo_repository_branch_name}" != "master" ]; then
-  echo "Not on the master branch. Exiting..."
-  exit 0
-fi
-
 ARTIFACTORY_USER="${bamboo_artifactoryUser}"
 ARTIFACTORY_PASS="${bamboo_artifactoryPassword}"
 ARTIFACTORY_PATH="https://${bamboo_artifactoryHostname}/artifactory/adguard-pods/binaries/AdGuardFLM"
