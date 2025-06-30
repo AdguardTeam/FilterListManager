@@ -3,6 +3,14 @@
 set -e
 set -x
 
+ROOT_PATH="$(pwd)"
+ROOT_PACKAGE_SWIFT="$ROOT_PATH/Package.swift"
+ROOT_PACKAGE_SOURCES="$ROOT_PATH/Sources"
+APPLE_PATH="$ROOT_PATH/crates/ffi/src/platforms/apple"
+APPLE_BUILD_PATH="$APPLE_PATH/build/framework"
+PACKAGE_PATH="$APPLE_PATH/AdGuardFLM"
+PACKAGE_SOURCES_PATH="$PACKAGE_PATH/Sources"
+
 ARTIFACTORY_USER="${bamboo_artifactoryUser}"
 ARTIFACTORY_PASS="${bamboo_artifactoryPassword}"
 ARTIFACTORY_PATH="https://${bamboo_artifactoryHostname}/artifactory/adguard-pods/binaries/AdGuardFLM"
@@ -52,9 +60,9 @@ PODSPEC=$(cat << EOF
 EOF
 )
 
-cd crates/ffi/src/platforms/apple/build/framework
+cd "$APPLE_BUILD_PATH"
 
-cp -r ../../AdGuardFLM/Sources/AdGuardFLMLib Sources
+cp -r "$PACKAGE_SOURCES_PATH/AdGuardFLMLib" Sources
 
 echo "#${VER}" > CHANGELOG
 echo "Confidential. Property of Adguard Software Ltd. https://adguard.com" > LICENSE
@@ -96,7 +104,7 @@ let package = Package(
     ),
   ]
 )
-' > ../../../../Package.swift
+' > "$ROOT_PACKAGE_SWIFT"
 
 # Should add key on these agents i think
 printf "%b\n" "${bamboo_sshSecretKey}" | ssh-add -
@@ -104,10 +112,10 @@ printf "%b\n" "${bamboo_sshSecretKey}" | ssh-add -
 git config user.email "Bamboo"
 git config user.name "Bamboo"
 
-cp -r ../../AdGuardFLM/Sources ../../../../Sources
+cp -r "$PACKAGE_SOURCES_PATH" "$ROOT_PACKAGE_SOURCES"
 
-git add ../../../../Package.swift
-git add ../../../../Sources
+git add "$ROOT_PACKAGE_SWIFT"
+git add "$ROOT_PACKAGE_SOURCES"
 git commit -m "AdGuardFLM for SwiftPM ${VER}"
 git tag -d "${SPM_TAG}" || true
 git tag "${SPM_TAG}"
@@ -121,7 +129,7 @@ gh release upload ${SPM_TAG} ${ARCH_NAME}
 
 rm "${ARCH_NAME}"
 
-cd ../../../../podspecs
+cd "$ROOT_PATH/podspecs"
 git reset
 git checkout master
 git remote set-url origin "${bamboo_planRepository_2_repositoryUrl}"
