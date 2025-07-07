@@ -27,10 +27,10 @@ namespace AdGuard.FilterListManager.Test
                 {
                     throw;
                 }
+                
+                outMessage = default;
+                outHandle = default;
             }
-
-            outMessage = default;
-            outHandle = default;
         }
     }
 }
