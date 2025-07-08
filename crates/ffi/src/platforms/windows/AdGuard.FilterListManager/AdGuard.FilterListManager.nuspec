@@ -31,7 +31,7 @@
     <file src="../build/bin/release/arm64/AdGuardFLM.pdb" target="build/arm64"/>
     <!-- Schemas -->
     <file src="AdGuard.FilterListManager.schema.json" target="schema.json" />
-    <file src="../../../crates/filter-list-manager/Cargo.toml" target="Cargo.toml" />
+    <file src="../../../../../filter-list-manager/Cargo.toml" target="Cargo.toml" />
     <!-- Targets -->
     <file src="AdGuard.FilterListManager.targets" target="build"/>
     <!-- .Net Reactor map files -->
