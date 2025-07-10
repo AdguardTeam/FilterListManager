@@ -495,6 +495,22 @@ pub struct ActiveRulesInfo {
     #[prost(string, repeated, tag = "4")]
     pub rules: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
+/// ActiveRulesInfo raw
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ActiveRulesInfoRaw {
+    /// Filter id for these rules
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
+    /// Group id of the filter
+    #[prost(int32, tag = "2")]
+    pub group_id: i32,
+    /// Is this filter trusted?
+    #[prost(bool, tag = "3")]
+    pub is_trusted: bool,
+    /// List of active rules as string.
+    #[prost(string, tag = "4")]
+    pub rules: ::prost::alloc::string::String,
+}
 /// UpdateResult
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateResult {
@@ -641,6 +657,11 @@ pub struct FetchFilterListMetadataRequest {
 pub struct FetchFilterListMetadataWithBodyRequest {
     #[prost(string, tag = "1")]
     pub url: ::prost::alloc::string::String,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetActiveRulesRawRequest {
+    #[prost(int32, repeated, tag = "1")]
+    pub filter_by: ::prost::alloc::vec::Vec<i32>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ChangeLocaleRequest {
@@ -817,6 +838,13 @@ pub struct InstallCustomFilterFromStringResponse {
 pub struct GetActiveRulesResponse {
     #[prost(message, repeated, tag = "1")]
     pub rules: ::prost::alloc::vec::Vec<ActiveRulesInfo>,
+    #[prost(message, optional, tag = "2")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetActiveRulesRawResponse {
+    #[prost(message, repeated, tag = "1")]
+    pub rules: ::prost::alloc::vec::Vec<ActiveRulesInfoRaw>,
     #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }

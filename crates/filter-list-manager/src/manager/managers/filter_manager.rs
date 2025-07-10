@@ -314,10 +314,7 @@ impl FilterManager {
         configuration: &Configuration,
         where_clause: Option<SQLOperator>,
     ) -> FLMResult<Vec<FullFilterList>> {
-        let full_filter_lists: Vec<FullFilterList> =
-            self.get_full_filter_lists_inner(connection_manager, configuration, where_clause)?;
-
-        Ok(full_filter_lists)
+        self.get_full_filter_lists_inner(connection_manager, configuration, where_clause)
     }
 }
 
@@ -329,22 +326,19 @@ impl FilterManager {
         configuration: &Configuration,
         where_clause: Option<SQLOperator>,
     ) -> FLMResult<Vec<FullFilterList>> {
-        let full_filter_list: Vec<FullFilterList> =
-            connection_manager.execute_db(move |conn: Connection| {
-                FilterRepository::new()
-                    .select(&conn, where_clause)
-                    .map_err(FLMError::from_database)?
-                    .map(|filters| {
-                        FullFilterListBuilder::new(&configuration.locale).build_full_filter_lists(
-                            conn,
-                            filters,
-                            configuration,
-                        )
-                    })
-                    .unwrap_or(Ok(vec![]))
-            })?;
-
-        Ok(full_filter_list)
+        connection_manager.execute_db(move |conn: Connection| {
+            FilterRepository::new()
+                .select(&conn, where_clause)
+                .map_err(FLMError::from_database)?
+                .map(|filters| {
+                    FullFilterListBuilder::new(&configuration.locale).build_full_filter_lists(
+                        conn,
+                        filters,
+                        configuration,
+                    )
+                })
+                .unwrap_or(Ok(vec![]))
+        })
     }
 
     /// Gets stored filter metadata by filter_list_builder

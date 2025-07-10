@@ -109,6 +109,10 @@ namespace FilterListManager
     {
     }
     
+    public partial class GetActiveRulesRawResponse : IAGOuterError 
+    {
+    }
+    
     public partial class GetDisabledRulesResponse : IAGOuterError 
     {
     }

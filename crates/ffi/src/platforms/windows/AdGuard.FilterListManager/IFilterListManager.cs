@@ -323,6 +323,12 @@ namespace AdGuard.FilterListManager
         /// Gets a list of [`ActiveRulesInfo`] from filters with `filter.is_enabled=true` flag.
         /// </summary>
         IEnumerable<ActiveRulesInfo> GetActiveRules();
+        
+        /// <summary>
+        /// Gets a list of [`ActiveRulesInfoRaw`] from filters with `filter.is_enabled=true` flag.
+        /// `filter_by` - If empty, returns all active rules, otherwise returns intersection between `filter_by` and all active rules
+        /// </summary>
+        IEnumerable<ActiveRulesInfoRaw> GetActiveRulesRaw(IEnumerable<int> filterBy);
 
         /// <summary>
         /// Gets a list of [`FilterListRulesRaw`] structures containing.

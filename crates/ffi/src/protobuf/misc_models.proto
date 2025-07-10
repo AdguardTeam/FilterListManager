@@ -23,6 +23,21 @@ message ActiveRulesInfo {
   repeated string rules = 4;
 }
 
+// ActiveRulesInfo raw
+message ActiveRulesInfoRaw {
+  // Filter id for these rules
+  int32 filter_id = 1;
+
+  // Group id of the filter
+  int32 group_id = 2;
+
+  // Is this filter trusted?
+  bool is_trusted = 3;
+
+  // List of active rules as string.
+  string rules = 4;
+}
+
 // UpdateResult
 message UpdateResult {
   // Currently updated filters.

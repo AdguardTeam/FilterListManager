@@ -94,6 +94,8 @@ public protocol FLMFacadeProtocol {
 
     func getActiveRules() throws -> [FilterListManager_ActiveRulesInfo]
 
+    func getActiveRulesRaw(filterBy: [Int32]) throws -> [FilterListManager_ActiveRulesInfoRaw]
+
     func getFilterRulesAsStrings(ids: [Int32]) throws -> [FilterListManager_FilterListRulesRaw]
 
     func saveRulesToFileBlob(id: Int32, filePath: String) throws
@@ -488,6 +490,19 @@ public class FLMFacade: FLMFacadeProtocol {
         let message = FilterListManager_EmptyRequest()
 
         let response: FilterListManager_GetActiveRulesResponse = try callRust(method: GetActiveRules, message: message)
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+
+        return response.rules
+    }
+
+    public func getActiveRulesRaw(filterBy: [Int32]) throws -> [FilterListManager_ActiveRulesInfoRaw] {
+        var message = FilterListManager_GetActiveRulesRawRequest()
+        message.filterBy = filterBy
+
+        let response: FilterListManager_GetActiveRulesRawResponse = try callRust(method: GetActiveRulesRaw, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)

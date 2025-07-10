@@ -183,6 +183,10 @@ class FilterListManagerAndroidTest {
             )
             assertTrue("Updating custom filter metadata should succeed", updateResult)
 
+            val activeRulesResult = flm.getActiveRulesRaw(listOf(customFilter.id))
+            assertEquals(activeRulesResult.size, 1)
+            assertEquals(activeRulesResult[0].filterId, customFilter.id)
+
             // Test getting rules count
             val rulesCount = flm.getRulesCount(listOf(customFilter.id))
             assertFalse("Rules count list should not be empty", rulesCount.isEmpty())

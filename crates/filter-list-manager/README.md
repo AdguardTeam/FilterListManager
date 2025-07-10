@@ -229,6 +229,10 @@ flm.get_full_filter_list_by_id(id /* FilterId */);
 // Retrieves all enabled filters as ActiveRulesInfo.
 flm.get_active_rules();
 
+// Gets a list of [`ActiveRulesInfoRaw`] from filters with `filter.is_enabled=true` flag.
+// `filter_by` - If empty, returns all active rules, otherwise returns intersection between `filter_by` and all active rules
+flm.get_active_rules_raw(filter_by /* Vec<FilterId> */);
+
 // Retrieves all filters metadata from the database **without** theirs rules.
 // Returns Vec<StoredFilterMetadata>
 flm.get_stored_filters_metadata();
@@ -266,6 +270,7 @@ flm.get_rules_count(ids, /* Vec<FilterId> */);
 [FullFilterList reference](./src/manager/models/full_filter_list.rs)\
 [StoredFilterMetadata reference](./src/manager/models/stored_filter_metadata.rs)\
 [ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)\
+[ActiveRulesInfoRaw reference](./src/manager/models/active_rules_info_raw.rs)\
 [FilterListRulesRaw reference](./src/manager/models/filter_list_rules_raw.rs)\
 [DisabledRulesRaw reference](./src/manager/models/disabled_rules_raw.rs)\
 [RulesCountByFilter reference](./src/manager/models/rules_count_by_filter.rs)

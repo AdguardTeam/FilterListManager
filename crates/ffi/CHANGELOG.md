@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.0.0-rc.3] - 2025-07-10
+
+### Added
+- `get_active_rules_raw` method
+
+### Changed
+- Update flm to 2.0.0-rc.3
+
+[2.0.0-rc.3]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.0.0-rc.2...ffi-2.0.0-rc.3
+
 ## [2.0.0-rc.2] - 2025-06-25
 
 ### Changed

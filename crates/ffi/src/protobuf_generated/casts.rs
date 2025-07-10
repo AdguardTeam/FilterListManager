@@ -4,10 +4,10 @@ use crate::outer_error::AGOuterError;
 use crate::protobuf_generated::filter_list_manager;
 use adguard_flm::manager::models::configuration::FiltersCompilationPolicy;
 use adguard_flm::{
-    ActiveRulesInfo, Configuration, DisabledRulesRaw, FilterGroup, FilterListMetadata,
-    FilterListMetadataWithBody, FilterListRules, FilterListRulesRaw, FilterListType, FilterTag,
-    FullFilterList, MovedFilterInfo, PullMetadataResult, RequestProxyMode, RulesCountByFilter,
-    StoredFilterMetadata, UpdateFilterError, UpdateResult,
+    ActiveRulesInfo, ActiveRulesInfoRaw, Configuration, DisabledRulesRaw, FilterGroup,
+    FilterListMetadata, FilterListMetadataWithBody, FilterListRules, FilterListRulesRaw,
+    FilterListType, FilterTag, FullFilterList, MovedFilterInfo, PullMetadataResult,
+    RequestProxyMode, RulesCountByFilter, StoredFilterMetadata, UpdateFilterError, UpdateResult,
 };
 
 impl From<Vec<String>> for filter_list_manager::FiltersCompilationPolicy {
@@ -440,6 +440,17 @@ impl From<filter_list_manager::FiltersCompilationPolicy> for FiltersCompilationP
     fn from(value: filter_list_manager::FiltersCompilationPolicy) -> Self {
         Self {
             constants: value.constants,
+        }
+    }
+}
+
+impl From<ActiveRulesInfoRaw> for filter_list_manager::ActiveRulesInfoRaw {
+    fn from(value: ActiveRulesInfoRaw) -> Self {
+        Self {
+            filter_id: value.filter_id,
+            group_id: value.group_id,
+            is_trusted: value.is_trusted,
+            rules: value.rules,
         }
     }
 }

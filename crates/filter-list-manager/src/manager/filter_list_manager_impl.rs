@@ -13,7 +13,6 @@ use super::models::{
     configuration::Configuration, FilterId, FilterListMetadata, FilterListMetadataWithBody,
     FullFilterList, PullMetadataResult, UpdateResult,
 };
-use crate::manager::models::active_rules_info::ActiveRulesInfo;
 use crate::manager::models::configuration::request_proxy_mode::RequestProxyMode;
 use crate::manager::models::configuration::Locale;
 use crate::manager::models::disabled_rules_raw::DisabledRulesRaw;
@@ -24,7 +23,10 @@ use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::DbConnectionManager;
-use crate::{manager::FilterListManager, FLMError, FLMResult, StoredFilterMetadata};
+use crate::{
+    manager::FilterListManager, ActiveRulesInfo, ActiveRulesInfoRaw, FLMError, FLMResult,
+    StoredFilterMetadata,
+};
 use std::path::Path;
 
 /// Default implementation for [`FilterListManager`]
@@ -245,6 +247,14 @@ impl FilterListManager for FilterListManagerImpl {
         RulesListManager::new().get_active_rules(&self.connection_manager, &self.configuration)
     }
 
+    fn get_active_rules_raw(&self, filter_by: Vec<FilterId>) -> FLMResult<Vec<ActiveRulesInfoRaw>> {
+        RulesListManager::new().get_active_rules_raw(
+            &self.connection_manager,
+            &self.configuration,
+            filter_by,
+        )
+    }
+
     fn get_filter_rules_as_strings(
         &self,
         ids: Vec<FilterId>,
@@ -278,6 +288,13 @@ impl FilterListManager for FilterListManagerImpl {
 
     fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>> {
         RulesListManager::new().get_rules_count(&self.connection_manager, ids)
+    }
+}
+
+#[cfg(test)]
+impl FilterListManagerImpl {
+    pub(crate) fn get_configuration(&self) -> &Configuration {
+        &self.configuration
     }
 }
 
@@ -616,84 +633,6 @@ mod tests {
         );
         assert!(filter.subscription_url.len() > 0);
         assert!(filter.download_url.len() > 0);
-    }
-
-    #[test]
-    fn test_get_active_rules_with_disabled_rules() {
-        let filter = include_str!("../../tests/fixtures/small_pseudo_custom_filter_rules_test.txt");
-
-        let source = DbConnectionManager::factory_test().unwrap();
-        let _ = spawn_test_db_with_metadata(&source);
-
-        let mut conf = Configuration::default();
-        conf.app_name = "FlmApp".to_string();
-        conf.version = "1.2.3".to_string();
-        let flm = FilterListManagerImpl::new(conf).unwrap();
-
-        let new_filter = flm
-            .install_custom_filter_from_string(
-                String::from("https://i-dont-ca.re"),
-                1970,
-                true,
-                true,
-                String::from(filter),
-                None,
-                None,
-            )
-            .unwrap();
-
-        // Last line rule has any copies in file.
-        // They all must be excluded from get_active_rules output
-        let new_filter_rules = new_filter.rules.unwrap();
-        let disabled_rule = new_filter_rules.rules.last().unwrap().to_owned();
-
-        flm.save_disabled_rules(new_filter.id, vec![disabled_rule])
-            .unwrap();
-
-        // There must be only two records. UserRules and new_filter
-        let active_rules = flm.get_active_rules().unwrap();
-
-        assert_eq!(active_rules.len(), 2);
-
-        let actual_filter = active_rules.last().unwrap();
-
-        assert_eq!(actual_filter.filter_id, new_filter.id);
-        assert!(actual_filter.is_trusted);
-        assert_eq!(actual_filter.group_id, new_filter.group_id);
-
-        assert_eq!(actual_filter.rules.len(), 32);
-        assert_eq!(new_filter_rules.rules.len(), 38);
-    }
-
-    #[test]
-    fn test_get_active_rules() {
-        let source = DbConnectionManager::factory_test().unwrap();
-        let _ = spawn_test_db_with_metadata(&source);
-
-        let mut conf = Configuration::default();
-        conf.app_name = "FlmApp".to_string();
-        conf.version = "1.2.3".to_string();
-        let flm = FilterListManagerImpl::new(conf).unwrap();
-        let list_ids = FilterManager::new()
-            .get_full_filter_lists(&flm.connection_manager, &flm.configuration, None)
-            .unwrap()
-            .into_iter()
-            .map(|f| f.id)
-            .collect::<Vec<FilterId>>();
-
-        flm.enable_filter_lists(list_ids, true).unwrap();
-
-        let iter = flm
-            .get_active_rules()
-            .unwrap()
-            .into_iter()
-            // Take filters with rules
-            .filter(|info| info.filter_id != crate::USER_RULES_FILTER_LIST_ID)
-            .take(4);
-
-        for filter in iter {
-            assert!(filter.rules.len() > 0);
-        }
     }
 
     #[test]

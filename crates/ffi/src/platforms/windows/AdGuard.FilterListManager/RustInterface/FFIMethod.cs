@@ -121,6 +121,12 @@
         GetActiveRules,
         
         /// <summary>
+        /// Gets a list of [`ActiveRulesInfoRaw`] from filters with `filter.is_enabled=true` flag.
+        /// `filter_by` - If empty, returns all active rules, otherwise returns intersection between `filter_by` and all active rules
+        /// </summary>
+        GetActiveRulesRaw,
+        
+        /// <summary>
         /// Gets filter rules as strings for a specific filter
         /// </summary>
         GetFilterRulesAsStrings,

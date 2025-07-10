@@ -8,11 +8,12 @@ use crate::protobuf_generated::filter_list_manager::{
     DeleteCustomFilterListsResponse, EmptyResponse, EnableFilterListsRequest,
     EnableFilterListsResponse, FetchFilterListMetadataRequest, FetchFilterListMetadataResponse,
     FetchFilterListMetadataWithBodyRequest, FetchFilterListMetadataWithBodyResponse,
-    ForceUpdateFiltersByIdsRequest, ForceUpdateFiltersByIdsResponse, GetActiveRulesResponse,
-    GetAllGroupsResponse, GetAllTagsResponse, GetDatabasePathResponse, GetDatabaseVersionResponse,
-    GetDisabledRulesRequest, GetDisabledRulesResponse, GetFilterRulesAsStringsRequest,
-    GetFilterRulesAsStringsResponse, GetFullFilterListByIdRequest, GetRulesCountRequest,
-    GetRulesCountResponse, GetStoredFilterMetadataByIdRequest, GetStoredFilterMetadataByIdResponse,
+    ForceUpdateFiltersByIdsRequest, ForceUpdateFiltersByIdsResponse, GetActiveRulesRawRequest,
+    GetActiveRulesRawResponse, GetActiveRulesResponse, GetAllGroupsResponse, GetAllTagsResponse,
+    GetDatabasePathResponse, GetDatabaseVersionResponse, GetDisabledRulesRequest,
+    GetDisabledRulesResponse, GetFilterRulesAsStringsRequest, GetFilterRulesAsStringsResponse,
+    GetFullFilterListByIdRequest, GetRulesCountRequest, GetRulesCountResponse,
+    GetStoredFilterMetadataByIdRequest, GetStoredFilterMetadataByIdResponse,
     GetStoredFiltersMetadataResponse, InstallCustomFilterFromStringRequest,
     InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
     InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
@@ -52,6 +53,7 @@ pub enum FFIMethod {
     GetDatabaseVersion,
     InstallCustomFilterFromString,
     GetActiveRules,
+    GetActiveRulesRaw,
     GetFilterRulesAsStrings,
     SaveRulesToFileBlob,
     GetDisabledRules,
@@ -429,6 +431,21 @@ pub unsafe extern "C" fn flm_call_protobuf(
             },
         }
         .encode(&mut out_bytes_buffer),
+        FFIMethod::GetActiveRulesRaw => {
+            let request = decode_input_request!(GetActiveRulesRawRequest);
+
+            match flm_handle.flm.get_active_rules_raw(request.filter_by) {
+                Ok(value) => GetActiveRulesRawResponse {
+                    rules: value.into_iter().map(Into::into).collect(),
+                    error: None,
+                },
+                Err(why) => GetActiveRulesRawResponse {
+                    rules: vec![],
+                    error: Some(why.into()),
+                },
+            }
+            .encode(&mut out_bytes_buffer)
+        }
         FFIMethod::GetFilterRulesAsStrings => {
             let request = decode_input_request!(GetFilterRulesAsStringsRequest);
 

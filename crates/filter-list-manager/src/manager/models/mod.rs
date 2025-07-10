@@ -1,5 +1,6 @@
 //! Models associated with [`crate::FilterListManager`]
 pub mod active_rules_info;
+pub mod active_rules_info_raw;
 pub mod configuration;
 pub mod disabled_rules_raw;
 pub mod filter_group;

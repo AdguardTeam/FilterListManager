@@ -137,6 +137,7 @@ namespace AdGuard.FilterListManager.Test
                 FilterListMetadataWithBody filterListMetadataWithBody =
                     flm.FetchFilterListMetadataWithBody("https://filters.adtidy.org/extension/safari/filters/101.txt");
                 flm.GetActiveRules();
+                flm.GetActiveRulesRaw(new[] { customFilter.Id });
                 flm.DeleteCustomFilterLists(new[] { customFilter.Id });
                 string path = flm.GetDatabasePath();
                 int version = flm.GetDatabaseVersion();

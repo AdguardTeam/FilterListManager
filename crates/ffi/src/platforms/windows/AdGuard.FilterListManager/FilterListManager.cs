@@ -394,6 +394,17 @@ namespace AdGuard.FilterListManager
             GetActiveRulesResponse response = CallRustMessage<GetActiveRulesResponse>(request);
             return response.Rules;
         }
+        
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public IEnumerable<ActiveRulesInfoRaw> GetActiveRulesRaw(IEnumerable<int> filterBy)
+        {
+            GetActiveRulesRawRequest request = new GetActiveRulesRawRequest();
+            request.FilterBy.AddRange(filterBy);
+            GetActiveRulesRawResponse response = CallRustMessage<GetActiveRulesRawResponse>(request);
+            return response.Rules;
+        }
 
         /// <summary>
         /// <inheritdoc/>

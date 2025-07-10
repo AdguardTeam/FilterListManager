@@ -27,23 +27,26 @@ namespace FilterListManager {
             "ChFtaXNjX21vZGVscy5wcm90bxITZmlsdGVyX2xpc3RfbWFuYWdlchoNZmls",
             "dGVycy5wcm90byJZCg9BY3RpdmVSdWxlc0luZm8SEQoJZmlsdGVyX2lkGAEg",
             "ASgFEhAKCGdyb3VwX2lkGAIgASgFEhIKCmlzX3RydXN0ZWQYAyABKAgSDQoF",
-            "cnVsZXMYBCADKAkiqgEKDFVwZGF0ZVJlc3VsdBI5Cgx1cGRhdGVkX2xpc3QY",
-            "ASADKAsyIy5maWx0ZXJfbGlzdF9tYW5hZ2VyLkZ1bGxGaWx0ZXJMaXN0Eh8K",
-            "F3JlbWFpbmluZ19maWx0ZXJzX2NvdW50GAIgASgFEj4KDmZpbHRlcnNfZXJy",
-            "b3JzGAMgAygLMiYuZmlsdGVyX2xpc3RfbWFuYWdlci5VcGRhdGVGaWx0ZXJF",
-            "cnJvciKVAQoRVXBkYXRlRmlsdGVyRXJyb3ISEQoJZmlsdGVyX2lkGAEgASgF",
-            "Eg8KB21lc3NhZ2UYAiABKAkSFwoKZmlsdGVyX3VybBgDIAEoCUgAiAEBEh4K",
-            "EWh0dHBfY2xpZW50X2Vycm9yGAQgASgJSAGIAQFCDQoLX2ZpbHRlcl91cmxC",
-            "FAoSX2h0dHBfY2xpZW50X2Vycm9yIjYKD01vdmVkRmlsdGVySW5mbxITCgtw",
-            "cmV2aW91c19pZBgBIAEoBRIOCgZuZXdfaWQYAiABKAUigQEKElB1bGxNZXRh",
-            "ZGF0YVJlc3VsdBIVCg1hZGRlZF9maWx0ZXJzGAEgAygFEhcKD3JlbW92ZWRf",
-            "ZmlsdGVycxgCIAMoBRI7Cg1tb3ZlZF9maWx0ZXJzGAMgAygLMiQuZmlsdGVy",
-            "X2xpc3RfbWFuYWdlci5Nb3ZlZEZpbHRlckluZm9CLQoYY29tLmFkZ3VhcmQu",
-            "ZmxtLnByb3RvYnVmQg9NaXNjTW9kZWxzUHJvdG9QAWIGcHJvdG8z"));
+            "cnVsZXMYBCADKAkiXAoSQWN0aXZlUnVsZXNJbmZvUmF3EhEKCWZpbHRlcl9p",
+            "ZBgBIAEoBRIQCghncm91cF9pZBgCIAEoBRISCgppc190cnVzdGVkGAMgASgI",
+            "Eg0KBXJ1bGVzGAQgASgJIqoBCgxVcGRhdGVSZXN1bHQSOQoMdXBkYXRlZF9s",
+            "aXN0GAEgAygLMiMuZmlsdGVyX2xpc3RfbWFuYWdlci5GdWxsRmlsdGVyTGlz",
+            "dBIfChdyZW1haW5pbmdfZmlsdGVyc19jb3VudBgCIAEoBRI+Cg5maWx0ZXJz",
+            "X2Vycm9ycxgDIAMoCzImLmZpbHRlcl9saXN0X21hbmFnZXIuVXBkYXRlRmls",
+            "dGVyRXJyb3IilQEKEVVwZGF0ZUZpbHRlckVycm9yEhEKCWZpbHRlcl9pZBgB",
+            "IAEoBRIPCgdtZXNzYWdlGAIgASgJEhcKCmZpbHRlcl91cmwYAyABKAlIAIgB",
+            "ARIeChFodHRwX2NsaWVudF9lcnJvchgEIAEoCUgBiAEBQg0KC19maWx0ZXJf",
+            "dXJsQhQKEl9odHRwX2NsaWVudF9lcnJvciI2Cg9Nb3ZlZEZpbHRlckluZm8S",
+            "EwoLcHJldmlvdXNfaWQYASABKAUSDgoGbmV3X2lkGAIgASgFIoEBChJQdWxs",
+            "TWV0YWRhdGFSZXN1bHQSFQoNYWRkZWRfZmlsdGVycxgBIAMoBRIXCg9yZW1v",
+            "dmVkX2ZpbHRlcnMYAiADKAUSOwoNbW92ZWRfZmlsdGVycxgDIAMoCzIkLmZp",
+            "bHRlcl9saXN0X21hbmFnZXIuTW92ZWRGaWx0ZXJJbmZvQi0KGGNvbS5hZGd1",
+            "YXJkLmZsbS5wcm90b2J1ZkIPTWlzY01vZGVsc1Byb3RvUAFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::FilterListManager.FiltersReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.ActiveRulesInfo), global::FilterListManager.ActiveRulesInfo.Parser, new[]{ "FilterId", "GroupId", "IsTrusted", "Rules" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.ActiveRulesInfoRaw), global::FilterListManager.ActiveRulesInfoRaw.Parser, new[]{ "FilterId", "GroupId", "IsTrusted", "Rules" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.UpdateResult), global::FilterListManager.UpdateResult.Parser, new[]{ "UpdatedList", "RemainingFiltersCount", "FiltersErrors" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.UpdateFilterError), global::FilterListManager.UpdateFilterError.Parser, new[]{ "FilterId", "Message", "FilterUrl", "HttpClientError" }, new[]{ "FilterUrl", "HttpClientError" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.MovedFilterInfo), global::FilterListManager.MovedFilterInfo.Parser, new[]{ "PreviousId", "NewId" }, null, null, null, null),
@@ -368,6 +371,330 @@ namespace FilterListManager {
   }
 
   /// <summary>
+  /// ActiveRulesInfo raw
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class ActiveRulesInfoRaw : pb::IMessage<ActiveRulesInfoRaw>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ActiveRulesInfoRaw> _parser = new pb::MessageParser<ActiveRulesInfoRaw>(() => new ActiveRulesInfoRaw());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ActiveRulesInfoRaw> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[1]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ActiveRulesInfoRaw() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ActiveRulesInfoRaw(ActiveRulesInfoRaw other) : this() {
+      filterId_ = other.filterId_;
+      groupId_ = other.groupId_;
+      isTrusted_ = other.isTrusted_;
+      rules_ = other.rules_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ActiveRulesInfoRaw Clone() {
+      return new ActiveRulesInfoRaw(this);
+    }
+
+    /// <summary>Field number for the "filter_id" field.</summary>
+    public const int FilterIdFieldNumber = 1;
+    private int filterId_;
+    /// <summary>
+    /// Filter id for these rules
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int FilterId {
+      get { return filterId_; }
+      set {
+        filterId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "group_id" field.</summary>
+    public const int GroupIdFieldNumber = 2;
+    private int groupId_;
+    /// <summary>
+    /// Group id of the filter
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int GroupId {
+      get { return groupId_; }
+      set {
+        groupId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "is_trusted" field.</summary>
+    public const int IsTrustedFieldNumber = 3;
+    private bool isTrusted_;
+    /// <summary>
+    /// Is this filter trusted?
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool IsTrusted {
+      get { return isTrusted_; }
+      set {
+        isTrusted_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rules" field.</summary>
+    public const int RulesFieldNumber = 4;
+    private string rules_ = "";
+    /// <summary>
+    /// List of active rules as string.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Rules {
+      get { return rules_; }
+      set {
+        rules_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ActiveRulesInfoRaw);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ActiveRulesInfoRaw other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (FilterId != other.FilterId) return false;
+      if (GroupId != other.GroupId) return false;
+      if (IsTrusted != other.IsTrusted) return false;
+      if (Rules != other.Rules) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (FilterId != 0) hash ^= FilterId.GetHashCode();
+      if (GroupId != 0) hash ^= GroupId.GetHashCode();
+      if (IsTrusted != false) hash ^= IsTrusted.GetHashCode();
+      if (Rules.Length != 0) hash ^= Rules.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (FilterId != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(FilterId);
+      }
+      if (GroupId != 0) {
+        output.WriteRawTag(16);
+        output.WriteInt32(GroupId);
+      }
+      if (IsTrusted != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(IsTrusted);
+      }
+      if (Rules.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Rules);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (FilterId != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(FilterId);
+      }
+      if (GroupId != 0) {
+        output.WriteRawTag(16);
+        output.WriteInt32(GroupId);
+      }
+      if (IsTrusted != false) {
+        output.WriteRawTag(24);
+        output.WriteBool(IsTrusted);
+      }
+      if (Rules.Length != 0) {
+        output.WriteRawTag(34);
+        output.WriteString(Rules);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (FilterId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilterId);
+      }
+      if (GroupId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(GroupId);
+      }
+      if (IsTrusted != false) {
+        size += 1 + 1;
+      }
+      if (Rules.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Rules);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ActiveRulesInfoRaw other) {
+      if (other == null) {
+        return;
+      }
+      if (other.FilterId != 0) {
+        FilterId = other.FilterId;
+      }
+      if (other.GroupId != 0) {
+        GroupId = other.GroupId;
+      }
+      if (other.IsTrusted != false) {
+        IsTrusted = other.IsTrusted;
+      }
+      if (other.Rules.Length != 0) {
+        Rules = other.Rules;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            FilterId = input.ReadInt32();
+            break;
+          }
+          case 16: {
+            GroupId = input.ReadInt32();
+            break;
+          }
+          case 24: {
+            IsTrusted = input.ReadBool();
+            break;
+          }
+          case 34: {
+            Rules = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            FilterId = input.ReadInt32();
+            break;
+          }
+          case 16: {
+            GroupId = input.ReadInt32();
+            break;
+          }
+          case 24: {
+            IsTrusted = input.ReadBool();
+            break;
+          }
+          case 34: {
+            Rules = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
   /// UpdateResult
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
@@ -385,7 +712,7 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[1]; }
+      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -647,7 +974,7 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[2]; }
+      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -999,7 +1326,7 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[3]; }
+      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1243,7 +1570,7 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[4]; }
+      get { return global::FilterListManager.MiscModelsReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

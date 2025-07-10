@@ -43,6 +43,29 @@ public struct FilterListManager_ActiveRulesInfo: Sendable {
   public init() {}
 }
 
+/// ActiveRulesInfo raw
+public struct FilterListManager_ActiveRulesInfoRaw: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// Filter id for these rules
+  public var filterID: Int32 = 0
+
+  /// Group id of the filter
+  public var groupID: Int32 = 0
+
+  /// Is this filter trusted?
+  public var isTrusted: Bool = false
+
+  /// List of active rules as string.
+  public var rules: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 /// UpdateResult
 public struct FilterListManager_UpdateResult: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
@@ -185,6 +208,56 @@ extension FilterListManager_ActiveRulesInfo: SwiftProtobuf.Message, SwiftProtobu
   }
 
   public static func ==(lhs: FilterListManager_ActiveRulesInfo, rhs: FilterListManager_ActiveRulesInfo) -> Bool {
+    if lhs.filterID != rhs.filterID {return false}
+    if lhs.groupID != rhs.groupID {return false}
+    if lhs.isTrusted != rhs.isTrusted {return false}
+    if lhs.rules != rhs.rules {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension FilterListManager_ActiveRulesInfoRaw: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".ActiveRulesInfoRaw"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "filter_id"),
+    2: .standard(proto: "group_id"),
+    3: .standard(proto: "is_trusted"),
+    4: .same(proto: "rules"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
+      case 2: try { try decoder.decodeSingularInt32Field(value: &self.groupID) }()
+      case 3: try { try decoder.decodeSingularBoolField(value: &self.isTrusted) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.rules) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.filterID != 0 {
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
+    }
+    if self.groupID != 0 {
+      try visitor.visitSingularInt32Field(value: self.groupID, fieldNumber: 2)
+    }
+    if self.isTrusted != false {
+      try visitor.visitSingularBoolField(value: self.isTrusted, fieldNumber: 3)
+    }
+    if !self.rules.isEmpty {
+      try visitor.visitSingularStringField(value: self.rules, fieldNumber: 4)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: FilterListManager_ActiveRulesInfoRaw, rhs: FilterListManager_ActiveRulesInfoRaw) -> Bool {
     if lhs.filterID != rhs.filterID {return false}
     if lhs.groupID != rhs.groupID {return false}
     if lhs.isTrusted != rhs.isTrusted {return false}

@@ -756,6 +756,29 @@ constructor(configuration: Configuration)
     }
 
     /**
+     * Gets a list of [ActiveRulesInfoRaw] from filters with `filter.is_enabled=true` flag.
+     *
+     * @param ids If empty, returns all active rules, otherwise returns intersection between `filter_by` and all active rules
+     * @return List of raw active rules info.
+     * @throws FilterListManagerException if there's an error in the Rust code.
+     */
+    @Throws(FilterListManagerException::class)
+    fun getActiveRulesRaw(filterBy: List<Int>): List<ActiveRulesInfoRaw> {
+        val request = getActiveRulesRawRequest {
+            this.filterBy.addAll(filterBy)
+        }
+
+        return call(FFIMethod.GetActiveRulesRaw, request).use { result ->
+            GetActiveRulesRawResponse.parseFrom(result.resultData).let { response ->
+                when {
+                    response.hasError() -> throw FilterListManagerException(response.error)
+                    else -> response.rulesList
+                }
+            }
+        }
+    }
+
+    /**
      * Gets a list of [FilterListRulesRaw] structures containing `rules` and `disabledRules` as strings,
      * directly from database fields.
      *

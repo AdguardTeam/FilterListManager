@@ -80,6 +80,10 @@ message FetchFilterListMetadataWithBodyRequest {
   string url = 1;
 }
 
+message GetActiveRulesRawRequest {
+  repeated int32 filter_by = 1;
+}
+
 message ChangeLocaleRequest {
   string suggested_locale = 1;
 }
@@ -210,6 +214,11 @@ message InstallCustomFilterFromStringResponse {
 
 message GetActiveRulesResponse {
   repeated ActiveRulesInfo rules = 1;
+  optional AGOuterError error = 2;
+}
+
+message GetActiveRulesRawResponse {
+  repeated ActiveRulesInfoRaw rules = 1;
   optional AGOuterError error = 2;
 }
 

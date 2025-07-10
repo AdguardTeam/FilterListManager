@@ -27,6 +27,7 @@ internal enum class FFIMethod {
     GetDatabaseVersion,
     InstallCustomFilterFromString,
     GetActiveRules,
+    GetActiveRulesRaw,
     GetFilterRulesAsStrings,
     SaveRulesToFileBlob,
     GetDisabledRules,
