@@ -152,7 +152,9 @@ Function SetAdapterVersion {
 function SetNativeVersion {
     
     $versionFromToml = GetVersionFromToml -FilePath "crates\ffi\Cargo.toml";
-    $rcVersion = $versionFromToml -replace '\.', ',' -replace '$', ',0';
+	$onlyNumbers = $versionFromToml -replace '^([0-9]+\.[0-9]+\.[0-9]+).*$', '$1'
+	Write-Host "Only numbers version from toml is $onlyNumbers";
+	$rcVersion = $onlyNumbers -replace '\.', ',' -replace '$', ',0'
 
     $rcFilePath = "crates\ffi\resources\AGWinFLM.rc";
     $rcContent = Get-Content -Path $rcFilePath;
@@ -160,8 +162,8 @@ function SetNativeVersion {
     $updatedRcContent = $rcContent | ForEach-Object {
         $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*FILEVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $rcVersion
         $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*PRODUCTVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $rcVersion
-        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"FileVersion",\s*")(\d+.\d+.\d+)' -NewVersion $versionFromToml
-        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"ProductVersion",\s*")(\d+.\d+.\d+)' -NewVersion $versionFromToml
+        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"FileVersion",\s*")([^"]+)' -NewVersion $versionFromToml
+        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"ProductVersion",\s*")([^"]+)' -NewVersion $versionFromToml
         return $_;
     }
 
