@@ -199,7 +199,7 @@ pub unsafe extern "C" fn flm_free_handle(handle: *mut FLMHandle) {
 }
 
 /// This represents short-circuit error for FFI processing. Returns as [`RustResponse`] with `.ffi_error = true`
-#[inline]
+#[cold]
 fn build_rust_response_error(
     error: Box<dyn std::error::Error>,
     mut rust_response: Box<RustResponse>,
@@ -220,7 +220,7 @@ fn build_rust_response_error(
     rust_response.result_data = Box::into_raw(vec.into_boxed_slice()) as *mut c_void;
     rust_response.response_type = RustResponseType::RustBuffer;
 
-    return Box::leak(rust_response);
+    Box::leak(rust_response)
 }
 
 /// Getter for the set of [`FilterListManager`] constants

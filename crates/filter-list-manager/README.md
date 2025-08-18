@@ -97,7 +97,7 @@ let flm = FilterListManagerImpl::new(configuration);
 flm.pull_metadata();
 
 // Then, downloads the contents of the filters.
-// Note, should be used once an hour or less.
+// !Note! should be used no more than once an hour.
 flm.update_filters(true, 0, true);
 ```
 
@@ -131,8 +131,8 @@ The method “raises” the state of the database to the working state.
 Starting with version `0.7.1` the database is “uplifted” automatically when the filter_list_manager constructor is called. 
 To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.\
 **Note: methods `flm.update_filters()`, `flm.force_update_filters_by_ids()`\
-should be used once an hour or less, method `flm.pull_metadata()`\
-should be used once a week or less**.
+should be used no more than once an hour, method `flm.pull_metadata()`\
+should be used no more than once a week**.
 
 #### Storage notes. Important
 **Database lifting**\
@@ -229,6 +229,10 @@ flm.get_full_filter_list_by_id(id /* FilterId */);
 // Retrieves all enabled filters as ActiveRulesInfo.
 flm.get_active_rules();
 
+// Gets a list of [`ActiveRulesInfoRaw`] from filters with `filter.is_enabled=true` flag.
+// `filter_by` - If empty, returns all active rules, otherwise returns intersection between `filter_by` and all active rules
+flm.get_active_rules_raw(filter_by /* Vec<FilterId> */);
+
 // Retrieves all filters metadata from the database **without** theirs rules.
 // Returns Vec<StoredFilterMetadata>
 flm.get_stored_filters_metadata();
@@ -266,6 +270,7 @@ flm.get_rules_count(ids, /* Vec<FilterId> */);
 [FullFilterList reference](./src/manager/models/full_filter_list.rs)\
 [StoredFilterMetadata reference](./src/manager/models/stored_filter_metadata.rs)\
 [ActiveRulesInfo reference](./src/manager/models/active_rules_info.rs)\
+[ActiveRulesInfoRaw reference](./src/manager/models/active_rules_info_raw.rs)\
 [FilterListRulesRaw reference](./src/manager/models/filter_list_rules_raw.rs)\
 [DisabledRulesRaw reference](./src/manager/models/disabled_rules_raw.rs)\
 [RulesCountByFilter reference](./src/manager/models/rules_count_by_filter.rs)

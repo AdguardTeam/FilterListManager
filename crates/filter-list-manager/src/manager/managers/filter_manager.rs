@@ -1,3 +1,4 @@
+use std::slice;
 use std::str::FromStr;
 
 use chrono::DateTime;
@@ -7,15 +8,16 @@ use rusqlite::Connection;
 use rusqlite::Transaction;
 
 use crate::filters::parser::diff_updates::process_diff_path::process_diff_path;
+use crate::filters::parser::filter_collector::FilterCollector;
+use crate::filters::parser::filter_compiler::{CompiledFilterEntities, FilterCompiler};
 use crate::filters::parser::filter_contents_provider::string_provider::StringProvider;
 use crate::filters::parser::metadata::parsers::expires::process_expires;
 use crate::filters::parser::metadata::KnownMetadataProperty;
-use crate::filters::parser::FilterParser;
 use crate::io::http::blocking_client::BlockingClient;
 use crate::manager::filter_lists_builder::FullFilterListBuilder;
 use crate::storage::entities::filter::filter_entity::FilterEntity;
-use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
+use crate::storage::repositories::filter_includes_repository::FilterIncludesRepository;
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
 use crate::storage::repositories::BulkDeleteRepository;
@@ -25,12 +27,12 @@ use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::with_transaction;
 use crate::storage::DbConnectionManager;
 use crate::utils::memory::heap;
-use crate::Configuration;
 use crate::FLMError;
 use crate::FLMResult;
 use crate::FilterId;
 use crate::FullFilterList;
 use crate::StoredFilterMetadata;
+use crate::{string, Configuration};
 
 /// Manager for filter logic
 pub(crate) struct FilterManager;
@@ -56,15 +58,15 @@ impl FilterManager {
         let client = BlockingClient::new(configuration)?;
         let provider = StringProvider::new(filter_body, &client);
 
-        let mut parser = FilterParser::with_custom_provider(heap(provider), configuration);
+        let mut compiler = FilterCompiler::with_custom_provider(heap(provider), configuration);
 
-        let normalized_url = parser
-            .parse_from_url(&download_url)
+        let normalized_url = compiler
+            .compile(&download_url)
             .map_err(FLMError::from_parser_error)?;
 
-        let (diff_path, mut entity, rule_entity): (String, FilterEntity, RulesListEntity) = self
-            .prepare_custom_filter_list_to_install(
-                &mut parser,
+        let (diff_path, mut entity, rule_entity): (String, FilterEntity, CompiledFilterEntities) =
+            self.prepare_custom_filter_list_for_install(
+                compiler,
                 normalized_url,
                 is_trusted,
                 title,
@@ -74,17 +76,16 @@ impl FilterManager {
         entity.last_download_time = last_download_time;
         entity.is_enabled = is_enabled;
 
-        let (inserted_entity, rule_entity): (FilterEntity, RulesListEntity) = self
-            .install_custom_filter_list(
-                connection_manager,
-                diff_path,
-                entity,
-                rule_entity,
-                parser.is_directives_encountered(),
-            )?;
+        let (inserted_entity, filter_entities): (FilterEntity, CompiledFilterEntities) =
+            self.install_custom_filter_list(connection_manager, diff_path, entity, rule_entity)?;
 
-        let full_filter_list: FullFilterList =
-            self.make_full_filter_list(download_url, inserted_entity, rule_entity)?;
+        let filter_collector = FilterCollector::new(configuration);
+        let full_filter_list: FullFilterList = self.make_full_filter_list(
+            download_url,
+            inserted_entity,
+            filter_entities,
+            filter_collector,
+        )?;
 
         Ok(full_filter_list)
     }
@@ -100,36 +101,35 @@ impl FilterManager {
         description: Option<String>,
     ) -> FLMResult<FullFilterList> {
         let client = BlockingClient::new(configuration)?;
-        let mut parser = FilterParser::factory(configuration, &client);
+        let mut compiler = FilterCompiler::factory(configuration, &client);
 
         let normalized_url = if download_url.is_empty() {
-            String::new()
+            string!()
         } else {
-            parser
-                .parse_from_url(&download_url)
+            compiler
+                .compile(&download_url)
                 .map_err(FLMError::from_parser_error)?
         };
 
-        let (diff_path, entity, rule_entity): (String, FilterEntity, RulesListEntity) = self
-            .prepare_custom_filter_list_to_install(
-                &mut parser,
+        let (diff_path, entity, rule_entity): (String, FilterEntity, CompiledFilterEntities) = self
+            .prepare_custom_filter_list_for_install(
+                compiler,
                 normalized_url,
                 is_trusted,
                 title,
                 description,
             )?;
 
-        let (inserted_entity, rule_entity): (FilterEntity, RulesListEntity) = self
-            .install_custom_filter_list(
-                connection_manager,
-                diff_path,
-                entity,
-                rule_entity,
-                parser.is_directives_encountered(),
-            )?;
+        let (inserted_entity, filter_entities): (FilterEntity, CompiledFilterEntities) =
+            self.install_custom_filter_list(connection_manager, diff_path, entity, rule_entity)?;
 
-        let full_filter_list: FullFilterList =
-            self.make_full_filter_list(download_url, inserted_entity, rule_entity)?;
+        let filter_collector = FilterCollector::new(configuration);
+        let full_filter_list: FullFilterList = self.make_full_filter_list(
+            download_url,
+            inserted_entity,
+            filter_entities,
+            filter_collector,
+        )?;
 
         Ok(full_filter_list)
     }
@@ -314,10 +314,7 @@ impl FilterManager {
         configuration: &Configuration,
         where_clause: Option<SQLOperator>,
     ) -> FLMResult<Vec<FullFilterList>> {
-        let full_filter_lists: Vec<FullFilterList> =
-            self.get_full_filter_lists_inner(connection_manager, configuration, where_clause)?;
-
-        Ok(full_filter_lists)
+        self.get_full_filter_lists_inner(connection_manager, configuration, where_clause)
     }
 }
 
@@ -329,19 +326,19 @@ impl FilterManager {
         configuration: &Configuration,
         where_clause: Option<SQLOperator>,
     ) -> FLMResult<Vec<FullFilterList>> {
-        let full_filter_list: Vec<FullFilterList> =
-            connection_manager.execute_db(move |conn: Connection| {
-                FilterRepository::new()
-                    .select(&conn, where_clause)
-                    .map_err(FLMError::from_database)?
-                    .map(|filters| {
-                        FullFilterListBuilder::new(&configuration.locale)
-                            .build_full_filter_lists(conn, filters)
-                    })
-                    .unwrap_or(Ok(vec![]))
-            })?;
-
-        Ok(full_filter_list)
+        connection_manager.execute_db(move |conn: Connection| {
+            FilterRepository::new()
+                .select(&conn, where_clause)
+                .map_err(FLMError::from_database)?
+                .map(|filters| {
+                    FullFilterListBuilder::new(&configuration.locale).build_full_filter_lists(
+                        conn,
+                        filters,
+                        configuration,
+                    )
+                })
+                .unwrap_or(Ok(vec![]))
+        })
     }
 
     /// Gets stored filter metadata by filter_list_builder
@@ -367,20 +364,20 @@ impl FilterManager {
     }
 
     /// Prepares custom filter list for installation
-    fn prepare_custom_filter_list_to_install(
+    fn prepare_custom_filter_list_for_install(
         &self,
-        parser: &mut FilterParser,
+        compiler: FilterCompiler,
         normalized_url: String,
         is_trusted: bool,
         title: Option<String>,
         description: Option<String>,
-    ) -> FLMResult<(String, FilterEntity, RulesListEntity)> {
-        let expires = match parser.get_metadata(KnownMetadataProperty::Expires) {
+    ) -> FLMResult<(String, FilterEntity, CompiledFilterEntities)> {
+        let expires = match compiler.get_metadata(KnownMetadataProperty::Expires) {
             value if value.is_empty() => 0i32,
             value => process_expires(value.as_str()),
         };
 
-        let time_updated: i64 = match parser
+        let time_updated: i64 = match compiler
             .get_metadata(KnownMetadataProperty::TimeUpdated)
             .as_str()
         {
@@ -391,16 +388,16 @@ impl FilterManager {
         };
 
         let (processed_title, is_user_title) = match title {
-            Some(title_candidate) if title_candidate.len() > 0 => (title_candidate, true),
-            _ => (parser.get_metadata(KnownMetadataProperty::Title), false),
+            Some(title_candidate) if !title_candidate.is_empty() => (title_candidate, true),
+            _ => (compiler.get_metadata(KnownMetadataProperty::Title), false),
         };
 
         let (processed_description, is_user_description) = match description {
-            Some(description_candidate) if description_candidate.len() > 0 => {
+            Some(description_candidate) if !description_candidate.is_empty() => {
                 (description_candidate, true)
             }
             _ => (
-                parser.get_metadata(KnownMetadataProperty::Description),
+                compiler.get_metadata(KnownMetadataProperty::Description),
                 false,
             ),
         };
@@ -412,20 +409,20 @@ impl FilterManager {
         entity.last_download_time = Utc::now().timestamp();
         entity.download_url = normalized_url;
         entity.is_enabled = true;
-        entity.version = parser.get_metadata(KnownMetadataProperty::Version);
+        entity.version = compiler.get_metadata(KnownMetadataProperty::Version);
         entity.is_trusted = is_trusted;
         entity.expires = expires;
-        entity.homepage = parser.get_metadata(KnownMetadataProperty::Homepage);
-        entity.checksum = parser.get_metadata(KnownMetadataProperty::Checksum);
-        entity.license = parser.get_metadata(KnownMetadataProperty::License);
+        entity.homepage = compiler.get_metadata(KnownMetadataProperty::Homepage);
+        entity.checksum = compiler.get_metadata(KnownMetadataProperty::Checksum);
+        entity.license = compiler.get_metadata(KnownMetadataProperty::License);
         entity.set_is_user_title(is_user_title);
         entity.set_is_user_description(is_user_description);
 
-        let diff_path = parser.get_metadata(KnownMetadataProperty::DiffPath);
+        let diff_path = compiler.get_metadata(KnownMetadataProperty::DiffPath);
 
-        let rule_entity = parser.extract_rule_entity(0);
+        let entities = compiler.into_entities(0);
 
-        Ok((diff_path, entity, rule_entity))
+        Ok((diff_path, entity, entities))
     }
 
     /// Installs custom filter lists
@@ -434,46 +431,53 @@ impl FilterManager {
         connection_manager: &DbConnectionManager,
         diff_path: String,
         entity: FilterEntity,
-        mut rule_entity: RulesListEntity,
-        is_directives_encountered: bool,
-    ) -> FLMResult<(FilterEntity, RulesListEntity)> {
-        let (inserted_entity, rule_entity): (FilterEntity, RulesListEntity) = connection_manager
-            .execute_db(move |mut conn: Connection| {
-                let (tx, inserted_entity) = spawn_transaction(&mut conn, |tx: &Transaction| {
-                    FilterRepository::new().only_insert_row(tx, entity)
-                })
+        mut entities: CompiledFilterEntities,
+    ) -> FLMResult<(FilterEntity, CompiledFilterEntities)> {
+        connection_manager.execute_db(move |mut conn: Connection| {
+            let (tx, inserted_entity) = spawn_transaction(&mut conn, |tx: &Transaction| {
+                FilterRepository::new().only_insert_row(tx, entity)
+            })
+            .map_err(FLMError::from_database)?;
+
+            let filter_id = match inserted_entity.filter_id {
+                None => {
+                    return FLMError::make_err(
+                        "Cannot resolve filter_id, after saving custom filter",
+                    )
+                }
+                Some(filter_id) => filter_id,
+            };
+
+            if !diff_path.is_empty() {
+                if let Some(entity) =
+                    process_diff_path(filter_id, diff_path).map_err(FLMError::from_display)?
+                {
+                    DiffUpdateRepository::new()
+                        .insert(&tx, &[entity])
+                        .map_err(FLMError::from_database)?;
+                }
+            }
+
+            entities.rules_list_entity.filter_id = filter_id;
+            entities
+                .filter_includes_entities
+                .iter_mut()
+                .for_each(|include_entity| {
+                    include_entity.filter_id = filter_id;
+                });
+
+            RulesListRepository::new()
+                .insert(&tx, slice::from_ref(&entities.rules_list_entity))
                 .map_err(FLMError::from_database)?;
 
-                let filter_id = match inserted_entity.filter_id {
-                    None => {
-                        return FLMError::make_err(
-                            "Cannot resolve filter_id, after saving custom filter",
-                        )
-                    }
-                    Some(filter_id) => filter_id,
-                };
+            FilterIncludesRepository::new()
+                .insert(&tx, &entities.filter_includes_entities)
+                .map_err(FLMError::from_database)?;
 
-                if !diff_path.is_empty() && !is_directives_encountered {
-                    if let Some(entity) =
-                        process_diff_path(filter_id, diff_path).map_err(FLMError::from_display)?
-                    {
-                        DiffUpdateRepository::new()
-                            .insert(&tx, &[entity])
-                            .map_err(FLMError::from_database)?;
-                    }
-                }
+            tx.commit().map_err(FLMError::from_database)?;
 
-                rule_entity.filter_id = filter_id;
-                RulesListRepository::new()
-                    .insert(&tx, &[rule_entity.clone()])
-                    .map_err(FLMError::from_database)?;
-
-                tx.commit().map_err(FLMError::from_database)?;
-
-                Ok((inserted_entity, rule_entity))
-            })?;
-
-        Ok((inserted_entity, rule_entity))
+            Ok((inserted_entity, entities))
+        })
     }
 
     /// Completes custom filter list installation
@@ -481,13 +485,18 @@ impl FilterManager {
         &self,
         download_url: String,
         inserted_entity: FilterEntity,
-        rule_entity: RulesListEntity,
+        compiled_filter_entities: CompiledFilterEntities,
+        mut filter_collector: FilterCollector,
     ) -> FLMResult<FullFilterList> {
+        filter_collector
+            .collect(&compiled_filter_entities, &download_url)
+            .map_err(FLMError::from_parser_error)?;
+
         let filter_list: Option<FullFilterList> = FullFilterList::from_filter_entity(
             inserted_entity,
             vec![],
             vec![],
-            Some(rule_entity.into()),
+            Some(compiled_filter_entities.rules_list_entity.into()),
         );
 
         if let Some(filter) = filter_list {

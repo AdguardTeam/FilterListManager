@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package filter_list_manager;
 
+option java_multiple_files = true;
+option java_package = "com.adguard.flm.protobuf";
+option java_outer_classname = "ConfigurationProto";
+
 enum FilterListType {
   STANDARD = 0;
   DNS = 1;
@@ -17,9 +21,9 @@ enum RawRequestProxyMode {
   USE_CUSTOM_PROXY = 2;
 }
 
-message CompilerConditionalConstants {
+message FiltersCompilationPolicy {
   // List of literal constants for filters conditional compilation.
-  repeated string compiler_conditional_constants = 1;
+  repeated string constants = 1;
 }
 
 message Configuration {
@@ -40,8 +44,17 @@ message Configuration {
   // Values < 3600 will be clamped to 3600.
   int32 default_filter_list_expires_period_sec = 4;
 
-  // List of literal constants for filters conditional compilation.
-  optional CompilerConditionalConstants compiler_conditional_constants = 5;
+  // Settings for filters compilation or collection from compiled parts.
+  // 
+  // ### Compilation
+  // During the update, each filter will be "compiled" into main filter and its includes.
+  // Main filter remains unchanged. But in includes, (include, if/else/endif) directives will be resolved, using this policy. 
+  // Recursive includes will be inlined.
+  // 
+  // ### Collection
+  // When you get filters, they will be collected from compiled parts (main filter + includes).
+  // All directives in main filter will be resolved, using this policy, and includes will be injected. 
+  optional FiltersCompilationPolicy filters_compilation_policy = 5;
 
   // URL of the index (filters.json) file.
   string metadata_url = 6;

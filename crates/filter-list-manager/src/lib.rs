@@ -133,6 +133,7 @@
 //!
 //! 1. **Index Filters** - Filters created by parsing the index (registry).
 //! 2. **Custom Filters** - Filters added (and edited) by the user using the
+//!
 //! library's methods.
 //! 3. **Special Filters** - Custom filters preconfigured by the library's scripts.
 //!
@@ -250,6 +251,7 @@ pub use crate::io::http::error::HttpClientError;
 /// # Re-exports
 pub use crate::manager::filter_list_manager_impl::FilterListManagerImpl;
 pub use crate::manager::models::active_rules_info::ActiveRulesInfo;
+pub use crate::manager::models::active_rules_info_raw::ActiveRulesInfoRaw;
 pub use crate::manager::models::configuration::Configuration;
 pub use crate::manager::models::configuration::FilterListType;
 pub use crate::manager::models::configuration::Locale;
@@ -268,6 +270,7 @@ pub use crate::manager::models::FilterListMetadata;
 pub use crate::manager::models::FilterListMetadataWithBody;
 pub use crate::manager::models::FullFilterList;
 pub use crate::manager::models::UpdateResult;
+pub use crate::manager::models::{MovedFilterInfo, PullMetadataResult};
 pub use crate::manager::FilterListManager;
 pub use crate::storage::constants::*;
 

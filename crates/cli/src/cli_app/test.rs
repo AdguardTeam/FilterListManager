@@ -4,6 +4,7 @@ use adguard_flm::Configuration;
 use std::time::{Instant, SystemTime};
 
 #[allow(dead_code)]
+#[allow(clippy::field_reassign_with_default)]
 fn install_lists() {
     let start = SystemTime::now();
 
@@ -17,7 +18,7 @@ fn install_lists() {
     for n in 1..max_lists {
         manager
             .install_custom_filter_list(
-                format!("https://example.org/mac_v2/filters/{}.txt", n),
+                format!("https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/mac_v2/filters/{}.txt", n),
                 true,
                 None,
                 None,
@@ -45,17 +46,22 @@ fn install_lists() {
 }
 
 #[allow(dead_code)]
-fn gets_filter_list() {
+#[allow(clippy::field_reassign_with_default)]
+fn get_active_filters() {
     let mut conf = Configuration::default();
     conf.app_name = "FlmApp".to_string();
     conf.version = "1.2.3".to_string();
 
+    let start = Instant::now();
     let result = FilterListManagerImpl::new(conf)
         .unwrap()
-        .get_full_filter_list_by_id(1)
+        .get_active_rules_raw(vec![])
         .unwrap();
+    let duration = start.elapsed().as_secs_f32();
 
-    println!("{:?}", result)
+    println!("Time elapsed: {:.6} micros", duration);
+
+    println!("{:?}", result.len());
 }
 
 #[allow(clippy::field_reassign_with_default)]
@@ -63,21 +69,29 @@ fn gets_filter_list() {
 fn update_filters() {
     let start = Instant::now();
     let mut conf = Configuration::default();
-    conf.metadata_url = "https://example.org/extension/safari/filters.json".to_string();
+    conf.metadata_url = "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/windows/filters.json".to_string();
     conf.metadata_locales_url =
-        "https://example.org/extension/safari/filters_i18n.json".to_string();
+        "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/windows/filters_i18n.json".to_string();
     conf.app_name = "FlmApp".to_string();
     conf.version = "1.2.3".to_string();
 
     let flm = FilterListManagerImpl::new(conf).unwrap();
-    //  flm.pull_metadata().unwrap();
+    flm.pull_metadata().unwrap();
     let updated = flm.update_filters(true, 0, true).unwrap().unwrap();
 
     println!("Updated filters count: {}", updated.updated_list.len());
+    updated.updated_list.iter().for_each(|f| {
+        println!("Updated filter: {}", f.id);
+    });
+
+    println!("Errors count: {}", updated.filters_errors.len());
+    updated.filters_errors.iter().for_each(|e| {
+        println!("Error: {}", e.message);
+    });
     println!("{}", "=".repeat(30));
     println!("Time elapsed: {:.2}", start.elapsed().as_secs_f32())
 }
 
 pub(crate) fn test() {
-    println!("Ok");
+    get_active_filters();
 }

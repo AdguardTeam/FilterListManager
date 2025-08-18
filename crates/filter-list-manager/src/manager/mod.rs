@@ -14,8 +14,8 @@ use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
-use crate::manager::models::UpdateResult;
-use crate::{FLMResult, StoredFilterMetadata};
+use crate::manager::models::{PullMetadataResult, UpdateResult};
+use crate::{ActiveRulesInfoRaw, FLMResult, StoredFilterMetadata};
 use models::configuration::Configuration;
 use models::filter_list_metadata::FilterListMetadata;
 use models::filter_list_metadata_with_body::FilterListMetadataWithBody;
@@ -156,7 +156,7 @@ pub trait FilterListManager {
     /// Returns [`Err`] if you can not get records from db, or common error
     /// encountered.
     ///
-    /// Note: should be used once an hour or less.
+    /// Note: should be used no more than once an hour.
     fn update_filters(
         &self,
         ignore_filters_expiration: bool,
@@ -234,10 +234,14 @@ pub trait FilterListManager {
     /// 5. Remove old groups/tags/locales.
     /// 6. Fill in new groups/tags/locales.
     /// 7. Fill in our updated filters along with the raw filters from the
-    /// index.
+    ///    index.
     ///
-    /// Note: should be used once a week or less.
-    fn pull_metadata(&self) -> FLMResult<()>;
+    /// Note: should be used no more than once a week.
+    ///
+    /// # Returns
+    ///
+    /// [`PullMetadataResult`] - the result of index metadata update
+    fn pull_metadata(&self) -> FLMResult<PullMetadataResult>;
 
     /// Updates custom filter data.
     ///
@@ -315,6 +319,10 @@ pub trait FilterListManager {
 
     /// Gets a list of [`ActiveRulesInfo`] from filters with `filter.is_enabled=true` flag.
     fn get_active_rules(&self) -> FLMResult<Vec<ActiveRulesInfo>>;
+
+    /// Gets a list of [`ActiveRulesInfoRaw`] from filters with `filter.is_enabled=true` flag.
+    /// * `filter_by` - If empty, returns all active rules, otherwise returns intersection between `filter_by` and all active rules
+    fn get_active_rules_raw(&self, filter_by: Vec<FilterId>) -> FLMResult<Vec<ActiveRulesInfoRaw>>;
 
     /// Gets a list of [`FilterListRulesRaw`] structures containing.
     /// `rules` and `disabled_rules` as strings, directly from database fields.

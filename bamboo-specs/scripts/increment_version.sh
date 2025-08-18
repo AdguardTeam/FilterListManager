@@ -3,10 +3,28 @@
 set -e
 
 increment_version() {
-  major=${1%%.*}
-  minor=$(echo ${1#*.} | sed -e "s/\.[0-9]*//")
-  revision=${1##*.}
-  echo ${major}.${minor}.$((revision+1))
+  local version="$1"
+
+  # Supports MAJOR.MINOR.PATCH, MAJOR.MINOR.PATCH-rc.N
+  if [[ "$version" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-rc\.([0-9]+))?$ ]]; then
+    local major="${BASH_REMATCH[1]}"
+    local minor="${BASH_REMATCH[2]}"
+    local patch="${BASH_REMATCH[3]}"
+    local rc="${BASH_REMATCH[5]}"
+
+    if [[ -n "$rc" ]]; then
+      # Update RC
+      rc=$((rc + 1))
+      echo "${major}.${minor}.${patch}-rc.${rc}"
+    else
+      # Update PATCH
+      patch=$((patch + 1))
+      echo "${major}.${minor}.${patch}"
+    fi
+  else
+    echo "Unsupported version format: $version" >&2
+    exit 1
+  fi
 }
 
 increment_flm_version() {
@@ -80,7 +98,7 @@ if [ ${bamboo_adguard_flm_custom_version} = "none" ] || [ ${bamboo_ffi_custom_ve
 fi
 
 # Check if there are any changes in the `filter-list-manager` crate
-HASH_FILE="platform/flm_version_hash.hash"
+HASH_FILE="bamboo-specs/hashes/flm_version_hash.hash"
 OBSERVED_DIR="crates/filter-list-manager"
 
 # Get the hash of the current state of the `filter-list-manager` crate

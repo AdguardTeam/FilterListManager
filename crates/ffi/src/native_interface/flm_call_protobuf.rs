@@ -8,15 +8,16 @@ use crate::protobuf_generated::filter_list_manager::{
     DeleteCustomFilterListsResponse, EmptyResponse, EnableFilterListsRequest,
     EnableFilterListsResponse, FetchFilterListMetadataRequest, FetchFilterListMetadataResponse,
     FetchFilterListMetadataWithBodyRequest, FetchFilterListMetadataWithBodyResponse,
-    ForceUpdateFiltersByIdsRequest, ForceUpdateFiltersByIdsResponse, GetActiveRulesResponse,
-    GetAllGroupsResponse, GetAllTagsResponse, GetDatabasePathResponse, GetDatabaseVersionResponse,
-    GetDisabledRulesRequest, GetDisabledRulesResponse, GetFilterRulesAsStringsRequest,
-    GetFilterRulesAsStringsResponse, GetFullFilterListByIdRequest, GetRulesCountRequest,
-    GetRulesCountResponse, GetStoredFilterMetadataByIdResponse,
-    GetStoredFiltersMetadataByIdRequest, GetStoredFiltersMetadataResponse,
-    InstallCustomFilterFromStringRequest, InstallCustomFilterFromStringResponse,
-    InstallCustomFilterListRequest, InstallCustomFilterListResponse, InstallFilterListsRequest,
-    InstallFilterListsResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
+    ForceUpdateFiltersByIdsRequest, ForceUpdateFiltersByIdsResponse, GetActiveRulesRawRequest,
+    GetActiveRulesRawResponse, GetActiveRulesResponse, GetAllGroupsResponse, GetAllTagsResponse,
+    GetDatabasePathResponse, GetDatabaseVersionResponse, GetDisabledRulesRequest,
+    GetDisabledRulesResponse, GetFilterRulesAsStringsRequest, GetFilterRulesAsStringsResponse,
+    GetFullFilterListByIdRequest, GetRulesCountRequest, GetRulesCountResponse,
+    GetStoredFilterMetadataByIdRequest, GetStoredFilterMetadataByIdResponse,
+    GetStoredFiltersMetadataResponse, InstallCustomFilterFromStringRequest,
+    InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
+    InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
+    PullMetadataResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
     SaveRulesToFileBlobRequest, SetProxyModeRequest, UpdateCustomFilterMetadataRequest,
     UpdateCustomFilterMetadataResponse, UpdateFiltersRequest, UpdateFiltersResponse,
 };
@@ -52,6 +53,7 @@ pub enum FFIMethod {
     GetDatabaseVersion,
     InstallCustomFilterFromString,
     GetActiveRules,
+    GetActiveRulesRaw,
     GetFilterRulesAsStrings,
     SaveRulesToFileBlob,
     GetDisabledRules,
@@ -192,9 +194,9 @@ pub unsafe extern "C" fn flm_call_protobuf(
         }
         .encode(&mut out_bytes_buffer),
         FFIMethod::GetStoredFilterMetadataById => {
-            let request = decode_input_request!(GetStoredFiltersMetadataByIdRequest);
+            let request = decode_input_request!(GetStoredFilterMetadataByIdRequest);
 
-            match flm_handle.flm.get_stored_filters_metadata_by_id(request.id) {
+            match flm_handle.flm.get_stored_filter_metadata_by_id(request.id) {
                 Ok(value) => GetStoredFilterMetadataByIdResponse {
                     filter_list: value.map(Into::into),
                     error: None,
@@ -357,8 +359,15 @@ pub unsafe extern "C" fn flm_call_protobuf(
                 success
             )
         }
-        FFIMethod::PullMetadata => EmptyResponse {
-            error: flm_handle.flm.pull_metadata().err().map(Into::into),
+        FFIMethod::PullMetadata => match flm_handle.flm.pull_metadata() {
+            Ok(value) => PullMetadataResponse {
+                result: Some(value.into()),
+                error: None,
+            },
+            Err(why) => PullMetadataResponse {
+                result: None,
+                error: Some(why.into()),
+            },
         }
         .encode(&mut out_bytes_buffer),
         FFIMethod::UpdateCustomFilterMetadata => {
@@ -422,6 +431,21 @@ pub unsafe extern "C" fn flm_call_protobuf(
             },
         }
         .encode(&mut out_bytes_buffer),
+        FFIMethod::GetActiveRulesRaw => {
+            let request = decode_input_request!(GetActiveRulesRawRequest);
+
+            match flm_handle.flm.get_active_rules_raw(request.filter_by) {
+                Ok(value) => GetActiveRulesRawResponse {
+                    rules: value.into_iter().map(Into::into).collect(),
+                    error: None,
+                },
+                Err(why) => GetActiveRulesRawResponse {
+                    rules: vec![],
+                    error: Some(why.into()),
+                },
+            }
+            .encode(&mut out_bytes_buffer)
+        }
         FFIMethod::GetFilterRulesAsStrings => {
             let request = decode_input_request!(GetFilterRulesAsStringsRequest);
 

@@ -35,6 +35,7 @@ typedef enum FFIMethod {
     GetDatabaseVersion,
     InstallCustomFilterFromString,
     GetActiveRules,
+    GetActiveRulesRaw,
     GetFilterRulesAsStrings,
     SaveRulesToFileBlob,
     GetDisabledRules,

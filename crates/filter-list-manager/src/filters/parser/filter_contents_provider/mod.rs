@@ -4,8 +4,9 @@ use crate::FilterParserError;
 
 mod check_contents_is_filter_contents;
 pub(crate) mod diff_path_provider;
-pub(super) mod io_provider;
+pub(in crate::filters) mod io_provider;
 pub(crate) mod string_provider;
+
 use crate::io::http::blocking_client::BlockingClient;
 use check_contents_is_filter_contents::check_contents_is_filter_contents;
 

@@ -98,12 +98,15 @@ impl FilterRepository {
     }
 }
 
-/// Queries
+/// Misc methods
 impl FilterRepository {
     pub(crate) const fn new() -> Self {
         Self {}
     }
+}
 
+/// Queries
+impl FilterRepository {
     /// Counts filters by condition
     pub(crate) fn count(
         &self,
@@ -125,7 +128,7 @@ impl FilterRepository {
         transaction: &Transaction,
         entity: FilterEntity,
     ) -> Result<FilterEntity, Error> {
-        let last_insert_id = self.insert_internal(transaction, &[entity], HashMap::new())?;
+        let last_insert_id = self.insert_internal(transaction, &[entity], HashMap::new(), None)?;
 
         let mut sql = String::from(BASIC_SELECT_SQL);
         sql += "WHERE f.filter_id=?";
@@ -316,6 +319,45 @@ impl FilterRepository {
         Ok(map)
     }
 
+    /// Gets download urls mapped by [`FilterId`]
+    ///
+    /// * `conn` - Connection
+    /// * `ids` - iterator of proposed ['FilterId']
+    /// * `len` - iterator length
+    pub(crate) fn select_download_urls<'i>(
+        &self,
+        conn: &Connection,
+        ids: impl Iterator<Item = &'i FilterId>,
+        len: usize,
+    ) -> rusqlite::Result<HashMap<FilterId, String>> {
+        if len == 0 {
+            return Ok(HashMap::new());
+        }
+
+        let mut sql = String::from(
+            r"
+            SELECT
+                filter_id,
+                download_url
+            FROM
+                [filter]
+            WHERE ",
+        );
+
+        sql += build_in_clause("filter_id", len).as_str();
+
+        let mut statement = conn.prepare(sql.as_str())?;
+
+        let mut rows = statement.query(params_from_iter(ids))?;
+
+        let mut out = HashMap::new();
+        while let Some(row) = rows.next()? {
+            out.insert(row.get(0)?, row.get(1)?);
+        }
+
+        Ok(out)
+    }
+
     /// Update user defined metadata for custom_filter
     ///
     /// * `transaction` - Outer transaction
@@ -396,41 +438,28 @@ impl FilterRepository {
         Ok(out)
     }
 
-    fn insert_internal(
+    /// Inserts entities with callback, which will be called once for each entity right after this [`FilterId`] selection, but before insert operation itself.
+    pub(crate) fn insert_with_chosen_filters_callback<'c, C>(
+        &self,
+        transaction: &Transaction<'_>,
+        entities: &[FilterEntity],
+        callback: C,
+    ) -> rusqlite::Result<i64>
+    where
+        C: FnMut(&FilterEntity, Option<FilterId>) + 'c,
+    {
+        let flags = self.select_filter_inner_flag(transaction, entities)?;
+        self.insert_internal(transaction, entities, flags, Some(Box::new(callback)))
+    }
+
+    #[allow(clippy::manual_range_contains)]
+    fn insert_internal<'c>(
         &self,
         transaction: &Transaction<'_>,
         entities: &[FilterEntity],
         filter_inner_flag_entities: HashMap<FilterId, FilterInnerFlagEntity>,
+        mut choose_filter_id_hook: Option<Box<dyn FnMut(&FilterEntity, Option<FilterId>) + 'c>>,
     ) -> rusqlite::Result<i64> {
-        let mut custom_filters_count: FilterId = 0;
-        for entity in entities.iter() {
-            if entity.filter_id.is_none() && entity.is_custom() {
-                custom_filters_count += 1;
-            }
-        }
-
-        // Need to use autoincrement
-        let mut metadata_entity: Option<DBMetadataEntity> = None;
-        if custom_filters_count > 0 {
-            // If empty, there is a problem with db
-            let db_metadata = match DBMetadataRepository::read(transaction)? {
-                None => return Err(Error::QueryReturnedNoRows),
-                Some(metadata) => metadata,
-            };
-
-            // Check negative autoincrement
-            if db_metadata.custom_filters_autoincrement_value > MAXIMUM_CUSTOM_FILTER_ID
-                || (db_metadata.custom_filters_autoincrement_value - custom_filters_count)
-                    < MINIMUM_CUSTOM_FILTER_ID
-            {
-                return Err(Error::InvalidParameterName(
-                    "custom_filter_increment".to_string(),
-                ));
-            }
-
-            metadata_entity = Some(db_metadata);
-        }
-
         let mut statement = transaction.prepare(
             r"
             INSERT OR REPLACE INTO
@@ -478,20 +507,39 @@ impl FilterRepository {
                 )",
         )?;
 
+        let mut metadata_entity: Option<DBMetadataEntity> = None;
         for entity in entities.iter() {
             // Should take special autoincrement id for new custom filters
-            let filter_id = match metadata_entity {
-                None => entity.filter_id,
-                Some(ref mut metadata_ref) => {
-                    if entity.is_custom() && entity.filter_id.is_none() {
-                        metadata_ref.custom_filters_autoincrement_value -= 1;
-                        Some(metadata_ref.custom_filters_autoincrement_value)
-                    } else {
-                        // Non-custom filters always must have their own filter id
-                        entity.filter_id
-                    }
+            let filter_id = if entity.is_custom_filter_has_invalid_or_empty_id() {
+                if metadata_entity.is_none() {
+                    metadata_entity = DBMetadataRepository::read(transaction)?;
                 }
+
+                if let Some(ref mut metadata_ref) = metadata_entity {
+                    let tmp_counter: FilterId = metadata_ref.custom_filters_autoincrement_value - 1;
+
+                    // Check negative autoincrement
+                    if tmp_counter > MAXIMUM_CUSTOM_FILTER_ID
+                        || tmp_counter < MINIMUM_CUSTOM_FILTER_ID
+                    {
+                        return Err(Error::InvalidParameterName(
+                            "custom_filter_increment".to_string(),
+                        ));
+                    }
+
+                    metadata_ref.custom_filters_autoincrement_value = tmp_counter;
+
+                    Some(metadata_ref.custom_filters_autoincrement_value)
+                } else {
+                    return Err(Error::QueryReturnedNoRows);
+                }
+            } else {
+                entity.filter_id
             };
+
+            if let Some(ref mut on_choose_id) = choose_filter_id_hook {
+                on_choose_id(entity, filter_id);
+            }
 
             let is_user_title = entity.is_user_title.or_else(|| {
                 filter_id
@@ -553,7 +601,7 @@ impl Repository<FilterEntity> for FilterRepository {
         entities: &[FilterEntity],
     ) -> Result<(), Error> {
         let filter_inner_flag_entities = self.select_filter_inner_flag(transaction, entities)?;
-        self.insert_internal(transaction, entities, filter_inner_flag_entities)
+        self.insert_internal(transaction, entities, filter_inner_flag_entities, None)
             .map(|_| ())
     }
 

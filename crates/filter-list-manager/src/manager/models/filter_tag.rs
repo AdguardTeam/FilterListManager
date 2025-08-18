@@ -13,6 +13,6 @@ pub struct FilterTag {
     /// - purpose:privacy
     /// - lang:de
     /// - platform:mobile
-    /// ... and so on
+    ///   ... and so on
     pub keyword: String,
 }

@@ -41,6 +41,16 @@ impl FilterEntity {
         self.group_id < 1
     }
 
+    /// This entity is custom, but its `filter_id` is invalid or [`None`]
+    pub(crate) fn is_custom_filter_has_invalid_or_empty_id(&self) -> bool {
+        self.is_custom()
+            && self
+                .filter_id
+                .as_ref()
+                .map(|id| id.is_positive())
+                .unwrap_or(true)
+    }
+
     /// `is_user_title` getter with default value
     pub(crate) fn is_user_title(&self) -> bool {
         self.is_user_title.unwrap_or(DEFAULT_IS_USER_TITLE_VALUE)

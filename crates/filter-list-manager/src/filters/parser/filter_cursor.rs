@@ -1,5 +1,5 @@
 /// Downloaded filter lines iterator.
-pub(super) struct FilterCursor {
+pub(crate) struct FilterCursor {
     /// Current line
     pub(super) lineno: usize,
     /// Normalized download url (scheme://(url)?path)
@@ -13,7 +13,6 @@ impl FilterCursor {
         Self {
             lineno: 0,
             normalized_url,
-            // @TODO: inefficient
             contents: contents.split('\n').map(str::to_string).collect(),
         }
     }

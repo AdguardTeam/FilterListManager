@@ -23,7 +23,8 @@ const BASIC_SELECT_SQL: &str = r"
         filter_id,
         rules_text,
         disabled_rules_text,
-        rules_count
+        rules_count,
+        has_directives
     FROM
         [rules_list]
 ";

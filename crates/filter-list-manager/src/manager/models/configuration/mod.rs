@@ -1,11 +1,14 @@
 //! Configuration-related objects for [`crate::FilterListManager`]
 pub mod filter_list_type;
+pub mod filters_compilation_policy;
 pub mod locale;
 pub mod request_proxy_mode;
 
 pub use self::filter_list_type::FilterListType;
+pub use self::filters_compilation_policy::FiltersCompilationPolicy;
 pub use self::locale::Locale;
 pub use self::request_proxy_mode::RequestProxyMode;
+
 use std::cmp::max;
 
 /// Expires value shouldn't be less than this constant. In seconds
@@ -35,8 +38,17 @@ pub struct Configuration {
     /// Default value: 86400
     /// Values < 3600 will be clamped to 3600
     pub default_filter_list_expires_period_sec: i32,
-    /// List of literal constants for filters conditional compilation
-    pub compiler_conditional_constants: Option<Vec<String>>,
+    /// Settings for filters compilation or collection from compiled parts.
+    ///
+    /// ### Compilation
+    /// During the update, each filter will be "compiled" into main filter and its includes.
+    /// Main filter remains unchanged. But in includes, (include, if/else/endif) directives will be resolved, using this policy.
+    /// Recursive includes will be inlined.
+    ///
+    /// ### Collection
+    /// When you get filters, they will be collected from compiled parts (main filter + includes).
+    /// All directives in main filter will be resolved, using this policy, and includes will be injected.
+    pub filters_compilation_policy: FiltersCompilationPolicy,
     /// URL of the index (filters.json) file
     pub metadata_url: String,
     /// URL of the locales (filters_i18n.json) file
@@ -96,7 +108,7 @@ impl Default for Configuration {
             working_directory: None,
             locale: "en".to_string(),
             default_filter_list_expires_period_sec: DEFAULT_EXPIRES_VALUE_FOR_FILTERS,
-            compiler_conditional_constants: None,
+            filters_compilation_policy: Default::default(),
             metadata_url: String::new(),
             request_proxy_mode: RequestProxyMode::UseSystemProxy,
             metadata_locales_url: String::new(),

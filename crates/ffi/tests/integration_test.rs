@@ -4,6 +4,7 @@ use filter_list_manager_ffi::FilterListManager;
 
 #[ignore]
 #[test]
+#[allow(clippy::field_reassign_with_default)]
 fn test_cannot_open_database() {
     let mut conf = Configuration::default();
     conf.app_name = "FlmApp".to_string();
@@ -17,6 +18,7 @@ fn test_cannot_open_database() {
 
 #[ignore]
 #[test]
+#[allow(clippy::field_reassign_with_default)]
 fn test_errors_from_update_custom_metadata() {
     let mut conf = Configuration::default();
     conf.app_name = "FlmApp".to_string();
@@ -51,6 +53,7 @@ fn test_create_flm_without_app_name() {
 }
 
 #[test]
+#[allow(clippy::field_reassign_with_default)]
 fn test_create_flm_without_version() {
     let mut conf = Configuration::default();
     conf.app_name = "FlmApp".to_string();

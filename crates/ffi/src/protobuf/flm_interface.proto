@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package filter_list_manager;
 
+option java_multiple_files = true;
+option java_package = "com.adguard.flm.protobuf";
+option java_outer_classname = "FlmInterfaceProto";
+
 import "configuration.proto";
 import "outer_error.proto";
 import "filters.proto";
@@ -44,7 +48,7 @@ message GetFullFilterListByIdRequest {
   int32 id = 1;
 }
 
-message GetStoredFiltersMetadataByIdRequest {
+message GetStoredFilterMetadataByIdRequest {
   int32 id = 1;
 }
 
@@ -74,6 +78,10 @@ message FetchFilterListMetadataRequest {
 
 message FetchFilterListMetadataWithBodyRequest {
   string url = 1;
+}
+
+message GetActiveRulesRawRequest {
+  repeated int32 filter_by = 1;
 }
 
 message ChangeLocaleRequest {
@@ -209,6 +217,11 @@ message GetActiveRulesResponse {
   optional AGOuterError error = 2;
 }
 
+message GetActiveRulesRawResponse {
+  repeated ActiveRulesInfoRaw rules = 1;
+  optional AGOuterError error = 2;
+}
+
 message GetFilterRulesAsStringsResponse {
   repeated FilterListRulesRaw rules_list = 1;
   optional AGOuterError error = 2;
@@ -221,6 +234,11 @@ message GetDisabledRulesResponse {
 
 message GetRulesCountResponse {
   repeated RulesCountByFilter rules_count_by_filter = 1;
+  optional AGOuterError error = 2;
+}
+
+message PullMetadataResponse {
+  PullMetadataResult result = 1;
   optional AGOuterError error = 2;
 }
 

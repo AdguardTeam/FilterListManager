@@ -1,6 +1,6 @@
 [package]
 name = "adguard-flm-ffi"
-version = "1.9.14"
+version = "2.0.0-rc.3"
 edition = "2021"
 homepage.workspace = true
 license-file.workspace = true
@@ -12,17 +12,16 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 name = "filter_list_manager_ffi"
 
 [dependencies]
-adguard-flm = { path = "../filter-list-manager", version = ">=1.3.0", default-features = false }
+adguard-flm = { path = "../filter-list-manager", version = ">=2.0.0-rc.1", default-features = false }
 thiserror.workspace = true
-protobuf = "3.5.1"
 prost = "0.13.2"
-prost-types = "0.13.2"
 enum_stringify = "0.6.0"
 
 [features]
 default = ["adguard-flm/default"]
 rusqlite-bundled = ["adguard-flm/rusqlite-bundled"]
 rustls-tls = ["adguard-flm/rustls-tls"]
+win-res = []
 
 [build-dependencies]
 windres = "0.2"

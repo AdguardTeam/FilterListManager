@@ -1,7 +1,7 @@
+use crate::filters::parser::filter_collector::FilterCollector;
+use crate::filters::parser::filter_compiler::FilterCompiler;
 use crate::filters::parser::metadata::KnownMetadataProperty;
-use crate::filters::parser::FilterParser;
 use crate::io::http::blocking_client::BlockingClient;
-use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 use crate::Configuration;
 use crate::FLMError;
 use crate::FLMResult;
@@ -23,22 +23,22 @@ impl FilterMetadataGrabber {
         url: String,
     ) -> FLMResult<FilterListMetadata> {
         let client = BlockingClient::new(configuration)?;
-        let mut parser = FilterParser::factory(configuration, &client);
+        let mut compiler = FilterCompiler::factory(configuration, &client);
 
-        let download_url = parser
-            .parse_from_url(&url)
+        let download_url = compiler
+            .compile(&url)
             .map_err(FLMError::from_parser_error)?;
 
         let filter_list_metadata: FilterListMetadata = FilterListMetadata {
-            title: parser.get_metadata(KnownMetadataProperty::Title),
-            description: parser.get_metadata(KnownMetadataProperty::Description),
-            time_updated: parser.get_metadata(KnownMetadataProperty::TimeUpdated),
-            version: parser.get_metadata(KnownMetadataProperty::Version),
-            homepage: parser.get_metadata(KnownMetadataProperty::Homepage),
-            license: parser.get_metadata(KnownMetadataProperty::License),
-            checksum: parser.get_metadata(KnownMetadataProperty::Checksum),
+            title: compiler.get_metadata(KnownMetadataProperty::Title),
+            description: compiler.get_metadata(KnownMetadataProperty::Description),
+            time_updated: compiler.get_metadata(KnownMetadataProperty::TimeUpdated),
+            version: compiler.get_metadata(KnownMetadataProperty::Version),
+            homepage: compiler.get_metadata(KnownMetadataProperty::Homepage),
+            license: compiler.get_metadata(KnownMetadataProperty::License),
+            checksum: compiler.get_metadata(KnownMetadataProperty::Checksum),
             url: download_url,
-            rules_count: parser.get_rules_count(),
+            rules_count: compiler.get_rules_count(),
         };
 
         Ok(filter_list_metadata)
@@ -51,28 +51,34 @@ impl FilterMetadataGrabber {
         url: String,
     ) -> FLMResult<FilterListMetadataWithBody> {
         let client = BlockingClient::new(configuration)?;
-        let mut parser = FilterParser::factory(configuration, &client);
+        let mut compiler = FilterCompiler::factory(configuration, &client);
 
-        let download_url = parser
-            .parse_from_url(&url)
+        let download_url = compiler
+            .compile(&url)
             .map_err(FLMError::from_parser_error)?;
 
-        let rule_entity: RulesListEntity = parser.extract_rule_entity(0);
+        let metadata = compiler.clone_metadata();
+        let compiled_filter_entities = compiler.into_entities(0);
+        let mut builder = FilterCollector::new(configuration);
+
+        let (filter_body, rules_count) = builder
+            .collect(&compiled_filter_entities, &download_url)
+            .map_err(FLMError::from_parser_error)?;
 
         let filter_list_metadata_with_body: FilterListMetadataWithBody =
             FilterListMetadataWithBody {
                 metadata: FilterListMetadata {
-                    title: parser.get_metadata(KnownMetadataProperty::Title),
-                    description: parser.get_metadata(KnownMetadataProperty::Description),
-                    time_updated: parser.get_metadata(KnownMetadataProperty::TimeUpdated),
-                    version: parser.get_metadata(KnownMetadataProperty::Version),
-                    homepage: parser.get_metadata(KnownMetadataProperty::Homepage),
-                    license: parser.get_metadata(KnownMetadataProperty::License),
-                    checksum: parser.get_metadata(KnownMetadataProperty::Checksum),
+                    title: metadata.get(KnownMetadataProperty::Title),
+                    description: metadata.get(KnownMetadataProperty::Description),
+                    time_updated: metadata.get(KnownMetadataProperty::TimeUpdated),
+                    version: metadata.get(KnownMetadataProperty::Version),
+                    homepage: metadata.get(KnownMetadataProperty::Homepage),
+                    license: metadata.get(KnownMetadataProperty::License),
+                    checksum: metadata.get(KnownMetadataProperty::Checksum),
                     url: download_url,
-                    rules_count: rule_entity.rules_count,
+                    rules_count,
                 },
-                filter_body: rule_entity.text,
+                filter_body,
             };
 
         Ok(filter_list_metadata_with_body)

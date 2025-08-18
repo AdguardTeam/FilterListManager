@@ -4,12 +4,39 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [1.9.2] - 2025-05-27
+## [2.0.0-rc.3] - 2025-07-10
+
+### Added
+- `get_active_rules_raw` method
+
+### Changed
+- Update flm to 2.0.0-rc.3
+
+[2.0.0-rc.3]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.0.0-rc.2...ffi-2.0.0-rc.3
+
+## [2.0.0-rc.2] - 2025-06-25
+
+### Changed
+- Apply clippy for workspace
+
+[2.0.0-rc.2]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.0.0-rc.1...ffi-2.0.0-rc.2
+
+## [2.0.0-rc.1] - 2025-06-23
+
+### Added
+- Kotlin for Android flm bindings
+
+### Changed
+- Update flm to 2.0.0-rc.1
+- Windows: change the way to handle FLM errors
 
 ### Fixed
-- Diff updates were _completely_ disabled for filters lists with directives
+- `get_filters_*` and `fetch_filter_*` methods names were corrected
 
-[1.9.2]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.9.1...ffi-1.9.2
+### Removed
+- Uniffi bindings and builds are completely removed
+
+[2.0.0-rc.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-1.9.0...ffi-2.0.0-rc.1
 
 ## [1.9.0] - 2025-04-14
 

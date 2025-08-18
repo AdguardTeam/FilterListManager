@@ -1,3 +1,4 @@
+use crate::manager::models::configuration::FiltersCompilationPolicy;
 use crate::utils::parsing::is_allowed_space;
 use std::cell::Cell;
 
@@ -11,22 +12,22 @@ enum ParserOperator {
 const TOKEN_LIST: [&str; 5] = ["!", "&&", "||", "(", ")"];
 
 /// Parses simple boolean expressions, like `(windows || (mac && gt_catalina))`
-pub(crate) struct BooleanExpressionParser {
+pub(crate) struct BooleanExpressionParser<'out> {
     /// Brackets balance counter
     bracket_balance: Cell<i16>,
 
     /// List of "true" tokens
-    flags: Vec<String>,
+    policy: &'out FiltersCompilationPolicy,
 }
 
-impl BooleanExpressionParser {
+impl<'out> BooleanExpressionParser<'out> {
     /// Ctor
     ///
     /// * `flags` - List of strings-tokens that represents true conditions for compiler. See tests for example
-    pub(crate) fn new(flags: Option<Vec<String>>) -> Self {
+    pub(crate) fn new(policy: &'out FiltersCompilationPolicy) -> Self {
         Self {
             bracket_balance: Cell::new(0i16),
-            flags: flags.unwrap_or_default(),
+            policy,
         }
     }
 
@@ -136,7 +137,7 @@ impl BooleanExpressionParser {
         let (token, remainder) = self.take(expr);
 
         match token {
-            token if token.is_empty() => None,
+            "" => None,
             "!" => {
                 let inversion = self.term(remainder)?;
 
@@ -150,8 +151,15 @@ impl BooleanExpressionParser {
             "true" => Some((true, remainder)),
             "false" => Some((false, remainder)),
 
-            // TODO: to_string looks weird
-            token => Some((self.flags.contains(&token.to_string()), remainder)),
+            token => {
+                let token_exists = self
+                    .policy
+                    .constants
+                    .iter()
+                    .any(|flag| flag.as_str() == token);
+
+                Some((token_exists, remainder))
+            }
         }
     }
 
@@ -184,10 +192,13 @@ impl BooleanExpressionParser {
 #[cfg(test)]
 mod tests {
     use super::BooleanExpressionParser;
+    use crate::manager::models::configuration::FiltersCompilationPolicy;
+    use crate::Configuration;
 
     #[test]
     fn tests_take() {
-        let object = BooleanExpressionParser::new(Some(vec![]));
+        let conf = Configuration::default();
+        let object = BooleanExpressionParser::new(&conf.filters_compilation_policy);
 
         [
             (" true", ("true", "")),
@@ -204,8 +215,9 @@ mod tests {
 
     #[test]
     fn tests_eval() {
-        let mut object =
-            BooleanExpressionParser::new(Some(vec![String::from("windows"), String::from("iOS")]));
+        let policy =
+            FiltersCompilationPolicy::new(vec![String::from("windows"), String::from("iOS")]);
+        let mut object = BooleanExpressionParser::new(&policy);
 
         [
             ("(adguard && (adguard_ext_firefox || adguard_app_windows || adguard_app_mac || adguard_app_android))", Some(false)),

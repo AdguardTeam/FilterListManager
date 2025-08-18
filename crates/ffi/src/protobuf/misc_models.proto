@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package filter_list_manager;
 
+option java_multiple_files = true;
+option java_package = "com.adguard.flm.protobuf";
+option java_outer_classname = "MiscModelsProto";
+
 import "filters.proto";
 
 // ActiveRulesInfo
@@ -17,6 +21,21 @@ message ActiveRulesInfo {
 
   // List of active rules.
   repeated string rules = 4;
+}
+
+// ActiveRulesInfo raw
+message ActiveRulesInfoRaw {
+  // Filter id for these rules
+  int32 filter_id = 1;
+
+  // Group id of the filter
+  int32 group_id = 2;
+
+  // Is this filter trusted?
+  bool is_trusted = 3;
+
+  // List of active rules as string.
+  string rules = 4;
 }
 
 // UpdateResult
@@ -44,4 +63,25 @@ message UpdateFilterError {
 
   // Http client error
   optional string http_client_error = 4;
+}
+
+// Information about filter movement during index metadata update
+message MovedFilterInfo {
+  /// Previous id of the filter
+  int32 previous_id = 1;
+
+  /// New id of the filter
+  int32 new_id = 2;
+}
+
+// Result of index metadata update
+message PullMetadataResult {
+  // List of filters added in the update
+  repeated int32 added_filters = 1;
+
+  // List of filters removed in the update
+  repeated int32 removed_filters = 2;
+
+  // List of filters moved in the update
+  repeated MovedFilterInfo moved_filters = 3;
 }

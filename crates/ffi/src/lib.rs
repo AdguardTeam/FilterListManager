@@ -3,7 +3,6 @@ mod native_interface;
 pub mod outer_error;
 mod protobuf_generated;
 mod result;
-mod top_level;
 
 pub use crate::models::FilterListManagerConstants;
 use crate::outer_error::AGOuterError;
@@ -14,7 +13,6 @@ use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 // Re-export native structs and functions
 pub use crate::native_interface::*;
-pub use crate::top_level::*;
 
 pub struct FilterListManager {
     flm: RwLock<FilterListManagerImpl>,
@@ -35,43 +33,43 @@ impl FilterListManager {
         title: Option<String>,
         description: Option<String>,
     ) -> AGResult<FullFilterList> {
-        self.wrap(move |flm| {
+        self.wrap(|flm| {
             flm.install_custom_filter_list(download_url, is_trusted, title, description)
         })
     }
 
     pub fn enable_filter_lists(&self, ids: Vec<FilterId>, is_enabled: bool) -> AGResult<i64> {
-        self.wrap(move |flm| flm.enable_filter_lists(ids, is_enabled).map(|v| v as i64))
+        self.wrap(|flm| flm.enable_filter_lists(ids, is_enabled).map(|v| v as i64))
     }
 
     pub fn install_filter_lists(&self, ids: Vec<FilterId>, is_installed: bool) -> AGResult<i64> {
-        self.wrap(move |flm| {
+        self.wrap(|flm| {
             flm.install_filter_lists(ids, is_installed)
                 .map(|v| v as i64)
         })
     }
 
     pub fn delete_custom_filter_lists(&self, ids: Vec<FilterId>) -> AGResult<i64> {
-        self.wrap(move |flm| flm.delete_custom_filter_lists(ids).map(|v| v as i64))
+        self.wrap(|flm| flm.delete_custom_filter_lists(ids).map(|v| v as i64))
     }
 
     pub fn get_full_filter_list_by_id(&self, id: FilterId) -> AGResult<Option<FullFilterList>> {
-        self.wrap(move |flm| flm.get_full_filter_list_by_id(id))
+        self.wrap(|flm| flm.get_full_filter_list_by_id(id))
     }
 
     pub fn get_stored_filters_metadata(&self) -> AGResult<Vec<StoredFilterMetadata>> {
         self.wrap(|flm| flm.get_stored_filters_metadata())
     }
 
-    pub fn get_stored_filters_metadata_by_id(
+    pub fn get_stored_filter_metadata_by_id(
         &self,
         filter_id: FilterId,
     ) -> AGResult<Option<StoredFilterMetadata>> {
-        self.wrap(move |flm| flm.get_stored_filter_metadata_by_id(filter_id))
+        self.wrap(|flm| flm.get_stored_filter_metadata_by_id(filter_id))
     }
 
     pub fn save_custom_filter_rules(&self, rules: FilterListRules) -> AGResult<()> {
-        self.wrap(move |flm| flm.save_custom_filter_rules(rules))
+        self.wrap(|flm| flm.save_custom_filter_rules(rules))
     }
 
     pub fn save_disabled_rules(
@@ -79,7 +77,7 @@ impl FilterListManager {
         filter_id: FilterId,
         disabled_rules: Vec<String>,
     ) -> AGResult<()> {
-        self.wrap(move |flm| flm.save_disabled_rules(filter_id, disabled_rules))
+        self.wrap(|flm| flm.save_disabled_rules(filter_id, disabled_rules))
     }
 
     pub fn update_filters(
@@ -102,18 +100,18 @@ impl FilterListManager {
         ids: Vec<FilterId>,
         loose_timeout: i32,
     ) -> AGResult<Option<UpdateResult>> {
-        self.wrap(move |flm| flm.force_update_filters_by_ids(ids, loose_timeout))
+        self.wrap(|flm| flm.force_update_filters_by_ids(ids, loose_timeout))
     }
 
     pub fn fetch_filter_list_metadata(&self, url: String) -> AGResult<FilterListMetadata> {
-        self.wrap(move |flm| flm.fetch_filter_list_metadata(url))
+        self.wrap(|flm| flm.fetch_filter_list_metadata(url))
     }
 
     pub fn fetch_filter_list_metadata_with_body(
         &self,
         url: String,
     ) -> AGResult<FilterListMetadataWithBody> {
-        self.wrap(move |flm| flm.fetch_filter_list_metadata_with_body(url))
+        self.wrap(|flm| flm.fetch_filter_list_metadata_with_body(url))
     }
 
     pub fn lift_up_database(&self) -> AGResult<()> {
@@ -129,10 +127,10 @@ impl FilterListManager {
     }
 
     pub fn change_locale(&self, suggested_locale: Locale) -> AGResult<bool> {
-        self.wrap_mut(move |mut flm| flm.change_locale(suggested_locale))
+        self.wrap_mut(|mut flm| flm.change_locale(suggested_locale))
     }
 
-    pub fn pull_metadata(&self) -> AGResult<()> {
+    pub fn pull_metadata(&self) -> AGResult<PullMetadataResult> {
         self.wrap(|flm| flm.pull_metadata())
     }
 
@@ -142,7 +140,7 @@ impl FilterListManager {
         title: String,
         is_trusted: bool,
     ) -> AGResult<bool> {
-        self.wrap(move |flm| flm.update_custom_filter_metadata(filter_id, title, is_trusted))
+        self.wrap(|flm| flm.update_custom_filter_metadata(filter_id, title, is_trusted))
     }
 
     pub fn get_database_path(&self) -> AGResult<String> {
@@ -163,7 +161,7 @@ impl FilterListManager {
         custom_title: Option<String>,
         custom_description: Option<String>,
     ) -> AGResult<FullFilterList> {
-        self.wrap(move |flm| {
+        self.wrap(|flm| {
             flm.install_custom_filter_from_string(
                 download_url,
                 last_download_time,
@@ -180,23 +178,30 @@ impl FilterListManager {
         self.wrap(|flm| flm.get_active_rules())
     }
 
+    pub fn get_active_rules_raw(
+        &self,
+        filter_by: Vec<FilterId>,
+    ) -> AGResult<Vec<ActiveRulesInfoRaw>> {
+        self.wrap(|flm| flm.get_active_rules_raw(filter_by))
+    }
+
     pub fn get_filter_rules_as_strings(
         &self,
         ids: Vec<FilterId>,
     ) -> AGResult<Vec<FilterListRulesRaw>> {
-        self.wrap(move |flm| flm.get_filter_rules_as_strings(ids))
+        self.wrap(|flm| flm.get_filter_rules_as_strings(ids))
     }
 
     pub fn save_rules_to_file_blob(&self, filter_id: FilterId, file_path: String) -> AGResult<()> {
-        self.wrap(move |flm| flm.save_rules_to_file_blob(filter_id, file_path))
+        self.wrap(|flm| flm.save_rules_to_file_blob(filter_id, file_path))
     }
 
     pub fn get_disabled_rules(&self, ids: Vec<FilterId>) -> AGResult<Vec<DisabledRulesRaw>> {
-        self.wrap(move |flm| flm.get_disabled_rules(ids))
+        self.wrap(|flm| flm.get_disabled_rules(ids))
     }
 
     pub fn set_proxy_mode(&self, request_proxy_mode: RequestProxyMode) -> AGResult<()> {
-        self.wrap_mut(move |mut flm| {
+        self.wrap_mut(|mut flm| {
             flm.set_proxy_mode(request_proxy_mode);
             Ok(())
         })
