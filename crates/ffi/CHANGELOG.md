@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+`## [2.0.0]` - 2025-08-18
+
+### Changed
+- Version 2.0 is released
+
+[2.0.0]: https://github.com/AdguardTeam/FilterListManager/releases/tag/ffi-2.0.0
+
 ## [2.0.0-rc.3] - 2025-07-10
 
 ### Added
