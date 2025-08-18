@@ -6,7 +6,7 @@ use rusqlite::{params_from_iter, ParamsFromIter};
 ///
 /// * `placeholders_count` - How many "?" will be inside IN brackets (?, ?, ...).
 ///
-/// ### Returns
+/// # Returns
 ///
 /// `field IN(?,?,?...) string` if `placeholders_count` > 0
 /// OR

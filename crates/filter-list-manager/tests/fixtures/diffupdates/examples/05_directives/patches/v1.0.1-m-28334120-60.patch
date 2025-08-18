@@ -1,0 +1,11 @@
+diff checksum:b77b9ad70b00f383473d2f702fa6bc6920466437 lines:10
+d2 2
+a3 2
+! Version: v1.0.2
+! Diff-Path: patches/v1.0.2-m-28334180-60.patch
+a12 1
+||google-analytics.com^
+d17 1
+a17 2
+||analytics.example.org^
+||facebook.com^$third-party 

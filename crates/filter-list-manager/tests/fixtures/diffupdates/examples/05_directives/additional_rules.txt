@@ -1,0 +1,4 @@
+! Additional rules included via !#include directive
+||ads.included.com^
+||trackers.included.net^
+||social.included.org^$third-party 

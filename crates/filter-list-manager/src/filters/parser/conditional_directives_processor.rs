@@ -6,10 +6,37 @@ use nom::Slice;
 /// if/else/endif nesting level counter
 type ConditionalNestingLevel = i16;
 
+/// Processes conditional directives and determines if line should be captured
+///
+/// # Arguments
+///
+/// * `conf` - Configuration
+///
+/// # Example
+///
+/// ```
+/// let filter_contents: impl AsRef<str> = "";
+/// let mut conditional_directives_processor = ConditionalDirectivesProcessor::new(&conf);
+/// for line in filter_contents.lines() {
+///     if conditional_directives_processor.process(line)? {
+///         // conditional directive was encountered
+///     }
+///
+///     if conditional_directives_processor.is_capturing_lines() {
+///         // line should be captured
+///     } else {
+///         // line should not be captured, because we are in `false` branch
+///     }
+/// }
+/// ```
 pub(crate) struct ConditionalDirectivesProcessor<'c> {
+    /// Current if/else/endif nesting level
     conditional_nesting_level: ConditionalNestingLevel,
+    /// At what nesting level condition was disabled
     condition_disabled_at_nesting: ConditionalNestingLevel,
+    /// Extra measure to detect unbalanced else/endif
     nesting_stack: Vec<ConditionalNestingLevel>,
+    /// Boolean expressions parser
     boolean_expression_parser: BooleanExpressionParser<'c>,
 }
 

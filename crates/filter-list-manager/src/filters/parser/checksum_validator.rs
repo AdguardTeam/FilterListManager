@@ -1,4 +1,5 @@
 use crate::utils::iterators::lines_with_terminator::lines_with_terminator;
+use crate::utils::parsing::collapse_newlines;
 use crate::FilterParserError;
 use base64::prelude::BASE64_STANDARD_NO_PAD;
 use base64::Engine;
@@ -60,6 +61,18 @@ pub(super) fn validate_checksum(contents: &str) -> Result<bool, FilterParserErro
         new_str += trimmed;
         new_str.push('\n');
     }
+
+    let mut b: i32 = 0;
+    let mut iter = new_str.chars().peekable();
+    while let Some(c) = iter.next() {
+        let peek = iter.peek();
+
+        if (c == '\r' || c == '\n') && (peek == Some(&'\n') || peek == Some(&'\r')) {
+            b += 1;
+        }
+    }
+
+    println!("Consecutive newlines: {}", b);
 
     new_str.pop();
 
