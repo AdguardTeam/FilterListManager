@@ -3,7 +3,7 @@
   <Import Project="..\common.props" />
   <Import Project="..\filter.targets" />
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net6.0-windows7.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
