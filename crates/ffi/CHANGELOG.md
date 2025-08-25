@@ -4,12 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+## [2.0.1] - 2025-08-25
 
 ### Changed
 - `update*` methods will check filters contents during update
 
-`## [2.0.0]` - 2025-08-18
+### Fixed
+- `has_directives` field was not set to false if there are no directives in the filter
+
+[2.0.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.0.0...ffi-2.0.1
+
+## [2.0.0] - 2025-08-18
 
 ### Changed
 - Version 2.0 is released
