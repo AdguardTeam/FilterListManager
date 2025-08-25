@@ -152,7 +152,7 @@ mod tests {
         let conf = Configuration::default();
         let mut collector = FilterCollector::new(&conf);
 
-        let rule = RulesListEntity::new(0, string!(test_filter), 0);
+        let rule = RulesListEntity::make(0, string!(test_filter), 0);
         let (contents, _) = collector
             .collect_from_parts::<Vec<FilterIncludeEntity>>(&rule, "", None)
             .unwrap();
@@ -170,7 +170,7 @@ mod tests {
         let conf = Configuration::default();
         let mut collector = FilterCollector::new(&conf);
 
-        let rule = RulesListEntity::new(0, string!(test_filter), 0);
+        let rule = RulesListEntity::make(0, string!(test_filter), 0);
         let error = collector
             .collect_from_parts::<Vec<FilterIncludeEntity>>(&rule, "", None)
             .err()
@@ -186,7 +186,7 @@ mod tests {
         let conf = Configuration::default();
         let mut collector = FilterCollector::new(&conf);
 
-        let rule = RulesListEntity::new(0, string!(test_filter), 0);
+        let rule = RulesListEntity::make(0, string!(test_filter), 0);
         let error = collector
             .collect_from_parts::<Vec<FilterIncludeEntity>>(&rule, "", None)
             .err()

@@ -213,16 +213,17 @@ impl<'a> FilterCompiler<'a> {
             .filter_parser_result
             .includes
             .into_iter()
-            .map(|include| FilterIncludeEntity {
-                row_id: None,
-                filter_id,
-                absolute_url: include.absolute_url,
-                rules_count: include.lines.get_rules_count(),
-                body: include.lines.into_body(),
+            .map(|include| {
+                FilterIncludeEntity::make(
+                    filter_id,
+                    include.absolute_url,
+                    include.lines.get_rules_count(),
+                    include.lines.into_body(),
+                )
             })
             .collect();
 
-        let mut rules_list_entity = RulesListEntity::new(
+        let mut rules_list_entity = RulesListEntity::make(
             filter_id,
             self.filter_parser_result.original_content,
             self.filter_parser_result.original_lines_count,

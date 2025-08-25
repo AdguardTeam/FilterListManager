@@ -93,5 +93,5 @@ fn update_filters() {
 }
 
 pub(crate) fn test() {
-    get_active_filters();
+    update_filters();
 }

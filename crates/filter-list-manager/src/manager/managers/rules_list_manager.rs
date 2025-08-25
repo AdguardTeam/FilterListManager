@@ -522,7 +522,7 @@ mod tests {
                 with_transaction(&mut conn, |tx| {
                     let entities: Vec<RulesListEntity> = list_ids
                         .iter()
-                        .map(|f| RulesListEntity::new(*f, string!(), 0))
+                        .map(|f| RulesListEntity::make(*f, string!(), 0))
                         .collect();
 
                     RulesListRepository::new().insert(tx, &entities)

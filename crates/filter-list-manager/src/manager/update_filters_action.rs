@@ -67,17 +67,27 @@ pub(super) fn update_filters_action(
         .filter_map(|filter| filter.filter_id)
         .collect::<Vec<FilterId>>();
 
-    let (mut diff_updates_map, mut rules_map, mut disabled_rules_map) = db_connection_manager
-        .execute_db(|conn: Connection| {
+    let (mut diff_updates_map, mut rules_map, mut disabled_rules_map, rules_hashes, includes_map) =
+        db_connection_manager.execute_db(|conn: Connection| {
             let diff_updates_map = diff_updates_repository
                 .select_map(&conn, &filter_ids)
                 .map_err(FLMError::from_database)?;
 
-            let (rules_map, disabled_rules_map) = rule_list_repository
+            let (rules_map, disabled_rules_map, rules_hashes) = rule_list_repository
                 .select_rules_maps(&conn, &filter_ids)
                 .map_err(FLMError::from_database)?;
 
-            Ok((diff_updates_map, rules_map, disabled_rules_map))
+            let includes_map = filter_includes_repository
+                .select_mapped(&conn, None)
+                .map_err(FLMError::from_database)?;
+
+            Ok((
+                diff_updates_map,
+                rules_map,
+                disabled_rules_map,
+                rules_hashes,
+                includes_map,
+            ))
         })?;
 
     let shared_http_client = BlockingClient::new(configuration)?;
@@ -231,7 +241,7 @@ pub(super) fn update_filters_action(
                 update_result.filters_errors.push(UpdateFilterError {
                     filter_id,
                     message: format!(
-                        "Filter with id: {} is gone from database while updating",
+                        "Filter with id \"{}\" is gone from database while updating",
                         filter_id
                     ),
                     filter_url: None,
@@ -247,18 +257,6 @@ pub(super) fn update_filters_action(
             };
 
             let diff_path = compiler.get_metadata(KnownMetadataProperty::DiffPath);
-            if !diff_path.is_empty() {
-                match process_diff_path(filter_id, diff_path) {
-                    Ok(Some(entity)) => diff_path_entities.push(entity),
-                    Err(why) => update_result.filters_errors.push(UpdateFilterError {
-                        filter_id,
-                        message: why.to_string(),
-                        filter_url: Some(filter.download_url.clone()),
-                        http_client_error: None,
-                    }),
-                    _ => {}
-                }
-            }
 
             filter.expires = expires;
             filter.last_download_time = current_time;
@@ -289,14 +287,80 @@ pub(super) fn update_filters_action(
             filter.license = compiler.get_metadata(KnownMetadataProperty::License);
             filter.checksum = compiler.get_metadata(KnownMetadataProperty::Checksum);
 
-            filter_entities.push(filter);
-
-            let mut filter_entities = compiler.into_entities(filter_id);
-            filter_entities.rules_list_entity.disabled_text =
+            let mut compiled_filter_entities = compiler.into_entities(filter_id);
+            compiled_filter_entities.rules_list_entity.disabled_text =
                 disabled_rules_map.remove(&filter_id).unwrap_or_default();
 
-            rules_entities.push(filter_entities.rules_list_entity);
-            includes_entities.append(&mut filter_entities.filter_includes_entities);
+            if !ignore_filters_expiration {
+                // Check that filter contents are really changed
+                if let Some(current_filter_hash) =
+                    compiled_filter_entities.rules_list_entity.get_text_hash()
+                {
+                    if let Some(old_filter_hash) = rules_hashes.get(&filter_id) {
+                        // Old filter has hash, and it is the same as current
+                        if !old_filter_hash.is_empty() && current_filter_hash == old_filter_hash {
+                            // We should check includes
+                            let current_includes =
+                                &compiled_filter_entities.filter_includes_entities;
+
+                            match includes_map.get(&filter_id) {
+                                Some(old_includes) if !old_includes.is_empty() => {
+                                    // Has includes and includes counts are the same
+                                    if old_includes.len() == current_includes.len() {
+                                        let all_includes_are_same = old_includes
+                                            .iter()
+                                            .zip(current_includes)
+                                            .all(|(old_include, current_include)| {
+                                                old_include.get_body_hash()
+                                                    == current_include.get_body_hash()
+                                            });
+
+                                        if all_includes_are_same {
+                                            // Filter is not changed
+                                            continue;
+                                        }
+                                    }
+                                }
+
+                                // Old filter has no includes
+                                Some(old_includes) if old_includes.is_empty() => {
+                                    // Current filter has no includes too
+                                    if current_includes.is_empty() {
+                                        continue;
+                                    }
+                                }
+
+                                None => {
+                                    // Old filter has no includes
+                                    if current_includes.is_empty() {
+                                        continue;
+                                    }
+                                }
+
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+            }
+
+            // All pushes should be made below this line
+            if !diff_path.is_empty() {
+                match process_diff_path(filter_id, diff_path) {
+                    Ok(Some(entity)) => diff_path_entities.push(entity),
+                    Err(why) => update_result.filters_errors.push(UpdateFilterError {
+                        filter_id,
+                        message: why.to_string(),
+                        filter_url: Some(filter.download_url.clone()),
+                        http_client_error: None,
+                    }),
+                    _ => {}
+                }
+            }
+
+            rules_entities.push(compiled_filter_entities.rules_list_entity);
+            includes_entities.append(&mut compiled_filter_entities.filter_includes_entities);
+            filter_entities.push(filter);
         }
 
         with_transaction(&mut conn, |transaction: &Transaction| {
@@ -424,45 +488,43 @@ mod tests {
         DIRECTIVE_ELSE, DIRECTIVE_ENDIF, DIRECTIVE_IF, DIRECTIVE_INCLUDE,
     };
     use crate::storage::entities::filter::filter_entity::FilterEntity;
-    use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
+    use crate::storage::entities::filter::filter_include_entity::FilterIncludeEntity;
+    use crate::storage::entities::rules_list::rules_list_entity::{
+        RulesListEntity, RulesListEntityCallsMock,
+    };
     use crate::storage::repositories::filter_includes_repository::FilterIncludesRepository;
     use crate::storage::repositories::filter_repository::FilterRepository;
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::repositories::Repository;
     use crate::storage::with_transaction;
     use crate::storage::DbConnectionManager;
-    use crate::test_utils::{tests_path, RAIIFile};
-    use crate::{string, Configuration, FilterId};
+    use crate::test_utils::tests_fixtures::TestsFixtures;
+    use crate::test_utils::tests_path;
+    use crate::{string, Configuration, FilterId, CUSTOM_FILTERS_GROUP_ID};
     use chrono::Utc;
+    use mimicry::Mock;
     use rusqlite::Connection;
-    use std::{env, thread};
+    use std::thread;
     use url::Url;
 
     #[allow(clippy::field_reassign_with_default)]
     #[test]
     fn test_update_filters_action() {
-        let timestamp = Utc::now().timestamp_micros();
-
         let source = DbConnectionManager::factory_test().unwrap();
-
         unsafe { source.lift_up_database().unwrap() }
 
-        let mut _files_guard = vec![];
+        let mut fixtures = TestsFixtures::new();
 
         // This creates filter in the fixtures folder
         let mut write_rules = |rules: RulesListEntity| -> (Url, RulesListEntity) {
-            let mut path = env::current_dir().unwrap();
-            path.push("fixtures");
-            path.push(format!(
-                "{}_update_filters_action_{}_{:?}.txt",
-                timestamp,
-                &rules.filter_id,
-                thread::current().id()
-            ));
-
-            let filter_url = Url::from_file_path(&path).unwrap();
-
-            _files_guard.push(RAIIFile::new(&path, rules.text.as_str()));
+            let filter_url = fixtures.write(
+                &format!(
+                    "update_filters_action_{}_{:?}",
+                    rules.filter_id,
+                    thread::current().id()
+                ),
+                &rules.text,
+            );
 
             (filter_url, rules)
         };
@@ -703,28 +765,21 @@ mod tests {
     #[allow(clippy::field_reassign_with_default)]
     #[test]
     fn test_force_update_filters_action() {
-        let timestamp = Utc::now().timestamp_micros();
-
         let source = DbConnectionManager::factory_test().unwrap();
-
         unsafe { source.lift_up_database().unwrap() }
 
-        let mut _files_guard = vec![];
+        let mut fixtures = TestsFixtures::new();
 
         // This creates filter in the fixtures folder
         let mut write_rules = |rules: RulesListEntity| -> (Url, RulesListEntity) {
-            let mut path = env::current_dir().unwrap();
-            path.push("fixtures");
-            path.push(format!(
-                "{}_update_filters_action_{}_{:?}.txt",
-                timestamp,
-                &rules.filter_id,
-                thread::current().id()
-            ));
-
-            let filter_url = Url::from_file_path(&path).unwrap();
-
-            _files_guard.push(RAIIFile::new(&path, rules.text.as_str()));
+            let filter_url = fixtures.write(
+                &format!(
+                    "update_filters_action_{}_{:?}",
+                    rules.filter_id,
+                    thread::current().id()
+                ),
+                &rules.text,
+            );
 
             (filter_url, rules)
         };
@@ -1105,5 +1160,130 @@ mod tests {
                 Ok(())
             })
             .unwrap();
+    }
+
+    #[test]
+    fn test_update_filters_hash_with_includes_unchanged() {
+        const INCLUDE_FILE_NAME: &str = "include_test_update_filters_hash_with_includes_unchanged";
+        const MAIN_FILE_NAME: &str = "main_test_update_filters_hash_with_includes_unchanged";
+        const FILTER_ID: i32 = -42;
+
+        let source = DbConnectionManager::factory_test().unwrap();
+        unsafe { source.lift_up_database().unwrap() }
+
+        // Fixtures files
+        let mut fixtures = TestsFixtures::new();
+        let include_body = "||example.org^";
+        let include_url = fixtures.write(INCLUDE_FILE_NAME, include_body);
+
+        let main_body = format!("bbbbb\n!#include {}\n", &include_url);
+        let main_url = fixtures.write(MAIN_FILE_NAME, &main_body);
+
+        // Prepare entities for DB
+        let mut filter = FilterEntity::default();
+        filter.filter_id = Some(FILTER_ID);
+        filter.group_id = CUSTOM_FILTERS_GROUP_ID;
+        filter.is_enabled = true;
+        filter.download_url = main_url.to_string();
+        filter.title = string!("TestFilter");
+
+        let rules_entity = RulesListEntity::make(FILTER_ID, main_body.to_string(), 0);
+        let include_entity = FilterIncludeEntity::make(
+            FILTER_ID,
+            include_url.to_string(),
+            1,
+            include_body.to_string(),
+        );
+
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+        let includes_repo = FilterIncludesRepository::new();
+
+        // Insert initial state
+        source
+            .execute_db(|mut conn: Connection| {
+                let tx = conn.transaction().unwrap();
+                filters_repo.insert(&tx, &[filter.clone()]).unwrap();
+                rules_repo.insert(&tx, &[rules_entity]).unwrap();
+                includes_repo
+                    .replace_entities_for_filters(&tx, &[include_entity])
+                    .unwrap();
+                tx.commit().unwrap();
+                Ok(())
+            })
+            .unwrap();
+
+        // Run update (files unchanged)
+        let conf = Configuration::default();
+        let result = update_filters_action(vec![filter], &source, false, false, 0, &conf).unwrap();
+
+        // Should NOT update because hash and includes are unchanged
+        assert!(result.updated_list.is_empty());
+    }
+
+    #[test]
+    fn test_update_filters_hash_with_includes_changed() {
+        const INCLUDE_FILE_NAME: &str = "include_test_update_filters_hash_with_includes_changed";
+        const MAIN_FILE_NAME: &str = "main_test_update_filters_hash_with_includes_changed";
+        const FILTER_ID: i32 = -43;
+
+        let source = DbConnectionManager::factory_test().unwrap();
+        unsafe { source.lift_up_database().unwrap() }
+
+        let mut fixtures = TestsFixtures::new();
+
+        // Initial include file content
+        let include_body_v1 = "||example.org^";
+        let include_url = fixtures.write(INCLUDE_FILE_NAME, include_body_v1);
+
+        let main_body = format!("aaaa\n!#include {}\n", include_url);
+        let main_url = fixtures.write(MAIN_FILE_NAME, &main_body);
+
+        let mut filter = FilterEntity::default();
+        filter.filter_id = Some(FILTER_ID);
+        filter.group_id = CUSTOM_FILTERS_GROUP_ID;
+        filter.is_enabled = true;
+        filter.download_url = main_url.to_string();
+        filter.title = string!("TestFilter2");
+
+        let rules_entity = RulesListEntity::make(FILTER_ID, main_body, 0);
+        let include_entity_v1 = FilterIncludeEntity::make(
+            FILTER_ID,
+            include_url.to_string(),
+            1,
+            include_body_v1.to_string(),
+        );
+
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+        let includes_repo = FilterIncludesRepository::new();
+
+        // Insert initial version into DB
+        source
+            .execute_db(|mut conn: Connection| {
+                let tx = conn.transaction().unwrap();
+                filters_repo.insert(&tx, &[filter.clone()]).unwrap();
+                rules_repo.insert(&tx, &[rules_entity.clone()]).unwrap();
+                includes_repo
+                    .replace_entities_for_filters(&tx, &[include_entity_v1.clone()])
+                    .unwrap();
+                tx.commit().unwrap();
+                Ok(())
+            })
+            .unwrap();
+
+        // Now change include file contents (simulate remote update)
+        fixtures.write(INCLUDE_FILE_NAME, "||changed.example.org^");
+
+        let _guard = RulesListEntityCallsMock::default().set_as_mock();
+
+        // Run update
+        let conf = Configuration::default();
+        let result = update_filters_action(vec![filter], &source, false, false, 0, &conf).unwrap();
+
+        // Should update because include body hash changed
+        assert_eq!(result.updated_list.len(), 1);
+        assert_eq!(result.updated_list[0].id, FILTER_ID);
+        assert_eq!(_guard.into_inner().called_times.into_inner(), 1);
     }
 }

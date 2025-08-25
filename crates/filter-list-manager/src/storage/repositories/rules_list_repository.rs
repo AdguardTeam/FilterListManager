@@ -24,7 +24,8 @@ const BASIC_SELECT_SQL: &str = r"
         rules_text,
         disabled_rules_text,
         rules_count,
-        has_directives
+        has_directives,
+        text_hash
     FROM
         [rules_list]
 ";
@@ -122,18 +123,25 @@ impl RulesListRepository {
         Ok(results)
     }
 
-    /// Gets rules strings and disabled_rules strings mapped by [`FilterId`] for provided `for_ids`
+    /// Gets rules strings, disabled_rules strings and rules hashes mapped by [`FilterId`] for provided `for_ids`
     pub(crate) fn select_rules_maps(
         &self,
         conn: &Connection,
         for_ids: &[FilterId],
-    ) -> Result<(MapFilterIdOnRulesString, MapFilterIdOnRulesString)> {
+    ) -> Result<(
+        MapFilterIdOnRulesString,
+        MapFilterIdOnRulesString,
+        MapFilterIdOnRulesString,
+    )> {
         let mut sql = String::from(
             r"
             SELECT
                 filter_id,
                 rules_text,
-                disabled_rules_text
+                disabled_rules_text,
+                rules_count,
+                has_directives,
+                text_hash
             FROM
                 [rules_list]
             WHERE ",
@@ -147,14 +155,18 @@ impl RulesListRepository {
 
         let mut rules = HashMap::new();
         let mut disabled_rules = HashMap::new();
+        let mut text_hashes = HashMap::new();
         while let Some(row) = rows.next()? {
             let id: FilterId = row.get(0)?;
 
             rules.insert(id, row.get(1)?);
             disabled_rules.insert(id, row.get(2)?);
+
+            let text_hash = row.get::<usize, Option<String>>(5)?;
+            text_hashes.insert(id, text_hash.unwrap_or_default());
         }
 
-        Ok((rules, disabled_rules))
+        Ok((rules, disabled_rules, text_hashes))
     }
 
     pub(crate) fn select(
@@ -305,14 +317,16 @@ impl Repository<RulesListEntity> for RulesListRepository {
                         filter_id,
                         rules_text,
                         disabled_rules_text,
-                        rules_count
+                        rules_count,
+                        text_hash
                     )
                 VALUES
                     (
                         :filter_id,
                         :rules_text,
                         :disabled_rules_text,
-                        :rules_count
+                        :rules_count,
+                        :text_hash
                     )
             ",
         )?;
@@ -322,7 +336,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
                 ":filter_id": entity.filter_id,
                 ":rules_text": entity.text,
                 ":disabled_rules_text": entity.disabled_text,
-                ":rules_count": entity.rules_count
+                ":rules_count": entity.rules_count,
+                ":text_hash": entity.text_hash
             })?;
         }
 

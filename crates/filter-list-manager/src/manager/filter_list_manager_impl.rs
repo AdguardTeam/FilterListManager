@@ -938,7 +938,7 @@ mod tests {
 
         source
             .execute_db(|mut connection: Connection| {
-                let rules = RulesListEntity::new(
+                let rules = RulesListEntity::make(
                     USER_RULES_FILTER_LIST_ID,
                     string!(),
                     user_rules_count_result,
