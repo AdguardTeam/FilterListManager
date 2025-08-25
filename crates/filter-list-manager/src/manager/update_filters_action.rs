@@ -599,7 +599,7 @@ mod tests {
         // Another special case: Rules is not installed, but version already came from metadata.
         // Expected behaviour: rules must be installed
         filter5.version = String::from("2.0.1");
-        let (download_url5, rules5) = write_rules(RulesListEntity::with_disabled_text(
+        let (download_url5, mut rules5) = write_rules(RulesListEntity::with_disabled_text(
             fifth_filter_id,
             string!("\n!Version: 2.0.1\nFilter5\nNonFilter5"),
             string!(),
@@ -651,7 +651,7 @@ mod tests {
         assert_eq!(installed_filters.len(), 5);
 
         // Write new data into all filters
-        let (_, new_rules1) = write_rules(RulesListEntity::with_disabled_text(
+        let (_, mut new_rules1) = write_rules(RulesListEntity::with_disabled_text(
             first_filter_id,
             string!("Filter1_new\nNonFilter1_new"),
             rules1.disabled_text,
@@ -665,7 +665,7 @@ mod tests {
             user_rules_count_new,
         ));
 
-        let (_, new_rules3) = write_rules(RulesListEntity::with_disabled_text(
+        let (_, mut new_rules3) = write_rules(RulesListEntity::with_disabled_text(
             third_filter_id,
             string!("Filter3_new\nNonFilter3_new"),
             rules3.disabled_text,
@@ -745,6 +745,10 @@ mod tests {
                     .iter()
                     .find(|rules| rules.filter_id == fifth_filter_id)
                     .unwrap();
+
+                new_rules1.set_has_directives(false);
+                new_rules3.set_has_directives(false);
+                rules5.set_has_directives(false);
 
                 // These will be updated
                 assert_eq!(first_filter, &new_rules1);
@@ -854,7 +858,7 @@ mod tests {
         // Another special case: Rules is not installed, but version already came from metadata.
         // Expected behaviour: rules must be installed
         filter5.version = String::from("2.0.1");
-        let (download_url5, rules5) = write_rules(RulesListEntity::with_disabled_text(
+        let (download_url5, mut rules5) = write_rules(RulesListEntity::with_disabled_text(
             fifth_filter_id,
             string!("\n!Version: 2.0.1\nFilter5\nNonFilter5"),
             string!(),
@@ -914,28 +918,28 @@ mod tests {
         assert_eq!(installed_filters.len(), 6);
 
         // Write new data into all filters
-        let (_, new_rules1) = write_rules(RulesListEntity::with_disabled_text(
+        let (_, mut new_rules1) = write_rules(RulesListEntity::with_disabled_text(
             first_filter_id,
             string!("Filter1_new\nNonFilter1_new"),
             rules1.clone().disabled_text,
             user_rules_count_new,
         ));
 
-        let (_, new_rules2) = write_rules(RulesListEntity::with_disabled_text(
+        let (_, mut new_rules2) = write_rules(RulesListEntity::with_disabled_text(
             second_filter_id,
             string!("Filter2_new\nNonFilter2_new"),
             rules2.clone().disabled_text,
             user_rules_count_new,
         ));
 
-        let (_, new_rules3) = write_rules(RulesListEntity::with_disabled_text(
+        let (_, mut new_rules3) = write_rules(RulesListEntity::with_disabled_text(
             third_filter_id,
             string!("Filter3_new\nNonFilter3_new"),
             rules3.clone().disabled_text,
             user_rules_count_new,
         ));
 
-        let (_, new_rules4) = write_rules(RulesListEntity::with_disabled_text(
+        let (_, mut new_rules4) = write_rules(RulesListEntity::with_disabled_text(
             fourth_filter_id,
             string!("Filter4_new\nNonFilter4_new"),
             rules4.clone().disabled_text,
@@ -1012,6 +1016,12 @@ mod tests {
                     .find(|rules| rules.filter_id == fifth_filter_id)
                     .unwrap();
 
+                new_rules1.set_has_directives(false);
+                new_rules2.set_has_directives(false);
+                new_rules3.set_has_directives(false);
+                new_rules4.set_has_directives(false);
+                rules5.set_has_directives(false);
+
                 // These will be updated
                 assert_eq!(first_filter, &new_rules1);
                 assert_eq!(third_filter, &new_rules3);
@@ -1022,6 +1032,9 @@ mod tests {
 
                 // This will be written as new during the update
                 assert_eq!(fifth_filter, &rules5);
+
+                // Update methods should set has_directives to false if there are no directives
+                assert!(!fifth_filter.has_directives());
 
                 Ok(())
             })

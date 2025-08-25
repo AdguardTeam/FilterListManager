@@ -318,7 +318,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
                         rules_text,
                         disabled_rules_text,
                         rules_count,
-                        text_hash
+                        text_hash,
+                        has_directives
                     )
                 VALUES
                     (
@@ -326,7 +327,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
                         :rules_text,
                         :disabled_rules_text,
                         :rules_count,
-                        :text_hash
+                        :text_hash,
+                        :has_directives
                     )
             ",
         )?;
@@ -337,7 +339,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
                 ":rules_text": entity.text,
                 ":disabled_rules_text": entity.disabled_text,
                 ":rules_count": entity.rules_count,
-                ":text_hash": entity.text_hash
+                ":text_hash": entity.text_hash,
+                ":has_directives": entity.has_directives
             })?;
         }
 
