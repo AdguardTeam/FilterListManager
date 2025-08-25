@@ -20,9 +20,9 @@
   </metadata>
   <files>
     <!-- Files -->
-    <file src="../build/bin/release/AdGuard.FilterListManager.dll" target="lib/net45"/>
-    <file src="../build/bin/release/AdGuard.FilterListManager.pdb" target="lib/net45"/>
-    <file src="../build/bin/release/AdGuard.FilterListManager.xml" target="lib/net45"/>
+    <file src="../build/bin/release/AdGuard.FilterListManager.dll" target="lib/net6.0-windows7.0"/>
+    <file src="../build/bin/release/AdGuard.FilterListManager.pdb" target="lib/net6.0-windows7.0"/>
+    <file src="../build/bin/release/AdGuard.FilterListManager.xml" target="lib/net6.0-windows7.0"/>
     <file src="../build/bin/release/x86/AdGuardFLM.dll" target="build/x86"/>
     <file src="../build/bin/release/x86/AdGuardFLM.pdb" target="build/x86"/>
     <file src="../build/bin/release/x64/AdGuardFLM.dll" target="build/x64"/>
