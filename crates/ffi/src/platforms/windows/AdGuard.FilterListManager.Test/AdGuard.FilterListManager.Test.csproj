@@ -1,10 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <Import Project="..\common.props" />
-  <Import Project="..\filter.targets" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows7.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
