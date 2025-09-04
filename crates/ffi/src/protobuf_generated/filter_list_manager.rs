@@ -60,6 +60,9 @@ pub struct Configuration {
     /// Client app version
     #[prost(string, tag = "13")]
     pub version: ::prost::alloc::string::String,
+    /// Should ignore expires for local urls during update
+    #[prost(bool, tag = "14")]
+    pub should_ignore_expires_for_local_urls: bool,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

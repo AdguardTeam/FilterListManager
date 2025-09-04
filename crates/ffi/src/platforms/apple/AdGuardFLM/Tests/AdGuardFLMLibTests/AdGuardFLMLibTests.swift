@@ -14,6 +14,7 @@ final class AdGuardFLMLibTests: XCTestCase {
         configuration.workingDirectory = "."
         configuration.filtersCompilationPolicy = FilterListManager_FiltersCompilationPolicy()
         configuration.filtersCompilationPolicy.constants = ["const1", "const2"]
+        configuration.shouldIgnoreExpiresForLocalUrls = false;
 
         return configuration
     }

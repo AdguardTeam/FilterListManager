@@ -8,6 +8,7 @@ use crate::filters::parser::metadata::KnownMetadataProperty;
 use crate::io::fetch_by_schemes::fetch_json_by_scheme;
 use crate::io::get_scheme;
 use crate::io::http::blocking_client::BlockingClient;
+use crate::io::url_schemes::UrlSchemes;
 use crate::manager::filter_lists_builder::FullFilterListBuilder;
 use crate::manager::models::update_result::UpdateFilterError;
 use crate::manager::models::UpdateResult;
@@ -452,6 +453,16 @@ fn build_compiler<'deps: 'compiler, 'compiler>(
                 ),
             };
         }
+    }
+
+    // If there is no chance for update this filter, it is local we should ignore expires
+    if configuration.should_ignore_expires_for_local_urls
+        && UrlSchemes::from(get_scheme(filter.download_url.as_str())) == UrlSchemes::File
+    {
+        return Ok((
+            Some(FilterCompiler::factory(configuration, shared_http_client)),
+            filter_will_use_diff_update,
+        ));
     }
 
     Ok((None, filter_will_use_diff_update))
@@ -1298,5 +1309,159 @@ mod tests {
         assert_eq!(result.updated_list.len(), 1);
         assert_eq!(result.updated_list[0].id, FILTER_ID);
         assert_eq!(_guard.into_inner().called_times.into_inner(), 1);
+    }
+
+    #[test]
+    fn test_local_urls_update_when_ignore_expires_enabled() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        unsafe { source.lift_up_database().unwrap() }
+
+        let mut fixtures = TestsFixtures::new();
+
+        let first_filter_id: FilterId = -11;
+        let second_filter_id: FilterId = -12;
+
+        // Create two enabled local filters: one with explicit expires, one without
+        const FILTER1_NAME: &str = "local_ignore_expires_enabled_1";
+        let mut filter1 = FilterEntity::default();
+        filter1.filter_id = Some(first_filter_id);
+        filter1.is_enabled = true;
+        filter1.title = String::from("LocalFilter1");
+        filter1.expires = 7200; // explicitly set expires
+        filter1.last_download_time = Utc::now().timestamp(); // just downloaded
+        let rules1 = RulesListEntity::with_disabled_text(
+            first_filter_id,
+            string!("some\nexample"),
+            string!(""),
+            2,
+        );
+        let download_url1 = fixtures.write(FILTER1_NAME, rules1.text.as_str());
+        filter1.download_url = download_url1.to_string();
+
+        const FILTER2_NAME: &str = "local_ignore_expires_enabled_2";
+        let mut filter2 = FilterEntity::default();
+        filter2.filter_id = Some(second_filter_id);
+        filter2.is_enabled = true;
+        filter2.title = String::from("LocalFilter2");
+        filter2.expires = 0; // not set
+        filter2.last_download_time = Utc::now().timestamp(); // just downloaded
+        let rules2 = RulesListEntity::with_disabled_text(
+            second_filter_id,
+            string!("that\nfilter"),
+            string!(""),
+            2,
+        );
+
+        let download_url2 = fixtures.write(FILTER2_NAME, rules2.text.as_str());
+        filter2.download_url = download_url2.to_string();
+
+        // Insert initial state into DB
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+
+        source
+            .execute_db(|mut connection: Connection| {
+                with_transaction(&mut connection, |tx| {
+                    filters_repo.insert(&tx, &[filter1, filter2])?;
+                    rules_repo.insert(&tx, &[rules1, rules2])
+                })
+            })
+            .unwrap();
+
+        // Overwrite files with new content to simulate available updates
+        let _ = fixtures.write(FILTER1_NAME, "some new example\nsome second line");
+        let _ = fixtures.write(FILTER2_NAME, "this->filter\n(*that).filter");
+
+        // Configuration: enable ignoring expires for local URLs
+        let mut conf = Configuration::default();
+        conf.should_ignore_expires_for_local_urls = true;
+        conf.metadata_url = Url::from_file_path(tests_path("fixtures/filters.json"))
+            .unwrap()
+            .to_string();
+
+        // Call without ignore_filters_expiration (false)
+        let installed_filters = source
+            .execute_db(|connection: Connection| {
+                Ok(filters_repo
+                    .select_filters_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap())
+            })
+            .unwrap();
+
+        let result =
+            update_filters_action(installed_filters, &source, false, false, 0, &conf).unwrap();
+
+        // Both local filters must be updated immediately
+        let updated_ids = result
+            .updated_list
+            .iter()
+            .map(|item| item.id)
+            .collect::<Vec<FilterId>>();
+
+        assert!(result.filters_errors.is_empty());
+        assert_eq!(updated_ids.len(), 2);
+        assert!(updated_ids.contains(&first_filter_id));
+        assert!(updated_ids.contains(&second_filter_id));
+    }
+
+    #[test]
+    fn test_local_urls_not_updated_when_ignore_expires_disabled() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        unsafe { source.lift_up_database().unwrap() }
+
+        let mut fixtures = TestsFixtures::new();
+
+        let filter_id: FilterId = -21;
+
+        const FILTER_NAME: &str = "local_ignore_expires_disabled";
+        let mut filter = FilterEntity::default();
+        filter.filter_id = Some(filter_id);
+        filter.is_enabled = true;
+        filter.title = string!("LocalFilterNoIgnore");
+        filter.expires = 0; // not set; minimal clamp to 3600 will apply
+        filter.last_download_time = Utc::now().timestamp(); // just downloaded
+        let rules = RulesListEntity::with_disabled_text(filter_id, string!("a\nb"), string!(""), 2);
+
+        let download_url = fixtures.write(FILTER_NAME, rules.text.as_str());
+        filter.download_url = download_url.to_string();
+
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+
+        source
+            .execute_db(|mut connection: Connection| {
+                with_transaction(&mut connection, |tx| {
+                    filters_repo.insert(&tx, &[filter])?;
+                    rules_repo.insert(&tx, &[rules])
+                })
+            })
+            .unwrap();
+
+        // Overwrite with new content that would be visible if update happened
+        let _ = fixtures.write(FILTER_NAME, "new a()\nnew b()");
+
+        // Config: should_ignore_expires_for_local_urls is disabled (default)
+        let mut conf = Configuration::default();
+        conf.should_ignore_expires_for_local_urls = false;
+        conf.metadata_url = Url::from_file_path(tests_path("fixtures/filters.json"))
+            .unwrap()
+            .to_string();
+
+        let installed_filters = source
+            .execute_db(|connection: Connection| {
+                Ok(filters_repo
+                    .select_filters_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap())
+            })
+            .unwrap();
+
+        let result =
+            update_filters_action(installed_filters, &source, false, false, 0, &conf).unwrap();
+
+        // Should NOT update because minimal expires (1 hour) applies when ignore flag is off
+        assert!(result.filters_errors.is_empty());
+        assert!(result.updated_list.is_empty());
     }
 }
