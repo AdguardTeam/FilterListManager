@@ -56,6 +56,7 @@ namespace AdGuard.FilterListManager.Test
                 configuration.AppName = "AdGuard.FilterListManager.Test";
                 configuration.Version = "1.0";
                 configuration.DefaultFilterListExpiresPeriodSec = 10;
+                configuration.ShouldIgnoreExpiresForLocalUrls = true;
                 configuration.FiltersCompilationPolicy = new FiltersCompilationPolicy
                 {
                     Constants = { "windows_is_the_best" }
