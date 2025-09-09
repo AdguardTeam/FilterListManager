@@ -26,6 +26,7 @@ regex.workspace = true
 thiserror.workspace = true
 blake3 = "1.8.2"
 mimicry = "0.1.0"
+bytes = "1"
 
 [features]
 default = ["reqwest/default"]

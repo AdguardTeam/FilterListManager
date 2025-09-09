@@ -124,14 +124,13 @@ impl FilterManager {
             self.install_custom_filter_list(connection_manager, diff_path, entity, rule_entity)?;
 
         let filter_collector = FilterCollector::new(configuration);
-        let full_filter_list: FullFilterList = self.make_full_filter_list(
+
+        self.make_full_filter_list(
             download_url,
             inserted_entity,
             filter_entities,
             filter_collector,
-        )?;
-
-        Ok(full_filter_list)
+        )
     }
 }
 

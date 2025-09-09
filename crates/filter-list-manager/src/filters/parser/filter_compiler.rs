@@ -26,11 +26,11 @@ pub(crate) struct CollectedInclude {
 
 #[derive(Default)]
 pub(crate) struct FilterParserResult {
-    /// Оригинальный текст фильтра
+    /// Original filter text
     pub(crate) original_content: String,
     /// Original filter lines count
     pub(crate) original_lines_count: i32,
-    /// Информация о найденных инклюдах
+    /// Collected includes info
     pub(crate) includes: Vec<CollectedInclude>,
 }
 
@@ -403,9 +403,6 @@ impl FilterCompiler<'_> {
                 let absolute_url = absolute_url.to_string();
                 let contents = self.filter_downloader.get_filter_contents(&absolute_url)?;
 
-                self.filter_downloader
-                    .pre_check_filter_contents(contents.as_str())?;
-
                 if !self.should_skip_checksum_validation {
                     validate_checksum(contents.as_str())?;
                 }
@@ -421,9 +418,6 @@ impl FilterCompiler<'_> {
             let contents = self
                 .filter_downloader
                 .get_included_filter_contents(absolute_url, current_scheme.into())?;
-
-            self.filter_downloader
-                .pre_check_filter_contents(contents.as_str())?;
 
             if !self.should_skip_checksum_validation {
                 validate_checksum(contents.as_str())?;
