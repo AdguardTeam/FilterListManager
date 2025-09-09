@@ -4,10 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [Unreleased]
+## [2.1.0] - 2025-09-09
 
 ### Added
 - `should_ignore_expires_for_local_urls` field to `Configuration` which allows to ignore expires for local urls during update. Default value is `false`.
+- Rust filter library now restricts adding `pdf/gif/png/jpeg` files as filter.
+
+[2.1.0]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.0.1...ffi-2.1.0
 
 ## [2.0.1] - 2025-08-25
 
