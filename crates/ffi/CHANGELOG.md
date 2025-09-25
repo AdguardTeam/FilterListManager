@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.1.1] - 2025-09-26
+
+### Added
+- Kotlin Multiplatform (KMP) module wrapper for Android and iOS platforms
+- Platform-specific FFI drivers for Android (JNI) and iOS (Kotlin/Native)
+- Protobuf code generation module using pbandk for cross-platform serialization
+- Comprehensive test suites for both Android and iOS platforms
+
+
+[2.1.1]:
+https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.1.0...ffi-2.1.1
+
 ## [2.1.0] - 2025-09-09
 
 ### Added
