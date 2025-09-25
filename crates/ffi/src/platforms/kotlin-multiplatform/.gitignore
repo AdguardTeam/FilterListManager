@@ -1,0 +1,8 @@
+# Project
+.idea
+.gradle
+.claude
+local.properties
+.cxx/
+jniLibs/
+publishing.gradle.kts

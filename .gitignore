@@ -24,6 +24,9 @@
 **/adguard.db
 **/*.profraw
 
+# OS
+.DS_Store
+
 build/
 *.dll
 obj/

@@ -1,0 +1,3 @@
+headers = src/iosMain/cpp/flm_native_interface_modified.h
+compilerOpts = -I./
+package = com.adguard.flm.native
