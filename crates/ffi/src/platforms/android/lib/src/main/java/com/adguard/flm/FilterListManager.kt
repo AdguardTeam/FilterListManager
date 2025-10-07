@@ -514,6 +514,37 @@ constructor(configuration: Configuration)
     }
 
     /**
+     * This method works almost the same as `updateFilters`
+     * But also, you MUST pass the list of `FilterId`
+     * Empty list will cause an empty `UpdateResult` if database exists.
+     * This returns null if db is empty
+     */
+    @Throws(FilterListManagerException::class)
+    fun updateFiltersByIds(
+        ids: List<Int>,
+        ignoreFiltersExpiration: Boolean = false,
+        looseTimeout: Int = 0,
+        ignoreFiltersStatus: Boolean = false
+    ): UpdateResult? {
+        var request = updateFiltersByIdsRequest {
+            this.ids.addAll(ids)
+            this.ignoreFiltersExpiration = ignoreFiltersExpiration
+            this.looseTimeout = looseTimeout
+            this.ignoreFiltersStatus = ignoreFiltersStatus
+        }
+
+        return call(FFIMethod.UpdateFiltersByIds, request).use { result ->
+            UpdateFiltersByIdsResponse.parseFrom(result.resultData).let { response ->
+                when {
+                    response.hasError() -> throw FilterListManagerException(response.error)
+                    response.hasResult() -> response.result
+                    else -> null
+                }
+            }
+        }
+    }
+
+    /**
      * Tries to update the specified list of filter IDs. The logic is the same as in the updateFilters method
      * with exceptions:
      * - Returns null if DB result set is empty

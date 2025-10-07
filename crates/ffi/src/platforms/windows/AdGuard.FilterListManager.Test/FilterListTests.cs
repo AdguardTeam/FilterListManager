@@ -124,6 +124,7 @@ namespace AdGuard.FilterListManager.Test
                 flm.SaveRulesToFileBlob(customFilter.Id, blobPath);
                 flm.GetFullFilterListById(customFilter.Id);
                 flm.ForceUpdateFiltersByIds(new[] { 1, 2 }, REQUEST_TIMEOUT_MS);
+                flm.UpdateFiltersByIds(new[] { 1, 2 }, false, REQUEST_TIMEOUT_MS, false);
                 customFilter = flm.InstallCustomFilterList(
                     "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt",
                     true,

@@ -117,7 +117,7 @@ use std::cell::Cell;
 #[cfg_attr(test, mock(using = "RulesListEntityCallsMock"))]
 impl RulesListEntity {
     pub(crate) fn get_text_hash(&self) -> Option<&str> {
-        self.text_hash.as_ref().map(|a| a.as_str())
+        self.text_hash.as_deref()
     }
 }
 

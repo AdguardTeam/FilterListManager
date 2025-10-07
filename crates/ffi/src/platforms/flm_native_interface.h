@@ -23,6 +23,7 @@ typedef enum FFIMethod {
     SaveDisabledRules,
     UpdateFilters,
     ForceUpdateFiltersByIds,
+    UpdateFiltersByIds,
     FetchFilterListMetadata,
     FetchFilterListMetadataWithBody,
     LiftUpDatabase,

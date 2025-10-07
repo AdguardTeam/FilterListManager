@@ -167,6 +167,23 @@ impl FilterListManager for FilterListManagerImpl {
         )
     }
 
+    fn update_filters_by_ids(
+        &self,
+        ids: Vec<FilterId>,
+        ignore_filters_expiration: bool,
+        loose_timeout: i32,
+        ignore_filters_status: bool,
+    ) -> FLMResult<Option<UpdateResult>> {
+        FilterUpdateManager::new().update_filters_by_ids(
+            &self.connection_manager,
+            &self.configuration,
+            ids,
+            ignore_filters_expiration,
+            loose_timeout,
+            ignore_filters_status,
+        )
+    }
+
     fn force_update_filters_by_ids(
         &self,
         ids: Vec<FilterId>,

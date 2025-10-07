@@ -14,7 +14,7 @@ pub(crate) fn fetch_by_scheme_with_content_check(
 ) -> Result<String, FilterParserError> {
     let contents = match scheme {
         UrlSchemes::File => read_binary_by_url(absolute_url)
-            .map(|v| Bytes::from(v))
+            .map(Bytes::from)
             .map_err(Into::into),
         UrlSchemes::Https | UrlSchemes::Http => shared_http_client
             .get_filter_bytes(absolute_url)

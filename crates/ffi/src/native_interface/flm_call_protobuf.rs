@@ -19,7 +19,8 @@ use crate::protobuf_generated::filter_list_manager::{
     InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
     PullMetadataResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
     SaveRulesToFileBlobRequest, SetProxyModeRequest, UpdateCustomFilterMetadataRequest,
-    UpdateCustomFilterMetadataResponse, UpdateFiltersRequest, UpdateFiltersResponse,
+    UpdateCustomFilterMetadataResponse, UpdateFiltersByIdsRequest, UpdateFiltersByIdsResponse,
+    UpdateFiltersRequest, UpdateFiltersResponse,
 };
 use adguard_flm::RequestProxyMode;
 use enum_stringify::EnumStringify;
@@ -41,6 +42,7 @@ pub enum FFIMethod {
     SaveDisabledRules,
     UpdateFilters,
     ForceUpdateFiltersByIds,
+    UpdateFiltersByIds,
     FetchFilterListMetadata,
     FetchFilterListMetadataWithBody,
     LiftUpDatabase,
@@ -267,6 +269,26 @@ pub unsafe extern "C" fn flm_call_protobuf(
                     error: None,
                 },
                 Err(why) => UpdateFiltersResponse {
+                    result: None,
+                    error: Some(why.into()),
+                },
+            }
+            .encode(&mut out_bytes_buffer)
+        }
+        FFIMethod::UpdateFiltersByIds => {
+            let request = decode_input_request!(UpdateFiltersByIdsRequest);
+
+            match flm_handle.flm.update_filters_by_ids(
+                request.ids,
+                request.ignore_filters_expiration,
+                request.loose_timeout,
+                request.ignore_filters_status,
+            ) {
+                Ok(update_result) => UpdateFiltersByIdsResponse {
+                    result: update_result.map(Into::into),
+                    error: None,
+                },
+                Err(why) => UpdateFiltersByIdsResponse {
                     result: None,
                     error: Some(why.into()),
                 },

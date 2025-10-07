@@ -61,6 +61,10 @@ namespace FilterListManager
     {
     }
     
+    public partial class UpdateFiltersByIdsResponse : IAGOuterError
+    {
+    }
+    
     public partial class FetchFilterListMetadataResponse : IAGOuterError
     {
     }
