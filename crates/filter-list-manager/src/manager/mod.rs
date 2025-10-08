@@ -139,8 +139,20 @@ pub trait FilterListManager {
     /// - Save `last_download_time`, and update metadata.
     /// - Collect updated filters.
     ///
+    /// # Internal checks
+    ///
+    /// This method conducts the following checks while updating filters:
+    /// - Filter expiration (or `ignore_filters_expiration` flag)
+    /// - Content equality via checksum comparison (not Checksum metadata field) (`ignore_filters_expiration` flag disables this check)
+    /// - Filter status (is_enabled) or `ignore_filters_status` flag
+    /// - Local urls without `download_url` won't be updated
+    /// - For index filters, versions are checked through `Version` metadata field checking up against the latest version from the index file
+    /// - Also `loose_timeout` can limit count of updated filters if non-zero
+    ///
+    /// # Parameters
+    ///
     /// * `ignore_filters_expiration` - Does not rely on filter's expire
-    ///   information.
+    ///   information, also ignores content equality via checksum comparison.
     /// * `loose_timeout` - Not a strict timeout, checked after processing each
     ///   filter. If the total time exceeds this value, filters processing will
     ///   stop, and the number of unprocessed filters will be set in result
@@ -159,6 +171,18 @@ pub trait FilterListManager {
     /// Note: should be used no more than once an hour.
     fn update_filters(
         &self,
+        ignore_filters_expiration: bool,
+        loose_timeout: i32,
+        ignore_filters_status: bool,
+    ) -> FLMResult<Option<UpdateResult>>;
+
+    /// This method works almost the same as [`Self::update_filters`].
+    /// But also, you MUST pass the list of [`FilterId`].
+    /// Empty list will cause an empty result [`Ok(UpdateResult.updated_list == 0)`] if database exists.
+    /// This returns [`Ok(None)`] if db is empty
+    fn update_filters_by_ids(
+        &self,
+        ids: Vec<FilterId>,
         ignore_filters_expiration: bool,
         loose_timeout: i32,
         ignore_filters_status: bool,

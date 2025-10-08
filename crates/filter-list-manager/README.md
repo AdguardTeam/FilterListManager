@@ -130,6 +130,7 @@ The method “raises” the state of the database to the working state.
 ### Usage notes
 Starting with version `0.7.1` the database is “uplifted” automatically when the filter_list_manager constructor is called. 
 To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.\
+
 **Note: methods `flm.update_filters()`, `flm.force_update_filters_by_ids()`\
 should be used no more than once an hour, method `flm.pull_metadata()`\
 should be used no more than once a week**.

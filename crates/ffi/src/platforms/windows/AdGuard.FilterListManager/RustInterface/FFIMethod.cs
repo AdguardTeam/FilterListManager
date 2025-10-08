@@ -61,6 +61,14 @@
         ForceUpdateFiltersByIds,
         
         /// <summary>
+        /// This method works almost the same as `updateFilters`
+        /// But also, you MUST pass the list of `FilterId`
+        /// Empty list will cause an empty `UpdateResult` if database exists.
+        /// This returns null if db is empty
+        /// </summary>
+        UpdateFiltersByIds,
+        
+        /// <summary>
         /// Fetches metadata for a filter list
         /// </summary>
         FetchFilterListMetadata,

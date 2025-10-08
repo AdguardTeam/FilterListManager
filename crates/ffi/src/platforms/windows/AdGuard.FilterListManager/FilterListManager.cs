@@ -237,6 +237,31 @@ namespace AdGuard.FilterListManager
             return response.Result;
         }
 
+
+        /// <summary>
+        /// This method works almost the same as `updateFilters`
+        /// But also, you MUST pass the list of `FilterId`
+        /// Empty list will cause an empty `UpdateResult` if database exists.
+        /// This returns null if db is empty
+        /// </summary>
+        public UpdateResult UpdateFiltersByIds(
+            IEnumerable<int> filterIds,
+            bool ignoreFiltersExpiration,
+            int looseTimeout,
+            bool ignoreFilterStatus)
+        {
+            UpdateFiltersByIdsRequest request = new UpdateFiltersByIdsRequest 
+            {
+                IgnoreFiltersExpiration = ignoreFiltersExpiration,
+                LooseTimeout = looseTimeout,
+                IgnoreFiltersStatus = ignoreFilterStatus
+            };
+            
+            request.Ids.AddRange(filterIds);
+            UpdateFiltersByIdsResponse response = CallRustMessage<UpdateFiltersByIdsResponse>(request);
+            return response.Result;
+        }
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>

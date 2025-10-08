@@ -103,6 +103,23 @@ impl FilterListManager {
         self.wrap(|flm| flm.force_update_filters_by_ids(ids, loose_timeout))
     }
 
+    pub fn update_filters_by_ids(
+        &self,
+        ids: Vec<FilterId>,
+        ignore_filters_expiration: bool,
+        loose_timeout: i32,
+        ignore_filters_status: bool,
+    ) -> AGResult<Option<UpdateResult>> {
+        self.wrap(|flm| {
+            flm.update_filters_by_ids(
+                ids,
+                ignore_filters_expiration,
+                loose_timeout,
+                ignore_filters_status,
+            )
+        })
+    }
+
     pub fn fetch_filter_list_metadata(&self, url: String) -> AGResult<FilterListMetadata> {
         self.wrap(|flm| flm.fetch_filter_list_metadata(url))
     }

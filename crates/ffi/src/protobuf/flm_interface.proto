@@ -67,6 +67,13 @@ message UpdateFiltersRequest {
   bool ignore_filters_status = 3;
 }
 
+message UpdateFiltersByIdsRequest {
+  repeated int32 ids = 1;
+  bool ignore_filters_expiration = 2;
+  int32 loose_timeout = 3;
+  bool ignore_filters_status = 4;
+}
+
 message ForceUpdateFiltersByIdsRequest {
   repeated int32 ids = 1;
   int32 loose_timeout = 2;
@@ -158,6 +165,11 @@ message GetFullFilterListByIdResponse {
 }
 
 message UpdateFiltersResponse {
+  optional UpdateResult result = 1;
+  optional AGOuterError error = 2;
+}
+
+message UpdateFiltersByIdsResponse {
   optional UpdateResult result = 1;
   optional AGOuterError error = 2;
 }
