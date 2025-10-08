@@ -89,7 +89,8 @@ Default Job:
     shared: true
     required: true
   requirements:
-  - system.builder.msbuild.MSBuild v15.0 (32bit)
+  - ephemeral-windows
+  - image: registry.int.agrd.dev/windows/windows11-bamboo:19
 variables:
   build_configuration: Release
   build_folder: crates\ffi\src\platforms\windows\build\bin\Release
