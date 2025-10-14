@@ -77,7 +77,7 @@ Default Job:
       scripts:
       - |-
         . "${bamboo.deploy_folder}\${bamboo.deploy_script}";
-        MainDeploy "${bamboo.build_folder}" "$Env:bamboo_windowsCertStoragePassword" ${bamboo.skip_signing_libs};
+        MainDeploy "${bamboo.build_folder}" "$Env:bamboo_windowsCertStoragePassword" ${bamboo.skip_signing_libs} "$Env:bamboo_artifactoryUser" "$Env:bamboo_artifactoryPassword";
       environment: use_force_master="${bamboo.use_force_master}"   
   artifacts:
   - name: dll
