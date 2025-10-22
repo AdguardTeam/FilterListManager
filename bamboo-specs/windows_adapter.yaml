@@ -28,14 +28,21 @@ Default Job:
       interpreter: WINDOWS_POWER_SHELL
       scripts:
       - |-
-        . "${bamboo.helper_scripts}"
-        CheckoutRepoHash ${bamboo.private_repo_path} "${bamboo.private_repo_hash}"
+        . "${bamboo.private_repo_path}/PowerShellScripts/product_version.ps1"
+        CheckoutHash "${bamboo.private_repo_hash}" "$Env:bamboo_working_directory/${bamboo.private_repo_path}"
+  - script:
+      interpreter: WINDOWS_POWER_SHELL
+      description: Prepare environment
+      scripts:
+      - |-
+        . "${bamboo.private_repo_path}/PowerShellScripts/build_product.ps1"
+        PrepareEnvironment "${bamboo.nuget_repo_url}"
   - script:
       interpreter: WINDOWS_POWER_SHELL
       description: Set first project to update
       scripts:
       - |-
-        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        . "${bamboo.deploy_script}"
         SetRootFolder "${bamboo.root_folder}"
         UpSchemaIfNeeded "AdGuard.FilterListManager\AdGuard.FilterListManager.schema.json"
         InitializeProjects
@@ -50,13 +57,13 @@ Default Job:
       scripts:
       - |-
 
-        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        . "${bamboo.deploy_script}"
         VersionIncrement "${Env:bamboo_planRepository_repositoryUrl}";
         
         . "${bamboo.root_folder}\Scripts\build_adapter.ps1"
         RustBuild
       
-        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        . "${bamboo.deploy_script}"
         MainBuild "${bamboo.build_configuration}" "${bamboo.define_constants}" "${bamboo.build_folder}";
       environment: channel="${bamboo.channel}" "use_force_master="${bamboo.use_force_master}"
   - script:
@@ -64,19 +71,14 @@ Default Job:
       description: Run unit tests
       scripts:
       - |-
-        . "${bamboo.deploy_folder}\${bamboo.deploy_script}"
+        . "${bamboo.deploy_script}"
         RunUnitTests "${bamboo.build_platform}" "${bamboo.build_configuration}" "${bamboo.build_folder}"
-  - any-task:
-      plugin-key: com.atlassian.bamboo.plugin.dotnet:mstest
-      configuration:
-        mstestTestResultsDirectory: TestResults\TestResults.trx
-        pickupOutdatedFiles: 'true'
   - script:
       interpreter: WINDOWS_POWER_SHELL
       description: Main deploy
       scripts:
       - |-
-        . "${bamboo.deploy_folder}\${bamboo.deploy_script}";
+        . "${bamboo.deploy_script}";
         MainDeploy "${bamboo.build_folder}" "$Env:bamboo_windowsCertStoragePassword" ${bamboo.skip_signing_libs} "$Env:bamboo_artifactoryUser" "$Env:bamboo_artifactoryPassword";
       environment: use_force_master="${bamboo.use_force_master}"   
   artifacts:
@@ -90,7 +92,13 @@ Default Job:
     required: true
   requirements:
   - ephemeral-windows
-  - image: registry.int.agrd.dev/windows/windows11-bamboo:19
+  - image: registry.int.agrd.dev/windows/windows11-bamboo:20
+  final-tasks:
+  - any-task:
+      plugin-key: com.atlassian.bamboo.plugin.dotnet:nunit
+      configuration:
+        testResultsDirectory: '**/TestResults.xml'
+        pickupOutdatedFiles: 'false'
 variables:
   build_configuration: Release
   build_folder: crates\ffi\src\platforms\windows\build\bin\Release
@@ -98,14 +106,14 @@ variables:
   channel: release
   code_coverage_threshold_percent: '1'
   define_constants: BUILD=Release
-  deploy_folder: crates\ffi\src\platforms\windows\adguard-windows-private\bamboo-specs
   use_force_master: 'false'
   private_repo_path: crates/ffi/src/platforms/windows/adguard-windows-private
-  deploy_script: "main_deploy.ps1"
+  nuget_repo_url: https://art.int.agrd.dev/artifactory/api/nuget/adguard-nuget
+  deploy_script: crates\ffi\src\platforms\windows\adguard-windows-private\bamboo-specs\main_deploy.ps1
   # opencover: opencover.xml
   root_folder: crates/ffi/src/platforms/windows
   skip_signing_libs: $False
-  private_repo_hash: latest
+  private_repo_hash: head
 notifications: []
 labels: []
 triggers: []
