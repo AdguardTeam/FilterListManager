@@ -56,6 +56,7 @@ namespace AdGuard.FilterListManager.Test
                 configuration.AppName = "AdGuard.FilterListManager.Test";
                 configuration.Version = "1.0";
                 configuration.DefaultFilterListExpiresPeriodSec = 10;
+                configuration.ShouldIgnoreExpiresForLocalUrls = true;
                 configuration.FiltersCompilationPolicy = new FiltersCompilationPolicy
                 {
                     Constants = { "windows_is_the_best" }
@@ -123,6 +124,7 @@ namespace AdGuard.FilterListManager.Test
                 flm.SaveRulesToFileBlob(customFilter.Id, blobPath);
                 flm.GetFullFilterListById(customFilter.Id);
                 flm.ForceUpdateFiltersByIds(new[] { 1, 2 }, REQUEST_TIMEOUT_MS);
+                flm.UpdateFiltersByIds(new[] { 1, 2 }, false, REQUEST_TIMEOUT_MS, false);
                 customFilter = flm.InstallCustomFilterList(
                     "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt",
                     true,

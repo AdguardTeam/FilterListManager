@@ -1,6 +1,6 @@
 [package]
 name = "adguard-flm"
-version = "2.0.0-rc.3"
+version = "2.2.0"
 edition = "2021"
 resolver = "2"
 homepage.workspace = true
@@ -24,6 +24,9 @@ faster-hex = "0.10.0"
 serde_json = "1.0.115"
 regex.workspace = true
 thiserror.workspace = true
+blake3 = "1.8.2"
+mimicry = "0.1.0"
+bytes = "1"
 
 [features]
 default = ["reqwest/default"]

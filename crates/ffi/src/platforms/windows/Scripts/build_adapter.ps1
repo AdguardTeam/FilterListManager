@@ -128,15 +128,17 @@ Function GenerateProtobufBindings {
     Write-Output "Protobuf bindings generated successfully"
 }
 
-Function SetAdapterVersion {
-    
+Function GetJsonVersion() {
     $jsonFilePath = "$win_root\AdGuard.FilterListManager\AdGuard.FilterListManager.schema.json";
-
     $jsonFileContent = Get-Content -Path $jsonFilePath -Raw
     $jsonFileJsonObject = ConvertFrom-Json -InputObject $jsonFileContent
-
     $jsonVersion = $jsonFileJsonObject.version.TrimEnd(".0");
+    return $jsonVersion
+}
 
+Function SetAdapterVersion {
+    
+    $jsonVersion = GetJsonVersion;
     $csprojFilePath = "$win_root\AdGuard.FilterListManager\AdGuard.FilterListManager.csproj";
     $csprojContent = Get-Content -Path $csprojFilePath;
 
@@ -150,20 +152,18 @@ Function SetAdapterVersion {
 }
 
 function SetNativeVersion {
-    
-    $versionFromToml = GetVersionFromToml -FilePath "crates\ffi\Cargo.toml";
-	$onlyNumbers = $versionFromToml -replace '^([0-9]+\.[0-9]+\.[0-9]+).*$', '$1'
-	Write-Host "Only numbers version from toml is $onlyNumbers";
-	$rcVersion = $onlyNumbers -replace '\.', ',' -replace '$', ',0'
-
+    $newVersion = GetJsonVersion;
+	Write-Host "Version from schema.json is $newVersion";
     $rcFilePath = "crates\ffi\resources\AGWinFLM.rc";
     $rcContent = Get-Content -Path $rcFilePath;
+    $dllMetaFormatVersion = $newVersion -replace '\.', ','
+    Write-Host "dllMetaFormatVersion is $dllMetaFormatVersion";
 
     $updatedRcContent = $rcContent | ForEach-Object {
-        $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*FILEVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $rcVersion
-        $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*PRODUCTVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $rcVersion
-        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"FileVersion",\s*")([^"]+)' -NewVersion $versionFromToml
-        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"ProductVersion",\s*")([^"]+)' -NewVersion $versionFromToml
+        $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*FILEVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $dllMetaFormatVersion
+        $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*PRODUCTVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $dllMetaFormatVersion
+        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"FileVersion",\s*")([^"]+)' -NewVersion $newVersion
+        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"ProductVersion",\s*")([^"]+)' -NewVersion $newVersion
         return $_;
     }
 

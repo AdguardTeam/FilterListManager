@@ -154,6 +154,18 @@ namespace AdGuard.FilterListManager
         UpdateResult ForceUpdateFiltersByIds(IEnumerable<int> filterIds, int looseTimeout);
 
         /// <summary>
+        /// This method works almost the same as `updateFilters`
+        /// But also, you MUST pass the list of `FilterId`
+        /// Empty list will cause an empty `UpdateResult` if database exists.
+        /// This returns null if db is empty
+        /// </summary>
+        UpdateResult UpdateFiltersByIds(
+            IEnumerable<int> filterIds, 
+            bool ignoreFiltersExpiration,
+            int looseTimeout,
+            bool ignoreFilterStatus);
+
+        /// <summary>
         /// Fetches filter list by url and returns its raw metadata.
         ///
         /// * `url` - Remote server or a `file://` URL.

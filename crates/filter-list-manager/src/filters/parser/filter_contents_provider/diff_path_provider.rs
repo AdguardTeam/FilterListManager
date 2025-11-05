@@ -4,7 +4,7 @@ use crate::filters::parser::{
     diff_updates::diff_directives::extract_patch, filter_contents_provider::FilterContentsProvider,
     paths::resolve_absolute_uri, rcs_diff::apply_patch,
 };
-use crate::io::fetch_by_schemes::fetch_by_scheme;
+use crate::io::fetch_by_schemes::fetch_by_scheme_with_content_check;
 use crate::io::http::blocking_client::BlockingClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_hash_from_url, get_scheme};
@@ -105,8 +105,11 @@ impl<'a> DiffPathProvider<'a> {
 
                     let diff_contents = match pinned_container.get_a_copy(&patch_path) {
                         None => {
-                            let body =
-                                fetch_by_scheme(&patch_path, scheme, self.get_http_client())?;
+                            let body = fetch_by_scheme_with_content_check(
+                                &patch_path,
+                                scheme,
+                                self.get_http_client(),
+                            )?;
 
                             pinned_container.insert(patch_path, body.clone());
 
@@ -117,8 +120,15 @@ impl<'a> DiffPathProvider<'a> {
 
                     (Some(resource_name), diff_contents)
                 }
-                None => fetch_by_scheme(&patch_file_absolute_uri, scheme, self.get_http_client())
-                    .map(|diff_contents| (None, diff_contents))?,
+                None => {
+                    let diff_contents = fetch_by_scheme_with_content_check(
+                        &patch_file_absolute_uri,
+                        scheme,
+                        self.get_http_client(),
+                    )?;
+
+                    (None, diff_contents)
+                }
             };
 
         self.patch_steps_remaining

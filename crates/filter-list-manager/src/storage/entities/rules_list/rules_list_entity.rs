@@ -1,10 +1,10 @@
-use rusqlite::{Result, Row};
-
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::FilterId;
 use crate::storage::entities::hydrate::Hydrate;
 use crate::string;
+use rusqlite::{Result, Row};
+use std::ops::Not;
 
 /// We should treat all new filters as "possibly having" directives.
 pub(crate) const DEFAULT_HAS_DIRECTIVES_VALUE: bool = true;
@@ -18,14 +18,20 @@ pub(crate) struct RulesListEntity {
     pub(crate) disabled_text: String,
     pub(crate) rules_count: i32,
     pub(in crate::storage) has_directives: bool,
+    pub(in crate::storage) text_hash: Option<String>,
 }
 
 impl RulesListEntity {
     /// Creates new instance of [RulesListEntity].
+    /// Text will be automatically hashed
     /// `disabled_text` is empty by default
-    pub(crate) const fn new(filter_id: FilterId, text: String, rules_count: i32) -> Self {
+    pub(crate) fn make(filter_id: FilterId, text: String, rules_count: i32) -> Self {
         RulesListEntity {
             filter_id,
+            text_hash: text
+                .is_empty()
+                .not()
+                .then(|| blake3::hash(text.as_bytes()).to_string()),
             text,
             disabled_text: string!(),
             rules_count,
@@ -42,24 +48,6 @@ impl RulesListEntity {
     }
 }
 
-impl RulesListEntity {
-    #[cfg(test)]
-    pub(crate) const fn with_disabled_text(
-        filter_id: FilterId,
-        text: String,
-        disabled_text: String,
-        rules_count: i32,
-    ) -> Self {
-        RulesListEntity {
-            filter_id,
-            text,
-            disabled_text,
-            rules_count,
-            has_directives: DEFAULT_HAS_DIRECTIVES_VALUE,
-        }
-    }
-}
-
 impl Hydrate for RulesListEntity {
     fn hydrate(row: &Row) -> Result<RulesListEntity> {
         Ok(RulesListEntity {
@@ -68,6 +56,7 @@ impl Hydrate for RulesListEntity {
             disabled_text: row.get(2)?,
             rules_count: row.get(3)?,
             has_directives: row.get(4)?,
+            text_hash: row.get(5)?,
         })
     }
 }
@@ -85,13 +74,12 @@ impl From<RulesListEntity> for FilterListRules {
 
 impl From<FilterListRules> for RulesListEntity {
     fn from(value: FilterListRules) -> Self {
-        Self {
-            filter_id: value.filter_id,
-            text: value.rules.join("\n"),
-            disabled_text: value.disabled_rules.join("\n"),
-            rules_count: value.rules_count,
-            has_directives: DEFAULT_HAS_DIRECTIVES_VALUE,
-        }
+        let text = value.rules.join("\n");
+
+        let mut entity = Self::make(value.filter_id, text, value.rules_count);
+        entity.disabled_text = value.disabled_rules.join("\n");
+
+        entity
     }
 }
 
@@ -103,5 +91,47 @@ impl From<RulesListEntity> for FilterListRulesRaw {
             disabled_rules: value.disabled_text,
             rules_count: value.rules_count,
         }
+    }
+}
+
+#[cfg(test)]
+impl RulesListEntity {
+    pub(crate) fn with_disabled_text(
+        filter_id: FilterId,
+        text: String,
+        disabled_text: String,
+        rules_count: i32,
+    ) -> Self {
+        let mut entity = RulesListEntity::make(filter_id, text, rules_count);
+        entity.disabled_text = disabled_text;
+
+        entity
+    }
+}
+
+#[cfg(test)]
+use mimicry::{mock, CallReal, Mock, RealCallSwitch};
+#[cfg(test)]
+use std::cell::Cell;
+
+#[cfg_attr(test, mock(using = "RulesListEntityCallsMock"))]
+impl RulesListEntity {
+    pub(crate) fn get_text_hash(&self) -> Option<&str> {
+        self.text_hash.as_deref()
+    }
+}
+
+#[cfg(test)]
+#[derive(Default, Mock, CallReal)]
+pub(crate) struct RulesListEntityCallsMock {
+    switch: RealCallSwitch,
+    pub(crate) called_times: Cell<usize>,
+}
+
+#[cfg(test)]
+impl RulesListEntityCallsMock {
+    fn get_text_hash<'a>(&self, the_self: &'a RulesListEntity) -> Option<&'a str> {
+        self.called_times.set(self.called_times.get() + 1);
+        self.call_real(|| the_self.get_text_hash())
     }
 }

@@ -1,5 +1,6 @@
 use crate::manager::models::configuration::request_proxy_mode::RequestProxyMode;
 use crate::{Configuration, FLMError, FLMResult, HttpClientError};
+use bytes::Bytes;
 use reqwest::blocking::{Client, ClientBuilder};
 use reqwest::{Proxy, StatusCode};
 use serde::de::DeserializeOwned;
@@ -48,7 +49,7 @@ impl BlockingClient {
     /// # Failure
     ///
     /// If status_code != 200, (e.g. 204), requests will fail with [`HttpClientError::Strict200Response`]
-    pub(crate) fn get_filter(&self, url: &str) -> Result<String, HttpClientError> {
+    pub(crate) fn get_filter_bytes(&self, url: &str) -> Result<Bytes, HttpClientError> {
         let response = self
             .inner
             .get(url)
@@ -66,7 +67,9 @@ impl BlockingClient {
             ));
         }
 
-        response.text().map_err(HttpClientError::make_body_recovery)
+        response
+            .bytes()
+            .map_err(HttpClientError::make_body_recovery)
     }
 
     /// Gets a json from `url` and constructs type `T`

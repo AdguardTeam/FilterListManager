@@ -4,6 +4,7 @@ use reqwest::Url;
 use std::fs;
 use std::path::PathBuf;
 
+mod content_checkers;
 pub mod error;
 pub(crate) mod fetch_by_schemes;
 pub(crate) mod http;
@@ -71,11 +72,18 @@ fn convert_file_url_to_path(url: &str) -> Result<PathBuf, ReadFilterFileError> {
         .map_err(|_| ReadFilterFileError::Other("Cannot make path for file url".to_string()))
 }
 
-/// Tries to read filter file by url
+/// Tries to read text file by url
 pub(crate) fn read_file_by_url(url: &str) -> Result<String, ReadFilterFileError> {
     let path = convert_file_url_to_path(url)?;
 
     fs::read_to_string(path).map_err(ReadFilterFileError::from)
+}
+
+/// Tries to read binary file by url
+pub(crate) fn read_binary_by_url(url: &str) -> Result<Vec<u8>, ReadFilterFileError> {
+    let path = convert_file_url_to_path(url)?;
+
+    fs::read(path).map_err(ReadFilterFileError::from)
 }
 
 /// Gets a #hash value from url

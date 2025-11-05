@@ -37,6 +37,8 @@ pub struct Configuration {
     /// or its value is too small).
     /// Default value: 86400
     /// Values < 3600 will be clamped to 3600
+    /// There is one exception for local filters:
+    /// If `should_ignore_expires_for_local_urls` is set to true, then expires will be ignored for local filters.
     pub default_filter_list_expires_period_sec: i32,
     /// Settings for filters compilation or collection from compiled parts.
     ///
@@ -57,6 +59,10 @@ pub struct Configuration {
     pub request_timeout_ms: i32,
     /// Requests proxy mode
     pub request_proxy_mode: RequestProxyMode,
+    /// Should ignore expires for local urls during update
+    /// This may be useful for local filters update.
+    /// Default value: false
+    pub should_ignore_expires_for_local_urls: bool,
     /// “Uplifting” a database is a set of measures that brings the database up to date:
     /// * Database creation
     /// * Filling with schema
@@ -65,6 +71,7 @@ pub struct Configuration {
     ///
     /// If you want to disable this option, you will need to manually call `flm.lift_up_database()`
     /// when you update the library in your application.
+    /// Default value: true
     pub auto_lift_up_database: bool,
     /// Client app name
     pub app_name: String,
@@ -112,6 +119,7 @@ impl Default for Configuration {
             metadata_url: String::new(),
             request_proxy_mode: RequestProxyMode::UseSystemProxy,
             metadata_locales_url: String::new(),
+            should_ignore_expires_for_local_urls: false,
             request_timeout_ms: DEFAULT_REQUEST_TIMEOUT_MS,
             auto_lift_up_database: true,
             app_name: String::new(),

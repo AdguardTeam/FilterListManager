@@ -632,7 +632,7 @@ mod tests {
                     new_chosen_filter.is_enabled = true;
 
                     with_transaction(&mut conn, |transaction| {
-                        let new_rules_entity = RulesListEntity::new(
+                        let new_rules_entity = RulesListEntity::make(
                             new_chosen_filter.filter_id.clone().unwrap(),
                             string!(),
                             0,

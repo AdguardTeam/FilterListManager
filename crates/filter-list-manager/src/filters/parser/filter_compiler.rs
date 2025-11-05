@@ -29,11 +29,11 @@ pub(crate) struct CollectedInclude {
 
 #[derive(Default)]
 pub(crate) struct FilterParserResult {
-    /// Оригинальный текст фильтра
+    /// Original filter text
     pub(crate) original_content: String,
     /// Original filter lines count
     pub(crate) original_lines_count: i32,
-    /// Информация о найденных инклюдах
+    /// Collected includes info
     pub(crate) includes: Vec<CollectedInclude>,
 }
 
@@ -220,16 +220,17 @@ impl<'a> FilterCompiler<'a> {
             .filter_parser_result
             .includes
             .into_iter()
-            .map(|include| FilterIncludeEntity {
-                row_id: None,
-                filter_id,
-                absolute_url: include.absolute_url,
-                rules_count: include.lines.get_rules_count(),
-                body: include.lines.into_body(),
+            .map(|include| {
+                FilterIncludeEntity::make(
+                    filter_id,
+                    include.absolute_url,
+                    include.lines.get_rules_count(),
+                    include.lines.into_body(),
+                )
             })
             .collect();
 
-        let mut rules_list_entity = RulesListEntity::new(
+        let mut rules_list_entity = RulesListEntity::make(
             filter_id,
             self.filter_parser_result.original_content,
             self.filter_parser_result.original_lines_count,
@@ -410,9 +411,6 @@ impl FilterCompiler<'_> {
                 let absolute_url = absolute_url.to_string();
                 let contents = self.filter_downloader.get_filter_contents(&absolute_url)?;
 
-                self.filter_downloader
-                    .pre_check_filter_contents(contents.as_str())?;
-
                 if !self.should_skip_checksum_validation {
                     validate_checksum(contents.as_str())?;
                 }
@@ -428,9 +426,6 @@ impl FilterCompiler<'_> {
             let contents = self
                 .filter_downloader
                 .get_included_filter_contents(absolute_url, current_scheme.into())?;
-
-            self.filter_downloader
-                .pre_check_filter_contents(contents.as_str())?;
 
             if !self.should_skip_checksum_validation {
                 validate_checksum(contents.as_str())?;

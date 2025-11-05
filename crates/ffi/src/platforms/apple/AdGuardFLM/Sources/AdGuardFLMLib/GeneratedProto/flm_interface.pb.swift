@@ -211,6 +211,24 @@ public struct FilterListManager_UpdateFiltersRequest: Sendable {
   public init() {}
 }
 
+public struct FilterListManager_UpdateFiltersByIdsRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var ids: [Int32] = []
+
+  public var ignoreFiltersExpiration: Bool = false
+
+  public var looseTimeout: Int32 = 0
+
+  public var ignoreFiltersStatus: Bool = false
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct FilterListManager_ForceUpdateFiltersByIdsRequest: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -549,6 +567,37 @@ public struct FilterListManager_GetFullFilterListByIdResponse: Sendable {
 }
 
 public struct FilterListManager_UpdateFiltersResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var result: FilterListManager_UpdateResult {
+    get {return _result ?? FilterListManager_UpdateResult()}
+    set {_result = newValue}
+  }
+  /// Returns true if `result` has been explicitly set.
+  public var hasResult: Bool {return self._result != nil}
+  /// Clears the value of `result`. Subsequent reads from it will return its default value.
+  public mutating func clearResult() {self._result = nil}
+
+  public var error: FilterListManager_AGOuterError {
+    get {return _error ?? FilterListManager_AGOuterError()}
+    set {_error = newValue}
+  }
+  /// Returns true if `error` has been explicitly set.
+  public var hasError: Bool {return self._error != nil}
+  /// Clears the value of `error`. Subsequent reads from it will return its default value.
+  public mutating func clearError() {self._error = nil}
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+
+  fileprivate var _result: FilterListManager_UpdateResult? = nil
+  fileprivate var _error: FilterListManager_AGOuterError? = nil
+}
+
+public struct FilterListManager_UpdateFiltersByIdsResponse: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1436,6 +1485,56 @@ extension FilterListManager_UpdateFiltersRequest: SwiftProtobuf.Message, SwiftPr
   }
 }
 
+extension FilterListManager_UpdateFiltersByIdsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".UpdateFiltersByIdsRequest"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "ids"),
+    2: .standard(proto: "ignore_filters_expiration"),
+    3: .standard(proto: "loose_timeout"),
+    4: .standard(proto: "ignore_filters_status"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.ids) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self.ignoreFiltersExpiration) }()
+      case 3: try { try decoder.decodeSingularInt32Field(value: &self.looseTimeout) }()
+      case 4: try { try decoder.decodeSingularBoolField(value: &self.ignoreFiltersStatus) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.ids.isEmpty {
+      try visitor.visitPackedInt32Field(value: self.ids, fieldNumber: 1)
+    }
+    if self.ignoreFiltersExpiration != false {
+      try visitor.visitSingularBoolField(value: self.ignoreFiltersExpiration, fieldNumber: 2)
+    }
+    if self.looseTimeout != 0 {
+      try visitor.visitSingularInt32Field(value: self.looseTimeout, fieldNumber: 3)
+    }
+    if self.ignoreFiltersStatus != false {
+      try visitor.visitSingularBoolField(value: self.ignoreFiltersStatus, fieldNumber: 4)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: FilterListManager_UpdateFiltersByIdsRequest, rhs: FilterListManager_UpdateFiltersByIdsRequest) -> Bool {
+    if lhs.ids != rhs.ids {return false}
+    if lhs.ignoreFiltersExpiration != rhs.ignoreFiltersExpiration {return false}
+    if lhs.looseTimeout != rhs.looseTimeout {return false}
+    if lhs.ignoreFiltersStatus != rhs.ignoreFiltersStatus {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension FilterListManager_ForceUpdateFiltersByIdsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ForceUpdateFiltersByIdsRequest"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
@@ -2166,6 +2265,48 @@ extension FilterListManager_UpdateFiltersResponse: SwiftProtobuf.Message, SwiftP
   }
 
   public static func ==(lhs: FilterListManager_UpdateFiltersResponse, rhs: FilterListManager_UpdateFiltersResponse) -> Bool {
+    if lhs._result != rhs._result {return false}
+    if lhs._error != rhs._error {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension FilterListManager_UpdateFiltersByIdsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".UpdateFiltersByIdsResponse"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "result"),
+    2: .same(proto: "error"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._result) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._error) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._result {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._error {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: FilterListManager_UpdateFiltersByIdsResponse, rhs: FilterListManager_UpdateFiltersByIdsResponse) -> Bool {
     if lhs._result != rhs._result {return false}
     if lhs._error != rhs._error {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}

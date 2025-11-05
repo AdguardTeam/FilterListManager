@@ -60,6 +60,9 @@ pub struct Configuration {
     /// Client app version
     #[prost(string, tag = "13")]
     pub version: ::prost::alloc::string::String,
+    /// Should ignore expires for local urls during update
+    #[prost(bool, tag = "14")]
+    pub should_ignore_expires_for_local_urls: bool,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -642,6 +645,17 @@ pub struct UpdateFiltersRequest {
     pub ignore_filters_status: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateFiltersByIdsRequest {
+    #[prost(int32, repeated, tag = "1")]
+    pub ids: ::prost::alloc::vec::Vec<i32>,
+    #[prost(bool, tag = "2")]
+    pub ignore_filters_expiration: bool,
+    #[prost(int32, tag = "3")]
+    pub loose_timeout: i32,
+    #[prost(bool, tag = "4")]
+    pub ignore_filters_status: bool,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ForceUpdateFiltersByIdsRequest {
     #[prost(int32, repeated, tag = "1")]
     pub ids: ::prost::alloc::vec::Vec<i32>,
@@ -759,6 +773,13 @@ pub struct GetFullFilterListByIdResponse {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateFiltersResponse {
+    #[prost(message, optional, tag = "1")]
+    pub result: ::core::option::Option<UpdateResult>,
+    #[prost(message, optional, tag = "2")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateFiltersByIdsResponse {
     #[prost(message, optional, tag = "1")]
     pub result: ::core::option::Option<UpdateResult>,
     #[prost(message, optional, tag = "2")]

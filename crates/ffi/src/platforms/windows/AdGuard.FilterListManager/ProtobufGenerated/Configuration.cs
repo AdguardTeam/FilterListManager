@@ -26,7 +26,7 @@ namespace FilterListManager {
           string.Concat(
             "ChNjb25maWd1cmF0aW9uLnByb3RvEhNmaWx0ZXJfbGlzdF9tYW5hZ2VyIi0K",
             "GEZpbHRlcnNDb21waWxhdGlvblBvbGljeRIRCgljb25zdGFudHMYASADKAki",
-            "tgQKDUNvbmZpZ3VyYXRpb24SPQoQZmlsdGVyX2xpc3RfdHlwZRgBIAEoDjIj",
+            "5AQKDUNvbmZpZ3VyYXRpb24SPQoQZmlsdGVyX2xpc3RfdHlwZRgBIAEoDjIj",
             "LmZpbHRlcl9saXN0X21hbmFnZXIuRmlsdGVyTGlzdFR5cGUSHgoRd29ya2lu",
             "Z19kaXJlY3RvcnkYAiABKAlIAIgBARIOCgZsb2NhbGUYAyABKAkSLgomZGVm",
             "YXVsdF9maWx0ZXJfbGlzdF9leHBpcmVzX3BlcmlvZF9zZWMYBCABKAUSVgoa",
@@ -37,17 +37,18 @@ namespace FilterListManager {
             "X2RhdGFiYXNlGAkgASgIEkQKEnJlcXVlc3RfcHJveHlfbW9kZRgKIAEoDjIo",
             "LmZpbHRlcl9saXN0X21hbmFnZXIuUmF3UmVxdWVzdFByb3h5TW9kZRIhChly",
             "ZXF1ZXN0X2N1c3RvbV9wcm94eV9hZGRyGAsgASgJEhAKCGFwcF9uYW1lGAwg",
-            "ASgJEg8KB3ZlcnNpb24YDSABKAlCFAoSX3dvcmtpbmdfZGlyZWN0b3J5Qh0K",
-            "G19maWx0ZXJzX2NvbXBpbGF0aW9uX3BvbGljeSonCg5GaWx0ZXJMaXN0VHlw",
-            "ZRIMCghTVEFOREFSRBAAEgcKA0ROUxABKk8KE1Jhd1JlcXVlc3RQcm94eU1v",
-            "ZGUSFAoQVVNFX1NZU1RFTV9QUk9YWRAAEgwKCE5PX1BST1hZEAESFAoQVVNF",
-            "X0NVU1RPTV9QUk9YWRACQjAKGGNvbS5hZGd1YXJkLmZsbS5wcm90b2J1ZkIS",
-            "Q29uZmlndXJhdGlvblByb3RvUAFiBnByb3RvMw=="));
+            "ASgJEg8KB3ZlcnNpb24YDSABKAkSLAokc2hvdWxkX2lnbm9yZV9leHBpcmVz",
+            "X2Zvcl9sb2NhbF91cmxzGA4gASgIQhQKEl93b3JraW5nX2RpcmVjdG9yeUId",
+            "ChtfZmlsdGVyc19jb21waWxhdGlvbl9wb2xpY3kqJwoORmlsdGVyTGlzdFR5",
+            "cGUSDAoIU1RBTkRBUkQQABIHCgNETlMQASpPChNSYXdSZXF1ZXN0UHJveHlN",
+            "b2RlEhQKEFVTRV9TWVNURU1fUFJPWFkQABIMCghOT19QUk9YWRABEhQKEFVT",
+            "RV9DVVNUT01fUFJPWFkQAkIwChhjb20uYWRndWFyZC5mbG0ucHJvdG9idWZC",
+            "EkNvbmZpZ3VyYXRpb25Qcm90b1ABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), typeof(global::FilterListManager.RawRequestProxyMode), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FiltersCompilationPolicy), global::FilterListManager.FiltersCompilationPolicy.Parser, new[]{ "Constants" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "FiltersCompilationPolicy", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version" }, new[]{ "WorkingDirectory", "FiltersCompilationPolicy" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "FiltersCompilationPolicy", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version", "ShouldIgnoreExpiresForLocalUrls" }, new[]{ "WorkingDirectory", "FiltersCompilationPolicy" }, null, null, null)
           }));
     }
     #endregion
@@ -318,6 +319,7 @@ namespace FilterListManager {
       requestCustomProxyAddr_ = other.requestCustomProxyAddr_;
       appName_ = other.appName_;
       version_ = other.version_;
+      shouldIgnoreExpiresForLocalUrls_ = other.shouldIgnoreExpiresForLocalUrls_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -548,6 +550,21 @@ namespace FilterListManager {
       }
     }
 
+    /// <summary>Field number for the "should_ignore_expires_for_local_urls" field.</summary>
+    public const int ShouldIgnoreExpiresForLocalUrlsFieldNumber = 14;
+    private bool shouldIgnoreExpiresForLocalUrls_;
+    /// <summary>
+    /// Should ignore expires for local urls during update
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool ShouldIgnoreExpiresForLocalUrls {
+      get { return shouldIgnoreExpiresForLocalUrls_; }
+      set {
+        shouldIgnoreExpiresForLocalUrls_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -576,6 +593,7 @@ namespace FilterListManager {
       if (RequestCustomProxyAddr != other.RequestCustomProxyAddr) return false;
       if (AppName != other.AppName) return false;
       if (Version != other.Version) return false;
+      if (ShouldIgnoreExpiresForLocalUrls != other.ShouldIgnoreExpiresForLocalUrls) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -596,6 +614,7 @@ namespace FilterListManager {
       if (RequestCustomProxyAddr.Length != 0) hash ^= RequestCustomProxyAddr.GetHashCode();
       if (AppName.Length != 0) hash ^= AppName.GetHashCode();
       if (Version.Length != 0) hash ^= Version.GetHashCode();
+      if (ShouldIgnoreExpiresForLocalUrls != false) hash ^= ShouldIgnoreExpiresForLocalUrls.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -666,6 +685,10 @@ namespace FilterListManager {
         output.WriteRawTag(106);
         output.WriteString(Version);
       }
+      if (ShouldIgnoreExpiresForLocalUrls != false) {
+        output.WriteRawTag(112);
+        output.WriteBool(ShouldIgnoreExpiresForLocalUrls);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -728,6 +751,10 @@ namespace FilterListManager {
         output.WriteRawTag(106);
         output.WriteString(Version);
       }
+      if (ShouldIgnoreExpiresForLocalUrls != false) {
+        output.WriteRawTag(112);
+        output.WriteBool(ShouldIgnoreExpiresForLocalUrls);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -776,6 +803,9 @@ namespace FilterListManager {
       }
       if (Version.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Version);
+      }
+      if (ShouldIgnoreExpiresForLocalUrls != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -830,6 +860,9 @@ namespace FilterListManager {
       }
       if (other.Version.Length != 0) {
         Version = other.Version;
+      }
+      if (other.ShouldIgnoreExpiresForLocalUrls != false) {
+        ShouldIgnoreExpiresForLocalUrls = other.ShouldIgnoreExpiresForLocalUrls;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -905,6 +938,10 @@ namespace FilterListManager {
             Version = input.ReadString();
             break;
           }
+          case 112: {
+            ShouldIgnoreExpiresForLocalUrls = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -977,6 +1014,10 @@ namespace FilterListManager {
           }
           case 106: {
             Version = input.ReadString();
+            break;
+          }
+          case 112: {
+            ShouldIgnoreExpiresForLocalUrls = input.ReadBool();
             break;
           }
         }

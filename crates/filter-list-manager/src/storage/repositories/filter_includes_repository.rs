@@ -16,7 +16,8 @@ const BASIC_SELECT_SQL: &str = r"
         filter_id,
         absolute_url,
         body,
-        rules_count
+        rules_count,
+        body_hash
     FROM
         [filter_includes]
 ";
@@ -153,7 +154,8 @@ impl Repository<FilterIncludeEntity> for FilterIncludesRepository {
                         filter_id,
                         absolute_url,
                         body,
-                        rules_count
+                        rules_count,
+                        body_hash
                     )
                 VALUES
                     (
@@ -161,7 +163,8 @@ impl Repository<FilterIncludeEntity> for FilterIncludesRepository {
                         :filter_id,
                         :absolute_url,
                         :body,
-                        :rules_count
+                        :rules_count,
+                        :body_hash
                     )
                 ",
         )?;
@@ -172,7 +175,8 @@ impl Repository<FilterIncludeEntity> for FilterIncludesRepository {
                 ":filter_id": entity.filter_id,
                 ":absolute_url": entity.absolute_url,
                 ":body": entity.body,
-                ":rules_count": entity.rules_count
+                ":rules_count": entity.rules_count,
+                ":body_hash": entity.body_hash,
             })?;
         }
 

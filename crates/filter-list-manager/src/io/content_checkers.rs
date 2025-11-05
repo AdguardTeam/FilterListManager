@@ -41,8 +41,38 @@ pub(super) fn check_contents_is_filter_contents(contents: &str) -> Result<(), Fi
     Ok(())
 }
 
+/// Checks the binary input to see if it is likely a media/document file
+/// supported by our quick sniffing: JPEG, PNG, GIF, or PDF.
+///
+/// The detection is based on well-known magic numbers at the beginning of the file:
+/// - JPEG: FF D8 FF
+/// - PNG:  89 50 4E 47 0D 0A 1A 0A
+/// - GIF:  "GIF87a" or "GIF89a"
+/// - PDF:  "%PDF-"
+///
+/// Returns true if any of the signatures match, false otherwise.
+pub(crate) fn is_likely_media(input: &[u8]) -> bool {
+    // Use nom's tag + alt to match any of the known signatures at the start.
+    // Define a small parser to help type inference (IResult fixes the error type).
+    fn media_signature(i: &[u8]) -> IResult<&[u8], &[u8]> {
+        alt((
+            // JPEG
+            tag(b"\xFF\xD8\xFF"),
+            // PNG
+            tag(b"\x89PNG\r\n\x1a\n"),
+            // GIF variants
+            tag(b"GIF87a"),
+            tag(b"GIF89a"),
+            // PDF
+            tag(b"%PDF-"),
+        ))(i)
+    }
+
+    media_signature(input).is_ok()
+}
+
 #[cfg(test)]
-mod test {
+mod tests {
     use super::check_contents_is_filter_contents;
     use crate::FilterParserError;
 
@@ -111,5 +141,24 @@ mod test {
 
             assert_eq!(actual, expected_result);
         });
+    }
+
+    #[test]
+    fn test_is_likely_media() {
+        use super::is_likely_media;
+
+        // JPEG
+        assert!(is_likely_media(b"\xFF\xD8\xFF\xE0rest"));
+        // PNG
+        assert!(is_likely_media(b"\x89PNG\r\n\x1a\nrest"));
+        // GIF 87a and 89a
+        assert!(is_likely_media(b"GIF87a........"));
+        assert!(is_likely_media(b"GIF89a........"));
+        // PDF
+        assert!(is_likely_media(b"%PDF-1.7\n%..."));
+
+        // Not media
+        assert!(!is_likely_media(b"Not a media file"));
+        assert!(!is_likely_media(b"<!DOCTYPE html>"));
     }
 }

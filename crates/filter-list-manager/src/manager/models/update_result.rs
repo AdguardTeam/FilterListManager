@@ -3,6 +3,7 @@ use crate::FilterId;
 use crate::FullFilterList;
 
 /// Filters update result container.
+#[derive(Default)]
 pub struct UpdateResult {
     /// Currently updated filters.
     /// `title` and `description` fields will be localised with current [`crate::Locale`]

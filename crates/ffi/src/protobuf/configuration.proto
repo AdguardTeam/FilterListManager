@@ -79,4 +79,7 @@ message Configuration {
 
   // Client app version
   string version = 13;
+
+  // Should ignore expires for local urls during update
+  bool should_ignore_expires_for_local_urls = 14;
 }

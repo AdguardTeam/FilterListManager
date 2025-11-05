@@ -96,6 +96,44 @@ impl FilterUpdateManager {
 
         Ok(Some(update_result))
     }
+
+    /// Updates filters with custom setup
+    pub(crate) fn update_filters_by_ids(
+        &self,
+        connection_manager: &DbConnectionManager,
+        configuration: &Configuration,
+        ids: Vec<FilterId>,
+        force_update: bool,
+        loose_timeout: i32,
+        ignore_filters_status: bool,
+    ) -> FLMResult<Option<UpdateResult>> {
+        if ids.is_empty() {
+            return Ok(Some(UpdateResult::default()));
+        }
+
+        let values = ids.into_iter().map(|id| id.into()).collect::<Vec<Value>>();
+
+        let result = connection_manager.execute_db(|conn: Connection| {
+            FilterRepository::new()
+                .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
+                .map_err(FLMError::from_database)
+        })?;
+
+        let Some(records) = result else {
+            return Ok(Some(UpdateResult::default()));
+        };
+
+        let update_result = update_filters_action(
+            records,
+            connection_manager,
+            force_update,
+            ignore_filters_status,
+            loose_timeout,
+            configuration,
+        )?;
+
+        Ok(Some(update_result))
+    }
 }
 
 #[cfg(test)]

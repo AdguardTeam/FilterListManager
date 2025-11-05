@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-10-08
+
+### Added
+- `update_filters_by_ids` method for more flexible filters update
+
+[2.2.0]: https://github.com/AdguardTeam/FilterListManager/compare/flm-2.1.0...flm-2.2.0
+
+## [2.1.0] - 2025-09-09
+
+### Added
+- `should_ignore_expires_for_local_urls` field to `Configuration` which allows to ignore expires for local urls during update. Default value is `false`.
+- Rust filter library now restricts adding `pdf/gif/png/jpeg` files as filter.
+
+[2.1.0]: https://github.com/AdguardTeam/FilterListManager/compare/flm-2.0.1...flm-2.1.0
+
+## [2.0.1] - 2025-08-25
+
+### Changed
+- `update*` methods will check filters contents during update 
+
+### Fixed
+- `has_directives` field was not set to false if there are no directives in the filter
+
+[2.0.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-2.0.0...flm-2.0.1
+
+## [2.0.0] - 2025-08-18
+
+### Changed
+- Version 2.0 is released
+
+[2.0.0]: https://github.com/AdguardTeam/FilterListManager/releases/tag/flm-2.0.0
+
 ## [2.0.0-rc.3] - 2025-07-10
 
 ### Added

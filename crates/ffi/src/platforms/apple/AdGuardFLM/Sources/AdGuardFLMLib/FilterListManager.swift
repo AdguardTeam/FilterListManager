@@ -60,6 +60,8 @@ public protocol FLMFacadeProtocol {
         ignoreFiltersStatus: Bool
     ) throws -> FilterListManager_UpdateResult?
 
+    func updateFiltersByIds(ids: [Int32], ignoreFiltersExpiration: Bool, looseTimeout: Int32, ignoreFiltersStatus: Bool) throws -> FilterListManager_UpdateResult?
+
     func forceUpdateFiltersByIds(ids: [Int32], looseTimeout: Int32) throws -> FilterListManager_UpdateResult?
 
     func fetchFilterListMetadata(url: String) throws -> FilterListManager_FilterListMetadata
@@ -309,6 +311,22 @@ public class FLMFacade: FLMFacadeProtocol {
         message.looseTimeout = looseTimeout
 
         let response: FilterListManager_UpdateFiltersResponse = try callRust(method: UpdateFilters, message: message)
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+
+        return response.hasResult ? response.result : nil
+    }
+
+    public func updateFiltersByIds(ids: [Int32], ignoreFiltersExpiration: Bool, looseTimeout: Int32, ignoreFiltersStatus: Bool) throws -> FilterListManager_UpdateResult? {
+        var message = FilterListManager_UpdateFiltersByIdsRequest()
+        message.ids = ids
+        message.ignoreFiltersExpiration = ignoreFiltersExpiration;
+        message.ignoreFiltersStatus = ignoreFiltersStatus;
+        message.looseTimeout = looseTimeout;
+
+        let response: FilterListManager_UpdateFiltersByIdsResponse = try callRust(method: UpdateFiltersByIds, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)

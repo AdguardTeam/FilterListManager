@@ -3,7 +3,7 @@ version: 2
 plan:
   project-key: CL
   key: FLMCBFM
-  name: Filter List Manager - Check build for macOS
+  name: Filter List Manager - Check build for Apple
 
 stages:
   - Default Stage:
@@ -24,6 +24,12 @@ Default Job:
           - |-
             ./bamboo-specs/scripts/xcframework_build.sh
         description: Prepare XCFramework
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            ./crates/ffi/src/platforms/apple/Scripts/archive_framework.sh
+        description: Archive XCFramework
     - script:
         interpreter: SHELL
         scripts:

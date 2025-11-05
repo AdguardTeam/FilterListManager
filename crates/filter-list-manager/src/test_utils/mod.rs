@@ -1,5 +1,6 @@
 pub(crate) mod indexes_fixtures;
 pub(crate) mod tests_db;
+pub(crate) mod tests_fixtures;
 
 use lazy_static::lazy_static;
 use once_cell::sync::Lazy;
@@ -82,7 +83,7 @@ where
 pub(crate) struct RAIIFile(PathBuf);
 
 impl RAIIFile {
-    pub(crate) fn new(path: &PathBuf, contents: &str) -> Self {
+    pub(crate) fn write(path: &PathBuf, contents: &str) -> Self {
         fs::write(&path, contents).unwrap();
         Self(path.to_path_buf())
     }

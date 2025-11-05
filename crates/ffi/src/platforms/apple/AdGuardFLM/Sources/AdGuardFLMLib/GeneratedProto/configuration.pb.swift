@@ -184,6 +184,9 @@ public struct FilterListManager_Configuration: Sendable {
   /// Client app version
   public var version: String = String()
 
+  /// Should ignore expires for local urls during update
+  public var shouldIgnoreExpiresForLocalUrls: Bool = false
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -259,6 +262,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     11: .standard(proto: "request_custom_proxy_addr"),
     12: .standard(proto: "app_name"),
     13: .same(proto: "version"),
+    14: .standard(proto: "should_ignore_expires_for_local_urls"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -280,6 +284,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
       case 11: try { try decoder.decodeSingularStringField(value: &self.requestCustomProxyAddr) }()
       case 12: try { try decoder.decodeSingularStringField(value: &self.appName) }()
       case 13: try { try decoder.decodeSingularStringField(value: &self.version) }()
+      case 14: try { try decoder.decodeSingularBoolField(value: &self.shouldIgnoreExpiresForLocalUrls) }()
       default: break
       }
     }
@@ -329,6 +334,9 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if !self.version.isEmpty {
       try visitor.visitSingularStringField(value: self.version, fieldNumber: 13)
     }
+    if self.shouldIgnoreExpiresForLocalUrls != false {
+      try visitor.visitSingularBoolField(value: self.shouldIgnoreExpiresForLocalUrls, fieldNumber: 14)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -346,6 +354,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if lhs.requestCustomProxyAddr != rhs.requestCustomProxyAddr {return false}
     if lhs.appName != rhs.appName {return false}
     if lhs.version != rhs.version {return false}
+    if lhs.shouldIgnoreExpiresForLocalUrls != rhs.shouldIgnoreExpiresForLocalUrls {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

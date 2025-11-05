@@ -21,6 +21,7 @@ class FilterListManagerAndroidTest {
 
     private fun createTestConfiguration() = FilterListManager.defaultConfiguration.copy {
         appName = "adguard-flm-instrumented-test"
+        shouldIgnoreExpiresForLocalUrls = true
         version = "1.0"
         workingDirectory = File(context.cacheDir, "flm-test-${System.currentTimeMillis()}").apply {
             mkdirs()
