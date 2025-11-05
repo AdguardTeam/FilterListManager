@@ -1,5 +1,4 @@
 use crate::utils::iterators::lines_with_terminator::lines_with_terminator;
-use crate::utils::parsing::collapse_newlines;
 use crate::FilterParserError;
 use base64::prelude::BASE64_STANDARD_NO_PAD;
 use base64::Engine;
@@ -27,6 +26,12 @@ fn parse_checksum(input: &str) -> IResult<&str, Option<&str>, nom::error::Error<
         ),
         take_while(is_base64_char),
     ))(input)
+}
+
+/// Calculates checksum from contents
+fn calculate_checksum(contents: &str) -> String {
+    let digest = md5::compute(contents);
+    BASE64_STANDARD_NO_PAD.encode(digest.as_bytes())
 }
 
 /// Tries to find checksum, then tries to validate if success
@@ -62,29 +67,37 @@ pub(super) fn validate_checksum(contents: &str) -> Result<bool, FilterParserErro
         new_str.push('\n');
     }
 
-    let mut b: i32 = 0;
-    let mut iter = new_str.chars().peekable();
-    while let Some(c) = iter.next() {
-        let peek = iter.peek();
-
-        if (c == '\r' || c == '\n') && (peek == Some(&'\n') || peek == Some(&'\r')) {
-            b += 1;
-        }
-    }
-
-    println!("Consecutive newlines: {}", b);
-
+    // Pop the last line
     new_str.pop();
 
     if checksum.is_empty() {
         return Ok(false);
     }
 
-    let digest = md5::compute(new_str);
-    let encoded_digest = BASE64_STANDARD_NO_PAD.encode(digest.as_bytes());
+    // Try compiled string
+    let original_digest = calculate_checksum(&new_str);
+    if original_digest.as_str() != checksum {
+        // Try pop once, if there is newline
+        if new_str.ends_with('\n') {
+            new_str.pop();
 
-    if encoded_digest.as_str() != checksum {
-        return FilterParserError::invalid_checksum(encoded_digest, checksum.to_string());
+            let digest_with_popped_line = calculate_checksum(&new_str);
+            if digest_with_popped_line.as_str() == checksum {
+                return Ok(true);
+            } else {
+                // If checksum is not valid, add back the newline
+                new_str.push('\n');
+            }
+        }
+
+        // Try with extra newline
+        new_str.push('\n');
+        let digest_with_newline = calculate_checksum(&new_str);
+
+        if digest_with_newline.as_str() != checksum {
+            // Throw an original checksum
+            return FilterParserError::invalid_checksum(original_digest, checksum.to_string());
+        }
     }
 
     Ok(true)

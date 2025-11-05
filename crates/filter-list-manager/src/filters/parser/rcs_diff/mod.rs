@@ -134,10 +134,12 @@ pub(crate) fn apply_patch(
             },
         );
 
-    // This is because diff -n do not respect the final newline character.
+    // This is because diff -n does not respect the final newline character.
     // If last command is `add` and one of (last_base_filter_line_is_line_feed, last_diff_line_is_line_feed), but not both
     // we need to remain empty line, because it was ignored by diff command.
-    if !(last_command_is_add && last_base_filter_line_is_line_feed ^ last_diff_line_is_line_feed) {
+    if !(last_command_is_add && last_base_filter_line_is_line_feed ^ last_diff_line_is_line_feed)
+        || patch_result.ends_with("\n\n")
+    {
         patch_result.pop();
     }
 

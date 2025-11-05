@@ -154,9 +154,10 @@ impl<'a> DiffPathProvider<'a> {
 
             // Update next patch url
             *next_patch_url = Cow::Owned(value);
+            return Ok(Continue(()));
         }
 
-        Ok(Continue(()))
+        Ok(Break(()))
     }
 }
 
@@ -330,16 +331,13 @@ a3 6
 
 
 
-||example.com^
-";
+||example.com^";
         let v2 = "! Title: Batch-Updatable List 1
-! Diff-Path: ../patches/batch_v1.0.0-s-1700045842-3600.patch#list1
 ||example.org^";
 
         let patch = "d1 1
 d3 6
-a8 2
-! Diff-Path: ../patches/batch_v1.0.0-s-1700045842-3600.patch#list1
+a8 1
 ||example.org^";
 
         let container = BatchPatchesContainer::factory();
