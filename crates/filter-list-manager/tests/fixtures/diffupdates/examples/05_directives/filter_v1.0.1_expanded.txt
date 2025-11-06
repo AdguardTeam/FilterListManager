@@ -1,0 +1,18 @@
+! Title: Directives Expansion Problem Example
+! Version: v1.0.1
+! Diff-Path: patches/v1.0.1-m-28334120-60.patch
+! This filter demonstrates the problem with directive expansion
+!
+! Include directive has been expanded:
+! Additional rules included via !#include directive
+||ads.included.com^
+||trackers.included.net^
+||social.included.org^$third-party
+!
+! Conditional directive has been expanded (adguard condition = true):
+||ads.example.com^
+||doubleclick.net^
+!
+! Regular rules
+||tracker.example.com^
+||analytics.example.org^ 

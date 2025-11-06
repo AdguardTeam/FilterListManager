@@ -1,36 +1,54 @@
 mod recognize_rcs;
 
 use self::recognize_rcs::{recognize_rcs, RCSOperations};
+use crate::filters::parser::metadata::collector::MetadataCollector;
+use crate::filters::parser::metadata::KnownMetadataProperty;
 use crate::utils::iterators::lines_with_terminator::lines_with_terminator;
 use crate::FilterParserError;
 
 /// Applies `diff` to `base_filter`
 ///
-/// Returns just an empty string if error encountered
+/// # Returns
+///
+/// - `Ok((patched_filter, next_diff_path))`
+/// - `Err(FilterParserError)`
 pub(crate) fn apply_patch(
     base_filter: &str,
     diff_lines: Vec<&str>,
-) -> Result<String, FilterParserError> {
+) -> Result<(String, Option<String>), FilterParserError> {
     let mut diff_iter = diff_lines.iter().enumerate();
     let base_filter_lines: Vec<&str> = lines_with_terminator(base_filter).collect();
 
     let mut slices: Vec<&[&str]> = vec![];
     let mut base_filter_cursor = 0usize;
+    let mut next_diff_path: Option<String> = None;
+
+    let mut last_command_is_add = false;
+    let last_base_filter_line_is_line_feed = base_filter_lines
+        .last()
+        .map(|line| line.is_empty())
+        .unwrap_or(false);
+    let last_diff_line_is_line_feed = diff_lines
+        .last()
+        .map(|line| line.is_empty())
+        .unwrap_or(false);
 
     #[allow(clippy::while_let_on_iterator)]
     while let Some((index, line)) = diff_iter.next() {
-        if line.is_empty() {
-            continue;
-        }
-
         match recognize_rcs(line) {
             Ok((_, None)) => {
-                // Just a regular line. Do nothing
+                // Just a regular line.
+                if next_diff_path.is_none() {
+                    next_diff_path =
+                        MetadataCollector::parse_line_for(KnownMetadataProperty::DiffPath, line)
+                }
             }
             Ok((_, Some((operation, line, count)))) => {
                 // Recognized rcs
                 match operation {
                     RCSOperations::Add => {
+                        last_command_is_add = true;
+
                         // If we have a gap between current base_filter_cursor and current diff line
                         // we should write all lines in this gap first
                         if base_filter_cursor + 1 < line {
@@ -59,6 +77,8 @@ pub(crate) fn apply_patch(
                         );
                     }
                     RCSOperations::Delete => {
+                        last_command_is_add = false;
+
                         // Delete is first in diff, in that case we don't need to save something here,
                         // just move the cursor
                         if line != 1 {
@@ -114,12 +134,16 @@ pub(crate) fn apply_patch(
             },
         );
 
-    // Remove trailing \n
-    if !patch_result.is_empty() {
+    // This is because diff -n does not respect the final newline character.
+    // If last command is `add` and one of (last_base_filter_line_is_line_feed, last_diff_line_is_line_feed), but not both
+    // we need to remain empty line, because it was ignored by diff command.
+    if !(last_command_is_add && last_base_filter_line_is_line_feed ^ last_diff_line_is_line_feed)
+        || patch_result.ends_with("\n\n")
+    {
         patch_result.pop();
     }
 
-    Ok(patch_result)
+    Ok((patch_result, next_diff_path))
 }
 
 /// Make special case error: when rcs diff `line` index is out of bounds for current file
@@ -183,7 +207,7 @@ d7 4
 !-------------------------------------------------------------------------------!
 "#;
         let patch_list = lines_with_terminator(PATCH).collect();
-        let patched = apply_patch(INPUT, patch_list).unwrap();
+        let (patched, _) = apply_patch(INPUT, patch_list).unwrap();
 
         assert_eq!(patched, OUTPUT);
     }
@@ -226,7 +250,7 @@ They both may be called deep and profound.
 Deeper and more profound,
 The door of all subtleties!";
 
-        let patched = apply_patch(LAO, PATCH.lines().collect()).unwrap();
+        let (patched, _) = apply_patch(LAO, PATCH.lines().collect()).unwrap();
 
         assert_eq!(patched, TZU);
     }
@@ -269,7 +293,7 @@ Deeper and more profound,
 The door of all subtleties!
 d11 1";
 
-        let patched = apply_patch(LAO, PATCH.lines().collect()).unwrap();
+        let (patched, _) = apply_patch(LAO, PATCH.lines().collect()).unwrap();
 
         assert_eq!(patched, TZU);
     }
@@ -318,7 +342,7 @@ They both may be called deep and profound.
 Deeper and more profound,
 The door of all subtleties!";
 
-        let patched = apply_patch(LAO, PATCH.lines().collect()).unwrap();
+        let (patched, _) = apply_patch(LAO, PATCH.lines().collect()).unwrap();
 
         assert_eq!(patched, TZU);
     }
@@ -361,7 +385,7 @@ They both may be called deep and profound.
 Deeper and more profound,
 The door of all subtleties!";
 
-        let patched = apply_patch(LAO, PATCH.lines().collect()).unwrap();
+        let (patched, _) = apply_patch(LAO, PATCH.lines().collect()).unwrap();
 
         assert_eq!(patched, TZU);
     }
@@ -385,7 +409,7 @@ a4 3
 ! Diff-Path: patches/v1.0.1-m-28334120-60.patch
 ||example.com^";
 
-        let result = apply_patch(ORIGINAL, PATCH.lines().collect()).unwrap();
+        let (result, _) = apply_patch(ORIGINAL, PATCH.lines().collect()).unwrap();
 
         assert_eq!(result, CHANGED);
     }

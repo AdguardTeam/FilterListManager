@@ -1,0 +1,19 @@
+! Title: Directives Expansion Problem Example
+! Version: v1.0.2
+! Diff-Path: patches/v1.0.2-m-28334180-60.patch
+! This filter demonstrates the problem with directive expansion
+!
+! Include directive that would be expanded by applications
+!#include ./additional_rules.txt
+!
+! Conditional directive that would be expanded
+!#if (adguard)
+||ads.example.com^
+||doubleclick.net^
+||google-analytics.com^
+!#endif
+!
+! Regular rules
+||tracker.example.com^
+||analytics.example.org^
+||facebook.com^$third-party 

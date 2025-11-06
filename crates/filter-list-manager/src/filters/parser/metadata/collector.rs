@@ -24,7 +24,28 @@ impl MetadataCollector {
         }
     }
 
-    pub(crate) fn parse_line(&mut self, line: &str, lineno: usize) {
+    /// Parse metadata line `$Property${METADATA_SPLIT_TOKEN} $Value` and return value for property
+    pub(crate) fn parse_line_for(property: KnownMetadataProperty, line: &str) -> Option<String> {
+        if !line.starts_with(METADATA_LINE_MARKER) {
+            return None;
+        }
+
+        line.split_once(METADATA_SPLIT_TOKEN)
+            .and_then(|(prop_candidate, value)| {
+                if property.equals_str(
+                    prop_candidate
+                        .trim_start_matches(METADATA_LINE_MARKER)
+                        .trim(),
+                ) {
+                    Some(value.trim().to_string())
+                } else {
+                    None
+                }
+            })
+    }
+
+    /// Collects metadata from given line if possible
+    pub(crate) fn collect_line(&mut self, line: &str, lineno: usize) {
         self.non_empty_lines += line.is_empty() as u32;
 
         // 1. Max metadata lines exceeded, or
@@ -76,5 +97,44 @@ impl MetadataCollector {
         }
 
         self.values.entry(prop).or_insert(value);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MetadataCollector;
+    use crate::filters::parser::metadata::KnownMetadataProperty;
+
+    #[test]
+    fn test_parse_line_for() {
+        [
+            (
+                KnownMetadataProperty::DiffPath,
+                "! Diff-Path: patches/v1.0.1-m-28334120-60.patch",
+                "patches/v1.0.1-m-28334120-60.patch",
+            ),
+            (
+                KnownMetadataProperty::TimeUpdated,
+                "!TimeUpdated: 2024-07-31T12:31:19+00:00",
+                "2024-07-31T12:31:19+00:00",
+            ),
+            (
+                KnownMetadataProperty::TimeUpdated,
+                "! Last modified: 123123",
+                "123123",
+            ),
+        ]
+        .into_iter()
+        .for_each(|(prop, line, expected)| {
+            let actual = MetadataCollector::parse_line_for(prop, line);
+
+            assert_eq!(expected, actual.unwrap());
+        });
+
+        let none = MetadataCollector::parse_line_for(
+            KnownMetadataProperty::DiffPath,
+            "Diff-Path: patches/v1.0.1-m-28334120-60.patch",
+        );
+        assert!(none.is_none())
     }
 }
