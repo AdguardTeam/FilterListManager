@@ -21,6 +21,10 @@ impl KnownMetadataProperty {
     pub(self) fn is_known(value: KnownMetadataProperty) -> bool {
         value != KnownMetadataProperty::Unknown
     }
+
+    pub(self) fn equals_str(&self, line: &str) -> bool {
+        KnownMetadataProperty::from(line) == *self
+    }
 }
 
 impl From<&str> for KnownMetadataProperty {

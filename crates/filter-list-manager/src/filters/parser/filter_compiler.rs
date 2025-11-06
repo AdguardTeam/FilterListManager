@@ -1,3 +1,6 @@
+//! This module implements filter compilation process.
+//! This collects metadata, main filter body as-is and all included filters as [`FilterIncludeEntity`] squashed, e.g. resolves all includes and compilation directives recursively
+
 use crate::filters::parser::checksum_validator::validate_checksum;
 use crate::filters::parser::conditional_directives_processor::ConditionalDirectivesProcessor;
 use crate::filters::parser::filter_contents_provider::io_provider::IOProvider;
@@ -64,7 +67,7 @@ impl Into<FilterCursor> for GetFileResult {
     }
 }
 
-/// Compiles filter
+/// Compiles filter line-by-line. This collects metadata, main filter body as-is and all included filters as [`FilterIncludeEntity`] squashed, e.g. resolves all includes and compilation directives recursively
 pub(crate) struct FilterCompiler<'a> {
     /// Conditional directives processor
     conditional_directives_processor: ConditionalDirectivesProcessor<'a>,
@@ -126,6 +129,10 @@ impl<'a> FilterCompiler<'a> {
     /// This is two-step compilation process:
     /// 1. Run through all lines and collect metadata, count rules, validate condition directives IN CAPTURING MODE and collect all includes
     /// 2. Process all includes, respecting condition directives
+    ///
+    /// # Returns
+    ///
+    /// Absolute url of processed filter or [`FilterParserErrorContext`] error with file url and line number
     pub(crate) fn compile(&mut self, url: &str) -> Result<String, FilterParserErrorContext> {
         // Get main filter
         let file_info = self
@@ -252,6 +259,7 @@ impl<'a> FilterCompiler<'a> {
 }
 
 impl FilterCompiler<'_> {
+    /// Parses line of the main filter
     fn process_filter_line(
         &mut self,
         line: &str,
@@ -278,7 +286,7 @@ impl FilterCompiler<'_> {
         // We do not need check lines is capturing here, cause all lines should be processed
 
         if !self.metadata_collector.is_reached_eod {
-            self.metadata_collector.parse_line(line, lineno);
+            self.metadata_collector.collect_line(line, lineno);
         }
 
         Ok(ProcessedMainFilterLine::MaybeRule)
@@ -309,7 +317,7 @@ impl FilterCompiler<'_> {
 
         // Should work at runtime
         if self.metadata_collector.is_reached_eod == false {
-            self.metadata_collector.parse_line(line, lineno);
+            self.metadata_collector.collect_line(line, lineno);
         }
 
         Ok(true)
