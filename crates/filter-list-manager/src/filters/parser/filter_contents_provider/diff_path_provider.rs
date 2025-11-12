@@ -207,6 +207,7 @@ mod tests {
     use crate::filters::parser::diff_updates::batch_patches_container::BatchPatchesContainer;
     use crate::filters::parser::filter_contents_provider::diff_path_provider::DiffPathProvider;
     use crate::filters::parser::filter_contents_provider::FilterContentsProvider;
+    use crate::string;
     use crate::test_utils::{tests_path, SHARED_TEST_BLOCKING_HTTP_CLIENT};
     use url::Url;
 
@@ -411,6 +412,33 @@ a8 1
         );
 
         let base_filter_url = Url::from_file_path(base_filter_path).unwrap();
+        let patched_contents = provider
+            .get_filter_contents(base_filter_url.to_string().as_str())
+            .unwrap();
+
+        validate_checksum(patched_contents.as_str()).unwrap();
+
+        assert_eq!(patched_contents, expected_filter);
+    }
+
+    #[test]
+    fn test_incorrect_application_order() {
+        let base_filter_contents =
+            include_str!("../../../../tests/fixtures/diffupdates_custom/filters/208_optimized.txt");
+        let base_filter_path = tests_path("fixtures/diffupdates_custom/filters/208_optimized.txt");
+        let expected_filter = include_str!(
+            "../../../../tests/fixtures/diffupdates_custom/filters/208_optimized_next.txt"
+        );
+
+        let base_filter_url = Url::from_file_path(base_filter_path).unwrap();
+
+        let provider = DiffPathProvider::new(
+            string!("../patches/208_optimized/208_optimized-s-1762822374-14400.patch"),
+            string!(base_filter_contents),
+            BatchPatchesContainer::factory(),
+            &SHARED_TEST_BLOCKING_HTTP_CLIENT,
+        );
+
         let patched_contents = provider
             .get_filter_contents(base_filter_url.to_string().as_str())
             .unwrap();

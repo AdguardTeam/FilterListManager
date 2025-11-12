@@ -76,8 +76,8 @@ fn update_filters() {
     conf.version = "1.2.3".to_string();
 
     let flm = FilterListManagerImpl::new(conf).unwrap();
-    flm.pull_metadata().unwrap();
-    let updated = flm.update_filters(true, 0, true).unwrap().unwrap();
+    // flm.pull_metadata().unwrap();
+    let updated = flm.update_filters(false, 0, false).unwrap().unwrap();
 
     println!("Updated filters count: {}", updated.updated_list.len());
     updated.updated_list.iter().for_each(|f| {

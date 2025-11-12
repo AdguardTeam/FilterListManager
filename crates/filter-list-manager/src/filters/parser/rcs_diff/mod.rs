@@ -51,7 +51,7 @@ pub(crate) fn apply_patch(
 
                         // If we have a gap between current base_filter_cursor and current diff line
                         // we should write all lines in this gap first
-                        if base_filter_cursor + 1 < line {
+                        if base_filter_cursor < line {
                             // Wrong diff encountered
                             if base_filter_lines.len() < line {
                                 return make_line_out_of_bounds_error(
@@ -330,7 +330,7 @@ They both may be called deep and profound.
 Deeper and more profound,
 The door of all subtleties!";
 
-        const PATCH: &str = "a1 2
+        const PATCH: &str = "a0 2
 FirstLine
 😀😎
 d4 1
