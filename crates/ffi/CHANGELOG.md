@@ -4,12 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [2.3.2] - 2025-11-19
+## [2.3.4] - 2025-11-19
+
+### Changed
+- Change windows adapter version to 2.3
 
 ### Fixed
 - 404 error of filter diff patch was considered as http error, rather than no content
 
-[2.3.2]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.3.1...ffi-2.3.2
+[2.3.4]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.3.1...ffi-2.3.4
 
 ## [2.3.1] - 2025-11-12
 
