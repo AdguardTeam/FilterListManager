@@ -160,8 +160,8 @@ function SetNativeVersion {
     Write-Host "dllMetaFormatVersion is $dllMetaFormatVersion";
 
     $updatedRcContent = $rcContent | ForEach-Object {
-        $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*FILEVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $dllMetaFormatVersion
-        $_ = ReplaceRcVersion -Line $_ -Pattern '^(.*PRODUCTVERSION\s+)\d+,\d+,\d+,\d+' -NewVersion $dllMetaFormatVersion
+        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*FILEVERSION\s+)\d+,\d+,\d+' -NewVersion $dllMetaFormatVersion
+        $_ = ReplaceRcVersion -Line $_ -Pattern '(.*PRODUCTVERSION\s+)\d+,\d+,\d+' -NewVersion $dllMetaFormatVersion
         $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"FileVersion",\s*")([^"]+)' -NewVersion $newVersion
         $_ = ReplaceRcVersion -Line $_ -Pattern '(.*"ProductVersion",\s*")([^"]+)' -NewVersion $newVersion
         return $_;
