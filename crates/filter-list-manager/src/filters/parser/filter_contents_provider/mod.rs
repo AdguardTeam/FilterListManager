@@ -1,4 +1,4 @@
-use crate::io::fetch_by_schemes::fetch_by_scheme_with_content_check;
+use crate::io::fetch_by_schemes::{fetch_filter_by_scheme_with_content_check, FilterFetchPolicy};
 use crate::io::url_schemes::UrlSchemes;
 use crate::FilterParserError;
 
@@ -21,7 +21,12 @@ pub(crate) trait FilterContentsProvider {
         absolute_url: &str,
         scheme: UrlSchemes,
     ) -> Result<String, FilterParserError> {
-        fetch_by_scheme_with_content_check(absolute_url, scheme, self.get_http_client())
+        fetch_filter_by_scheme_with_content_check(
+            absolute_url,
+            scheme,
+            self.get_http_client(),
+            FilterFetchPolicy::RegularFilter,
+        )
     }
 
     /// Gets blocking client. Every provider needs it

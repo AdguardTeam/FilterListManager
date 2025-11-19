@@ -4,11 +4,11 @@ use crate::filters::parser::{
     diff_updates::diff_directives::extract_patch, filter_contents_provider::FilterContentsProvider,
     paths::resolve_absolute_uri, rcs_diff::apply_patch,
 };
-use crate::io::fetch_by_schemes::fetch_by_scheme_with_content_check;
+use crate::io::fetch_by_schemes::{fetch_filter_by_scheme_with_content_check, FilterFetchPolicy};
 use crate::io::http::blocking_client::BlockingClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_hash_from_url, get_scheme};
-use crate::{FilterParserError, IOError};
+use crate::FilterParserError;
 use std::borrow::Cow;
 use std::cell::{Cell, RefCell};
 use std::ops::ControlFlow;
@@ -105,10 +105,11 @@ impl<'a> DiffPathProvider<'a> {
 
                     let diff_contents = match pinned_container.get_a_copy(&patch_path) {
                         None => {
-                            let body = fetch_by_scheme_with_content_check(
+                            let body = fetch_filter_by_scheme_with_content_check(
                                 &patch_path,
                                 scheme,
                                 self.get_http_client(),
+                                FilterFetchPolicy::RegularFilter,
                             )?;
 
                             pinned_container.insert(patch_path, body.clone());
@@ -121,10 +122,11 @@ impl<'a> DiffPathProvider<'a> {
                     (Some(resource_name), diff_contents)
                 }
                 None => {
-                    let diff_contents = fetch_by_scheme_with_content_check(
+                    let diff_contents = fetch_filter_by_scheme_with_content_check(
                         &patch_file_absolute_uri,
                         scheme,
                         self.get_http_client(),
+                        FilterFetchPolicy::DiffUpdates,
                     )?;
 
                     (None, diff_contents)
@@ -180,12 +182,8 @@ impl FilterContentsProvider for DiffPathProvider<'_> {
                 Ok(Continue(())) => continue,
                 Ok(Break(())) => return Ok(current_filter_contents.into_owned()),
                 Err(why) => {
-                    // NotFound from IO, we count as NoContent
                     // If we encounter NoContent, but diff was applied at least once we should return current contents
-                    if matches!(
-                        why,
-                        FilterParserError::NoContent | FilterParserError::Io(IOError::NotFound(_))
-                    ) && self.diff_applied_at_least_once.get()
+                    if why == FilterParserError::NoContent && self.diff_applied_at_least_once.get()
                     {
                         return Ok(current_filter_contents.into_owned());
                     }
@@ -412,6 +410,36 @@ a8 1
         );
 
         let base_filter_url = Url::from_file_path(base_filter_path).unwrap();
+        let patched_contents = provider
+            .get_filter_contents(base_filter_url.to_string().as_str())
+            .unwrap();
+
+        validate_checksum(patched_contents.as_str()).unwrap();
+
+        assert_eq!(patched_contents, expected_filter);
+    }
+
+    /// Note: This also tests that we return current contents if next diff file is not found
+    /// Update should not fail in this case
+    #[test]
+    fn test_simple_diff_updates_with_inexistent_diff_file_read() {
+        let base_filter_contents = include_str!(
+            "../../../../tests/fixtures/diffupdates/examples/01_simple/filter_v1.0.0.txt"
+        );
+        let base_filter_path =
+            tests_path("fixtures/diffupdates/examples/01_simple/filter_v1.0.0.txt");
+        let expected_filter =
+            include_str!("../../../../tests/fixtures/diffupdates/examples/01_simple/filter.txt");
+
+        let base_filter_url = Url::from_file_path(base_filter_path).unwrap();
+
+        let provider = DiffPathProvider::new(
+            "patches/v1.0.0-472234-1.patch".to_string(),
+            String::from(base_filter_contents),
+            BatchPatchesContainer::factory(),
+            &SHARED_TEST_BLOCKING_HTTP_CLIENT,
+        );
+
         let patched_contents = provider
             .get_filter_contents(base_filter_url.to_string().as_str())
             .unwrap();
