@@ -32,9 +32,9 @@ pub(crate) fn fetch_filter_by_scheme_with_content_check(
             let result = read_binary_by_url(absolute_url);
 
             if fetch_policy == FilterFetchPolicy::DiffUpdates {
-                if matches!(result, Err(ReadFilterFileError::Io(IOError::NotFound(_)))) {
-                    return Err(FilterParserError::NoContent);
-                } else if result.as_ref().is_ok_and(|vec| vec.is_empty()) {
+                if matches!(result, Err(ReadFilterFileError::Io(IOError::NotFound(_))))
+                    || result.as_ref().is_ok_and(|vec| vec.is_empty())
+                {
                     return Err(FilterParserError::NoContent);
                 }
             }
