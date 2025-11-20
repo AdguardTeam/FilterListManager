@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [2.3.4] - 2025-11-19
 
 ### Changed
-- Change windows adapter version to 2.3
+- Change windows adapter version to 2.3.4
 
 ### Fixed
 - 404 error of filter diff patch was considered as http error, rather than no content
