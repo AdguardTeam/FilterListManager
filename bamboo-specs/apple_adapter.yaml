@@ -36,7 +36,7 @@ Default Job:
         description: Deploy Swift package and CocoaPod
   requirements:
     - ephemeral
-    - image: registry.int.agrd.dev/macos/sequoia-build-agent-xcode16.1:latest
+    - image: registry.int.agrd.dev/macos/tahoe-build-agent-xcode26.1.1:latest
   artifact-subscriptions: [ ]
 
 repositories:
