@@ -375,5 +375,23 @@ namespace AdGuard.FilterListManager
         /// Returns lists of rules count by list of filter IDs
         /// </summary>
         IEnumerable<RulesCountByFilter> GetRulesCount(IEnumerable<int> filterIds);
+
+        /// <summary>
+        /// Signs all filter rules and includes entities with the integrity key from configuration.
+        /// Throws exception if integrity_key is not set in configuration.
+        /// </summary>
+        void SignAllFilterRules();
+
+        /// <summary>
+        /// Updates the integrity key in configuration and re-signs all filter rules and includes
+        /// entities with the new key.
+        /// </summary>
+        void SignAllRulesWithNewKey(string integrityKey);
+
+        /// <summary>
+        /// Verifies integrity signatures of all filter rules and includes entities in the database.
+        /// Throws exception if integrity_key is not set or if any entity has a missing or invalid signature.
+        /// </summary>
+        void VerifyIntegrity();
     }
 }

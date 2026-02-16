@@ -187,12 +187,24 @@ public struct FilterListManager_Configuration: Sendable {
   /// Should ignore expires for local urls during update
   public var shouldIgnoreExpiresForLocalUrls: Bool = false
 
+  /// Optional key for signing and verifying integrity of filter rules.
+  /// If set, rules will be signed on write and verified on read.
+  public var integrityKey: String {
+    get {return _integrityKey ?? String()}
+    set {_integrityKey = newValue}
+  }
+  /// Returns true if `integrityKey` has been explicitly set.
+  public var hasIntegrityKey: Bool {return self._integrityKey != nil}
+  /// Clears the value of `integrityKey`. Subsequent reads from it will return its default value.
+  public mutating func clearIntegrityKey() {self._integrityKey = nil}
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
 
   fileprivate var _workingDirectory: String? = nil
   fileprivate var _filtersCompilationPolicy: FilterListManager_FiltersCompilationPolicy? = nil
+  fileprivate var _integrityKey: String? = nil
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -263,6 +275,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     12: .standard(proto: "app_name"),
     13: .same(proto: "version"),
     14: .standard(proto: "should_ignore_expires_for_local_urls"),
+    15: .standard(proto: "integrity_key"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -285,6 +298,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
       case 12: try { try decoder.decodeSingularStringField(value: &self.appName) }()
       case 13: try { try decoder.decodeSingularStringField(value: &self.version) }()
       case 14: try { try decoder.decodeSingularBoolField(value: &self.shouldIgnoreExpiresForLocalUrls) }()
+      case 15: try { try decoder.decodeSingularStringField(value: &self._integrityKey) }()
       default: break
       }
     }
@@ -337,6 +351,9 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if self.shouldIgnoreExpiresForLocalUrls != false {
       try visitor.visitSingularBoolField(value: self.shouldIgnoreExpiresForLocalUrls, fieldNumber: 14)
     }
+    try { if let v = self._integrityKey {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 15)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -355,6 +372,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     if lhs.appName != rhs.appName {return false}
     if lhs.version != rhs.version {return false}
     if lhs.shouldIgnoreExpiresForLocalUrls != rhs.shouldIgnoreExpiresForLocalUrls {return false}
+    if lhs._integrityKey != rhs._integrityKey {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

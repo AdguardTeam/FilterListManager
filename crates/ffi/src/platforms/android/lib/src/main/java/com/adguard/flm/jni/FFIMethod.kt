@@ -33,5 +33,8 @@ internal enum class FFIMethod {
     SaveRulesToFileBlob,
     GetDisabledRules,
     SetProxyMode,
-    GetRulesCount
+    GetRulesCount,
+    SignAllFilterRules,
+    SignAllRulesWithNewKey,
+    VerifyIntegrity
 }

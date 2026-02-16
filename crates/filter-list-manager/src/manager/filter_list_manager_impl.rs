@@ -331,6 +331,12 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn sign_all_rules_with_new_key(&mut self, integrity_key: String) -> FLMResult<()> {
+        if integrity_key.trim().is_empty() {
+            return Err(FLMError::InvalidConfiguration(
+                "integrity_key is set, but empty or contains whitespaces only",
+            ));
+        }
+
         self.configuration.integrity_key = Some(integrity_key);
         IntegrityControlManager::new()
             .sign_all_filter_rules(&self.connection_manager, &self.configuration)

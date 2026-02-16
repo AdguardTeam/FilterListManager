@@ -173,6 +173,14 @@ public struct FilterListManager_AGOuterError: Sendable {
     set {error = .other(newValue)}
   }
 
+  public var filterIntegrityCheckFailed: FilterListManager_FilterIntegrityCheckFailed {
+    get {
+      if case .filterIntegrityCheckFailed(let v)? = error {return v}
+      return FilterListManager_FilterIntegrityCheckFailed()
+    }
+    set {error = .filterIntegrityCheckFailed(newValue)}
+  }
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_Error: Equatable, Sendable {
@@ -194,6 +202,7 @@ public struct FilterListManager_AGOuterError: Sendable {
     case mutex(FilterListManager_Mutex)
     case invalidConfiguration(FilterListManager_InvalidConfiguration)
     case other(FilterListManager_Other)
+    case filterIntegrityCheckFailed(FilterListManager_FilterIntegrityCheckFailed)
 
   }
 
@@ -404,6 +413,18 @@ public struct FilterListManager_Other: Sendable {
   public init() {}
 }
 
+public struct FilterListManager_FilterIntegrityCheckFailed: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var filterID: Int64 = 0
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate let _protobuf_package = "filter_list_manager"
@@ -430,6 +451,7 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
     17: .same(proto: "mutex"),
     18: .standard(proto: "invalid_configuration"),
     19: .same(proto: "other"),
+    20: .standard(proto: "filter_integrity_check_failed"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -673,6 +695,19 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
           self.error = .other(v)
         }
       }()
+      case 20: try {
+        var v: FilterListManager_FilterIntegrityCheckFailed?
+        var hadOneofValue = false
+        if let current = self.error {
+          hadOneofValue = true
+          if case .filterIntegrityCheckFailed(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.error = .filterIntegrityCheckFailed(v)
+        }
+      }()
       default: break
       }
     }
@@ -758,6 +793,10 @@ extension FilterListManager_AGOuterError: SwiftProtobuf.Message, SwiftProtobuf._
     case .other?: try {
       guard case .other(let v)? = self.error else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 19)
+    }()
+    case .filterIntegrityCheckFailed?: try {
+      guard case .filterIntegrityCheckFailed(let v)? = self.error else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 20)
     }()
     case nil: break
     }
@@ -1206,6 +1245,38 @@ extension FilterListManager_Other: SwiftProtobuf.Message, SwiftProtobuf._Message
   }
 
   public static func ==(lhs: FilterListManager_Other, rhs: FilterListManager_Other) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension FilterListManager_FilterIntegrityCheckFailed: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".FilterIntegrityCheckFailed"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "filter_id"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.filterID != 0 {
+      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: FilterListManager_FilterIntegrityCheckFailed, rhs: FilterListManager_FilterIntegrityCheckFailed) -> Bool {
+    if lhs.filterID != rhs.filterID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

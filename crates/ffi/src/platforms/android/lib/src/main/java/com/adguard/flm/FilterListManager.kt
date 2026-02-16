@@ -100,6 +100,33 @@ constructor(configuration: Configuration)
         val constants: FilterListManagerConstants
             get() = NativeInterface.flmGetConstants()
 
+        /**
+         * Generates a cryptographically secure random key for use as integrity_key.
+         *
+         * @return A 64-character hex-encoded random key.
+         * @throws FilterListManagerException if key generation fails.
+         */
+        @Throws(FilterListManagerException::class)
+        fun generateRandomKey(): String = NativeInterface
+            .flmGenerateRandomKeyProtobuf()
+            .use { result ->
+                when {
+                    result.responseType != RustResponseType.RustBuffer ->
+                        throw responseTypeRuntimeException(RustResponseType.RustBuffer, result.responseType)
+
+                    result.ffiError ->
+                        throw FilterListManagerException(AGOuterError.parseFrom(result.resultData))
+
+                    else -> {
+                        val response = GenerateRandomKeyResponse.parseFrom(result.resultData)
+                        if (response.hasError()) {
+                            throw FilterListManagerException(response.error)
+                        }
+                        response.key
+                    }
+                }
+            }
+
         private fun responseTypeRuntimeException(expected: RustResponseType, actual: RustResponseType) =
             RuntimeException("Expected responseType is $expected but $actual received")
     }
@@ -926,6 +953,65 @@ constructor(configuration: Configuration)
                 when {
                     response.hasError() -> throw FilterListManagerException(response.error)
                     else -> response.rulesCountByFilterList
+                }
+            }
+        }
+    }
+
+    /**
+     * Signs all filter rules and includes entities with the integrity key from configuration.
+     *
+     * @throws FilterListManagerException if integrity_key is not set in configuration.
+     */
+    @Throws(FilterListManagerException::class)
+    fun signAllFilterRules() {
+        val request = emptyRequest { }
+
+        call(FFIMethod.SignAllFilterRules, request).use { result ->
+            EmptyResponse.parseFrom(result.resultData).let { response ->
+                if (response.hasError()) {
+                    throw FilterListManagerException(response.error)
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the integrity key in configuration and re-signs all filter rules and includes
+     * entities with the new key.
+     *
+     * @param integrityKey New integrity key to use for signing.
+     * @throws FilterListManagerException if there's an error in the Rust code.
+     */
+    @Throws(FilterListManagerException::class)
+    fun signAllRulesWithNewKey(integrityKey: String) {
+        val request = signAllRulesWithNewKeyRequest {
+            this.integrityKey = integrityKey
+        }
+
+        call(FFIMethod.SignAllRulesWithNewKey, request).use { result ->
+            EmptyResponse.parseFrom(result.resultData).let { response ->
+                if (response.hasError()) {
+                    throw FilterListManagerException(response.error)
+                }
+            }
+        }
+    }
+
+    /**
+     * Verifies integrity signatures of all filter rules and includes entities in the database.
+     *
+     * @throws FilterListManagerException if integrity_key is not set or if any entity has
+     *         a missing or invalid signature.
+     */
+    @Throws(FilterListManagerException::class)
+    fun verifyIntegrity() {
+        val request = emptyRequest { }
+
+        call(FFIMethod.VerifyIntegrity, request).use { result ->
+            EmptyResponse.parseFrom(result.resultData).let { response ->
+                if (response.hasError()) {
+                    throw FilterListManagerException(response.error)
                 }
             }
         }

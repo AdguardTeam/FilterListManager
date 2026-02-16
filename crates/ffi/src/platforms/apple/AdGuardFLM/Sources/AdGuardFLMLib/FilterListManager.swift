@@ -30,6 +30,29 @@ public func getFLMConstants() -> FilterListManagerConstants {
     return flm_get_constants()
 }
 
+/// Generates a cryptographically secure random key for use as integrity_key
+public func generateRandomKey() throws -> String {
+    let pointer = flm_generate_random_key_protobuf()
+
+    guard let response: UnsafeMutablePointer<RustResponse> = pointer else {
+        throw FLMFacadeError.rustResponseAsNullptr
+    }
+
+    defer {
+        flm_free_response(response)
+    }
+
+    let byteData = Data(bytes: response.pointee.result_data, count: response.pointee.result_data_len)
+
+    let result = try FilterListManager_GenerateRandomKeyResponse(serializedBytes: byteData)
+
+    guard result.hasError == false else {
+        throw AGOuterError(from: result.error)
+    }
+
+    return result.key
+}
+
 public protocol FLMFacadeProtocol {
     func installCustomFilterList(
         downloadUrl: String,
@@ -107,6 +130,12 @@ public protocol FLMFacadeProtocol {
     func setProxyMode(mode: FilterListManager_RawRequestProxyMode, custom_addr: String?) throws
 
     func getRulesCount(ids: [Int32]) throws -> [FilterListManager_RulesCountByFilter]
+
+    func signAllFilterRules() throws
+
+    func signAllRulesWithNewKey(integrityKey: String) throws
+
+    func verifyIntegrity() throws
 }
 
 /// Main FLM facade.
@@ -590,6 +619,37 @@ public class FLMFacade: FLMFacadeProtocol {
         }
 
         return response.rulesCountByFilter
+    }
+
+    public func signAllFilterRules() throws {
+        let message = FilterListManager_EmptyRequest()
+
+        let response: FilterListManager_EmptyResponse = try callRust(method: SignAllFilterRules, message: message)
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+    }
+
+    public func signAllRulesWithNewKey(integrityKey: String) throws {
+        var message = FilterListManager_SignAllRulesWithNewKeyRequest()
+        message.integrityKey = integrityKey
+
+        let response: FilterListManager_EmptyResponse = try callRust(method: SignAllRulesWithNewKey, message: message)
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
+    }
+
+    public func verifyIntegrity() throws {
+        let message = FilterListManager_EmptyRequest()
+
+        let response: FilterListManager_EmptyResponse = try callRust(method: VerifyIntegrity, message: message)
+
+        guard response.hasError == false else {
+            throw AGOuterError(from: response.error)
+        }
     }
 
     deinit {

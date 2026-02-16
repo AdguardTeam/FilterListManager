@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.adguard.flm.exceptions.FilterListManagerException
+import com.adguard.flm.jni.NativeInterface
 import com.adguard.flm.protobuf.*
 import org.junit.Assert.*
 import org.junit.Test
@@ -170,6 +171,12 @@ class FilterListManagerAndroidTest {
             assertNotNull("Custom filter should be created successfully", customFilter)
             assertTrue("Custom filter ID should be valid", customFilter.id != 0)
             assertEquals("Custom filter title should match", "Test Filter", customFilter.title)
+
+            val randomKey = FilterListManager.generateRandomKey()
+            assertFalse(randomKey.isEmpty())
+
+            flm.signAllRulesWithNewKey(randomKey)
+            flm.verifyIntegrity()
 
             // Test getting filter by ID
             val retrievedFilter = flm.getFullFilterListById(customFilter.id)

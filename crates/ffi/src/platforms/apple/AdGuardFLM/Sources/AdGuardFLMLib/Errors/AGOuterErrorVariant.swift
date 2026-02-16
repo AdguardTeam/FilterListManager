@@ -22,6 +22,7 @@ public enum AGOuterErrorVariant: Error {
     case Mutex
     case InvalidConfiguration(String)
     case Other
+    case FilterIntegrityCheckFailed(Int64)
 }
 
 extension AGOuterErrorVariant {
@@ -71,6 +72,8 @@ extension AGOuterErrorVariant {
             self = Self.Other
         case .databaseBusy(_):
             self = Self.DatabaseBusy
+        case .filterIntegrityCheckFailed(let container):
+            self = Self.FilterIntegrityCheckFailed(container.filterID)
         }
     }
 }

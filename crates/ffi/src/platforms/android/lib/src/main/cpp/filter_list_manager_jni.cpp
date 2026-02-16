@@ -150,6 +150,21 @@ Java_com_adguard_flm_jni_NativeInterface_flmGetConstants(JNIEnv *env, jclass cla
 
 extern "C"
 JNIEXPORT jobject JNICALL
+Java_com_adguard_flm_jni_NativeInterface_flmGenerateRandomKeyProtobuf(JNIEnv *env, jclass clazz) {
+    // Call the C function to generate random key
+    RustResponse *response = flm_generate_random_key_protobuf();
+    if (response == nullptr) {
+        env->ThrowNew(env->FindClass("java/lang/RuntimeException"),
+                      "flm_generate_random_key_protobuf() cannot return null");
+        return nullptr;
+    }
+
+    // Convert the response to a Java object
+    return rust_response_to_jobject(env, response);
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
 Java_com_adguard_flm_jni_NativeInterface_flmCallProtobuf(JNIEnv *env, jclass clazz, jlong handle,
                                                          jobject method, jbyteArray inputBuffer) {
     // Get the FFIMethod enum value

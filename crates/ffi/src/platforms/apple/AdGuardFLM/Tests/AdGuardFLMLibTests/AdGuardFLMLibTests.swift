@@ -49,6 +49,12 @@ final class AdGuardFLMLibTests: XCTestCase {
                 ignoreFiltersStatus: false
             )
         )
+        
+        let integrityKey = try generateRandomKey()
+        XCTAssertNotEqual(integrityKey, "")
+
+        try flm.signAllRulesWithNewKey(integrityKey: integrityKey)
+        try flm.verifyIntegrity()
 
         let filter = try flm.getFullFilterListById(id: 1)
         NSLog("[Default locale] Filter with id 1 has title \(String(describing: filter?.title))")

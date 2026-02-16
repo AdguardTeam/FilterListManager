@@ -54,6 +54,15 @@ internal class NativeInterface {
         external fun flmGetConstants(): FilterListManagerConstants
 
         /**
+         * Generates a cryptographically secure random key and returns it
+         * as a protobuf-encoded GenerateRandomKeyResponse in RustResponse
+         *
+         * @return RustResponse containing the generated random key
+         */
+        @JvmStatic
+        external fun flmGenerateRandomKeyProtobuf(): RustResponse
+
+        /**
          * Calls FLM method described as FFIMethod for object behind FLMHandle
          *
          * @param handle FLM handle value from FLMHandlePointer

@@ -76,8 +76,8 @@ pub enum FFIMethod {
 pub unsafe extern "C" fn flm_call_protobuf(
     handle: *mut FLMHandle,
     method: FFIMethod,
-    input_buffer: *mut u8,
-    input_buf_len: usize,
+    #[allow(unused)] input_buffer: *mut u8,
+    #[allow(unused)] input_buf_len: usize,
 ) -> *mut RustResponse {
     let mut rust_response = Box::<RustResponse>::default();
 
