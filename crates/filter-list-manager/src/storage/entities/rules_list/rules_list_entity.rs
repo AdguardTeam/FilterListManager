@@ -19,6 +19,7 @@ pub(crate) struct RulesListEntity {
     pub(crate) rules_count: i32,
     pub(in crate::storage) has_directives: bool,
     pub(in crate::storage) text_hash: Option<String>,
+    pub(crate) integrity_signature: Option<String>,
 }
 
 impl RulesListEntity {
@@ -36,6 +37,7 @@ impl RulesListEntity {
             disabled_text: string!(),
             rules_count,
             has_directives: DEFAULT_HAS_DIRECTIVES_VALUE,
+            integrity_signature: None,
         }
     }
 
@@ -57,6 +59,7 @@ impl Hydrate for RulesListEntity {
             rules_count: row.get(3)?,
             has_directives: row.get(4)?,
             text_hash: row.get(5)?,
+            integrity_signature: row.get(6)?,
         })
     }
 }

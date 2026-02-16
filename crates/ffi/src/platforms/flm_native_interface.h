@@ -42,6 +42,8 @@ typedef enum FFIMethod {
     GetDisabledRules,
     SetProxyMode,
     GetRulesCount,
+    SignAllFilterRules,
+    VerifyIntegrity,
 } FFIMethod;
 
 /**
@@ -153,6 +155,12 @@ struct RustResponse *flm_init_protobuf(const uint8_t *bytes, size_t size);
  * 2. `handle.result_data_len <= handle.result_data_capacity` is unsafe and will panic
  */
 void flm_free_response(struct RustResponse *handle);
+
+/**
+ * Generates a cryptographically secure random key and returns it
+ * as a protobuf-encoded [`GenerateRandomKeyResponse`] in [`RustResponse`].
+ */
+struct RustResponse *flm_generate_random_key_protobuf(void);
 
 /**
  * Drops [`FLMHandle`]

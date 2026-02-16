@@ -6,9 +6,12 @@ use std::path::Path;
 use rusqlite::Connection;
 use rusqlite::Error;
 
+use crate::manager::models::configuration::Configuration;
 use crate::storage::blob::write_to_stream;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
+use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::DbConnectionManager;
+use crate::utils::integrity;
 use crate::utils::parsing::LF_BYTES_SLICE;
 use crate::FLMError;
 use crate::FLMResult;
@@ -26,6 +29,7 @@ impl StreamingRulesManager {
     pub(crate) fn save_rules_to_file_blob<P: AsRef<Path>>(
         &self,
         connection_manager: &DbConnectionManager,
+        configuration: &Configuration,
         filter_id: FilterId,
         file_path: P,
     ) -> FLMResult<()> {
@@ -41,6 +45,26 @@ impl StreamingRulesManager {
         connection_manager
             .execute_db(|conn: Connection| {
                 let rules_repository = RulesListRepository::new();
+
+                if configuration.integrity_key.is_some() {
+                    let entity = rules_repository
+                        .select(
+                            &conn,
+                            Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                        )
+                        .map_err(FLMError::from_database)?
+                        .and_then(|mut v| {
+                            if v.is_empty() {
+                                None
+                            } else {
+                                Some(v.remove(0))
+                            }
+                        })
+                        .ok_or(FLMError::EntityNotFound(filter_id as i64))?;
+
+                    integrity::verify_rules_list_if_needed(configuration, &entity)?;
+                }
+
                 let (disabled_rules, blob) = rules_repository
                     .get_blob_handle_and_disabled_rules(&conn, filter_id)
                     .map_err(|why| match why {

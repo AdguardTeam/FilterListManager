@@ -258,4 +258,9 @@ message EmptyResponse {
   optional AGOuterError error = 1;
 }
 
+message GenerateRandomKeyResponse {
+  string key = 1;
+  optional AGOuterError error = 2;
+}
+
 // endregion

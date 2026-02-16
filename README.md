@@ -4,8 +4,8 @@ This repository contains a library for managing AdGuard filter lists and its
 tools and wrappers.
 
 This library is used by different AdGuard applications to integrate filter
-registries ([FiltersRegistry][filtersregistry] and
-[HostlistsRegistry][hostlistsregistry]), check for updates and download them,
+registries ([Filters Registry][filtersregistry] and
+[Hostlists Registry][hostlistsregistry]), check for updates and download them,
 implement differential updates, etc.
 
 [filtersregistry]: https://github.com/AdguardTeam/FiltersRegistry

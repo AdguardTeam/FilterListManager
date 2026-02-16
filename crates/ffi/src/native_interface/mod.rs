@@ -186,6 +186,36 @@ pub unsafe extern "C" fn flm_free_response(handle: *mut RustResponse) {
     }
 }
 
+/// Generates a cryptographically secure random key and returns it
+/// as a protobuf-encoded [`GenerateRandomKeyResponse`] in [`RustResponse`].
+#[no_mangle]
+pub extern "C" fn flm_generate_random_key_protobuf() -> *mut RustResponse {
+    let response = match FilterListManager::generate_random_key() {
+        Ok(key) => filter_list_manager::GenerateRandomKeyResponse { key, error: None },
+        Err(e) => filter_list_manager::GenerateRandomKeyResponse {
+            key: String::new(),
+            error: Some(e.into()),
+        },
+    };
+
+    let mut rust_response = Box::<RustResponse>::default();
+
+    let mut vec = vec![];
+    if let Err(why) = response.encode(&mut vec) {
+        return build_rust_response_error(
+            Box::new(why),
+            rust_response,
+            "Cannot encode GenerateRandomKeyResponse",
+        );
+    }
+
+    rust_response.result_data_capacity = vec.capacity();
+    rust_response.result_data_len = vec.len();
+    rust_response.result_data = Box::into_raw(vec.into_boxed_slice()) as *mut c_void;
+
+    Box::into_raw(rust_response)
+}
+
 /// Drops [`FLMHandle`]
 ///
 /// # Safety

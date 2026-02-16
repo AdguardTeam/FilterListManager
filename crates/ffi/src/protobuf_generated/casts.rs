@@ -60,6 +60,7 @@ impl From<Configuration> for filter_list_manager::Configuration {
             request_custom_proxy_addr: proxy_addr,
             app_name: value.app_name,
             version: value.version,
+            integrity_key: value.integrity_key,
         }
     }
 }
@@ -95,6 +96,7 @@ impl From<filter_list_manager::Configuration> for Configuration {
             auto_lift_up_database: val.auto_lift_up_database,
             app_name: val.app_name,
             version: val.version,
+            integrity_key: val.integrity_key,
         }
     }
 }
@@ -208,6 +210,12 @@ impl From<AGOuterError> for filter_list_manager::AgOuterError {
                     filter_list_manager::InvalidConfiguration {
                         msg: msg.to_string(),
                     },
+                )),
+                message,
+            },
+            AGOuterError::FilterIntegrityCheckFailed(filter_id) => Self {
+                error: Some(crate::protobuf_generated::filter_list_manager::ag_outer_error::Error::FilterIntegrityCheckFailed(
+                    filter_list_manager::FilterIntegrityCheckFailed { filter_id },
                 )),
                 message,
             },

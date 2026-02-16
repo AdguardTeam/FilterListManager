@@ -27,6 +27,7 @@ message AGOuterError {
     Mutex mutex = 17;
     InvalidConfiguration invalid_configuration = 18;
     Other other = 19;
+    FilterIntegrityCheckFailed filter_integrity_check_failed = 20;
   }
 }
 
@@ -89,3 +90,6 @@ message InvalidConfiguration {
 // Do not duplicate the message
 message Other {}
 
+message FilterIntegrityCheckFailed {
+  int64 filter_id = 1;
+}

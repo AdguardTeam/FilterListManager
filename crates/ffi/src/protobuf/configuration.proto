@@ -82,4 +82,8 @@ message Configuration {
 
   // Should ignore expires for local urls during update
   bool should_ignore_expires_for_local_urls = 14;
+
+  // Optional key for signing and verifying integrity of filter rules.
+  // If set, rules will be signed on write and verified on read.
+  optional string integrity_key = 15;
 }

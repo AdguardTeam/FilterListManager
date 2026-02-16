@@ -15,6 +15,7 @@ use crate::storage::repositories::Repository;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::with_transaction;
 use crate::storage::DbConnectionManager;
+use crate::utils::integrity;
 use crate::DisabledRulesRaw;
 use crate::FLMError;
 use crate::FLMResult;
@@ -143,6 +144,16 @@ impl RulesListManager {
             })?;
 
         if let Some(ref mut rules) = result {
+            for rule in rules.iter() {
+                integrity::verify_rules_list_if_needed(configuration, rule)?;
+            }
+
+            for (_, includes) in these_includes.iter() {
+                for include in includes {
+                    integrity::verify_filter_include_if_needed(configuration, include)?;
+                }
+            }
+
             for rule in rules.iter_mut() {
                 if rule.has_directives() {
                     if let Some(download_url) = download_urls.get(&rule.filter_id) {
@@ -242,6 +253,12 @@ impl RulesListManager {
 
                     let mut entities = compiler.into_entities(filter_id);
                     entities.rules_list_entity.disabled_text = rules_entity.disabled_text;
+
+                    integrity::sign_entities_if_needed(
+                        configuration,
+                        &mut entities.rules_list_entity,
+                        &mut entities.filter_includes_entities,
+                    );
 
                     // TODO: do we need to update metadata here?
                     let _ = with_transaction(&mut conn, |tx: &Transaction| {
@@ -356,6 +373,14 @@ impl RulesListManager {
         for filter_entity in list {
             if let Some(filter_id) = filter_entity.filter_id {
                 if let Some(mut rule_entity) = rules.remove(&filter_id) {
+                    integrity::verify_rules_list_if_needed(configuration, &rule_entity)?;
+
+                    if let Some(includes) = includes_list.get(&filter_id) {
+                        for include in includes {
+                            integrity::verify_filter_include_if_needed(configuration, include)?;
+                        }
+                    }
+
                     if rule_entity.has_directives() {
                         let (new_body, new_count) = FilterCollector::new(configuration)
                             .collect_from_parts(

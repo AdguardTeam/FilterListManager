@@ -7,6 +7,7 @@ use super::managers::filter_manager::FilterManager;
 use super::managers::filter_metadata_grabber::FilterMetadataGrabber;
 use super::managers::filter_tag_manager::FilterTagManager;
 use super::managers::filter_update_manager::FilterUpdateManager;
+use super::managers::integrity_control_manager::IntegrityControlManager;
 use super::managers::rules_list_manager::RulesListManager;
 use super::managers::streaming_rules_manager::StreamingRulesManager;
 use super::models::{
@@ -27,6 +28,7 @@ use crate::{
     manager::FilterListManager, ActiveRulesInfo, ActiveRulesInfoRaw, FLMError, FLMResult,
     StoredFilterMetadata,
 };
+use getrandom;
 use std::path::Path;
 
 /// Default implementation for [`FilterListManager`]
@@ -36,12 +38,27 @@ pub struct FilterListManagerImpl {
 }
 
 impl FilterListManager for FilterListManagerImpl {
+    fn generate_random_key() -> FLMResult<String> {
+        let mut bytes = [0u8; 32];
+        getrandom::fill(&mut bytes)
+            .map_err(|e| FLMError::Other(format!("Couldn't generate random key: {}", e)))?;
+
+        Ok(bytes.iter().map(|b| format!("{:02x}", b)).collect())
+    }
+
     fn new(mut configuration: Configuration) -> FLMResult<Box<Self>> {
         if configuration.app_name.is_empty() {
             return Err(FLMError::InvalidConfiguration("app_name is empty"));
         }
         if configuration.version.is_empty() {
             return Err(FLMError::InvalidConfiguration("version is empty"));
+        }
+        if let Some(ref key) = configuration.integrity_key {
+            if key.trim().is_empty() {
+                return Err(FLMError::InvalidConfiguration(
+                    "integrity_key is set, but empty or contains whitespaces only",
+                ));
+            }
         }
 
         configuration.normalized();
@@ -290,6 +307,7 @@ impl FilterListManager for FilterListManagerImpl {
     ) -> FLMResult<()> {
         StreamingRulesManager::new().save_rules_to_file_blob(
             &self.connection_manager,
+            &self.configuration,
             filter_id,
             file_path,
         )
@@ -305,6 +323,16 @@ impl FilterListManager for FilterListManagerImpl {
 
     fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>> {
         RulesListManager::new().get_rules_count(&self.connection_manager, ids)
+    }
+
+    fn sign_all_rules(&self) -> FLMResult<()> {
+        IntegrityControlManager::new()
+            .sign_all_filter_rules(&self.connection_manager, &self.configuration)
+    }
+
+    fn verify_integrity(&self) -> FLMResult<()> {
+        IntegrityControlManager::new()
+            .verify_integrity(&self.connection_manager, &self.configuration)
     }
 }
 

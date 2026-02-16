@@ -26,6 +26,7 @@ use crate::storage::repositories::Repository;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::with_transaction;
 use crate::storage::DbConnectionManager;
+use crate::utils::integrity;
 use crate::utils::memory::heap;
 use crate::{Configuration, FLMError, FLMResult, FilterId, FilterParserError};
 use chrono::{DateTime, ParseError, Utc};
@@ -358,6 +359,12 @@ pub(super) fn update_filters_action(
                     _ => {}
                 }
             }
+
+            integrity::sign_entities_if_needed(
+                configuration,
+                &mut compiled_filter_entities.rules_list_entity,
+                &mut compiled_filter_entities.filter_includes_entities,
+            );
 
             rules_entities.push(compiled_filter_entities.rules_list_entity);
             includes_entities.append(&mut compiled_filter_entities.filter_includes_entities);

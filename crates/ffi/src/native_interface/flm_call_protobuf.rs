@@ -61,6 +61,8 @@ pub enum FFIMethod {
     GetDisabledRules,
     SetProxyMode,
     GetRulesCount,
+    SignAllFilterRules,
+    VerifyIntegrity,
 }
 
 /// Calls FLM method described as [`FFIMethod`] for object behind [`FLMHandle`]
@@ -539,6 +541,14 @@ pub unsafe extern "C" fn flm_call_protobuf(
                     error: Some(why.into()),
                 },
             }
+        }
+        .encode(&mut out_bytes_buffer),
+        FFIMethod::SignAllFilterRules => EmptyResponse {
+            error: flm_handle.flm.sign_all_filter_rules().err().map(Into::into),
+        }
+        .encode(&mut out_bytes_buffer),
+        FFIMethod::VerifyIntegrity => EmptyResponse {
+            error: flm_handle.flm.verify_integrity().err().map(Into::into),
         }
         .encode(&mut out_bytes_buffer),
     };

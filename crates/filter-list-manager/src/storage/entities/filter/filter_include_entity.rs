@@ -13,6 +13,7 @@ pub(crate) struct FilterIncludeEntity {
     pub(crate) body: String,
     pub(crate) rules_count: i32,
     pub(crate) body_hash: Option<String>,
+    pub(crate) integrity_signature: Option<String>,
 }
 
 impl FilterIncludeEntity {
@@ -33,6 +34,7 @@ impl FilterIncludeEntity {
                 .then(|| blake3::hash(body.as_bytes()).to_string()),
             body,
             rules_count,
+            integrity_signature: None,
         }
     }
 
@@ -50,6 +52,7 @@ impl Hydrate for FilterIncludeEntity {
             body: row.get(3)?,
             rules_count: row.get(4)?,
             body_hash: row.get(5)?,
+            integrity_signature: row.get(6)?,
         })
     }
 }

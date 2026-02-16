@@ -9,6 +9,7 @@ pub use self::filters_compilation_policy::FiltersCompilationPolicy;
 pub use self::locale::Locale;
 pub use self::request_proxy_mode::RequestProxyMode;
 
+use crate::string;
 use std::cmp::max;
 
 /// Expires value shouldn't be less than this constant. In seconds
@@ -77,6 +78,10 @@ pub struct Configuration {
     pub app_name: String,
     /// Client app version
     pub version: String,
+    /// Integrity key for hashing sensitive data
+    /// Every read/write operation will be hashed using this key
+    /// If not set, hashing will be disabled and updates will clear existing hashes from storage
+    pub integrity_key: Option<String>,
 }
 
 /// Normalized locales delimiter
@@ -113,7 +118,7 @@ impl Default for Configuration {
         Self {
             filter_list_type: FilterListType::STANDARD,
             working_directory: None,
-            locale: "en".to_string(),
+            locale: string!("en"),
             default_filter_list_expires_period_sec: DEFAULT_EXPIRES_VALUE_FOR_FILTERS,
             filters_compilation_policy: Default::default(),
             metadata_url: String::new(),
@@ -124,6 +129,7 @@ impl Default for Configuration {
             auto_lift_up_database: true,
             app_name: String::new(),
             version: String::new(),
+            integrity_key: None,
         }
     }
 }

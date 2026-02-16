@@ -227,6 +227,20 @@ impl FilterListManager {
     pub fn get_rules_count(&self, ids: Vec<FilterId>) -> AGResult<Vec<RulesCountByFilter>> {
         self.wrap(move |flm| flm.get_rules_count(ids))
     }
+
+    pub fn sign_all_filter_rules(&self) -> AGResult<()> {
+        self.wrap(|flm| flm.sign_all_rules())
+    }
+
+    pub fn verify_integrity(&self) -> AGResult<()> {
+        self.wrap(|flm| flm.verify_integrity())
+    }
+}
+
+impl FilterListManager {
+    pub fn generate_random_key() -> AGResult<String> {
+        FilterListManagerImpl::generate_random_key().map_err(AGOuterError::from)
+    }
 }
 
 impl FilterListManager {

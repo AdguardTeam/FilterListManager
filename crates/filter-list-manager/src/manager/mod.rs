@@ -25,6 +25,12 @@ use std::path::Path;
 
 /// FilterListManager is the interface of a filter list manager.
 pub trait FilterListManager {
+    /// Generates a cryptographically secure random key suitable for use as
+    /// `Configuration.integrity_key`.
+    ///
+    /// Returns a 64-character hex-encoded string (32 random bytes).
+    fn generate_random_key() -> FLMResult<String>;
+
     /// In the constructor, the object is configured and initialized depending on the passed configuration.
     /// *NOTE:* You must create its own manager for different filter lists types.
     ///
@@ -376,4 +382,24 @@ pub trait FilterListManager {
 
     /// Returns lists of rules count by list of filter IDs
     fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>>;
+
+    /// Signs all rules and includes entities with the integrity key
+    /// from configuration.
+    ///
+    /// # Failure
+    ///
+    /// Returns [`crate::FLMError::InvalidConfiguration`] if `integrity_key`
+    /// is not set in configuration.
+    fn sign_all_rules(&self) -> FLMResult<()>;
+
+    /// Verifies integrity signatures of all filter rules and includes
+    /// entities in the database.
+    ///
+    /// # Failure
+    ///
+    /// - Returns [`crate::FLMError::InvalidConfiguration`] if `integrity_key`
+    ///   is not set in configuration.
+    /// - Returns [`crate::FLMError::FilterIntegrityCheckFailed`] if any entity
+    ///   has a missing or invalid signature.
+    fn verify_integrity(&self) -> FLMResult<()>;
 }

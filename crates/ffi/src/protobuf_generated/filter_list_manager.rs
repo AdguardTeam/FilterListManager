@@ -63,6 +63,10 @@ pub struct Configuration {
     /// Should ignore expires for local urls during update
     #[prost(bool, tag = "14")]
     pub should_ignore_expires_for_local_urls: bool,
+    /// Optional key for signing and verifying integrity of filter rules.
+    /// If set, rules will be signed on write and verified on read.
+    #[prost(string, optional, tag = "15")]
+    pub integrity_key: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -129,7 +133,7 @@ pub struct AgOuterError {
     pub message: ::prost::alloc::string::String,
     #[prost(
         oneof = "ag_outer_error::Error",
-        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19"
+        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20"
     )]
     pub error: ::core::option::Option<ag_outer_error::Error>,
 }
@@ -173,6 +177,8 @@ pub mod ag_outer_error {
         InvalidConfiguration(super::InvalidConfiguration),
         #[prost(message, tag = "19")]
         Other(super::Other),
+        #[prost(message, tag = "20")]
+        FilterIntegrityCheckFailed(super::FilterIntegrityCheckFailed),
     }
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
@@ -242,6 +248,11 @@ pub struct InvalidConfiguration {
 /// Do not duplicate the message
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct Other {}
+#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+pub struct FilterIntegrityCheckFailed {
+    #[prost(int64, tag = "1")]
+    pub filter_id: i64,
+}
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterTag {
     /// Filter tag id.
@@ -900,5 +911,12 @@ pub struct PullMetadataResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EmptyResponse {
     #[prost(message, optional, tag = "1")]
+    pub error: ::core::option::Option<AgOuterError>,
+}
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GenerateRandomKeyResponse {
+    #[prost(string, tag = "1")]
+    pub key: ::prost::alloc::string::String,
+    #[prost(message, optional, tag = "2")]
     pub error: ::core::option::Option<AgOuterError>,
 }

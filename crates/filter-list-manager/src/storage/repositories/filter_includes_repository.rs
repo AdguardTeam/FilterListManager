@@ -17,7 +17,8 @@ const BASIC_SELECT_SQL: &str = r"
         absolute_url,
         body,
         rules_count,
-        body_hash
+        body_hash,
+        integrity_signature
     FROM
         [filter_includes]
 ";
@@ -111,6 +112,26 @@ impl FilterIncludesRepository {
         statement.execute(params_from_iter(ids)).map(|_| ())
     }
 
+    /// Gets entities as a flat list
+    pub(crate) fn select(
+        &self,
+        conn: &Connection,
+        where_clause: Option<SQLOperator>,
+    ) -> rusqlite::Result<Vec<FilterIncludeEntity>> {
+        let mut sql = String::from(BASIC_SELECT_SQL);
+        let params = process_where_clause(&mut sql, where_clause)?;
+        let mut statement = conn.prepare(sql.as_str())?;
+
+        let rows = statement.query_map(params, FilterIncludeEntity::hydrate)?;
+
+        let mut results = Vec::new();
+        for row in rows {
+            results.push(row?);
+        }
+
+        Ok(results)
+    }
+
     /// Gets entities mapped by [`FilterId`]
     pub(crate) fn select_mapped(
         &self,
@@ -137,6 +158,28 @@ impl FilterIncludesRepository {
     }
 }
 
+impl FilterIncludesRepository {
+    /// Updates only the integrity_signature column for given entities
+    pub(crate) fn update_integrity_signatures(
+        &self,
+        conn: &Transaction<'_>,
+        entities: &[FilterIncludeEntity],
+    ) -> rusqlite::Result<(), Error> {
+        let mut statement = conn.prepare(
+            r"UPDATE [filter_includes] SET integrity_signature = :integrity_signature WHERE row_id = :row_id",
+        )?;
+
+        for entity in entities.iter() {
+            statement.execute(named_params! {
+                ":row_id": entity.row_id,
+                ":integrity_signature": entity.integrity_signature
+            })?;
+        }
+
+        Ok(())
+    }
+}
+
 impl Repository<FilterIncludeEntity> for FilterIncludesRepository {
     const TABLE_NAME: &'static str = "filter_includes";
 
@@ -155,7 +198,8 @@ impl Repository<FilterIncludeEntity> for FilterIncludesRepository {
                         absolute_url,
                         body,
                         rules_count,
-                        body_hash
+                        body_hash,
+                        integrity_signature
                     )
                 VALUES
                     (
@@ -164,7 +208,8 @@ impl Repository<FilterIncludeEntity> for FilterIncludesRepository {
                         :absolute_url,
                         :body,
                         :rules_count,
-                        :body_hash
+                        :body_hash,
+                        :integrity_signature
                     )
                 ",
         )?;
@@ -177,6 +222,7 @@ impl Repository<FilterIncludeEntity> for FilterIncludesRepository {
                 ":body": entity.body,
                 ":rules_count": entity.rules_count,
                 ":body_hash": entity.body_hash,
+                ":integrity_signature": entity.integrity_signature,
             })?;
         }
 

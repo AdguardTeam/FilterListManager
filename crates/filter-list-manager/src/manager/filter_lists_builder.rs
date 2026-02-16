@@ -11,6 +11,7 @@ use crate::storage::repositories::localisation::filter_localisations_repository:
 use crate::storage::repositories::rules_list_repository::{
     MapFilterIdOnRulesList, RulesListRepository,
 };
+use crate::utils::integrity;
 use crate::{Configuration, FLMError, FLMResult, Locale, StoredFilterMetadata};
 use rusqlite::Connection;
 use std::mem::take;
@@ -69,8 +70,16 @@ impl<'a> FullFilterListBuilder<'a> {
                 let these_includes = includes_map.get(filter_id);
                 let mut out: Option<FilterListRules> = None;
 
+                if let Some(includes) = these_includes {
+                    for include in includes {
+                        integrity::verify_filter_include_if_needed(conf, include)?;
+                    }
+                }
+
                 // Append rules
                 if let Some(mut rules_entity) = rules_map.remove(filter_id) {
+                    integrity::verify_rules_list_if_needed(conf, &rules_entity)?;
+
                     if rules_entity.has_directives() {
                         let (text, lines_count) = FilterCollector::new(conf)
                             .collect_from_parts(

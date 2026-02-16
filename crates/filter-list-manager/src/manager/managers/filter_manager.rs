@@ -26,6 +26,7 @@ use crate::storage::spawn_transaction;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::with_transaction;
 use crate::storage::DbConnectionManager;
+use crate::utils::integrity;
 use crate::utils::memory::heap;
 use crate::FLMError;
 use crate::FLMResult;
@@ -76,8 +77,14 @@ impl FilterManager {
         entity.last_download_time = last_download_time;
         entity.is_enabled = is_enabled;
 
-        let (inserted_entity, filter_entities): (FilterEntity, CompiledFilterEntities) =
-            self.install_custom_filter_list(connection_manager, diff_path, entity, rule_entity)?;
+        let (inserted_entity, filter_entities): (FilterEntity, CompiledFilterEntities) = self
+            .install_custom_filter_list(
+                connection_manager,
+                configuration,
+                diff_path,
+                entity,
+                rule_entity,
+            )?;
 
         let filter_collector = FilterCollector::new(configuration);
         let full_filter_list: FullFilterList = self.make_full_filter_list(
@@ -120,8 +127,14 @@ impl FilterManager {
                 description,
             )?;
 
-        let (inserted_entity, filter_entities): (FilterEntity, CompiledFilterEntities) =
-            self.install_custom_filter_list(connection_manager, diff_path, entity, rule_entity)?;
+        let (inserted_entity, filter_entities): (FilterEntity, CompiledFilterEntities) = self
+            .install_custom_filter_list(
+                connection_manager,
+                configuration,
+                diff_path,
+                entity,
+                rule_entity,
+            )?;
 
         let filter_collector = FilterCollector::new(configuration);
 
@@ -428,6 +441,7 @@ impl FilterManager {
     fn install_custom_filter_list(
         &self,
         connection_manager: &DbConnectionManager,
+        configuration: &Configuration,
         diff_path: String,
         entity: FilterEntity,
         mut entities: CompiledFilterEntities,
@@ -464,6 +478,12 @@ impl FilterManager {
                 .for_each(|include_entity| {
                     include_entity.filter_id = filter_id;
                 });
+
+            integrity::sign_entities_if_needed(
+                configuration,
+                &mut entities.rules_list_entity,
+                &mut entities.filter_includes_entities,
+            );
 
             RulesListRepository::new()
                 .insert(&tx, slice::from_ref(&entities.rules_list_entity))

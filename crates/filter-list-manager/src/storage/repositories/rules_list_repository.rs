@@ -25,7 +25,8 @@ const BASIC_SELECT_SQL: &str = r"
         disabled_rules_text,
         rules_count,
         has_directives,
-        text_hash
+        text_hash,
+        integrity_signature
     FROM
         [rules_list]
 ";
@@ -141,7 +142,8 @@ impl RulesListRepository {
                 disabled_rules_text,
                 rules_count,
                 has_directives,
-                text_hash
+                text_hash,
+                integrity_signature
             FROM
                 [rules_list]
             WHERE ",
@@ -301,6 +303,28 @@ impl RulesListRepository {
     }
 }
 
+impl RulesListRepository {
+    /// Updates only the integrity_signature column for given entities
+    pub(crate) fn update_integrity_signatures(
+        &self,
+        conn: &Transaction<'_>,
+        entities: &[RulesListEntity],
+    ) -> Result<(), Error> {
+        let mut statement = conn.prepare(
+            r"UPDATE [rules_list] SET integrity_signature = :integrity_signature WHERE filter_id = :filter_id",
+        )?;
+
+        for entity in entities.iter() {
+            statement.execute(named_params! {
+                ":filter_id": entity.filter_id,
+                ":integrity_signature": entity.integrity_signature
+            })?;
+        }
+
+        Ok(())
+    }
+}
+
 impl BulkDeleteRepository<RulesListEntity, FilterId> for RulesListRepository {
     const PK_FIELD: &'static str = "filter_id";
 }
@@ -319,7 +343,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
                         disabled_rules_text,
                         rules_count,
                         text_hash,
-                        has_directives
+                        has_directives,
+                        integrity_signature
                     )
                 VALUES
                     (
@@ -328,7 +353,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
                         :disabled_rules_text,
                         :rules_count,
                         :text_hash,
-                        :has_directives
+                        :has_directives,
+                        :integrity_signature
                     )
             ",
         )?;
@@ -340,7 +366,8 @@ impl Repository<RulesListEntity> for RulesListRepository {
                 ":disabled_rules_text": entity.disabled_text,
                 ":rules_count": entity.rules_count,
                 ":text_hash": entity.text_hash,
-                ":has_directives": entity.has_directives
+                ":has_directives": entity.has_directives,
+                ":integrity_signature": entity.integrity_signature
             })?;
         }
 

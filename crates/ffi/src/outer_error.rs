@@ -69,6 +69,10 @@ pub enum AGOuterError {
     #[error("Invalid configuration: {0}")]
     InvalidConfiguration(&'static str),
 
+    /// Filter integrity check failed — signature is missing or does not match
+    #[error("Filter integrity check failed for filter_id={0}")]
+    FilterIntegrityCheckFailed(i64),
+
     /// Other errors
     #[error("{0}")]
     Other(String),
@@ -96,6 +100,7 @@ impl From<FLMError> for AGOuterError {
             FLMError::FieldIsEmpty(value) => Self::FieldIsEmpty(value),
             FLMError::InvalidConfiguration(value) => Self::InvalidConfiguration(value),
             FLMError::EntityNotFound(id) => Self::EntityNotFound(id),
+            FLMError::FilterIntegrityCheckFailed(id) => Self::FilterIntegrityCheckFailed(id),
             FLMError::Other(msg) => Self::Other(msg),
             FLMError::Network(variant) => match variant {
                 HttpClientError::NetworkError(err) => Self::HttpClientNetworkError(err),
