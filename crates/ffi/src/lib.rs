@@ -232,6 +232,10 @@ impl FilterListManager {
         self.wrap(|flm| flm.sign_all_rules())
     }
 
+    pub fn sign_all_rules_with_new_key(&self, integrity_key: String) -> AGResult<()> {
+        self.wrap_mut(|mut flm| flm.sign_all_rules_with_new_key(integrity_key))
+    }
+
     pub fn verify_integrity(&self) -> AGResult<()> {
         self.wrap(|flm| flm.verify_integrity())
     }

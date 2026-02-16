@@ -330,6 +330,12 @@ impl FilterListManager for FilterListManagerImpl {
             .sign_all_filter_rules(&self.connection_manager, &self.configuration)
     }
 
+    fn sign_all_rules_with_new_key(&mut self, integrity_key: String) -> FLMResult<()> {
+        self.configuration.integrity_key = Some(integrity_key);
+        IntegrityControlManager::new()
+            .sign_all_filter_rules(&self.connection_manager, &self.configuration)
+    }
+
     fn verify_integrity(&self) -> FLMResult<()> {
         IntegrityControlManager::new()
             .verify_integrity(&self.connection_manager, &self.configuration)

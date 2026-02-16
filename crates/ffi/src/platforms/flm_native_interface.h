@@ -43,6 +43,7 @@ typedef enum FFIMethod {
     SetProxyMode,
     GetRulesCount,
     SignAllFilterRules,
+    SignAllRulesWithNewKey,
     VerifyIntegrity,
 } FFIMethod;
 

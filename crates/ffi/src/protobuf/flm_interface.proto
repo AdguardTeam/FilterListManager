@@ -123,6 +123,10 @@ message GetRulesCountRequest {
   repeated int32 ids = 1;
 }
 
+message SignAllRulesWithNewKeyRequest {
+  string integrity_key = 1;
+}
+
 message EmptyRequest {}
 
 // endregion

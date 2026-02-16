@@ -392,6 +392,20 @@ pub trait FilterListManager {
     /// is not set in configuration.
     fn sign_all_rules(&self) -> FLMResult<()>;
 
+    /// Updates the integrity key in configuration and re-signs all filter
+    /// rules and includes entities with the new key.
+    ///
+    /// This method atomically:
+    /// 1. Updates `configuration.integrity_key` with the provided key.
+    /// 2. Re-signs all stored filter rules and includes with the new key.
+    ///
+    /// Use this method when rotating the integrity key.
+    ///
+    /// # Arguments
+    ///
+    /// * `integrity_key` - New integrity key to use for signing.
+    fn sign_all_rules_with_new_key(&mut self, integrity_key: String) -> FLMResult<()>;
+
     /// Verifies integrity signatures of all filter rules and includes
     /// entities in the database.
     ///

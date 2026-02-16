@@ -18,9 +18,10 @@ use crate::protobuf_generated::filter_list_manager::{
     InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
     InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
     PullMetadataResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
-    SaveRulesToFileBlobRequest, SetProxyModeRequest, UpdateCustomFilterMetadataRequest,
-    UpdateCustomFilterMetadataResponse, UpdateFiltersByIdsRequest, UpdateFiltersByIdsResponse,
-    UpdateFiltersRequest, UpdateFiltersResponse,
+    SaveRulesToFileBlobRequest, SetProxyModeRequest, SignAllRulesWithNewKeyRequest,
+    UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse,
+    UpdateFiltersByIdsRequest, UpdateFiltersByIdsResponse, UpdateFiltersRequest,
+    UpdateFiltersResponse,
 };
 use adguard_flm::RequestProxyMode;
 use enum_stringify::EnumStringify;
@@ -62,6 +63,7 @@ pub enum FFIMethod {
     SetProxyMode,
     GetRulesCount,
     SignAllFilterRules,
+    SignAllRulesWithNewKey,
     VerifyIntegrity,
 }
 
@@ -92,11 +94,10 @@ pub unsafe extern "C" fn flm_call_protobuf(
     // Get handle
     let flm_handle = &mut *handle;
 
-    // Get args
-    let input_bytes = std::slice::from_raw_parts(input_buffer, input_buf_len);
-
     macro_rules! decode_input_request {
         ($type:ty) => {{
+            // Get args
+            let input_bytes = std::slice::from_raw_parts(input_buffer, input_buf_len);
             let decode_result = <$type>::decode(input_bytes);
 
             let Ok(request) = decode_result else {
@@ -545,6 +546,18 @@ pub unsafe extern "C" fn flm_call_protobuf(
         .encode(&mut out_bytes_buffer),
         FFIMethod::SignAllFilterRules => EmptyResponse {
             error: flm_handle.flm.sign_all_filter_rules().err().map(Into::into),
+        }
+        .encode(&mut out_bytes_buffer),
+        FFIMethod::SignAllRulesWithNewKey => {
+            let request = decode_input_request!(SignAllRulesWithNewKeyRequest);
+
+            EmptyResponse {
+                error: flm_handle
+                    .flm
+                    .sign_all_rules_with_new_key(request.integrity_key)
+                    .err()
+                    .map(Into::into),
+            }
         }
         .encode(&mut out_bytes_buffer),
         FFIMethod::VerifyIntegrity => EmptyResponse {
