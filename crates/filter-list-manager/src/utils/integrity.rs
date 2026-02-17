@@ -3,11 +3,36 @@ use crate::storage::entities::filter::filter_include_entity::FilterIncludeEntity
 use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 use crate::{FLMError, FLMResult, FilterId};
 use blake3::{derive_key as derive_key_impl, Hash, Hasher};
+use std::fmt::Write;
 
 /// Domain separation context for blake3 key derivation.
 /// Ensures that the same user-provided secret produces different derived keys
 /// when used in different applications or for different purposes.
 const KEY_DERIVATION_CONTEXT: &str = "adguard-flm integrity signature v1";
+
+/// Generates a cryptographically secure random 256-bit key encoded as a 64-character hex string.
+///
+/// This key can be used as `Configuration::integrity_key` to enable integrity protection
+/// for filter rules stored in the database.
+///
+/// # Example
+///
+/// ```rust,ignore
+/// use adguard_flm::generate_random_key;
+///
+/// let key = generate_random_key()?;
+/// config.integrity_key = Some(key);
+/// ```
+pub fn generate_random_key() -> FLMResult<String> {
+    let mut bytes = [0u8; 32];
+    getrandom::fill(&mut bytes)
+        .map_err(|e| FLMError::Other(format!("Couldn't generate random key: {}", e)))?;
+
+    Ok(bytes.iter().fold(String::with_capacity(64), |mut acc, b| {
+        let _ = write!(&mut acc, "{:02x}", b);
+        acc
+    }))
+}
 
 /// Derives a 32-byte key from an arbitrary-length integrity key string
 /// using blake3's key derivation function.
@@ -85,25 +110,17 @@ pub(crate) fn verify_filter_include_entity(
 }
 
 /// Signs rules_list and filter_includes entities if integrity_key is set in configuration.
-/// Clears signatures if integrity_key is not set.
+/// No-op if integrity_key is not set.
 pub(crate) fn sign_entities_if_needed(
     configuration: &Configuration,
     rules_entity: &mut RulesListEntity,
     includes_entities: &mut [FilterIncludeEntity],
 ) {
-    match &configuration.integrity_key {
-        Some(key) => {
-            let derived = derive_key(key);
-            sign_rules_list_entity(&derived, rules_entity);
-            for include in includes_entities.iter_mut() {
-                sign_filter_include_entity(&derived, include);
-            }
-        }
-        None => {
-            rules_entity.integrity_signature = None;
-            for include in includes_entities.iter_mut() {
-                include.integrity_signature = None;
-            }
+    if let Some(key) = &configuration.integrity_key {
+        let derived = derive_key(key);
+        sign_rules_list_entity(&derived, rules_entity);
+        for include in includes_entities.iter_mut() {
+            sign_filter_include_entity(&derived, include);
         }
     }
 }

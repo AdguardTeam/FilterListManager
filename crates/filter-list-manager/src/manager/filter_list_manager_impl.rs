@@ -28,8 +28,6 @@ use crate::{
     manager::FilterListManager, ActiveRulesInfo, ActiveRulesInfoRaw, FLMError, FLMResult,
     StoredFilterMetadata,
 };
-use getrandom;
-use std::fmt::Write;
 use std::path::Path;
 
 /// Default implementation for [`FilterListManager`]
@@ -39,17 +37,6 @@ pub struct FilterListManagerImpl {
 }
 
 impl FilterListManager for FilterListManagerImpl {
-    fn generate_random_key() -> FLMResult<String> {
-        let mut bytes = [0u8; 32];
-        getrandom::fill(&mut bytes)
-            .map_err(|e| FLMError::Other(format!("Couldn't generate random key: {}", e)))?;
-
-        Ok(bytes.iter().fold(String::with_capacity(64), |mut acc, b| {
-            let _ = write!(&mut acc, "{:02x}", b);
-            acc
-        }))
-    }
-
     fn new(mut configuration: Configuration) -> FLMResult<Box<Self>> {
         if configuration.app_name.is_empty() {
             return Err(FLMError::InvalidConfiguration("app_name is empty"));
@@ -1266,13 +1253,13 @@ mod tests {
     #[test]
     fn test_integrity_key_lifecycle() {
         use crate::test_utils::tests_path;
-        use crate::FLMError;
+        use crate::{generate_random_key, FLMError};
 
         let source = DbConnectionManager::factory_test().unwrap();
         spawn_test_db_with_metadata(&source);
 
         // 1. Generate initial integrity key
-        let initial_key = FilterListManagerImpl::generate_random_key().unwrap();
+        let initial_key = generate_random_key().unwrap();
         assert_eq!(initial_key.len(), 64);
 
         // 2. Create FLM with integrity key
@@ -1322,7 +1309,7 @@ mod tests {
         flm.verify_integrity().unwrap();
 
         // 7. Generate new key and re-sign all rules
-        let new_key = FilterListManagerImpl::generate_random_key().unwrap();
+        let new_key = generate_random_key().unwrap();
         assert_eq!(new_key.len(), 64);
         assert_ne!(initial_key, new_key);
 

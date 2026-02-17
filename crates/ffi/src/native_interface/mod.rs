@@ -7,7 +7,7 @@ use crate::protobuf_generated::filter_list_manager;
 use crate::protobuf_generated::filter_list_manager::ag_outer_error::Error as ProtobufErrorEnum;
 use crate::result::AGResult;
 use crate::{FilterListManager, FilterListManagerConstants};
-use adguard_flm::Configuration;
+use adguard_flm::{generate_random_key, Configuration};
 use prost::Message;
 use std::ffi::c_void;
 use std::mem::size_of;
@@ -190,11 +190,11 @@ pub unsafe extern "C" fn flm_free_response(handle: *mut RustResponse) {
 /// as a protobuf-encoded [`GenerateRandomKeyResponse`] in [`RustResponse`].
 #[no_mangle]
 pub extern "C" fn flm_generate_random_key_protobuf() -> *mut RustResponse {
-    let response = match FilterListManager::generate_random_key() {
+    let response = match generate_random_key() {
         Ok(key) => filter_list_manager::GenerateRandomKeyResponse { key, error: None },
         Err(e) => filter_list_manager::GenerateRandomKeyResponse {
             key: String::new(),
-            error: Some(e.into()),
+            error: Some(AGOuterError::from(e).into()),
         },
     };
 

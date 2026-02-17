@@ -94,10 +94,10 @@ The typical workflow is to sign the database once during initial setup or when e
 To enable integrity protection:
 
 ```rust
-use adguard_flm::{Configuration, FilterListManager, FilterListManagerImpl};
+use adguard_flm::{Configuration, FilterListManagerImpl, generate_random_key};
 
 // 1. Generate a cryptographically secure random key
-let integrity_key = FilterListManagerImpl::generate_random_key()?;
+let integrity_key = generate_random_key()?;
 
 // 2. Create configuration with the integrity key
 let mut config = Configuration::default();
@@ -128,7 +128,7 @@ To rotate the integrity key:
 
 ```rust
 // Generate a new key and re-sign all rules atomically
-let new_key = FilterListManagerImpl::generate_random_key()?;
+let new_key = generate_random_key()?;
 flm.sign_all_rules_with_new_key(new_key)?;
 ```
 

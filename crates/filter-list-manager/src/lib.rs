@@ -273,6 +273,7 @@ pub use crate::manager::models::UpdateResult;
 pub use crate::manager::models::{MovedFilterInfo, PullMetadataResult};
 pub use crate::manager::FilterListManager;
 pub use crate::storage::constants::*;
+pub use crate::utils::integrity::generate_random_key;
 
 #[doc(hidden)]
 pub mod filters;

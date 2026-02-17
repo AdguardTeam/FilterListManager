@@ -25,12 +25,6 @@ use std::path::Path;
 
 /// FilterListManager is the interface of a filter list manager.
 pub trait FilterListManager {
-    /// Generates a cryptographically secure random key suitable for use as
-    /// `Configuration.integrity_key`.
-    ///
-    /// Returns a 64-character hex-encoded string (32 random bytes).
-    fn generate_random_key() -> FLMResult<String>;
-
     /// In the constructor, the object is configured and initialized depending on the passed configuration.
     /// *NOTE:* You must create its own manager for different filter lists types.
     ///

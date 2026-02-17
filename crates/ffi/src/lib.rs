@@ -242,12 +242,6 @@ impl FilterListManager {
 }
 
 impl FilterListManager {
-    pub fn generate_random_key() -> AGResult<String> {
-        FilterListManagerImpl::generate_random_key().map_err(AGOuterError::from)
-    }
-}
-
-impl FilterListManager {
     fn wrap<B, U>(&self, block: B) -> AGResult<U>
     where
         B: FnOnce(RwLockReadGuard<FilterListManagerImpl>) -> FLMResult<U>,
