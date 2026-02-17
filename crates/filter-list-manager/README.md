@@ -85,6 +85,57 @@ let flm = FilterListManagerImpl::new(configuration);
 
 ---
 
+### Data integrity protection
+
+The library supports cryptographic integrity protection for filter rules using BLAKE3 keyed hashing. When enabled, all filter rules are signed with a derived key, and their signatures are verified on read operations. This ensures that filter data has not been tampered with or corrupted.
+
+The typical workflow is to sign the database once during initial setup or when enabling integrity protection for existing data. After that, the library automatically signs all newly installed or updated filters, maintaining integrity protection transparently without requiring manual intervention.
+
+To enable integrity protection:
+
+```rust
+use adguard_flm::{Configuration, FilterListManager, FilterListManagerImpl};
+
+// 1. Generate a cryptographically secure random key
+let integrity_key = FilterListManagerImpl::generate_random_key()?;
+
+// 2. Create configuration with the integrity key
+let mut config = Configuration::default();
+config.app_name = "MyApp".to_string();
+config.version = "1.0.0".to_string();
+// This enables integrity protection
+config.integrity_key = Some(integrity_key);
+```
+
+To sign storage first time:
+
+```rust
+// This call has rules:
+// - Call this only if your data is not signed yet, or you instantiated the FLM with new integrity key
+// - If integrity protection is disabled, this call will return an error
+// - If integrity protection is enabled, you should call this method immediately after creating the FLM instance and before any read operations
+flm.sign_all_rules()?;
+```
+
+To verify integrity:
+
+```rust
+// returns FilterIntegrityCheckFailed(filter_id) if any signature is invalid
+flm.verify_integrity()?;
+```
+
+To rotate the integrity key:
+
+```rust
+// Generate a new key and re-sign all rules atomically
+let new_key = FilterListManagerImpl::generate_random_key()?;
+flm.sign_all_rules_with_new_key(new_key)?;
+```
+
+**Note:** Once integrity protection is enabled, you must sign all existing filter rules immediately after creating the FLM instance and before any read operations, or you will get an integrity check failed error. All subsequent filter installations and updates will be automatically signed.
+
+---
+
 ### How to create and fill up standard filters database
 
 ```rust
