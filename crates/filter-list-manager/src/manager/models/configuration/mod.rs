@@ -80,7 +80,6 @@ pub struct Configuration {
     pub version: String,
     /// Integrity key for hashing sensitive data
     /// Every read/write operation will be hashed using this key
-    /// If not set, hashing will be disabled and updates will clear existing hashes from storage
     pub integrity_key: Option<String>,
 }
 

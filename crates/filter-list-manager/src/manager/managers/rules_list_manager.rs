@@ -144,13 +144,10 @@ impl RulesListManager {
             })?;
 
         if let Some(ref mut rules) = result {
-            for rule in rules.iter() {
-                integrity::verify_rules_list_if_needed(configuration, rule)?;
-            }
-
-            for (_, includes) in these_includes.iter() {
-                for include in includes {
-                    integrity::verify_filter_include_if_needed(configuration, include)?;
+            if let Some(ref dk) = integrity::derive_key_if_needed(configuration) {
+                integrity::verify_rules_list_entities(dk, rules)?;
+                for (_, includes) in these_includes.iter() {
+                    integrity::verify_filter_include_entities(dk, includes)?;
                 }
             }
 
@@ -369,15 +366,15 @@ impl RulesListManager {
             })?;
 
         // Collect new active rules from filters, rules, includes and stuff
+        let derived_key = integrity::derive_key_if_needed(configuration);
         let mut active_rules: Vec<ActiveRules> = Vec::with_capacity(list.len());
         for filter_entity in list {
             if let Some(filter_id) = filter_entity.filter_id {
                 if let Some(mut rule_entity) = rules.remove(&filter_id) {
-                    integrity::verify_rules_list_if_needed(configuration, &rule_entity)?;
-
-                    if let Some(includes) = includes_list.get(&filter_id) {
-                        for include in includes {
-                            integrity::verify_filter_include_if_needed(configuration, include)?;
+                    if let Some(ref dk) = derived_key {
+                        integrity::verify_rules_list_entity(dk, &rule_entity)?;
+                        if let Some(includes) = includes_list.get(&filter_id) {
+                            integrity::verify_filter_include_entities(dk, includes)?;
                         }
                     }
 

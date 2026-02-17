@@ -40,25 +40,10 @@ pub(crate) fn derive_key(integrity_key: &str) -> [u8; 32] {
     derive_key_impl(KEY_DERIVATION_CONTEXT, integrity_key.as_bytes())
 }
 
-/// Computes an integrity signature for given filter content.
-/// Signs `filter_id` concatenated with `content` using blake3 keyed hash.
-pub(crate) fn sign(derived_key: &[u8; 32], filter_id: FilterId, content: &str) -> Hash {
-    let mut hasher = Hasher::new_keyed(derived_key);
-    hasher.update(&filter_id.to_le_bytes());
-    hasher.update(content.as_bytes());
-    hasher.finalize()
-}
-
-/// Verifies an integrity signature against the expected value.
-/// Returns `true` if the signature matches.
-pub(crate) fn verify(
-    derived_key: &[u8; 32],
-    filter_id: FilterId,
-    content: &str,
-    signature: &str,
-) -> bool {
-    let computed = sign(derived_key, filter_id, content);
-    Hash::from_hex(signature).ok() == Some(computed)
+/// Derives a key from configuration if integrity_key is set.
+/// Returns `None` if integrity protection is disabled.
+pub(crate) fn derive_key_if_needed(configuration: &Configuration) -> Option<[u8; 32]> {
+    configuration.integrity_key.as_deref().map(derive_key)
 }
 
 /// Signs a [`RulesListEntity`] in-place using the derived key.
@@ -116,8 +101,7 @@ pub(crate) fn sign_entities_if_needed(
     rules_entity: &mut RulesListEntity,
     includes_entities: &mut [FilterIncludeEntity],
 ) {
-    if let Some(key) = &configuration.integrity_key {
-        let derived = derive_key(key);
+    if let Some(derived) = derive_key_if_needed(configuration) {
         sign_rules_list_entity(&derived, rules_entity);
         for include in includes_entities.iter_mut() {
             sign_filter_include_entity(&derived, include);
@@ -125,30 +109,43 @@ pub(crate) fn sign_entities_if_needed(
     }
 }
 
-/// Verifies integrity of a [`RulesListEntity`] if integrity_key is set in configuration.
-/// No-op if integrity_key is None.
-pub(crate) fn verify_rules_list_if_needed(
-    configuration: &Configuration,
-    entity: &RulesListEntity,
+/// Verifies a batch of [`RulesListEntity`] items with a pre-derived key.
+pub(crate) fn verify_rules_list_entities(
+    derived_key: &[u8; 32],
+    entities: &[RulesListEntity],
 ) -> FLMResult<()> {
-    if let Some(key) = &configuration.integrity_key {
-        let derived = derive_key(key);
-        verify_rules_list_entity(&derived, entity)?;
+    for entity in entities {
+        verify_rules_list_entity(derived_key, entity)?;
     }
     Ok(())
 }
 
-/// Verifies integrity of a [`FilterIncludeEntity`] if integrity_key is set in configuration.
-/// No-op if integrity_key is None.
-pub(crate) fn verify_filter_include_if_needed(
-    configuration: &Configuration,
-    entity: &FilterIncludeEntity,
+/// Verifies a batch of [`FilterIncludeEntity`] items with a pre-derived key.
+pub(crate) fn verify_filter_include_entities(
+    derived_key: &[u8; 32],
+    entities: &[FilterIncludeEntity],
 ) -> FLMResult<()> {
-    if let Some(key) = &configuration.integrity_key {
-        let derived = derive_key(key);
-        verify_filter_include_entity(&derived, entity)?;
+    for entity in entities {
+        verify_filter_include_entity(derived_key, entity)?;
     }
     Ok(())
+}
+
+/// Computes an integrity signature for given filter content.
+/// Signs `filter_id` concatenated with `content` using blake3 keyed hash.
+fn sign(derived_key: &[u8; 32], filter_id: FilterId, content: &str) -> Hash {
+    let mut hasher = Hasher::new_keyed(derived_key);
+    hasher.update(&filter_id.to_le_bytes());
+    hasher.update(content.as_bytes());
+    hasher.finalize()
+}
+
+/// Verifies an integrity signature against the expected value.
+/// Returns `true` if the signature matches.
+fn verify(derived_key: &[u8; 32], filter_id: FilterId, content: &str, signature: &str) -> bool {
+    let computed = sign(derived_key, filter_id, content);
+    // This does not allocate on heap
+    computed.to_hex().as_str() == signature
 }
 
 #[cfg(test)]

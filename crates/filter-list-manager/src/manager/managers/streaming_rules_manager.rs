@@ -46,7 +46,7 @@ impl StreamingRulesManager {
             .execute_db(|conn: Connection| {
                 let rules_repository = RulesListRepository::new();
 
-                if configuration.integrity_key.is_some() {
+                if let Some(ref dk) = integrity::derive_key_if_needed(configuration) {
                     let entity = rules_repository
                         .select(
                             &conn,
@@ -62,7 +62,7 @@ impl StreamingRulesManager {
                         })
                         .ok_or(FLMError::EntityNotFound(filter_id as i64))?;
 
-                    integrity::verify_rules_list_if_needed(configuration, &entity)?;
+                    integrity::verify_rules_list_entity(dk, &entity)?;
                 }
 
                 let (disabled_rules, blob) = rules_repository

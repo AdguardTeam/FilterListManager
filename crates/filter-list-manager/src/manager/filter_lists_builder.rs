@@ -60,6 +60,7 @@ impl<'a> FullFilterListBuilder<'a> {
     ) -> FLMResult<Vec<FullFilterList>> {
         let mut rules_map = self.take_rules_map(&conn)?;
         let includes_map = self.take_includes_map(&conn)?;
+        let derived_key = integrity::derive_key_if_needed(conf);
 
         self.build_filter_lists_with_block(
             &conn,
@@ -70,15 +71,17 @@ impl<'a> FullFilterListBuilder<'a> {
                 let these_includes = includes_map.get(filter_id);
                 let mut out: Option<FilterListRules> = None;
 
-                if let Some(includes) = these_includes {
-                    for include in includes {
-                        integrity::verify_filter_include_if_needed(conf, include)?;
+                if let Some(ref dk) = derived_key {
+                    if let Some(includes) = these_includes {
+                        integrity::verify_filter_include_entities(dk, includes)?;
                     }
                 }
 
                 // Append rules
                 if let Some(mut rules_entity) = rules_map.remove(filter_id) {
-                    integrity::verify_rules_list_if_needed(conf, &rules_entity)?;
+                    if let Some(ref dk) = derived_key {
+                        integrity::verify_rules_list_entity(dk, &rules_entity)?;
+                    }
 
                     if rules_entity.has_directives() {
                         let (text, lines_count) = FilterCollector::new(conf)
