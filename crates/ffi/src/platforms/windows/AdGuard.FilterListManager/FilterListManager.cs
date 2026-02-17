@@ -46,7 +46,7 @@ namespace AdGuard.FilterListManager
             RustResponse result = null;
             try
             {
-                result = RustInterop.Call(IntPtr.Zero, FfiMethod.GetRulesCount, IntPtr.Zero, 0, FlmInteropFunc);
+                result = RustInterop.Call(IntPtr.Zero, FfiMethod.GenerateRandomKey, IntPtr.Zero, 0, FlmInteropFunc);
                 
                 if (result.FfiError)
                 {
