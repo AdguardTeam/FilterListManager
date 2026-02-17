@@ -29,6 +29,7 @@ use crate::{
     StoredFilterMetadata,
 };
 use getrandom;
+use std::fmt::Write;
 use std::path::Path;
 
 /// Default implementation for [`FilterListManager`]
@@ -43,7 +44,10 @@ impl FilterListManager for FilterListManagerImpl {
         getrandom::fill(&mut bytes)
             .map_err(|e| FLMError::Other(format!("Couldn't generate random key: {}", e)))?;
 
-        Ok(bytes.iter().map(|b| format!("{:02x}", b)).collect())
+        Ok(bytes.iter().fold(String::with_capacity(64), |mut acc, b| {
+            let _ = write!(&mut acc, "{:02x}", b);
+            acc
+        }))
     }
 
     fn new(mut configuration: Configuration) -> FLMResult<Box<Self>> {
@@ -1257,5 +1261,107 @@ mod tests {
                 Ok(filters)
             })
             .unwrap();
+    }
+
+    #[test]
+    fn test_integrity_key_lifecycle() {
+        use crate::test_utils::tests_path;
+        use crate::FLMError;
+
+        let source = DbConnectionManager::factory_test().unwrap();
+        spawn_test_db_with_metadata(&source);
+
+        // 1. Generate initial integrity key
+        let initial_key = FilterListManagerImpl::generate_random_key().unwrap();
+        assert_eq!(initial_key.len(), 64);
+
+        // 2. Create FLM with integrity key
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        conf.integrity_key = Some(initial_key.clone());
+
+        let mut flm = FilterListManagerImpl::new(conf).unwrap();
+
+        // 3. Install custom filter with includes (main.txt references included_part*.txt)
+        let includes_filter_path = tests_path("fixtures/includes/main.txt");
+        let includes_filter_body = std::fs::read_to_string(&includes_filter_path).unwrap();
+
+        let filter_with_includes = flm
+            .install_custom_filter_from_string(
+                "file://".to_string() + includes_filter_path.to_str().unwrap(),
+                1234567890,
+                true,
+                true,
+                includes_filter_body,
+                Some("Filter with includes".to_string()),
+                None,
+            )
+            .unwrap();
+
+        // 4. Install another custom filter (1.txt)
+        let simple_filter_path = tests_path("fixtures/1.txt");
+        let simple_filter_body = fs::read_to_string(&simple_filter_path).unwrap();
+
+        let _simple_filter = flm
+            .install_custom_filter_from_string(
+                Url::from_file_path(simple_filter_path).unwrap().to_string(),
+                1234567890,
+                true,
+                true,
+                simple_filter_body,
+                Some("Simple filter".to_string()),
+                None,
+            )
+            .unwrap();
+
+        // 5. Sign all rules with initial key
+        flm.sign_all_rules().unwrap();
+
+        // 6. Verify integrity - should pass
+        flm.verify_integrity().unwrap();
+
+        // 7. Generate new key and re-sign all rules
+        let new_key = FilterListManagerImpl::generate_random_key().unwrap();
+        assert_eq!(new_key.len(), 64);
+        assert_ne!(initial_key, new_key);
+
+        flm.sign_all_rules_with_new_key(new_key.clone()).unwrap();
+
+        // 8. Verify integrity again - should still pass with new key
+        flm.verify_integrity().unwrap();
+
+        let corrupted_id = filter_with_includes.id;
+        // 9. Manually corrupt signature in database for one filter
+        flm.connection_manager
+            .execute_db(|connection: Connection| {
+                RulesListRepository::new()
+                    .force_set_integrity_signature(&connection, corrupted_id, None)
+                    .map_err(FLMError::from_database)?;
+                Ok(())
+            })
+            .unwrap();
+
+        // 10. Verify integrity - should fail now
+        let verify_result = flm.verify_integrity();
+        assert!(verify_result.is_err());
+
+        // Verify that the error is FilterIntegrityCheckFailed
+        match verify_result {
+            Err(FLMError::FilterIntegrityCheckFailed(filter_id)) => {
+                assert_eq!(corrupted_id, filter_id)
+            }
+            _ => panic!("Expected FilterIntegrityCheckFailed error"),
+        }
+
+        // 11. Test that empty key is rejected
+        let empty_key_result = flm.sign_all_rules_with_new_key("   ".to_string());
+        assert!(empty_key_result.is_err());
+        match empty_key_result {
+            Err(FLMError::InvalidConfiguration(_)) => {
+                // Expected error
+            }
+            _ => panic!("Expected InvalidConfiguration error for empty key"),
+        }
     }
 }

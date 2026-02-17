@@ -33,9 +33,7 @@ pub(crate) fn verify(
     signature: &str,
 ) -> bool {
     let computed = sign(derived_key, filter_id, content);
-    Hash::from_hex(signature)
-        .ok()
-        .map_or(false, |expected| computed == expected)
+    Hash::from_hex(signature).ok() == Some(computed)
 }
 
 /// Signs a [`RulesListEntity`] in-place using the derived key.
@@ -68,9 +66,7 @@ pub(crate) fn verify_rules_list_entity(
         }
     }
 
-    Err(FLMError::FilterIntegrityCheckFailed(
-        entity.filter_id as i64,
-    ))
+    Err(FLMError::FilterIntegrityCheckFailed(entity.filter_id))
 }
 
 /// Verifies a [`FilterIncludeEntity`] integrity signature.
@@ -85,9 +81,7 @@ pub(crate) fn verify_filter_include_entity(
         }
     }
 
-    Err(FLMError::FilterIntegrityCheckFailed(
-        entity.filter_id as i64,
-    ))
+    Err(FLMError::FilterIntegrityCheckFailed(entity.filter_id))
 }
 
 /// Signs rules_list and filter_includes entities if integrity_key is set in configuration.

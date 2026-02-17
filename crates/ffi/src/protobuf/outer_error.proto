@@ -91,5 +91,5 @@ message InvalidConfiguration {
 message Other {}
 
 message FilterIntegrityCheckFailed {
-  int64 filter_id = 1;
+  int32 filter_id = 1;
 }

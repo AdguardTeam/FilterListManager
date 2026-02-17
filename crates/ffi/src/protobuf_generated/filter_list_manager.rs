@@ -250,8 +250,8 @@ pub struct InvalidConfiguration {
 pub struct Other {}
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct FilterIntegrityCheckFailed {
-    #[prost(int64, tag = "1")]
-    pub filter_id: i64,
+    #[prost(int32, tag = "1")]
+    pub filter_id: i32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct FilterTag {

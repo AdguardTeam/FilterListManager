@@ -418,7 +418,7 @@ public struct FilterListManager_FilterIntegrityCheckFailed: Sendable {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var filterID: Int64 = 0
+  public var filterID: Int32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1262,7 +1262,7 @@ extension FilterListManager_FilterIntegrityCheckFailed: SwiftProtobuf.Message, S
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.filterID) }()
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.filterID) }()
       default: break
       }
     }
@@ -1270,7 +1270,7 @@ extension FilterListManager_FilterIntegrityCheckFailed: SwiftProtobuf.Message, S
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.filterID != 0 {
-      try visitor.visitSingularInt64Field(value: self.filterID, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.filterID, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }

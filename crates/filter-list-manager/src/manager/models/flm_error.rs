@@ -2,6 +2,7 @@
 use crate::filters::parser::parser_error::FilterParserErrorContext;
 use crate::io::error::IOError;
 use crate::io::http::error::HttpClientError;
+use crate::manager::models::FilterId;
 use crate::storage::error::DatabaseError;
 use std::fmt::Display;
 
@@ -40,7 +41,7 @@ pub enum FLMError {
 
     /// Filter integrity check failed — signature is missing or does not match
     #[error("Filter integrity check failed for filter_id={0}")]
-    FilterIntegrityCheckFailed(i64),
+    FilterIntegrityCheckFailed(FilterId),
 
     /// Other errors
     #[error("{0}")]

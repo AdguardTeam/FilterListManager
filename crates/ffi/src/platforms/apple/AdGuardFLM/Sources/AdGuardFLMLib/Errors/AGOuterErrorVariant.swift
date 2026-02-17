@@ -22,7 +22,7 @@ public enum AGOuterErrorVariant: Error {
     case Mutex
     case InvalidConfiguration(String)
     case Other
-    case FilterIntegrityCheckFailed(Int64)
+    case FilterIntegrityCheckFailed(Int32)
 }
 
 extension AGOuterErrorVariant {

@@ -58,6 +58,31 @@ impl RulesListRepository {
         )
     }
 
+    #[cfg(test)]
+    /// Forces setting integrity_signature for a filter (for testing purposes)
+    pub(crate) fn force_set_integrity_signature(
+        &self,
+        connection: &Connection,
+        filter_id: FilterId,
+        integrity_signature: Option<String>,
+    ) -> Result<usize> {
+        let sql = r"
+            UPDATE
+                [rules_list]
+            SET
+                integrity_signature = :integrity_signature
+            WHERE
+                filter_id = :filter_id
+        ";
+
+        let mut statement = connection.prepare(sql)?;
+
+        statement.execute(named_params! {
+            ":integrity_signature": integrity_signature,
+            ":filter_id": filter_id
+        })
+    }
+
     /// Updates just `disabled_rules_text` column
     pub(crate) fn set_disabled_rules(
         &self,
