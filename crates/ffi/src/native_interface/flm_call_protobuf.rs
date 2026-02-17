@@ -62,7 +62,7 @@ pub enum FFIMethod {
     GetDisabledRules,
     SetProxyMode,
     GetRulesCount,
-    SignAllFilterRules,
+    SignAllRules,
     SignAllRulesWithNewKey,
     VerifyIntegrity,
 }
@@ -544,7 +544,7 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethod::SignAllFilterRules => EmptyResponse {
+        FFIMethod::SignAllRules => EmptyResponse {
             error: flm_handle.flm.sign_all_filter_rules().err().map(Into::into),
         }
         .encode(&mut out_bytes_buffer),

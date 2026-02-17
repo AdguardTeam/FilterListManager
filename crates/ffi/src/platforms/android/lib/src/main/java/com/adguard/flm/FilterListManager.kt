@@ -964,10 +964,10 @@ constructor(configuration: Configuration)
      * @throws FilterListManagerException if integrity_key is not set in configuration.
      */
     @Throws(FilterListManagerException::class)
-    fun signAllFilterRules() {
+    fun signAllRules() {
         val request = emptyRequest { }
 
-        call(FFIMethod.SignAllFilterRules, request).use { result ->
+        call(FFIMethod.SignAllRules, request).use { result ->
             EmptyResponse.parseFrom(result.resultData).let { response ->
                 if (response.hasError()) {
                     throw FilterListManagerException(response.error)

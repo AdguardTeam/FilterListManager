@@ -380,7 +380,7 @@ namespace AdGuard.FilterListManager
         /// Signs all filter rules and includes entities with the integrity key from configuration.
         /// Throws exception if integrity_key is not set in configuration.
         /// </summary>
-        void SignAllFilterRules();
+        void SignAllRules();
 
         /// <summary>
         /// Updates the integrity key in configuration and re-signs all filter rules and includes

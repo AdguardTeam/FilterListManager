@@ -34,7 +34,7 @@ internal enum class FFIMethod {
     GetDisabledRules,
     SetProxyMode,
     GetRulesCount,
-    SignAllFilterRules,
+    SignAllRules,
     SignAllRulesWithNewKey,
     VerifyIntegrity
 }

@@ -131,7 +131,7 @@ public protocol FLMFacadeProtocol {
 
     func getRulesCount(ids: [Int32]) throws -> [FilterListManager_RulesCountByFilter]
 
-    func signAllFilterRules() throws
+    func signAllRules() throws
 
     func signAllRulesWithNewKey(integrityKey: String) throws
 
@@ -621,10 +621,10 @@ public class FLMFacade: FLMFacadeProtocol {
         return response.rulesCountByFilter
     }
 
-    public func signAllFilterRules() throws {
+    public func signAllRules() throws {
         let message = FilterListManager_EmptyRequest()
 
-        let response: FilterListManager_EmptyResponse = try callRust(method: SignAllFilterRules, message: message)
+        let response: FilterListManager_EmptyResponse = try callRust(method: SignAllRules, message: message)
 
         guard response.hasError == false else {
             throw AGOuterError(from: response.error)

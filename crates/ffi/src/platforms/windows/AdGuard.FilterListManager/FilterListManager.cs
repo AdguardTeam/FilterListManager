@@ -531,7 +531,7 @@ namespace AdGuard.FilterListManager
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void SignAllFilterRules()
+        public void SignAllRules()
         {
             EmptyRequest request = new EmptyRequest();
             CallRustMessage<EmptyResponse>(request);
