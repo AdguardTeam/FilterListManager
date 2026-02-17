@@ -317,8 +317,7 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn sign_all_rules(&self) -> FLMResult<()> {
-        IntegrityControlManager::new()
-            .sign_all_filter_rules(&self.connection_manager, &self.configuration)
+        IntegrityControlManager::new().sign_all_rules(&self.connection_manager, &self.configuration)
     }
 
     fn sign_all_rules_with_new_key(&mut self, integrity_key: String) -> FLMResult<()> {
@@ -329,8 +328,7 @@ impl FilterListManager for FilterListManagerImpl {
         }
 
         self.configuration.integrity_key = Some(integrity_key);
-        IntegrityControlManager::new()
-            .sign_all_filter_rules(&self.connection_manager, &self.configuration)
+        IntegrityControlManager::new().sign_all_rules(&self.connection_manager, &self.configuration)
     }
 
     fn verify_integrity(&self) -> FLMResult<()> {

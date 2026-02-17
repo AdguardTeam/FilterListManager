@@ -24,7 +24,7 @@ impl IntegrityControlManager {
     ///
     /// Returns [`FLMError::InvalidConfiguration`] if `integrity_key` is not
     /// set in configuration.
-    pub(crate) fn sign_all_filter_rules(
+    pub(crate) fn sign_all_rules(
         &self,
         connection_manager: &DbConnectionManager,
         configuration: &Configuration,
