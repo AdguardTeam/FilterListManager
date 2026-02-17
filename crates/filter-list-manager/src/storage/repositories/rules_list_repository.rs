@@ -7,6 +7,7 @@ use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
 use crate::storage::repositories::{BulkDeleteRepository, Repository};
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::utils::{build_in_clause, process_where_clause};
+use crate::utils::integrity::{sign_content, verify_content};
 use rusqlite::{
     named_params, params_from_iter, Connection, Error, OptionalExtension, Row, Transaction,
 };
@@ -329,20 +330,92 @@ impl RulesListRepository {
 }
 
 impl RulesListRepository {
-    /// Updates only the integrity_signature column for given entities
-    pub(crate) fn update_integrity_signatures(
+    /// Iterates over all rules_list rows, computes integrity signature for each
+    /// using the derived key, and collects `(filter_id, signature)` pairs
+    /// without loading all rule bodies into memory at once.
+    pub(crate) fn sign_and_collect_signatures_streaming(
         &self,
-        conn: &Transaction<'_>,
-        entities: &[RulesListEntity],
-    ) -> Result<(), Error> {
+        conn: &Connection,
+        derived_key: &[u8; 32],
+    ) -> Result<Vec<(FilterId, String)>> {
         let mut statement = conn.prepare(
-            r"UPDATE [rules_list] SET integrity_signature = :integrity_signature WHERE filter_id = :filter_id",
+            r"
+            SELECT
+                filter_id,
+                rules_text
+            FROM
+                [rules_list]",
         )?;
 
-        for entity in entities.iter() {
+        let mut signatures = Vec::new();
+        let mut rows = statement.query([])?;
+        while let Some(row) = rows.next()? {
+            let filter_id: FilterId = row.get(0)?;
+            let text: String = row.get(1)?;
+
+            let sig = sign_content(derived_key, filter_id, &text);
+            signatures.push((filter_id, sig));
+        }
+
+        Ok(signatures)
+    }
+
+    /// Iterates over all rules_list rows and verifies integrity signatures
+    /// without loading all rule bodies into memory at once.
+    /// Returns the `filter_id` of the first entity that fails verification.
+    pub(crate) fn verify_all_streaming(
+        &self,
+        conn: &Connection,
+        derived_key: &[u8; 32],
+    ) -> Result<Option<FilterId>> {
+        let mut statement = conn.prepare(
+            r"
+                SELECT
+                    filter_id,
+                    rules_text,
+                    integrity_signature
+                FROM
+                    [rules_list]",
+        )?;
+
+        let mut rows = statement.query([])?;
+        while let Some(row) = rows.next()? {
+            let filter_id: FilterId = row.get(0)?;
+            let text: String = row.get(1)?;
+            let signature: Option<String> = row.get(2)?;
+
+            if let Some(ref sig) = signature {
+                if !verify_content(derived_key, filter_id, &text, sig) {
+                    return Ok(Some(filter_id));
+                }
+            } else {
+                return Ok(Some(filter_id));
+            }
+        }
+
+        Ok(None)
+    }
+
+    /// Batch updates integrity_signature by filter_id from `(filter_id, signature)` pairs.
+    pub(crate) fn batch_update_signatures(
+        &self,
+        tx: &Transaction<'_>,
+        signatures: &[(FilterId, String)],
+    ) -> Result<()> {
+        let mut statement = tx.prepare(
+            r"
+            UPDATE
+                [rules_list]
+            SET
+                integrity_signature = :sig
+            WHERE
+                filter_id = :filter_id",
+        )?;
+
+        for (filter_id, sig) in signatures {
             statement.execute(named_params! {
-                ":filter_id": entity.filter_id,
-                ":integrity_signature": entity.integrity_signature
+                ":filter_id": filter_id,
+                ":sig": sig,
             })?;
         }
 

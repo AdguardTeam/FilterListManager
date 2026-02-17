@@ -131,6 +131,23 @@ pub(crate) fn verify_filter_include_entities(
     Ok(())
 }
 
+/// Computes an integrity signature and returns it as a hex string.
+/// Used by streaming repository methods that don't work with full entities.
+pub(crate) fn sign_content(derived_key: &[u8; 32], filter_id: FilterId, content: &str) -> String {
+    sign(derived_key, filter_id, content).to_hex().to_string()
+}
+
+/// Verifies an integrity signature for given content.
+/// Used by streaming repository methods that don't work with full entities.
+pub(crate) fn verify_content(
+    derived_key: &[u8; 32],
+    filter_id: FilterId,
+    content: &str,
+    signature: &str,
+) -> bool {
+    verify(derived_key, filter_id, content, signature)
+}
+
 /// Computes an integrity signature for given filter content.
 /// Signs `filter_id` concatenated with `content` using blake3 keyed hash.
 fn sign(derived_key: &[u8; 32], filter_id: FilterId, content: &str) -> Hash {

@@ -3,6 +3,7 @@ use crate::storage::repositories::Repository;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::utils::{build_in_clause, process_where_clause};
 use crate::storage::Hydrate;
+use crate::utils::integrity::{sign_content, verify_content};
 use crate::FilterId;
 use rusqlite::{named_params, params_from_iter, Connection, Error, Transaction};
 use std::collections::HashMap;
@@ -112,26 +113,6 @@ impl FilterIncludesRepository {
         statement.execute(params_from_iter(ids)).map(|_| ())
     }
 
-    /// Gets entities as a flat list
-    pub(crate) fn select(
-        &self,
-        conn: &Connection,
-        where_clause: Option<SQLOperator>,
-    ) -> rusqlite::Result<Vec<FilterIncludeEntity>> {
-        let mut sql = String::from(BASIC_SELECT_SQL);
-        let params = process_where_clause(&mut sql, where_clause)?;
-        let mut statement = conn.prepare(sql.as_str())?;
-
-        let rows = statement.query_map(params, FilterIncludeEntity::hydrate)?;
-
-        let mut results = Vec::new();
-        for row in rows {
-            results.push(row?);
-        }
-
-        Ok(results)
-    }
-
     /// Gets entities mapped by [`FilterId`]
     pub(crate) fn select_mapped(
         &self,
@@ -159,20 +140,95 @@ impl FilterIncludesRepository {
 }
 
 impl FilterIncludesRepository {
-    /// Updates only the integrity_signature column for given entities
-    pub(crate) fn update_integrity_signatures(
+    /// Iterates over all filter_includes rows, computes integrity signature for each
+    /// using the derived key, and collects `(row_id, signature)` pairs
+    /// without loading all include bodies into memory at once.
+    pub(crate) fn sign_and_collect_signatures_streaming(
         &self,
-        conn: &Transaction<'_>,
-        entities: &[FilterIncludeEntity],
-    ) -> rusqlite::Result<(), Error> {
+        conn: &Connection,
+        derived_key: &[u8; 32],
+    ) -> rusqlite::Result<Vec<(i64, String)>> {
         let mut statement = conn.prepare(
-            r"UPDATE [filter_includes] SET integrity_signature = :integrity_signature WHERE row_id = :row_id",
+            r"
+            SELECT
+                row_id,
+                filter_id,
+                body
+            FROM
+                [filter_includes]",
         )?;
 
-        for entity in entities.iter() {
+        let mut signatures = Vec::new();
+        let mut rows = statement.query([])?;
+
+        while let Some(row) = rows.next()? {
+            let row_id: i64 = row.get(0)?;
+            let filter_id: FilterId = row.get(1)?;
+            let body: String = row.get(2)?;
+
+            let sig = sign_content(derived_key, filter_id, &body);
+            signatures.push((row_id, sig));
+        }
+
+        Ok(signatures)
+    }
+
+    /// Iterates over all filter_includes rows and verifies integrity signatures
+    /// without loading all include bodies into memory at once.
+    /// Returns the `filter_id` of the first entity that fails verification.
+    pub(crate) fn verify_all_streaming(
+        &self,
+        conn: &Connection,
+        derived_key: &[u8; 32],
+    ) -> rusqlite::Result<Option<FilterId>> {
+        let mut statement = conn.prepare(
+            r"
+            SELECT
+                filter_id,
+                body,
+                integrity_signature
+            FROM
+                [filter_includes]",
+        )?;
+
+        let mut rows = statement.query([])?;
+        while let Some(row) = rows.next()? {
+            let filter_id: FilterId = row.get(0)?;
+            let body: String = row.get(1)?;
+            let signature: Option<String> = row.get(2)?;
+
+            if let Some(ref sig) = signature {
+                if !verify_content(derived_key, filter_id, &body, sig) {
+                    return Ok(Some(filter_id));
+                }
+            } else {
+                return Ok(Some(filter_id));
+            }
+        }
+
+        Ok(None)
+    }
+
+    /// Batch updates integrity_signature by row_id from `(row_id, signature)` pairs.
+    pub(crate) fn batch_update_signatures(
+        &self,
+        tx: &Transaction<'_>,
+        signatures: &[(i64, String)],
+    ) -> rusqlite::Result<()> {
+        let mut statement = tx.prepare(
+            r"
+            UPDATE
+                [filter_includes]
+            SET
+                integrity_signature = :sig
+            WHERE
+                row_id = :row_id",
+        )?;
+
+        for (row_id, sig) in signatures {
             statement.execute(named_params! {
-                ":row_id": entity.row_id,
-                ":integrity_signature": entity.integrity_signature
+                ":row_id": row_id,
+                ":sig": sig,
             })?;
         }
 

@@ -17,6 +17,9 @@ impl IntegrityControlManager {
     /// Signs all filter rules and includes entities with the integrity key
     /// from configuration.
     ///
+    /// Uses streaming iteration to avoid loading all rule bodies into memory
+    /// at once — only `(id, signature)` pairs are accumulated.
+    ///
     /// # Failure
     ///
     /// Returns [`FLMError::InvalidConfiguration`] if `integrity_key` is not
@@ -40,32 +43,26 @@ impl IntegrityControlManager {
             let rules_list_repository = RulesListRepository::new();
             let filter_includes_repository = FilterIncludesRepository::new();
 
-            let mut rules_entities = rules_list_repository
-                .select(&conn, None)
-                .map_err(FLMError::from_database)?
-                .unwrap_or_default();
-
-            let mut includes_entities = filter_includes_repository
-                .select(&conn, None)
+            let rules_signatures = rules_list_repository
+                .sign_and_collect_signatures_streaming(&conn, &derived_key)
                 .map_err(FLMError::from_database)?;
 
-            for entity in rules_entities.iter_mut() {
-                integrity::sign_rules_list_entity(&derived_key, entity);
-            }
-
-            for entity in includes_entities.iter_mut() {
-                integrity::sign_filter_include_entity(&derived_key, entity);
-            }
+            let includes_signatures = filter_includes_repository
+                .sign_and_collect_signatures_streaming(&conn, &derived_key)
+                .map_err(FLMError::from_database)?;
 
             with_transaction(&mut conn, |tx: &Transaction| {
-                rules_list_repository.update_integrity_signatures(tx, &rules_entities)?;
-                filter_includes_repository.update_integrity_signatures(tx, &includes_entities)
+                rules_list_repository.batch_update_signatures(tx, &rules_signatures)?;
+                filter_includes_repository.batch_update_signatures(tx, &includes_signatures)
             })
         })
     }
 
     /// Verifies integrity signatures of all filter rules and includes
     /// entities in the database.
+    ///
+    /// Uses streaming iteration to verify one row at a time without loading
+    /// all rule bodies into memory. Stops at the first failed entity.
     ///
     /// # Failure
     ///
@@ -89,21 +86,18 @@ impl IntegrityControlManager {
         let derived_key = integrity::derive_key(integrity_key);
 
         connection_manager.execute_db(|conn: Connection| {
-            let rules_entities = RulesListRepository::new()
-                .select(&conn, None)
+            if let Some(filter_id) = RulesListRepository::new()
+                .verify_all_streaming(&conn, &derived_key)
                 .map_err(FLMError::from_database)?
-                .unwrap_or_default();
-
-            for entity in &rules_entities {
-                integrity::verify_rules_list_entity(&derived_key, entity)?;
+            {
+                return Err(FLMError::FilterIntegrityCheckFailed(filter_id));
             }
 
-            let includes_entities = FilterIncludesRepository::new()
-                .select(&conn, None)
-                .map_err(FLMError::from_database)?;
-
-            for entity in &includes_entities {
-                integrity::verify_filter_include_entity(&derived_key, entity)?;
+            if let Some(filter_id) = FilterIncludesRepository::new()
+                .verify_all_streaming(&conn, &derived_key)
+                .map_err(FLMError::from_database)?
+            {
+                return Err(FLMError::FilterIntegrityCheckFailed(filter_id));
             }
 
             Ok(())
