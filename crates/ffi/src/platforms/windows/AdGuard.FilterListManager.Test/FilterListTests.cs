@@ -86,6 +86,7 @@ namespace AdGuard.FilterListManager.Test
                     Constants = { "windows_is_the_best" }
                 };
                 flm.Init(configuration);
+                GenerateRandomKeyResponse randomKey = flm.GenerateRandomKey();
                 flm.PullMetadata();
                 flm.UpdateFilters(false, REQUEST_TIMEOUT_MS, false);
 
@@ -113,6 +114,9 @@ namespace AdGuard.FilterListManager.Test
                 flm.SaveDisabledRules(customFilter.Id, new[] { "world" });
                 IEnumerable<DisabledRulesRaw> disabledRules1 =
                     flm.GetDisabledRules(new[] { customFilter.Id });
+                flm.SignAllRules();
+                flm.SignAllRulesWithNewKey(randomKey.Key);
+                flm.VerifyIntegrity();
                 IEnumerable<FilterTag> tags = flm.GetAllTags();
                 IEnumerable<FilterGroup> groups = flm.GetAllGroups();
                 IEnumerable<StoredFilterMetadata> storedFiltersMetadata = flm.GetStoredFiltersMetadata();

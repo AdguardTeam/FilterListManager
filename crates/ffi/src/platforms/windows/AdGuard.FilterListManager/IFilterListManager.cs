@@ -16,6 +16,12 @@ namespace AdGuard.FilterListManager
         Configuration SpawnDefaultConfiguration();
 
         /// <summary>
+        /// Generates a cryptographically secure random key for use as integrity_key.
+        /// </summary>
+        /// <returns>A 64-character hex-encoded random key.</returns>
+        GenerateRandomKeyResponse GenerateRandomKey();
+
+        /// <summary>
         /// Initializes inner RUST-based FLM under-the-hood the <see cref="IFilterListManager"/>
         /// instance according to the passed <see cref="configuration"/>
         /// </summary>

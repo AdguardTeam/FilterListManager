@@ -33,42 +33,6 @@ namespace AdGuard.FilterListManager
             return ProtobufInterop.flm_get_constants();
         }
 
-        /// <summary>
-        /// Generates a cryptographically secure random key for use as integrity_key.
-        /// </summary>
-        /// <returns>A 64-character hex-encoded random key.</returns>
-        /// <exception cref="FilterListManagerException">Thrown if key generation fails.</exception>
-        public static string GenerateRandomKey()
-        {
-            IntPtr FlmInteropFunc(IntPtr pHandle, FfiMethod ffiMethod, IntPtr pInputData, ulong inputDataLength) =>
-                ProtobufInterop.flm_generate_random_key_protobuf();
-
-            RustResponse result = null;
-            try
-            {
-                result = RustInterop.Call(IntPtr.Zero, FfiMethod.GenerateRandomKey, IntPtr.Zero, 0, FlmInteropFunc);
-                
-                if (result.FfiError)
-                {
-                    AGOuterError error = AGOuterError.Parser.ParseFrom(result.ResultData);
-                    throw new FilterListManagerException(error);
-                }
-
-                GenerateRandomKeyResponse response = GenerateRandomKeyResponse.Parser.ParseFrom(result.ResultData);
-                
-                if (response.Error != null)
-                {
-                    throw new FilterListManagerException(response.Error);
-                }
-
-                return response.Key;
-            }
-            finally
-            {
-                result?.Dispose();
-            }
-        }
-
        /// <summary>
        /// Initializes a new instance of <see cref="FilterListManager"/> class.
        /// </summary>
@@ -102,6 +66,18 @@ namespace AdGuard.FilterListManager
                 ProtobufInterop.flm_default_configuration_protobuf();
             EmptyRequest request = new EmptyRequest();
             return CallRustMessage<Configuration>(request, FlmInteropFunc);
+        }
+        
+        /// <summary>
+        /// Generates a cryptographically secure random key for use as integrity_key.
+        /// </summary>
+        /// <returns>A 64-character hex-encoded random key.</returns>
+        public GenerateRandomKeyResponse GenerateRandomKey()
+        {
+            IntPtr FlmInteropFunc(IntPtr pHandle, FfiMethod ffiMethod, IntPtr pInputData, ulong inputDataLength) =>
+                ProtobufInterop.flm_generate_random_key_protobuf();
+            EmptyRequest request = new EmptyRequest();
+            return CallRustMessage<GenerateRandomKeyResponse>(request, FlmInteropFunc);
         }
 
         /// <summary>

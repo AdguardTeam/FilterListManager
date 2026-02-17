@@ -12,7 +12,6 @@ namespace AdGuard.FilterListManager.RustInterface
         /// <summary>
         /// Getter for the set of [`FilterListManager`] constants
         /// </summary>
-        /// <returns></returns>
         [DllImport(Constants.FLM_DLL_NAME)]
         internal static extern FLMConstants flm_get_constants();
         
@@ -21,6 +20,13 @@ namespace AdGuard.FilterListManager.RustInterface
         /// </summary>
         [DllImport(Constants.FLM_DLL_NAME)]
         internal static extern IntPtr flm_default_configuration_protobuf();
+        
+        /// <summary>
+        /// Generates a cryptographically secure random key and returns it
+        /// as a protobuf-encoded [`GenerateRandomKeyResponse`] in [`RustResponse`].
+        /// </summary>
+        [DllImport(Constants.FLM_DLL_NAME)]
+        internal static extern IntPtr flm_generate_random_key_protobuf();
 
         /// <summary>
         /// Makes an FLM object and returns opaque pointer of [`FLMHandle`]

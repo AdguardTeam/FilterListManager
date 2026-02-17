@@ -24,7 +24,7 @@ namespace FilterListManager {
     static OuterErrorReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChFvdXRlcl9lcnJvci5wcm90bxITZmlsdGVyX2xpc3RfbWFuYWdlciL9CQoM",
+            "ChFvdXRlcl9lcnJvci5wcm90bxITZmlsdGVyX2xpc3RfbWFuYWdlciLXCgoM",
             "QUdPdXRlckVycm9yEg8KB21lc3NhZ2UYASABKAkSRwoUY2Fubm90X29wZW5f",
             "ZGF0YWJhc2UYAiABKAsyJy5maWx0ZXJfbGlzdF9tYW5hZ2VyLkNhbm5vdE9w",
             "ZW5EYXRhYmFzZUgAEjsKDm5vdF9hX2RhdGFiYXNlGAMgASgLMiEuZmlsdGVy",
@@ -53,7 +53,9 @@ namespace FilterListManager {
             "bGlzdF9tYW5hZ2VyLk11dGV4SAASSgoVaW52YWxpZF9jb25maWd1cmF0aW9u",
             "GBIgASgLMikuZmlsdGVyX2xpc3RfbWFuYWdlci5JbnZhbGlkQ29uZmlndXJh",
             "dGlvbkgAEisKBW90aGVyGBMgASgLMhouZmlsdGVyX2xpc3RfbWFuYWdlci5P",
-            "dGhlckgAQgcKBWVycm9yIhQKEkNhbm5vdE9wZW5EYXRhYmFzZSIOCgxOb3RB",
+            "dGhlckgAElgKHWZpbHRlcl9pbnRlZ3JpdHlfY2hlY2tfZmFpbGVkGBQgASgL",
+            "Mi8uZmlsdGVyX2xpc3RfbWFuYWdlci5GaWx0ZXJJbnRlZ3JpdHlDaGVja0Zh",
+            "aWxlZEgAQgcKBWVycm9yIhQKEkNhbm5vdE9wZW5EYXRhYmFzZSIOCgxOb3RB",
             "RGF0YWJhc2UiCgoIRGlza0Z1bGwiDgoMRGF0YWJhc2VCdXN5IiMKDkVudGl0",
             "eU5vdEZvdW5kEhEKCWVudGl0eV9pZBgBIAEoAyIcCgxQYXRoTm90Rm91bmQS",
             "DAoEcGF0aBgBIAEoCSInChdQYXRoSGFzRGVuaWVkUGVybWlzc2lvbhIMCgRw",
@@ -64,12 +66,13 @@ namespace FilterListManager {
             "dGVyQ29udGVudElzTGlrZWx5Tm90QUZpbHRlciITChFGaWx0ZXJQYXJzZXJF",
             "cnJvciIiCgxGaWVsZElzRW1wdHkSEgoKZmllbGRfbmFtZRgBIAEoCSIHCgVN",
             "dXRleCIjChRJbnZhbGlkQ29uZmlndXJhdGlvbhILCgNtc2cYASABKAkiBwoF",
-            "T3RoZXJCKAoYY29tLmFkZ3VhcmQuZmxtLnByb3RvYnVmQgpPdXRlckVycm9y",
-            "UABiBnByb3RvMw=="));
+            "T3RoZXIiLwoaRmlsdGVySW50ZWdyaXR5Q2hlY2tGYWlsZWQSEQoJZmlsdGVy",
+            "X2lkGAEgASgFQigKGGNvbS5hZGd1YXJkLmZsbS5wcm90b2J1ZkIKT3V0ZXJF",
+            "cnJvclAAYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.AGOuterError), global::FilterListManager.AGOuterError.Parser, new[]{ "Message", "CannotOpenDatabase", "NotADatabase", "DatabaseBusy", "DiskFull", "EntityNotFound", "PathNotFound", "PathHasDeniedPermission", "PathAlreadyExists", "TimedOut", "HttpClientNetworkError", "HttpStrict200Response", "HttpClientBodyRecoveryFailed", "FilterContentIsLikelyNotAFilter", "FilterParserError", "FieldIsEmpty", "Mutex", "InvalidConfiguration", "Other" }, new[]{ "Error" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.AGOuterError), global::FilterListManager.AGOuterError.Parser, new[]{ "Message", "CannotOpenDatabase", "NotADatabase", "DatabaseBusy", "DiskFull", "EntityNotFound", "PathNotFound", "PathHasDeniedPermission", "PathAlreadyExists", "TimedOut", "HttpClientNetworkError", "HttpStrict200Response", "HttpClientBodyRecoveryFailed", "FilterContentIsLikelyNotAFilter", "FilterParserError", "FieldIsEmpty", "Mutex", "InvalidConfiguration", "Other", "FilterIntegrityCheckFailed" }, new[]{ "Error" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.CannotOpenDatabase), global::FilterListManager.CannotOpenDatabase.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.NotADatabase), global::FilterListManager.NotADatabase.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.DiskFull), global::FilterListManager.DiskFull.Parser, null, null, null, null, null),
@@ -87,7 +90,8 @@ namespace FilterListManager {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FieldIsEmpty), global::FilterListManager.FieldIsEmpty.Parser, new[]{ "FieldName" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Mutex), global::FilterListManager.Mutex.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.InvalidConfiguration), global::FilterListManager.InvalidConfiguration.Parser, new[]{ "Msg" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Other), global::FilterListManager.Other.Parser, null, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Other), global::FilterListManager.Other.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FilterIntegrityCheckFailed), global::FilterListManager.FilterIntegrityCheckFailed.Parser, new[]{ "FilterId" }, null, null, null, null)
           }));
     }
     #endregion
@@ -184,6 +188,9 @@ namespace FilterListManager {
           break;
         case ErrorOneofCase.Other:
           Other = other.Other.Clone();
+          break;
+        case ErrorOneofCase.FilterIntegrityCheckFailed:
+          FilterIntegrityCheckFailed = other.FilterIntegrityCheckFailed.Clone();
           break;
       }
 
@@ -424,6 +431,18 @@ namespace FilterListManager {
       }
     }
 
+    /// <summary>Field number for the "filter_integrity_check_failed" field.</summary>
+    public const int FilterIntegrityCheckFailedFieldNumber = 20;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::FilterListManager.FilterIntegrityCheckFailed FilterIntegrityCheckFailed {
+      get { return errorCase_ == ErrorOneofCase.FilterIntegrityCheckFailed ? (global::FilterListManager.FilterIntegrityCheckFailed) error_ : null; }
+      set {
+        error_ = value;
+        errorCase_ = value == null ? ErrorOneofCase.None : ErrorOneofCase.FilterIntegrityCheckFailed;
+      }
+    }
+
     private object error_;
     /// <summary>Enum of possible cases for the "error" oneof.</summary>
     public enum ErrorOneofCase {
@@ -446,6 +465,7 @@ namespace FilterListManager {
       Mutex = 17,
       InvalidConfiguration = 18,
       Other = 19,
+      FilterIntegrityCheckFailed = 20,
     }
     private ErrorOneofCase errorCase_ = ErrorOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -495,6 +515,7 @@ namespace FilterListManager {
       if (!object.Equals(Mutex, other.Mutex)) return false;
       if (!object.Equals(InvalidConfiguration, other.InvalidConfiguration)) return false;
       if (!object.Equals(Other, other.Other)) return false;
+      if (!object.Equals(FilterIntegrityCheckFailed, other.FilterIntegrityCheckFailed)) return false;
       if (ErrorCase != other.ErrorCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -522,6 +543,7 @@ namespace FilterListManager {
       if (errorCase_ == ErrorOneofCase.Mutex) hash ^= Mutex.GetHashCode();
       if (errorCase_ == ErrorOneofCase.InvalidConfiguration) hash ^= InvalidConfiguration.GetHashCode();
       if (errorCase_ == ErrorOneofCase.Other) hash ^= Other.GetHashCode();
+      if (errorCase_ == ErrorOneofCase.FilterIntegrityCheckFailed) hash ^= FilterIntegrityCheckFailed.GetHashCode();
       hash ^= (int) errorCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -617,6 +639,10 @@ namespace FilterListManager {
         output.WriteRawTag(154, 1);
         output.WriteMessage(Other);
       }
+      if (errorCase_ == ErrorOneofCase.FilterIntegrityCheckFailed) {
+        output.WriteRawTag(162, 1);
+        output.WriteMessage(FilterIntegrityCheckFailed);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -703,6 +729,10 @@ namespace FilterListManager {
         output.WriteRawTag(154, 1);
         output.WriteMessage(Other);
       }
+      if (errorCase_ == ErrorOneofCase.FilterIntegrityCheckFailed) {
+        output.WriteRawTag(162, 1);
+        output.WriteMessage(FilterIntegrityCheckFailed);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -769,6 +799,9 @@ namespace FilterListManager {
       }
       if (errorCase_ == ErrorOneofCase.Other) {
         size += 2 + pb::CodedOutputStream.ComputeMessageSize(Other);
+      }
+      if (errorCase_ == ErrorOneofCase.FilterIntegrityCheckFailed) {
+        size += 2 + pb::CodedOutputStream.ComputeMessageSize(FilterIntegrityCheckFailed);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -893,6 +926,12 @@ namespace FilterListManager {
             Other = new global::FilterListManager.Other();
           }
           Other.MergeFrom(other.Other);
+          break;
+        case ErrorOneofCase.FilterIntegrityCheckFailed:
+          if (FilterIntegrityCheckFailed == null) {
+            FilterIntegrityCheckFailed = new global::FilterListManager.FilterIntegrityCheckFailed();
+          }
+          FilterIntegrityCheckFailed.MergeFrom(other.FilterIntegrityCheckFailed);
           break;
       }
 
@@ -1081,6 +1120,15 @@ namespace FilterListManager {
             Other = subBuilder;
             break;
           }
+          case 162: {
+            global::FilterListManager.FilterIntegrityCheckFailed subBuilder = new global::FilterListManager.FilterIntegrityCheckFailed();
+            if (errorCase_ == ErrorOneofCase.FilterIntegrityCheckFailed) {
+              subBuilder.MergeFrom(FilterIntegrityCheckFailed);
+            }
+            input.ReadMessage(subBuilder);
+            FilterIntegrityCheckFailed = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -1264,6 +1312,15 @@ namespace FilterListManager {
             }
             input.ReadMessage(subBuilder);
             Other = subBuilder;
+            break;
+          }
+          case 162: {
+            global::FilterListManager.FilterIntegrityCheckFailed subBuilder = new global::FilterListManager.FilterIntegrityCheckFailed();
+            if (errorCase_ == ErrorOneofCase.FilterIntegrityCheckFailed) {
+              subBuilder.MergeFrom(FilterIntegrityCheckFailed);
+            }
+            input.ReadMessage(subBuilder);
+            FilterIntegrityCheckFailed = subBuilder;
             break;
           }
         }
@@ -4484,6 +4541,204 @@ namespace FilterListManager {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class FilterIntegrityCheckFailed : pb::IMessage<FilterIntegrityCheckFailed>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<FilterIntegrityCheckFailed> _parser = new pb::MessageParser<FilterIntegrityCheckFailed>(() => new FilterIntegrityCheckFailed());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<FilterIntegrityCheckFailed> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::FilterListManager.OuterErrorReflection.Descriptor.MessageTypes[19]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FilterIntegrityCheckFailed() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FilterIntegrityCheckFailed(FilterIntegrityCheckFailed other) : this() {
+      filterId_ = other.filterId_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public FilterIntegrityCheckFailed Clone() {
+      return new FilterIntegrityCheckFailed(this);
+    }
+
+    /// <summary>Field number for the "filter_id" field.</summary>
+    public const int FilterIdFieldNumber = 1;
+    private int filterId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int FilterId {
+      get { return filterId_; }
+      set {
+        filterId_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as FilterIntegrityCheckFailed);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(FilterIntegrityCheckFailed other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (FilterId != other.FilterId) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (FilterId != 0) hash ^= FilterId.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (FilterId != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(FilterId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (FilterId != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(FilterId);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (FilterId != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(FilterId);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(FilterIntegrityCheckFailed other) {
+      if (other == null) {
+        return;
+      }
+      if (other.FilterId != 0) {
+        FilterId = other.FilterId;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            FilterId = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            FilterId = input.ReadInt32();
+            break;
+          }
         }
       }
     }
