@@ -26,7 +26,7 @@ namespace FilterListManager {
           string.Concat(
             "ChNjb25maWd1cmF0aW9uLnByb3RvEhNmaWx0ZXJfbGlzdF9tYW5hZ2VyIi0K",
             "GEZpbHRlcnNDb21waWxhdGlvblBvbGljeRIRCgljb25zdGFudHMYASADKAki",
-            "5AQKDUNvbmZpZ3VyYXRpb24SPQoQZmlsdGVyX2xpc3RfdHlwZRgBIAEoDjIj",
+            "kgUKDUNvbmZpZ3VyYXRpb24SPQoQZmlsdGVyX2xpc3RfdHlwZRgBIAEoDjIj",
             "LmZpbHRlcl9saXN0X21hbmFnZXIuRmlsdGVyTGlzdFR5cGUSHgoRd29ya2lu",
             "Z19kaXJlY3RvcnkYAiABKAlIAIgBARIOCgZsb2NhbGUYAyABKAkSLgomZGVm",
             "YXVsdF9maWx0ZXJfbGlzdF9leHBpcmVzX3BlcmlvZF9zZWMYBCABKAUSVgoa",
@@ -38,17 +38,18 @@ namespace FilterListManager {
             "LmZpbHRlcl9saXN0X21hbmFnZXIuUmF3UmVxdWVzdFByb3h5TW9kZRIhChly",
             "ZXF1ZXN0X2N1c3RvbV9wcm94eV9hZGRyGAsgASgJEhAKCGFwcF9uYW1lGAwg",
             "ASgJEg8KB3ZlcnNpb24YDSABKAkSLAokc2hvdWxkX2lnbm9yZV9leHBpcmVz",
-            "X2Zvcl9sb2NhbF91cmxzGA4gASgIQhQKEl93b3JraW5nX2RpcmVjdG9yeUId",
-            "ChtfZmlsdGVyc19jb21waWxhdGlvbl9wb2xpY3kqJwoORmlsdGVyTGlzdFR5",
-            "cGUSDAoIU1RBTkRBUkQQABIHCgNETlMQASpPChNSYXdSZXF1ZXN0UHJveHlN",
-            "b2RlEhQKEFVTRV9TWVNURU1fUFJPWFkQABIMCghOT19QUk9YWRABEhQKEFVT",
-            "RV9DVVNUT01fUFJPWFkQAkIwChhjb20uYWRndWFyZC5mbG0ucHJvdG9idWZC",
-            "EkNvbmZpZ3VyYXRpb25Qcm90b1ABYgZwcm90bzM="));
+            "X2Zvcl9sb2NhbF91cmxzGA4gASgIEhoKDWludGVncml0eV9rZXkYDyABKAlI",
+            "AogBAUIUChJfd29ya2luZ19kaXJlY3RvcnlCHQobX2ZpbHRlcnNfY29tcGls",
+            "YXRpb25fcG9saWN5QhAKDl9pbnRlZ3JpdHlfa2V5KicKDkZpbHRlckxpc3RU",
+            "eXBlEgwKCFNUQU5EQVJEEAASBwoDRE5TEAEqTwoTUmF3UmVxdWVzdFByb3h5",
+            "TW9kZRIUChBVU0VfU1lTVEVNX1BST1hZEAASDAoITk9fUFJPWFkQARIUChBV",
+            "U0VfQ1VTVE9NX1BST1hZEAJCMAoYY29tLmFkZ3VhcmQuZmxtLnByb3RvYnVm",
+            "QhJDb25maWd1cmF0aW9uUHJvdG9QAWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), typeof(global::FilterListManager.RawRequestProxyMode), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FiltersCompilationPolicy), global::FilterListManager.FiltersCompilationPolicy.Parser, new[]{ "Constants" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "FiltersCompilationPolicy", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version", "ShouldIgnoreExpiresForLocalUrls" }, new[]{ "WorkingDirectory", "FiltersCompilationPolicy" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "FiltersCompilationPolicy", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version", "ShouldIgnoreExpiresForLocalUrls", "IntegrityKey" }, new[]{ "WorkingDirectory", "FiltersCompilationPolicy", "IntegrityKey" }, null, null, null)
           }));
     }
     #endregion
@@ -320,6 +321,7 @@ namespace FilterListManager {
       appName_ = other.appName_;
       version_ = other.version_;
       shouldIgnoreExpiresForLocalUrls_ = other.shouldIgnoreExpiresForLocalUrls_;
+      integrityKey_ = other.integrityKey_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -565,6 +567,36 @@ namespace FilterListManager {
       }
     }
 
+    /// <summary>Field number for the "integrity_key" field.</summary>
+    public const int IntegrityKeyFieldNumber = 15;
+    private readonly static string IntegrityKeyDefaultValue = "";
+
+    private string integrityKey_;
+    /// <summary>
+    /// Optional key for signing and verifying integrity of filter rules.
+    /// If set, rules will be signed on write and verified on read.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string IntegrityKey {
+      get { return integrityKey_ ?? IntegrityKeyDefaultValue; }
+      set {
+        integrityKey_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+    /// <summary>Gets whether the "integrity_key" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool HasIntegrityKey {
+      get { return integrityKey_ != null; }
+    }
+    /// <summary>Clears the value of the "integrity_key" field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearIntegrityKey() {
+      integrityKey_ = null;
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -594,6 +626,7 @@ namespace FilterListManager {
       if (AppName != other.AppName) return false;
       if (Version != other.Version) return false;
       if (ShouldIgnoreExpiresForLocalUrls != other.ShouldIgnoreExpiresForLocalUrls) return false;
+      if (IntegrityKey != other.IntegrityKey) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -615,6 +648,7 @@ namespace FilterListManager {
       if (AppName.Length != 0) hash ^= AppName.GetHashCode();
       if (Version.Length != 0) hash ^= Version.GetHashCode();
       if (ShouldIgnoreExpiresForLocalUrls != false) hash ^= ShouldIgnoreExpiresForLocalUrls.GetHashCode();
+      if (HasIntegrityKey) hash ^= IntegrityKey.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -689,6 +723,10 @@ namespace FilterListManager {
         output.WriteRawTag(112);
         output.WriteBool(ShouldIgnoreExpiresForLocalUrls);
       }
+      if (HasIntegrityKey) {
+        output.WriteRawTag(122);
+        output.WriteString(IntegrityKey);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -755,6 +793,10 @@ namespace FilterListManager {
         output.WriteRawTag(112);
         output.WriteBool(ShouldIgnoreExpiresForLocalUrls);
       }
+      if (HasIntegrityKey) {
+        output.WriteRawTag(122);
+        output.WriteString(IntegrityKey);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -806,6 +848,9 @@ namespace FilterListManager {
       }
       if (ShouldIgnoreExpiresForLocalUrls != false) {
         size += 1 + 1;
+      }
+      if (HasIntegrityKey) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(IntegrityKey);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -863,6 +908,9 @@ namespace FilterListManager {
       }
       if (other.ShouldIgnoreExpiresForLocalUrls != false) {
         ShouldIgnoreExpiresForLocalUrls = other.ShouldIgnoreExpiresForLocalUrls;
+      }
+      if (other.HasIntegrityKey) {
+        IntegrityKey = other.IntegrityKey;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -942,6 +990,10 @@ namespace FilterListManager {
             ShouldIgnoreExpiresForLocalUrls = input.ReadBool();
             break;
           }
+          case 122: {
+            IntegrityKey = input.ReadString();
+            break;
+          }
         }
       }
     #endif
@@ -1018,6 +1070,10 @@ namespace FilterListManager {
           }
           case 112: {
             ShouldIgnoreExpiresForLocalUrls = input.ReadBool();
+            break;
+          }
+          case 122: {
+            IntegrityKey = input.ReadString();
             break;
           }
         }

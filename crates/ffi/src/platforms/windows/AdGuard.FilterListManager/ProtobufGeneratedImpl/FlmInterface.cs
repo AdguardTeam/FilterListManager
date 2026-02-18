@@ -21,6 +21,10 @@ namespace FilterListManager
         public AGOuterError Error { get; set; }
     }
     
+    public partial class GenerateRandomKeyResponse : IAGOuterError
+    {
+    }
+    
     public partial class PullMetadataResponse : IAGOuterError
     {
     }
