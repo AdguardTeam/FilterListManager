@@ -22,7 +22,6 @@ This library can:
   - [Data integrity protection](#data-integrity-protection)
   - [How to create and fill up standard filters database](#how-to-create-and-fill-up-standard-filters-database)
   - [Database scheme updates](#database-scheme-updates)
-  - [Usage notes](#usage-notes)
   - [Operations with custom filters](#operations-with-custom-filters)
   - [Get operations](#get-operations)
   - [Other (All) operations](#other-all-operations)
@@ -199,7 +198,7 @@ The method “raises” the state of the database to the working state.
 
 ... and so on.
 
-### Usage notes
+#### Migrations notes
 Starting with version `0.7.1` the database is “uplifted” automatically when the filter_list_manager constructor is called. 
 To override this behavior you need to disable it in the configuration: `configuration.auto_lift_up_database = false;`.\
 
@@ -207,7 +206,7 @@ To override this behavior you need to disable it in the configuration: `configur
 should be used no more than once an hour, method `flm.pull_metadata()`\
 should be used no more than once a week**.
 
-#### Storage notes. Important
+#### Storage notes
 > [!IMPORTANT]
 > **Database lifting**\
 > If you have disabled automatic lifting, you must invoke it yourself after each library update if you don't want to miss a migration.
@@ -216,6 +215,7 @@ should be used no more than once a week**.
 >`SQLITE_BUSY` Error\
 >The library ensures that when using a single [FLM](./src/manager/filter_list_manager_impl.rs) instance for a single database file (also, by default, a [database type](./src/manager/models/configuration/filter_list_type.rs)) in a multithreaded environment, database queries will not return [SQLITE_BUSY](https://www.sqlite.org/rescode.html#busy) errors.
 
+--- 
 ### Operations with custom filters
 
 The library categorizes all filters into three types:
