@@ -19,11 +19,9 @@ implement differential updates, etc.
 - [FFI][ffireadme]: FFI interface for the library. In other words, this is a
   wrapper for integrating the library into programs written in other programming
   languages.
-- [CLI][clireadme]: CLI tools for the library.
 
 [flmreadme]: ./crates/filter-list-manager/README.md
 [ffireadme]: ./crates/ffi/README.md
-[clireadme]: ./crates/cli/README.md
 
 ## Development
 

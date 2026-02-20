@@ -1,4 +1,4 @@
-# Filter list manager library core
+# Filter List Manager library core
 
 ## Overview
 
@@ -7,18 +7,40 @@ This crate represents a library for managing AdGuard filter lists.
 This library can:
 
 - Fetch filter lists
-- Store the downloaded filter list
-- Perform filter lists updates
+- Store downloaded filter lists
+- Perform filter list updates
 - ... and more
 
-## Filters analysis
+## Table of Contents
+
+- [How to build](#how-to-build)
+- [Filters analysis notes](#filters-analysis-notes)
+  - [List of meta tags that the library parses from filter content](#list-of-meta-tags-that-the-library-parses-from-filter-content)
+  - [List of filter preprocessor directives supported by the library](#list-of-filter-preprocessor-directives-supported-by-the-library)
+- [Usage](#usage)
+  - [Create and setup configuration for library facade](#create-and-setup-configuration-for-library-facade)
+  - [Data integrity protection](#data-integrity-protection)
+  - [How to create and fill up standard filters database](#how-to-create-and-fill-up-standard-filters-database)
+  - [Database scheme updates](#database-scheme-updates)
+  - [Usage notes](#usage-notes)
+  - [Operations with custom filters](#operations-with-custom-filters)
+  - [Get operations](#get-operations)
+  - [Other (All) operations](#other-all-operations)
+
+## How to build
+`cargo build -p adguard-flm` from workspace root
+
+For Windows builds you may need to build with `libsqlite-bundled` feature enabled:\
+`cargo build -p adguard-flm --features rusqlite-bundled`
+
+## Filters analysis notes
 
 ### List of meta tags that the library parses from filter content
 
 - `! Title` - Name of the filter.
 - `! Description` - Detailed description of the filter.
 - `! Version` - Current version of the filter.
-- `! Expires` - Filter expiration period. Will be converted into seconds. [See the tests for an example](./src/filters/parser/metadata/parsers/expires.rs) If this field is missing in the metadata, the global value from the [configuration](./src/manager/models/configuration/mod.rs) will be used. Before updating the filter, the value will be checked and aligned to the lower boundary ([3600](./src/manager/models/configuration/mod.rs)) if it is less than this value.
+- `! Expires` - Filter expiration period. It will be converted into seconds. [See the tests for an example](./src/filters/parser/metadata/parsers/expires.rs) If this field is missing in the metadata, the global value from the [configuration](./src/manager/models/configuration/mod.rs) will be used. Before updating the filter, the value will be checked and aligned to the lower boundary ([3600](./src/manager/models/configuration/mod.rs)) if it is less than this value.
 - `! Homepage` - Filter website/homepage.
 - `! TimeUpdated` - When this filter was updated in registry. Format: `2024-08-13T13:30:53+00:00`.
 - `! Last modified` - Alias for `TimeUpdated`. Format: `2024-08-13T12:01:26.703Z`. You can choose one format for both fields.
@@ -32,16 +54,16 @@ This library can:
 
 The library supports:
 
-- `!#include file_path` - Includes contents of file into filter and process. `file_path` must be:
-    - Absolute url with the [same origin](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) as the parent filter.
-    - Relative url.
-    - File url (only if the parent filter's url has `file` scheme).
+- `!#include file_path` - Includes contents of file into filter and processes it. `file_path` must be:
+    - Absolute URL with the [same origin](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) as the parent filter.
+    - Relative URL.
+    - File URL (only if the parent filter's URL has `file` scheme).
 - `!#if/!#endif/!#else` - Condition compilation directives. They can be nested. Supported tokens:
     - `()` - parentheses
     - `true/false` - boolean values
     - `&& ||` - AND/OR operators
     - `!` - NOT operator
-    - Literal compiler constant from [configuration](./src/manager/models/configuration). For example, `windows`,`mac`, etc... It works like this: if the constant encountered is in the `configuration.compiler_conditional_constants` list, then the condition becomes **true**, **false** otherwise
+    - Literal compiler constant from [configuration](./src/manager/models/configuration). For example, `windows`, `mac`, etc. It works like this: if the constant encountered is in the `configuration.compiler_conditional_constants` list, then the condition becomes **true**, **false** otherwise
 
 **See the tests for more information:**
 
@@ -71,11 +93,11 @@ configuration.filter_list_type = FilterListType::DNS;
 
 // Sets app name and version for user-agent header.
 // Required fields.
-configuration.app_name = "FlmApp";
-configuration.version = "1.2.3";
+configuration.app_name = "FlmApp".to_string();
+configuration.version = "1.2.3".to_string();
 
 // Creates facade instance
-let flm = FilterListManagerImpl::new(configuration);
+let flm = FilterListManagerImpl::new(configuration)?;
 ```
 
 #### Example references
@@ -107,11 +129,11 @@ config.version = "1.0.0".to_string();
 config.integrity_key = Some(integrity_key);
 ```
 
-To sign storage first time:
+To sign storage for the first time:
 
 ```rust
 // This call has rules:
-// - Call this only if your data is not signed yet, or you instantiated the FLM with new integrity key
+// - Call this only if your data is not signed yet, or you have instantiated the FLM with a new integrity key
 // - If integrity protection is disabled, this call will return an error
 // - If integrity protection is enabled, you should call this method immediately after creating the FLM instance and before any read operations
 flm.sign_all_rules()?;
@@ -131,8 +153,8 @@ To rotate the integrity key:
 let new_key = generate_random_key()?;
 flm.sign_all_rules_with_new_key(new_key)?;
 ```
-
-**Note:** Once integrity protection is enabled, you must sign all existing filter rules immediately after creating the FLM instance and before any read operations, or you will get an integrity check failed error. All subsequent filter installations and updates will be automatically signed.
+> [!IMPORTANT]
+> Once integrity protection is enabled, you must sign all existing filter rules immediately after creating the FLM instance and before any read operations, or you will get an integrity-check-failed error. All subsequent filter installations and updates will be automatically signed.
 
 ---
 
@@ -145,18 +167,17 @@ flm.sign_all_rules_with_new_key(new_key)?;
 // In addition, this method applies migrations that have not yet been applied.
 // See the lift_up_database method for details on "lifting" a database.
 // Note, should be used once a week or less.
-flm.pull_metadata();
+flm.pull_metadata()?;
 
 // Then, downloads the contents of the filters.
 // !Note! should be used no more than once an hour.
-flm.update_filters(true, 0, true);
+flm.update_filters(true, 0, true)?;
 ```
 
 > [!NOTE]
-> By default, the application operates with a database located in the current
-> working directory (**cwd**), and the database file name is generated based on
-> the format `agflm_{configuration.filter_list_type.to_string()}`. For standard
-> filters, the file path will be `$CWD/agflm_standard.db`.
+> By default, the application operates with a database located in the current working directory (**cwd**).\
+> The database file name is generated based on the format `agflm_{configuration.filter_list_type.to_string()}`.\
+> For standard filters, the file path will be `$CWD/agflm_standard.db`.
 
 ---
 
@@ -175,7 +196,7 @@ The method “raises” the state of the database to the working state.
 - Rolls the schema
 - Rolls migrations
 - Performs bootstrap.
-  
+
 ... and so on.
 
 ### Usage notes
@@ -187,11 +208,13 @@ should be used no more than once an hour, method `flm.pull_metadata()`\
 should be used no more than once a week**.
 
 #### Storage notes. Important
-**Database lifting**\
-If you have disabled automatic lifting, you must invoke it yourself after each library update if you don't want to miss a migration.
+> [!IMPORTANT]
+> **Database lifting**\
+> If you have disabled automatic lifting, you must invoke it yourself after each library update if you don't want to miss a migration.
 
-`SQLITE_BUSY` Error\
-The library ensures that when using a single [FLM](./src/manager/filter_list_manager_impl.rs) instance for a single database file (also, by default, a [database type](./src/manager/models/configuration/filter_list_type.rs)) in a multithreaded environment, database queries will not return [SQLITE_BUSY](https://www.sqlite.org/rescode.html#busy) errors.
+> [!CAUTION]
+>`SQLITE_BUSY` Error\
+>The library ensures that when using a single [FLM](./src/manager/filter_list_manager_impl.rs) instance for a single database file (also, by default, a [database type](./src/manager/models/configuration/filter_list_type.rs)) in a multithreaded environment, database queries will not return [SQLITE_BUSY](https://www.sqlite.org/rescode.html#busy) errors.
 
 ### Operations with custom filters
 
@@ -249,7 +272,7 @@ flm.install_custom_filter_from_string(
 );
 ```
 
-[constants]: ./crates/filter-list-manager/src/storage/constants.rs
+[constants]: ./src/storage/constants.rs
 
 #### Save operations for custom filters rules
 
@@ -257,7 +280,7 @@ flm.install_custom_filter_from_string(
 // Saves the structure containing the filter rules.
 flm.save_custom_filter_rules(/* FilterListRules */ rules_for_new_local_custom_filter);
 
-// You can save only disabled rules for the filter list 
+// You can save only the disabled rules for a filter list 
 flm.save_disabled_rules(filter.id, /* Vec<String> */ disabled_rules_list);
 ```
 
@@ -270,11 +293,7 @@ flm.save_disabled_rules(filter.id, /* Vec<String> */ disabled_rules_list);
 ### Get operations
 
 ```rust
-// Retrieves all filters metadata from the database **with** theirs rules.
-// Returns Vec<FullFilterList>.
-flm.get_full_filter_lists();
-
-// Retrieves a filter metadata by its ID from the database **with** its rules.
+// Retrieves filter metadata by its ID from the database **with** its rules.
 // Returns Optional<FullFilterList>.
 flm.get_full_filter_list_by_id(id /* FilterId */);
 
@@ -282,42 +301,42 @@ flm.get_full_filter_list_by_id(id /* FilterId */);
 flm.get_active_rules();
 
 // Gets a list of [`ActiveRulesInfoRaw`] from filters with `filter.is_enabled=true` flag.
-// `filter_by` - If empty, returns all active rules, otherwise returns intersection between `filter_by` and all active rules
+// `filter_by` - If empty, returns all active rules, otherwise returns the intersection between `filter_by` and all active rules
 flm.get_active_rules_raw(filter_by /* Vec<FilterId> */);
 
-// Retrieves all filters metadata from the database **without** theirs rules.
+// Retrieves all filters metadata from the database **without** their rules.
 // Returns Vec<StoredFilterMetadata>
 flm.get_stored_filters_metadata();
 
-// Retrieves a filter metadata by its ID from the database **without** its rules.
+// Retrieves filter metadata by its ID from the database **without** its rules.
 // Returns Optional<StoredFilterMetadata>.
 flm.get_stored_filter_metadata_by_id(id /* FilterId */);
 
 // Retrieves a list of FilterListRulesRaw by IDs.
-// This method acts in the same way as the `IN` database operator. Only found entities will be returned
+// This method acts in the same way as the `IN` database operator. Returns only the entities that are found
 flm.get_filter_rules_as_strings(ids /* Vec<FilterId> */);
 
 // Reads the rule list for a specific filter in chunks, applying exceptions from the disabled_rules list on the fly.
 // The default size of the read buffer is 1 megabyte. But this size can be exceeded if a longer string appears in the list of filter rules.
 // The main purpose of this method is to reduce RAM consumption when reading large size filters.
-flm.save_rules_to_file_blob(id /* FilterId */, file_path: /* String or AsRef<Path> */);
+flm.save_rules_to_file_blob(id /* FilterId */, file_path /* String or AsRef<Path> */);
 
-/// Returns lists of disabled rules by list of filter IDs as Vec<DisabledRulesRaw>
-flm.get_disabled_rules(ids, /* Vec<FilterId> */);
+// Returns lists of disabled rules by list of filter IDs as Vec<DisabledRulesRaw>
+flm.get_disabled_rules(ids /* Vec<FilterId> */);
 
-// Fetches filter list by url and returns its raw metadata.
+// Fetches filter list by URL and returns its raw metadata.
 // Returns FilterListMetadata.
-flm.fetch_filter_list_metadata(url, /* String */);
+flm.fetch_filter_list_metadata(url /* String */);
 
-// Fetches filter list by url and returns its raw metadata and body.
+// Fetches filter list by URL and returns its raw metadata and body.
 // Returns FilterListMetadataWithBody.
-flm.fetch_filter_list_metadata_with_body(url, /* String */);
+flm.fetch_filter_list_metadata_with_body(url /* String */);
 
-/// Returns lists of rules count by list of filter IDs as Vec<RulesCountByFilter>
-flm.get_rules_count(ids, /* Vec<FilterId> */);
+// Returns lists of rule counts by list of filter IDs as Vec<RulesCountByFilter>
+flm.get_rules_count(ids /* Vec<FilterId> */);
 ```
 
-#### This example references
+#### These example references
 
 [FullFilterList reference](./src/manager/models/full_filter_list.rs)\
 [StoredFilterMetadata reference](./src/manager/models/stored_filter_metadata.rs)\
