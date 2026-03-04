@@ -5,6 +5,7 @@ use crate::filters::parser::filter_compiler::FilterCompiler;
 use crate::filters::parser::filter_contents_provider::diff_path_provider::DiffPathProvider;
 use crate::filters::parser::metadata::parsers::expires::process_expires;
 use crate::filters::parser::metadata::KnownMetadataProperty;
+use crate::filters::parser::parser_error::FilterParserErrorContext;
 use crate::io::fetch_by_schemes::fetch_json_by_scheme;
 use crate::io::get_scheme;
 use crate::io::http::blocking_client::BlockingClient;
@@ -32,11 +33,27 @@ use crate::{Configuration, FLMError, FLMResult, FilterId, FilterParserError};
 use chrono::{DateTime, ParseError, Utc};
 use rusqlite::types::Value;
 use rusqlite::{Connection, Transaction};
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
 use std::str::FromStr;
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
+
+/// Maximum number of concurrent downloads
+const MAX_CONCURRENT_DOWNLOADS: usize = 16;
+
+/// Compiled filter entry with metadata
+struct CompilationListEntry<'compiler> {
+    /// Index of the filter in the list
+    index: usize,
+    /// ID of the filter
+    filter_id: FilterId,
+    /// Base entity
+    filter: FilterEntity,
+    /// Filter compiler with all filter data
+    compiler: FilterCompiler<'compiler>,
+    /// Result of compilation
+    compilation_result: Result<String, FilterParserErrorContext>,
+}
 
 /// Tries to update passed filters
 #[allow(clippy::unwrap_or_default)]
@@ -176,35 +193,46 @@ pub(super) fn update_filters_action(
         configuration.metadata_url.as_str(),
     )?;
 
-    // Compilers with successful filter downloads
-    let mut successful_compilers_with_result: Vec<(FilterId, FilterCompiler)> =
-        Vec::with_capacity(filter_entities.len() / 2);
-
-    let start_time = Instant::now();
-    let is_use_timeout = loose_timeout > 0;
-
-    // Put here processed_filters
-    let mut diff_path_entities: Vec<DiffUpdateEntity> = vec![];
-    let rows_count = compilation_infos.len();
-    for (index, (filter_id, filter, mut compiler)) in compilation_infos.into_iter().enumerate() {
-        if let Some(new_version) = last_index_filter_versions.get(&filter_id) {
+    // Pre-filter: skip filters with up-to-date versions
+    compilation_infos.retain(|(filter_id, filter, _)| {
+        if let Some(new_version) = last_index_filter_versions.get(filter_id) {
             if !filter.version.is_empty() && &filter.version == new_version &&
                 // Extra spike, 'cause we may already have metadata, but not the filters
                 // This stupid spike is here, 'cause we MIGHT fall in situation,
                 // when filter metadata.version is provided, it is up-to-date, BUT empty rules object is saved
-                rules_map.get(&filter_id).map(|old_rules| !old_rules.is_empty()).unwrap_or_default()
+                rules_map.get(filter_id).map(|old_rules| !old_rules.is_empty()).unwrap_or_default()
             {
-                continue;
+                return false;
             }
         }
 
-        if let Err(err) = compiler.compile(&filter.download_url) {
+        true
+    });
+    let rows_count = compilation_infos.len();
+
+    // Multithreaded filter compilation
+    let compile_results = compile_concurrently(
+        compilation_infos,
+        rows_count,
+        &mut update_result,
+        loose_timeout as u64,
+    );
+
+    // Put here processed_filters
+    let mut diff_path_entities: Vec<DiffUpdateEntity> = vec![];
+    // Compilers with successful filter downloads
+    let mut successful_compilers_with_result: Vec<(FilterId, FilterCompiler)> =
+        Vec::with_capacity(rows_count);
+
+    // Collect successfully compiled filters
+    for compilation_entry in compile_results.into_iter() {
+        if let Err(err) = compilation_entry.compilation_result {
             // NoContent means update just unavailable yet
             if err.error != FilterParserError::NoContent {
                 update_result.filters_errors.push(UpdateFilterError {
-                    filter_id,
+                    filter_id: compilation_entry.filter_id,
                     message: err.to_string(),
-                    filter_url: Some(filter.download_url),
+                    filter_url: Some(compilation_entry.filter.download_url),
                     http_client_error: Some(err.error)
                         .filter(|e| matches!(e, FilterParserError::Network(_)))
                         .map(|e| e.to_string()),
@@ -214,13 +242,9 @@ pub(super) fn update_filters_action(
             continue;
         }
 
-        successful_compilers_with_result.push((filter_id, compiler));
-
-        if is_use_timeout && start_time.elapsed().as_secs() > loose_timeout as u64 {
-            // Set count of unprocessed filters
-            update_result.remaining_filters_count = (rows_count - index + 1) as i32;
-            break;
-        }
+        // compiler is None only on panic (already recorded as error above)
+        successful_compilers_with_result
+            .push((compilation_entry.filter_id, compilation_entry.compiler));
     }
 
     let successful_filter_ids = successful_compilers_with_result
@@ -414,7 +438,7 @@ fn build_compiler<'deps: 'compiler, 'compiler>(
     diff_updates_map: &mut DiffUpdatesMap,
     current_time: i64,
     rules_map: &mut MapFilterIdOnRulesString,
-    batch_patches_container: &Rc<RefCell<BatchPatchesContainer>>,
+    batch_patches_container: &Arc<Mutex<BatchPatchesContainer>>,
     filter: &FilterEntity,
     shared_http_client: &'deps BlockingClient,
 ) -> FLMResult<(Option<FilterCompiler<'compiler>>, bool)> {
@@ -441,7 +465,7 @@ fn build_compiler<'deps: 'compiler, 'compiler>(
                     let provider = DiffPathProvider::new(
                         diff_update_info.next_path,
                         rules,
-                        Rc::clone(batch_patches_container),
+                        Arc::clone(batch_patches_container),
                         shared_http_client,
                     );
 
@@ -473,6 +497,98 @@ fn build_compiler<'deps: 'compiler, 'compiler>(
     }
 
     Ok((None, filter_will_use_diff_update))
+}
+
+/// Compiles filters concurrently, using work-stealing algorithm
+fn compile_concurrently<'compilers>(
+    compilation_infos: Vec<(FilterId, FilterEntity, FilterCompiler<'compilers>)>,
+    infos_count: usize,
+    update_result: &mut UpdateResult,
+    loose_timeout: u64,
+) -> Vec<CompilationListEntry<'compilers>> {
+    let is_use_timeout = loose_timeout > 0;
+    let start_time = Instant::now();
+    let num_workers = MAX_CONCURRENT_DOWNLOADS.min(infos_count);
+    let thread_errors = Mutex::new(Vec::<UpdateFilterError>::new());
+    let work = Mutex::new(compilation_infos.into_iter().enumerate());
+
+    // Parallel compilation: download and compile filters concurrently
+    let mut compilation_list = std::thread::scope(|s| {
+        let handles = (0..num_workers)
+            .map(|_| {
+                s.spawn(|| {
+                    let mut thread_results: Vec<CompilationListEntry> = Vec::new();
+
+                    while !is_use_timeout || start_time.elapsed().as_secs() <= loose_timeout {
+                        match work.lock() {
+                            Ok(mut tasks_list) => {
+                                // Get next task
+                                if let Some((index, (filter_id, filter, mut compiler))) =
+                                    tasks_list.next()
+                                {
+                                    // Unlock tasks list before compilation
+                                    drop(tasks_list);
+
+                                    // Download and compile filter
+                                    let compilation_result = compiler.compile(&filter.download_url);
+
+                                    thread_results.push(CompilationListEntry {
+                                        index,
+                                        filter_id,
+                                        filter,
+                                        compiler,
+                                        compilation_result,
+                                    });
+
+                                    // Continue working
+                                    continue;
+                                }
+                            }
+
+                            Err(why) => {
+                                // This thread is panicked
+                                let panic_reason = format!("Thread panic: {}", why);
+
+                                // Give up, if lock is poisoned
+                                thread_errors
+                                    .lock()
+                                    .unwrap()
+                                    .push(UpdateFilterError::with_message(panic_reason));
+                            }
+                        }
+
+                        // Could not continue working
+                        break;
+                    }
+
+                    thread_results
+                })
+            })
+            .collect::<Vec<_>>();
+
+        // Join all threads
+        handles
+            .into_iter()
+            // Let it empty if thread panicked
+            .flat_map(|h| h.join().unwrap_or_else(|_| Vec::new()))
+            .collect::<Vec<_>>()
+    });
+
+    // Set count of unprocessed filters
+    update_result.remaining_filters_count = (infos_count - compilation_list.len()) as i32;
+
+    // Try to put errors into update result, if there are any
+    match thread_errors.into_inner() {
+        Ok(errors) if !errors.is_empty() => {
+            update_result.filters_errors.extend(errors);
+        }
+        _ => {}
+    }
+
+    // Sort compilation list by index, to restore original order
+    compilation_list.sort_by_key(|entry| entry.index);
+
+    compilation_list
 }
 
 /// Gets the latest versions of index filters from the server

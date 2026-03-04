@@ -1,7 +1,9 @@
 mod connect;
 
 use self::connect::{connect, connect_with_create};
-use crate::storage::database_status::{get_database_status, DatabaseStatus};
+use crate::storage::database_status::{
+    create_db_folder_if_it_does_not_exist, get_database_status, DatabaseStatus,
+};
 use crate::storage::db_bootstrap::db_bootstrap;
 use crate::storage::migrations::run_migrations;
 use crate::{
@@ -61,9 +63,7 @@ impl DbConnectionManager {
         let _guard = self.db_mutex.lock();
 
         // First of all, create folder
-        crate::storage::database_status::create_db_folder_if_it_does_not_exist(
-            self.get_calculated_path().to_owned(),
-        )?;
+        create_db_folder_if_it_does_not_exist(self.get_calculated_path().to_owned())?;
 
         let mut conn = connect_with_create(self)?;
         let mut tx = conn.transaction().map_err(FLMError::from_database)?;

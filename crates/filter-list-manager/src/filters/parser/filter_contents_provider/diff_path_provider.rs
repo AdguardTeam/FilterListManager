@@ -10,10 +10,10 @@ use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_hash_from_url, get_scheme};
 use crate::FilterParserError;
 use std::borrow::Cow;
-use std::cell::{Cell, RefCell};
+use std::cell::Cell;
 use std::ops::ControlFlow;
 use std::ops::ControlFlow::{Break, Continue};
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 /// Maximum number of consecutive diff updates in a row
 #[cfg(not(test))]
@@ -28,7 +28,7 @@ pub(crate) struct DiffPathProvider<'a> {
     /// Contents of saved filter
     base_filter_contents: String,
     /// Container for shared patch files
-    batch_patches_container: Rc<RefCell<BatchPatchesContainer>>,
+    batch_patches_container: Arc<Mutex<BatchPatchesContainer>>,
     /// Shared sync http client
     shared_http_client: &'a BlockingClient,
     /// Does at least one diff was applied
@@ -41,7 +41,7 @@ impl<'a> DiffPathProvider<'a> {
     pub(crate) fn new(
         patch_relative_path: String,
         base_filter_contents: String,
-        batch_patches_container: Rc<RefCell<BatchPatchesContainer>>,
+        batch_patches_container: Arc<Mutex<BatchPatchesContainer>>,
         shared_http_client: &'a BlockingClient,
     ) -> Self {
         Self {
@@ -101,9 +101,10 @@ impl<'a> DiffPathProvider<'a> {
         let (resource_name, diff_file_contents) =
             match get_hash_from_url(patch_file_absolute_uri.as_str()) {
                 Some((patch_path, resource_name)) => {
-                    let mut pinned_container = self.batch_patches_container.borrow_mut();
+                    // If mutex is poisoned, let it be
+                    let mut locked_container = self.batch_patches_container.lock().unwrap();
 
-                    let diff_contents = match pinned_container.get_a_copy(&patch_path) {
+                    let diff_contents = match locked_container.get_a_copy(&patch_path) {
                         None => {
                             let body = fetch_filter_by_scheme_with_content_check(
                                 &patch_path,
@@ -112,7 +113,7 @@ impl<'a> DiffPathProvider<'a> {
                                 FilterFetchPolicy::RegularFilter,
                             )?;
 
-                            pinned_container.insert(patch_path, body.clone());
+                            locked_container.insert(patch_path, body.clone());
 
                             body
                         }
@@ -240,7 +241,7 @@ mod tests {
 
         // Batch patches container
         let container = BatchPatchesContainer::factory();
-        container.borrow_mut().insert(
+        container.lock().unwrap().insert(
             Url::from_file_path(batch_path_path).unwrap().to_string(),
             batch_patch.to_string(),
         );
@@ -303,7 +304,7 @@ a3 6
 ||example.com^
 ";
         let container = BatchPatchesContainer::factory();
-        container.borrow_mut().insert(
+        container.lock().unwrap().insert(
             "https://example.org/patches/batch_v1.0.0-s-1700045842-3600.patch".to_string(),
             patch.to_string(),
         );
@@ -341,7 +342,7 @@ a8 1
 
         let container = BatchPatchesContainer::factory();
 
-        container.borrow_mut().insert(
+        container.lock().unwrap().insert(
             "https://example.org/patches/batch_v1.0.0-s-1700045842-3600.patch".to_string(),
             patch.to_string(),
         );

@@ -10,7 +10,7 @@ use crate::io::http::blocking_client::BlockingClient;
 
 /// Provides filters contents.
 /// It can provide filter by `root_filter_url` and resolves its includes
-pub(crate) trait FilterContentsProvider {
+pub(crate) trait FilterContentsProvider: Send {
     /// Get root filter contents by root filter url.
     /// It can be only absolute url and do not need a parent_url
     fn get_filter_contents(&self, root_filter_url: &str) -> Result<String, FilterParserError>;

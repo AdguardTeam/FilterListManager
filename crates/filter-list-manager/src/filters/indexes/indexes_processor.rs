@@ -1,6 +1,6 @@
 use super::entities::{IndexEntity, IndexI18NEntity};
 use crate::filters::indexes::index_consistency_checker::check_consistency;
-use crate::io::http::async_client::AsyncHTTPClient;
+use crate::io::http::blocking_client::BlockingClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::io::{get_scheme, read_file_by_url};
 use crate::manager::models::{MovedFilterInfo, PullMetadataResult};
@@ -21,19 +21,20 @@ use crate::{
         localisation::filter_tag_localisation_repository::FilterTagLocalisationRepository,
         localisation::group_localisation_repository::GroupLocalisationRepository, Repository,
     },
-    Configuration, FLMError, FLMResult, FilterId, CUSTOM_FILTERS_GROUP_ID,
+    string, Configuration, FLMError, FLMResult, FilterId, CUSTOM_FILTERS_GROUP_ID,
 };
 use rusqlite::{Connection, Transaction};
 use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 use std::mem::take;
+use std::sync::Arc;
 
 /// The class responsible for updating filters and rules from indexes
 pub struct IndexesProcessor<'a> {
     connection_source: &'a DbConnectionManager,
     loaded_index: Option<IndexEntity>,
     loaded_index_i18n: Option<IndexI18NEntity>,
-    http_client: AsyncHTTPClient,
+    http_client: Arc<BlockingClient>,
 }
 
 /// Public methods
@@ -47,7 +48,7 @@ impl<'a> IndexesProcessor<'a> {
             connection_source,
             loaded_index: None,
             loaded_index_i18n: None,
-            http_client: AsyncHTTPClient::new(configuration)?,
+            http_client: Arc::new(BlockingClient::new(configuration)?),
         })
     }
 
@@ -62,13 +63,8 @@ impl<'a> IndexesProcessor<'a> {
         index_url: &str,
         index_locales_url: &str,
     ) -> FLMResult<PullMetadataResult> {
-        let async_rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .map_err(FLMError::from_io)?;
-
         // Load indices and check consistency
-        async_rt.block_on(self.fetch_indices(index_url, index_locales_url))?;
+        self.fetch_indices(string!(index_url), string!(index_locales_url))?;
 
         self.connection_source
             .execute_db(move |mut conn: Connection| {
@@ -313,21 +309,25 @@ impl IndexesProcessor<'_> {
     ///
     /// May return an [`Err`] if the request to the remote server is unsuccessful
     /// or if the index consistency is violated.
-    async fn fetch_indices(&mut self, index_url: &str, index_locales_url: &str) -> FLMResult<()> {
-        let (index_result, index_localisations_result) = tokio::join!(
-            self.load_data::<IndexEntity>(index_url),
-            self.load_data::<IndexI18NEntity>(index_locales_url)
-        );
+    fn fetch_indices(&mut self, index_url: String, index_locales_url: String) -> FLMResult<()> {
+        let http_client = Arc::clone(&self.http_client);
 
-        let index = match index_result {
-            Ok(index) => index,
-            Err(err) => return Err(err),
-        };
+        let (index_result, index_localisations_result) = std::thread::scope(|s| {
+            let client1 = Arc::clone(&http_client);
+            let h1 = s.spawn(move || Self::load_data::<IndexEntity>(&index_url, &client1));
 
-        let index_localisations = match index_localisations_result {
-            Ok(index_localisations) => index_localisations,
-            Err(err) => return Err(err),
-        };
+            let client2 = Arc::clone(&http_client);
+            let h2 =
+                s.spawn(move || Self::load_data::<IndexI18NEntity>(&index_locales_url, &client2));
+
+            (h1.join(), h2.join())
+        });
+
+        let index = index_result
+            .map_err(|_| FLMError::from_display("Thread panicked while loading index"))??;
+        let index_localisations = index_localisations_result.map_err(|_| {
+            FLMError::from_display("Thread panicked while loading index localisations")
+        })??;
 
         check_consistency(&index)?;
 
@@ -338,7 +338,7 @@ impl IndexesProcessor<'_> {
     }
 
     /// Loads indices data
-    async fn load_data<I>(&self, url: &str) -> FLMResult<I>
+    fn load_data<I>(url: &str, http_client: &BlockingClient) -> FLMResult<I>
     where
         I: DeserializeOwned,
     {
@@ -349,11 +349,9 @@ impl IndexesProcessor<'_> {
                 let contents = read_file_by_url(url).map_err::<FLMError, _>(Into::into)?;
                 serde_json::from_str::<I>(&contents).map_err(FLMError::from_display)
             }
-            UrlSchemes::Https | UrlSchemes::Http => self
-                .http_client
-                .get_json::<I>(url)
-                .await
-                .map_err(FLMError::Network),
+            UrlSchemes::Https | UrlSchemes::Http => {
+                http_client.get_json::<I>(url).map_err(FLMError::Network)
+            }
             _ => FLMError::make_err(format!("Unknown scheme for url: {}", url)),
         }
     }
@@ -409,11 +407,17 @@ impl<'a> IndexesProcessor<'a> {
         loaded_index: IndexEntity,
         loaded_index_i18n: IndexI18NEntity,
     ) -> Self {
+        use lazy_static::lazy_static;
+
+        lazy_static! {
+            static ref TEST_CONFIG: Configuration = Configuration::default();
+        }
+
         Self {
             connection_source,
             loaded_index: Some(loaded_index),
             loaded_index_i18n: Some(loaded_index_i18n),
-            http_client: AsyncHTTPClient::new(&Configuration::default()).unwrap(),
+            http_client: Arc::new(BlockingClient::new(&TEST_CONFIG).unwrap()),
         }
     }
 
@@ -549,8 +553,8 @@ mod tests {
         let groups_repository = FilterGroupRepository::new();
 
         let connection_manager = DbConnectionManager::factory_test().unwrap();
-        let mut indexes =
-            IndexesProcessor::factory(&connection_manager, &Configuration::default()).unwrap();
+        let config = Configuration::default();
+        let mut indexes = IndexesProcessor::factory(&connection_manager, &config).unwrap();
 
         let mut rng = thread_rng();
         let (mut index, index_localisation) = build_filters_indices_fixtures().unwrap();
@@ -666,8 +670,9 @@ mod tests {
 
         // region second update
         {
+            let config2 = Configuration::default();
             let mut second_indexes =
-                IndexesProcessor::factory(&connection_manager, &Configuration::default()).unwrap();
+                IndexesProcessor::factory(&connection_manager, &config2).unwrap();
 
             let (mut index_second, index_localisation_second) =
                 build_filters_indices_fixtures().unwrap();
@@ -776,8 +781,8 @@ mod tests {
         unsafe {
             connection_manager.lift_up_database().unwrap();
         };
-        let mut processor =
-            IndexesProcessor::factory(&connection_manager, &Configuration::default()).unwrap();
+        let config = Configuration::default();
+        let mut processor = IndexesProcessor::factory(&connection_manager, &config).unwrap();
 
         processor.sync_metadata(&index_url, &index_i18_url).unwrap();
     }

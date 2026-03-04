@@ -1,6 +1,5 @@
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 /// Container for batch patch files.
 /// We should download each file once and share between few filters
@@ -9,8 +8,8 @@ pub(crate) struct BatchPatchesContainer {
 }
 
 impl BatchPatchesContainer {
-    pub(crate) fn factory() -> Rc<RefCell<Self>> {
-        Rc::new(RefCell::new(Self {
+    pub(crate) fn factory() -> Arc<Mutex<Self>> {
+        Arc::new(Mutex::new(Self {
             map: HashMap::new(),
         }))
     }

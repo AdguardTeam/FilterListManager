@@ -4,6 +4,10 @@ use adguard_flm::Configuration;
 use std::time::{Instant, SystemTime};
 
 #[allow(dead_code)]
+/// Number of rules per one disabled rule
+const RULES_PER_DISABLED_RULE: u32 = 100;
+
+#[allow(dead_code)]
 #[allow(clippy::field_reassign_with_default)]
 fn install_lists() {
     let start = SystemTime::now();
@@ -55,7 +59,7 @@ fn get_active_filters() {
     let start = Instant::now();
     let result = FilterListManagerImpl::new(conf)
         .unwrap()
-        .get_active_rules_raw(vec![])
+        .get_active_rules()
         .unwrap();
     let duration = start.elapsed().as_secs_f32();
 
@@ -76,8 +80,8 @@ fn update_filters() {
     conf.version = "1.2.3".to_string();
 
     let flm = FilterListManagerImpl::new(conf).unwrap();
-    // flm.pull_metadata().unwrap();
-    let updated = flm.update_filters(false, 0, false).unwrap().unwrap();
+    flm.pull_metadata().unwrap();
+    let updated = flm.update_filters(true, 0, true).unwrap().unwrap();
 
     println!("Updated filters count: {}", updated.updated_list.len());
     updated.updated_list.iter().for_each(|f| {
@@ -92,6 +96,75 @@ fn update_filters() {
     println!("Time elapsed: {:.2}", start.elapsed().as_secs_f32())
 }
 
+/// Duplicate all existing filters with random disabled rules
+#[allow(clippy::field_reassign_with_default)]
+#[allow(dead_code)]
+fn duplicate_filters_with_disabled_rules(add_disabled_rules: bool) {
+    let mut conf = Configuration::default();
+    conf.app_name = "FlmApp".to_string();
+    conf.version = "1.2.3".to_string();
+    let flm = FilterListManagerImpl::new(conf).unwrap();
+
+    enable_all_filters();
+
+    flm.get_active_rules()
+        .unwrap()
+        .into_iter()
+        .for_each(|info| {
+            let installed = flm
+                .install_custom_filter_from_string(
+                    String::default(),
+                    1990,
+                    true,
+                    true,
+                    info.rules.join("\n"),
+                    Some(format!("Duplicate filter: #{}", info.filter_id)),
+                    None,
+                )
+                .unwrap();
+
+            if add_disabled_rules {
+                // Collect disabled rules
+                let mut counter = 0;
+                let disabled_rules = info
+                    .rules
+                    .into_iter()
+                    .filter(|_| {
+                        let tmp = counter;
+                        counter += 1;
+
+                        return tmp % RULES_PER_DISABLED_RULE == 0;
+                    })
+                    .collect::<Vec<String>>();
+
+                flm.save_disabled_rules(installed.id, disabled_rules)
+                    .unwrap();
+            }
+        });
+}
+
+#[allow(clippy::field_reassign_with_default)]
+#[allow(dead_code)]
+fn enable_all_filters() {
+    let mut conf = Configuration::default();
+    conf.app_name = "FlmApp".to_string();
+    conf.version = "1.2.3".to_string();
+    let flm = FilterListManagerImpl::new(conf).unwrap();
+
+    let ids = flm
+        .get_stored_filters_metadata()
+        .unwrap()
+        .into_iter()
+        .map(|f| f.id)
+        .collect();
+
+    flm.enable_filter_lists(ids, true).unwrap();
+}
+
 pub(crate) fn test() {
-    update_filters();
+    // update_filters();
+    // enable_all_filters();
+    // duplicate_filters_with_disabled_rules(true);
+    // duplicate_filters_with_disabled_rules(false);
+    get_active_filters();
 }

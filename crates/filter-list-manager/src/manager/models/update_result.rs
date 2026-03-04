@@ -26,3 +26,15 @@ pub struct UpdateFilterError {
     /// Http client error
     pub http_client_error: Option<String>,
 }
+
+impl UpdateFilterError {
+    /// Creates a new [`UpdateFilterError`] only with the specified message.
+    pub const fn with_message(message: String) -> Self {
+        Self {
+            filter_id: 0,
+            message,
+            filter_url: None,
+            http_client_error: None,
+        }
+    }
+}
