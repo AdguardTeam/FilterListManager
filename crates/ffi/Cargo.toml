@@ -15,7 +15,7 @@ name = "filter_list_manager_ffi"
 adguard-flm = { path = "../filter-list-manager", version = ">=2.0.0-rc.1", default-features = false }
 thiserror.workspace = true
 prost = "0.13.2"
-enum_stringify = "0.6.0"
+enum_stringify.workspace = true
 
 [features]
 default = ["adguard-flm/default"]

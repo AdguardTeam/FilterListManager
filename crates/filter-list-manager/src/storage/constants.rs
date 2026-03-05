@@ -21,11 +21,6 @@ pub const MINIMUM_CUSTOM_FILTER_ID: FilterId = -1_000_000_000;
 /// The library is guaranteed to never create a filter with this id.
 pub const SMALLEST_POSSIBLE_FILTER_ID: FilterId = -2_000_000_000;
 
-/// Database filename for [`crate::FilterListType::STANDARD`]
-pub const STANDARD_FILTERS_DATABASE_FILENAME: &str = "agflm_standard.db";
-/// Database filename for [`crate::FilterListType::DNS`]
-pub const DNS_FILTERS_DATABASE_FILENAME: &str = "agflm_dns.db";
-
 #[cfg(test)]
 mod tests {
     use crate::{MINIMUM_CUSTOM_FILTER_ID, SMALLEST_POSSIBLE_FILTER_ID};

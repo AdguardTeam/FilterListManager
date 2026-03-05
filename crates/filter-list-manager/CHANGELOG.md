@@ -7,8 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- `FilterListType::MISC` for managing a collection of miscellaneous filters
+
 ### Fixed
-- Reformat, clean and fix README.md
+- Reformatted, cleaned up, and fixed `README.md`
+
+### Changed
+- Constants `adguard_flm::storage::constants::{STANDARD_FILTERS_DATABASE_FILENAME, DNS_FILTERS_DATABASE_FILENAME}` were replaced with `adguard_flm::storage::database_name::build_database_name_for_filter_list_type(FilterListType)`
+- Index localizations are now optional: when `Configuration::metadata_locales_url` is empty (default), localizations are skipped (previously this could fail)
+- Filter updates now use multithreading, speeding up the operation by up to 8x
 
 ## [2.4.0] - 2026-02-18
 

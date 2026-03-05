@@ -20,11 +20,13 @@ This library can:
 - [Usage](#usage)
   - [Create and setup configuration for library facade](#create-and-setup-configuration-for-library-facade)
   - [Data integrity protection](#data-integrity-protection)
-  - [How to create and fill up standard filters database](#how-to-create-and-fill-up-standard-filters-database)
+  - [How to create and fill up filters database](#how-to-create-and-fill-up-filters-database)
   - [Database scheme updates](#database-scheme-updates)
   - [Operations with custom filters](#operations-with-custom-filters)
   - [Get operations](#get-operations)
   - [Other (All) operations](#other-all-operations)
+- [Cookbook](#cookbook)
+  - [Miscellaneous filters/scripts collection](#miscellaneous-filtersscripts-collection)
 
 ## How to build
 `cargo build -p adguard-flm` from workspace root
@@ -79,16 +81,12 @@ The library supports:
 let mut configuration = Configuration::default();
 
 // Sets urls for filters indices.
-configuration.metadata_url = "https://filters.adtidy.org/extension/safari/filters.json".to_string();
-configuration.metadata_locales_url = "https://filters.adtidy.org/extension/safari/filters_i18n.json".to_string();
+configuration.metadata_url = "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/extension/safari/filters.json".to_string();
+configuration.metadata_locales_url = "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/extension/safari/filters_i18n.js".to_string();
 
 // Sets locale. Will be used for returning localized strings for filters,
 // groups, and tags, where applicable.
 configuration.locale = "pt_PT".to_string();
-
-// Sets type of filters lists.
-// By default, FilterListType::STANDARD will be selected.
-configuration.filter_list_type = FilterListType::DNS;
 
 // Sets app name and version for user-agent header.
 // Required fields.
@@ -153,11 +151,11 @@ let new_key = generate_random_key()?;
 flm.sign_all_rules_with_new_key(new_key)?;
 ```
 > [!IMPORTANT]
-> Once integrity protection is enabled, you must sign all existing filter rules immediately after creating the FLM instance and before any read operations, or you will get an integrity-check-failed error. All subsequent filter installations and updates will be automatically signed.
+> Once integrity protection is enabled, you must sign all existing filter rules immediately after creating the FLM instance and before any read operations, or you will get an integrity-check-failed error `FilterIntegrityCheckFailed(filter_id)`. All subsequent filter installations and updates will be automatically signed.
 
 ---
 
-### How to create and fill up standard filters database
+### How to create and fill up filters database
 
 ```rust
 // Creates and configures the database. Populates the database with information
@@ -175,7 +173,7 @@ flm.update_filters(true, 0, true)?;
 
 > [!NOTE]
 > By default, the application operates with a database located in the current working directory (**cwd**).\
-> The database file name is generated based on the format `agflm_{configuration.filter_list_type.to_string()}`.\
+> The database file name is generated based on the format `agflm_{configuration.filter_list_type.to_string().to_lowercase()}.db`.\
 > For standard filters, the file path will be `$CWD/agflm_standard.db`.
 
 ---
@@ -349,3 +347,53 @@ flm.get_rules_count(ids /* Vec<FilterId> */);
 ### Other (All) operations
 
 [Facade Interface](./src/manager/mod.rs)
+
+## Cookbook
+
+### Miscellaneous filters/scripts collection
+By setting `configuration.filter_list_type = FilterListType::MISC`, you can create a dedicated FLM instance with its own database (for example, `agflm_misc.db`) and a custom index.
+
+This allows you to:
+
+- keep a collection of unrelated filters/scripts in a single place
+- store arbitrary custom metadata in the index
+- use stable, hard-coded IDs for your filters/scripts
+- still use all FLM features (storage, updates, etc.)
+
+Here is an [index example][index_example].
+You may also be interested in the [consistency checker][consistency_checker] (index consistency rules) and the internal index entities ([FilterIndexEntity][flm_index_entity]).
+
+```rust
+use adguard_flm::{Configuration, FilterListManager, FilterListManagerImpl, FilterListType};
+
+const FILTER_A: FilterId = 1;
+const FILTER_B: FilterId = 3;
+
+let mut configuration = Configuration::default();
+
+// Sets the URL of your custom index (can be a local `file://` URL).
+configuration.metadata_url = "file:///path/to/filters.json".to_string();
+// Optional: localizations index. Leave empty if you don't have one.
+configuration.metadata_locales_url = String::new();
+
+// Use a dedicated database for miscellaneous filters/scripts.
+configuration.filter_list_type = FilterListType::MISC;
+
+// Required fields.
+configuration.app_name = "FlmApp".to_string();
+configuration.version = "1.2.3".to_string();
+
+let flm = FilterListManagerImpl::new(configuration)?;
+// Sync metadata from the index into the database.
+flm.pull_metadata()?;
+// Download/update filter contents.
+flm.update_filters(false, 0, false)?;
+// Gets your known filters contents
+flm.get_filter_rules_as_strings(vec![FILTER_A, FILTER_B])?;
+// Gets "Filter_A" metadata
+flm.get_stored_filter_metadata_by_id(FILTER_A)?;
+```
+
+[index_example]: https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/extension/safari/filters.json
+[consistency_checker]: ./src/filters/indexes/index_consistency_checker.rs
+[flm_index_entity]: ./src/filters/indexes/entities/index_entities.rs

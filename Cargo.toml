@@ -10,6 +10,7 @@ repository = "https://github.com/AdguardTeam/FilterListManager"
 [workspace.dependencies]
 regex = "1.10.2"
 thiserror = "1.0.61"
+enum_stringify = "0.6.0"
 
 [profile.release]
 lto = "thin"

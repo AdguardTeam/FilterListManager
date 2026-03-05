@@ -46,6 +46,7 @@ impl From<Configuration> for filter_list_manager::Configuration {
             filter_list_type: match value.filter_list_type {
                 FilterListType::STANDARD => filter_list_manager::FilterListType::Standard as i32,
                 FilterListType::DNS => filter_list_manager::FilterListType::Dns as i32,
+                FilterListType::MISC => filter_list_manager::FilterListType::Misc as i32,
             },
             working_directory: value.working_directory,
             locale: value.locale,
@@ -74,9 +75,10 @@ impl From<filter_list_manager::Configuration> for Configuration {
 
         Configuration {
             filter_list_type: match val.filter_list_type {
+                2 => FilterListType::MISC,
                 1 => FilterListType::DNS,
                 0 => FilterListType::STANDARD,
-                _ => unimplemented!(), // TODO: how it will fail in compile time?
+                _ => unimplemented!(),
             },
             working_directory: val.working_directory,
             locale: val.locale,

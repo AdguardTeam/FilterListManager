@@ -28,6 +28,7 @@ use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 use std::mem::take;
 use std::sync::Arc;
+use std::thread::scope as thread_scope;
 
 /// The class responsible for updating filters and rules from indexes
 pub struct IndexesProcessor<'a> {
@@ -120,9 +121,9 @@ impl IndexesProcessor<'_> {
             let filter_id = match filter.filter_id {
                 None => {
                     return FLMError::make_err(format!(
-                    "That can't be, but i cannot determine filter_id for filter with url: \"{}\"",
-                    filter.download_url
-                ))
+                        "Couldn't determine filter_id for filter with url: \"{}\"",
+                        filter.download_url
+                    ))
                 }
                 Some(filter_id) => filter_id,
             };
@@ -312,27 +313,44 @@ impl IndexesProcessor<'_> {
     fn fetch_indices(&mut self, index_url: String, index_locales_url: String) -> FLMResult<()> {
         let http_client = Arc::clone(&self.http_client);
 
-        let (index_result, index_localisations_result) = std::thread::scope(|s| {
-            let client1 = Arc::clone(&http_client);
-            let h1 = s.spawn(move || Self::load_data::<IndexEntity>(&index_url, &client1));
+        let index_result: FLMResult<IndexEntity>;
+        let mut index_localisations_result: Option<FLMResult<IndexI18NEntity>> = None;
 
-            let client2 = Arc::clone(&http_client);
-            let h2 =
-                s.spawn(move || Self::load_data::<IndexI18NEntity>(&index_locales_url, &client2));
+        // Localizations are optional
+        if !index_locales_url.is_empty() {
+            let scope = thread_scope(|s| {
+                let client1 = Arc::clone(&http_client);
+                let h1 = s.spawn(move || Self::load_data::<IndexEntity>(&index_url, &client1));
 
-            (h1.join(), h2.join())
-        });
+                let client2 = Arc::clone(&http_client);
+                let h2 = s.spawn(move || {
+                    Self::load_data::<IndexI18NEntity>(&index_locales_url, &client2)
+                });
 
-        let index = index_result
-            .map_err(|_| FLMError::from_display("Thread panicked while loading index"))??;
-        let index_localisations = index_localisations_result.map_err(|_| {
-            FLMError::from_display("Thread panicked while loading index localisations")
-        })??;
+                (h1.join(), h2.join())
+            });
 
+            index_result = scope
+                .0
+                .map_err(|_| FLMError::from_display("Thread panicked while loading index"))?;
+            index_localisations_result = Some(scope.1.map_err(|_| {
+                FLMError::from_display("Thread panicked while loading index localisations")
+            })?);
+        } else {
+            index_result = Self::load_data::<IndexEntity>(&index_url, &http_client);
+        }
+
+        // Index operations
+        let index = index_result?;
         check_consistency(&index)?;
-
         self.loaded_index = Some(index);
-        self.loaded_index_i18n = Some(index_localisations);
+
+        // Localizations operations
+        if let Some(result) = index_localisations_result {
+            let index_localisations = result?;
+
+            self.loaded_index_i18n = Some(index_localisations);
+        }
 
         Ok(())
     }
@@ -361,28 +379,23 @@ impl IndexesProcessor<'_> {
 impl IndexesProcessor<'_> {
     /// Saves data from index localisation
     fn save_index_localisations(&mut self, transaction: &Transaction) -> FLMResult<()> {
-        let localisations = match take(&mut self.loaded_index_i18n) {
-            None => {
-                return FLMError::make_err(
-                    "Index localisations is empty. You should fetch them first",
-                );
-            }
-            Some(localisations) => localisations,
-        };
+        if let Some(localisations) = take(&mut self.loaded_index_i18n) {
+            let (group_vec, tags_vec, filters_vec) = localisations.exchange()?;
 
-        let (group_vec, tags_vec, filters_vec) = localisations.exchange()?;
+            GroupLocalisationRepository::new()
+                .insert(transaction, &group_vec)
+                .map_err(FLMError::from_database)?;
 
-        GroupLocalisationRepository::new()
-            .insert(transaction, &group_vec)
-            .map_err(FLMError::from_database)?;
+            FilterTagLocalisationRepository::new()
+                .insert(transaction, &tags_vec)
+                .map_err(FLMError::from_database)?;
 
-        FilterTagLocalisationRepository::new()
-            .insert(transaction, &tags_vec)
-            .map_err(FLMError::from_database)?;
+            FilterLocalisationRepository::new()
+                .insert(transaction, &filters_vec)
+                .map_err(FLMError::from_database)?;
+        }
 
-        FilterLocalisationRepository::new()
-            .insert(transaction, &filters_vec)
-            .map_err(FLMError::from_database)
+        Ok(())
     }
 
     /// Tries to take index value from `self` object
