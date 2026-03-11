@@ -77,6 +77,7 @@ pub(super) fn run_app() {
             let filter_list_type: FilterListType = match filter_list_type_str {
                 FILL_STANDARD_DATABASE => FilterListType::STANDARD,
                 FILL_DNS_DATABASE => FilterListType::DNS,
+                // No need fill MISC database right now
                 _ => unimplemented!(),
             };
 

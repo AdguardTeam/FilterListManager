@@ -1,15 +1,14 @@
 mod connect;
+pub mod database_name;
 
 use self::connect::{connect, connect_with_create};
+use crate::storage::database_name::build_database_name_for_filter_list_type;
 use crate::storage::database_status::{
     create_db_folder_if_it_does_not_exist, get_database_status, DatabaseStatus,
 };
 use crate::storage::db_bootstrap::db_bootstrap;
 use crate::storage::migrations::run_migrations;
-use crate::{
-    Configuration, FLMError, FLMResult, FilterListType, DNS_FILTERS_DATABASE_FILENAME,
-    STANDARD_FILTERS_DATABASE_FILENAME,
-};
+use crate::{Configuration, FLMError, FLMResult, FilterListType};
 use rusqlite::Connection;
 use std::env;
 use std::path::PathBuf;
@@ -92,36 +91,19 @@ impl DbConnectionManager {
 }
 
 impl DbConnectionManager {
-    #[cfg(test)]
     #[inline]
     fn build_with_dir(mut dir: PathBuf, filter_list_type: FilterListType) -> Self {
-        let file_name = match filter_list_type {
-            FilterListType::STANDARD => STANDARD_FILTERS_DATABASE_FILENAME,
-            FilterListType::DNS => DNS_FILTERS_DATABASE_FILENAME,
-        };
+        let file_name = build_database_name_for_filter_list_type(filter_list_type);
 
         dir.push(file_name);
 
-        use crate::test_utils::do_with_database_names_manipulator;
-        dir = do_with_database_names_manipulator(|mut helper| unsafe {
-            helper.build_temporary_db_name(dir)
-        });
-
-        Self {
-            calculated_path: dir,
-            db_mutex: Arc::new(Mutex::new(())),
+        #[cfg(test)]
+        {
+            use crate::test_utils::do_with_database_names_manipulator;
+            dir = do_with_database_names_manipulator(|mut helper| unsafe {
+                helper.build_temporary_db_name(dir)
+            });
         }
-    }
-
-    #[cfg(not(test))]
-    #[inline]
-    fn build_with_dir(mut dir: PathBuf, filter_list_type: FilterListType) -> Self {
-        let file_name = match filter_list_type {
-            FilterListType::STANDARD => STANDARD_FILTERS_DATABASE_FILENAME,
-            FilterListType::DNS => DNS_FILTERS_DATABASE_FILENAME,
-        };
-
-        dir.push(file_name);
 
         Self {
             calculated_path: dir,

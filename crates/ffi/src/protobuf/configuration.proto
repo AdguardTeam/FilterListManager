@@ -9,6 +9,7 @@ option java_outer_classname = "ConfigurationProto";
 enum FilterListType {
   STANDARD = 0;
   DNS = 1;
+  MISC = 2;
 }
 
 // FLM Requests proxy mode

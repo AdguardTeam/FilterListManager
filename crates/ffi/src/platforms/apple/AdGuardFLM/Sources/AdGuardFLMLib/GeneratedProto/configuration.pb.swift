@@ -24,6 +24,7 @@ public enum FilterListManager_FilterListType: SwiftProtobuf.Enum, Swift.CaseIter
   public typealias RawValue = Int
   case standard // = 0
   case dns // = 1
+  case misc // = 2
   case UNRECOGNIZED(Int)
 
   public init() {
@@ -34,6 +35,7 @@ public enum FilterListManager_FilterListType: SwiftProtobuf.Enum, Swift.CaseIter
     switch rawValue {
     case 0: self = .standard
     case 1: self = .dns
+    case 2: self = .misc
     default: self = .UNRECOGNIZED(rawValue)
     }
   }
@@ -42,6 +44,7 @@ public enum FilterListManager_FilterListType: SwiftProtobuf.Enum, Swift.CaseIter
     switch self {
     case .standard: return 0
     case .dns: return 1
+    case .misc: return 2
     case .UNRECOGNIZED(let i): return i
     }
   }
@@ -50,6 +53,7 @@ public enum FilterListManager_FilterListType: SwiftProtobuf.Enum, Swift.CaseIter
   public static let allCases: [FilterListManager_FilterListType] = [
     .standard,
     .dns,
+    .misc,
   ]
 
 }
@@ -215,6 +219,7 @@ extension FilterListManager_FilterListType: SwiftProtobuf._ProtoNameProviding {
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     0: .same(proto: "STANDARD"),
     1: .same(proto: "DNS"),
+    2: .same(proto: "MISC"),
   ]
 }
 

@@ -40,11 +40,11 @@ namespace FilterListManager {
             "ASgJEg8KB3ZlcnNpb24YDSABKAkSLAokc2hvdWxkX2lnbm9yZV9leHBpcmVz",
             "X2Zvcl9sb2NhbF91cmxzGA4gASgIEhoKDWludGVncml0eV9rZXkYDyABKAlI",
             "AogBAUIUChJfd29ya2luZ19kaXJlY3RvcnlCHQobX2ZpbHRlcnNfY29tcGls",
-            "YXRpb25fcG9saWN5QhAKDl9pbnRlZ3JpdHlfa2V5KicKDkZpbHRlckxpc3RU",
-            "eXBlEgwKCFNUQU5EQVJEEAASBwoDRE5TEAEqTwoTUmF3UmVxdWVzdFByb3h5",
-            "TW9kZRIUChBVU0VfU1lTVEVNX1BST1hZEAASDAoITk9fUFJPWFkQARIUChBV",
-            "U0VfQ1VTVE9NX1BST1hZEAJCMAoYY29tLmFkZ3VhcmQuZmxtLnByb3RvYnVm",
-            "QhJDb25maWd1cmF0aW9uUHJvdG9QAWIGcHJvdG8z"));
+            "YXRpb25fcG9saWN5QhAKDl9pbnRlZ3JpdHlfa2V5KjEKDkZpbHRlckxpc3RU",
+            "eXBlEgwKCFNUQU5EQVJEEAASBwoDRE5TEAESCAoETUlTQxACKk8KE1Jhd1Jl",
+            "cXVlc3RQcm94eU1vZGUSFAoQVVNFX1NZU1RFTV9QUk9YWRAAEgwKCE5PX1BS",
+            "T1hZEAESFAoQVVNFX0NVU1RPTV9QUk9YWRACQjAKGGNvbS5hZGd1YXJkLmZs",
+            "bS5wcm90b2J1ZkISQ29uZmlndXJhdGlvblByb3RvUAFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), typeof(global::FilterListManager.RawRequestProxyMode), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -59,6 +59,7 @@ namespace FilterListManager {
   public enum FilterListType {
     [pbr::OriginalName("STANDARD")] Standard = 0,
     [pbr::OriginalName("DNS")] Dns = 1,
+    [pbr::OriginalName("MISC")] Misc = 2,
   }
 
   /// <summary>

@@ -15,6 +15,7 @@ pub(crate) mod repositories;
 pub(crate) mod sql_generators;
 mod utils;
 
+pub use db_connection_manager::database_name;
 pub use db_connection_manager::DbConnectionManager;
 pub use entities::hydrate::Hydrate;
 

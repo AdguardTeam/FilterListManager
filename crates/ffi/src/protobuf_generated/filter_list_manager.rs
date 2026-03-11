@@ -73,6 +73,7 @@ pub struct Configuration {
 pub enum FilterListType {
     Standard = 0,
     Dns = 1,
+    Misc = 2,
 }
 impl FilterListType {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -83,6 +84,7 @@ impl FilterListType {
         match self {
             Self::Standard => "STANDARD",
             Self::Dns => "DNS",
+            Self::Misc => "MISC",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -90,6 +92,7 @@ impl FilterListType {
         match value {
             "STANDARD" => Some(Self::Standard),
             "DNS" => Some(Self::Dns),
+            "MISC" => Some(Self::Misc),
             _ => None,
         }
     }
