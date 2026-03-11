@@ -1,11 +1,18 @@
+/// SQLite blob handle wrapper implementation.
+pub(crate) mod blob_handle_impl;
+/// Buffered sequential blob reading helpers.
+pub(crate) mod blob_reader;
+/// Buffered wrapper for sequential blob readers.
+pub(crate) mod buffered_blob_reader;
+pub(crate) mod filter_stream;
+
 use crate::{FLMError, FLMResult};
-use nom::bytes::complete::{tag, take_until};
-use nom::multi::many0;
-use nom::sequence::terminated;
-use nom::IResult;
-use rusqlite::{blob::Blob, Result};
+use rusqlite::Result;
 use std::collections::HashSet;
-use std::io::Write;
+use std::io::{BufRead, Write};
+
+pub(crate) use blob_handle_impl::BlobHandleImpl;
+pub(crate) use buffered_blob_reader::{create_buffered_reader, BufferedBlobReader};
 
 #[cfg(test)]
 pub const BLOB_CHUNK_SIZE: usize = 12; // 12 bytes for "hello world\n"
@@ -18,78 +25,69 @@ pub(crate) trait BlobHandle {
     fn read_at(&self, buf: &mut [u8], read_start: usize) -> Result<usize>;
 }
 
-/// Blob handler wrapper with [`BlobHandle`] trait implementation
-pub(crate) struct BlobHandleImpl<'conn> {
-    inner: Blob<'conn>,
-}
-
-impl<'conn> BlobHandleImpl<'conn> {
-    pub(in crate::storage) fn new(blob: Blob<'conn>) -> Self {
-        Self { inner: blob }
-    }
-}
-
-impl BlobHandle for BlobHandleImpl<'_> {
-    fn read_at(&self, buf: &mut [u8], read_start: usize) -> Result<usize> {
-        self.inner.read_at(buf, read_start)
-    }
-}
-
-/// Divides the text into several lines and the rest of text as a *remainder*
-fn parse_blob_chunk(input: &[u8]) -> IResult<&[u8], Vec<&[u8]>, nom::error::Error<&[u8]>> {
-    many0(terminated(take_until("\n"), tag(b"\n")))(input)
-}
-
-/// [`BlobHandle`] blob chunking into [`Write`] stream.
+/// Streams a blob into a [`Write`] sink line by line.
+///
+/// Disabled lines are skipped using exact byte matching against
+/// `disabled_rules_set`.
+///
+/// Returns `true` when the last emitted line ended with `\n`, otherwise `false`.
 pub(crate) fn write_to_stream<W, B>(
     stream: &mut W,
     blob: B,
-    disabled_rules_set: HashSet<Vec<u8>>,
-) -> FLMResult<()>
+    disabled_rules_set: &HashSet<Vec<u8>>,
+) -> FLMResult<bool>
 where
     W: Write,
     B: BlobHandle,
 {
-    let mut offset = 0;
-    let mut buffer: Vec<u8> = vec![0; BLOB_CHUNK_SIZE];
-    let mut accumulator = Vec::new();
+    let mut reader = create_buffered_reader(blob);
+    let mut line_buf = Vec::new();
+    let mut ended_with_newline = false;
 
-    loop {
-        // Read the buffer
-        let bytes_read = blob.read_at(&mut buffer, offset)?;
-        if bytes_read == 0 {
-            if !accumulator.is_empty() && !disabled_rules_set.contains(&accumulator) {
-                stream.write(&accumulator).map_err(FLMError::from_io)?;
+    while let Some(has_newline) = read_next_line(&mut reader, &mut line_buf)? {
+        if !disabled_rules_set.contains(&line_buf) {
+            stream.write_all(&line_buf).map_err(FLMError::from_io)?;
+
+            if has_newline {
+                stream.write_all(b"\n").map_err(FLMError::from_io)?;
             }
 
-            break;
+            ended_with_newline = has_newline;
         }
-
-        accumulator.extend_from_slice(&buffer[0..bytes_read]);
-
-        let current_accum_len = accumulator.len();
-        let (remainder, matched_chunks) =
-            parse_blob_chunk(&accumulator).map_err(FLMError::from_display)?;
-
-        if !matched_chunks.is_empty() {
-            // Write found chunks
-            for chunk in matched_chunks {
-                if !disabled_rules_set.contains(chunk) {
-                    stream.write(chunk).map_err(FLMError::from_io)?;
-                    stream.write(b"\n").map_err(FLMError::from_io)?;
-                }
-            }
-
-            // Move remainder from end to start and shrinks length without extra allocations
-            let remainder_len = remainder.len();
-            accumulator.copy_within((current_accum_len - remainder_len).., 0);
-            accumulator.truncate(remainder_len);
-        }
-
-        offset += bytes_read;
     }
 
-    Ok(())
+    Ok(ended_with_newline)
+}
+
+/// Reads the next line from a buffered blob reader.
+///
+/// The resulting bytes are written into `line_buf` without the trailing `\n`.
+///
+/// Returns:
+/// - `Ok(Some(true))` if a line was read and ended with `\n`
+/// - `Ok(Some(false))` if the final unterminated line was read at EOF
+/// - `Ok(None)` if no more data is available
+pub(crate) fn read_next_line<R: BufRead>(
+    reader: &mut R,
+    line_buf: &mut Vec<u8>,
+) -> FLMResult<Option<bool>> {
+    line_buf.clear();
+
+    let bytes_read = reader
+        .read_until(b'\n', line_buf)
+        .map_err(FLMError::from_io)?;
+
+    if bytes_read == 0 {
+        return Ok(None);
+    }
+
+    let has_newline = line_buf.ends_with(b"\n");
+
+    if has_newline {
+        line_buf.pop();
+    }
+
+    Ok(Some(has_newline))
 }
 
 #[cfg(test)]
@@ -129,7 +127,7 @@ mod tests {
         let blob = TestBlobHandle::new(data.as_bytes().to_vec());
         let mut fake_file = Cursor::new(Vec::new());
 
-        write_to_stream(&mut fake_file, blob, disabled_rules_set).unwrap();
+        write_to_stream(&mut fake_file, blob, &disabled_rules_set).unwrap();
 
         let mut test_string = String::new();
 

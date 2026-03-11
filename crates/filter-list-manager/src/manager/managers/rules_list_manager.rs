@@ -1,4 +1,4 @@
-use crate::filters::parser::filter_collector::FilterCollector;
+use crate::filters::parser::collectors::default_filter_collector::DefaultFilterCollector;
 use crate::filters::parser::filter_compiler::FilterCompiler;
 use crate::filters::parser::filter_contents_provider::string_provider::StringProvider;
 use crate::filters::parser::is_rule_detector::is_line_is_rule;
@@ -154,7 +154,7 @@ impl RulesListManager {
             for rule in rules.iter_mut() {
                 if rule.has_directives() {
                     if let Some(download_url) = download_urls.get(&rule.filter_id) {
-                        let mut collector = FilterCollector::new(configuration);
+                        let collector = DefaultFilterCollector::new(configuration);
                         let (new_body, new_count) = collector
                             .collect_from_parts(
                                 rule,
@@ -379,7 +379,7 @@ impl RulesListManager {
                     }
 
                     if rule_entity.has_directives() {
-                        let (new_body, new_count) = FilterCollector::new(configuration)
+                        let (new_body, new_count) = DefaultFilterCollector::new(configuration)
                             .collect_from_parts(
                                 &rule_entity,
                                 filter_entity.download_url.as_str(),

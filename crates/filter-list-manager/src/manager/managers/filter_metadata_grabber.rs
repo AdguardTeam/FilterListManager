@@ -1,4 +1,4 @@
-use crate::filters::parser::filter_collector::FilterCollector;
+use crate::filters::parser::collectors::default_filter_collector::DefaultFilterCollector;
 use crate::filters::parser::filter_compiler::FilterCompiler;
 use crate::filters::parser::metadata::KnownMetadataProperty;
 use crate::io::http::blocking_client::BlockingClient;
@@ -59,7 +59,7 @@ impl FilterMetadataGrabber {
 
         let metadata = compiler.clone_metadata();
         let compiled_filter_entities = compiler.into_entities(0);
-        let mut builder = FilterCollector::new(configuration);
+        let builder = DefaultFilterCollector::new(configuration);
 
         let (filter_body, rules_count) = builder
             .collect(&compiled_filter_entities, &download_url)

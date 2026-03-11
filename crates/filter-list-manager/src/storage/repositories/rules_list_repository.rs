@@ -1,13 +1,15 @@
 use crate::manager::models::FilterId;
-use crate::storage::blob::BlobHandleImpl;
+use crate::storage::blob::{BlobHandleImpl, BLOB_CHUNK_SIZE};
 use crate::storage::entities::hydrate::Hydrate;
 use crate::storage::entities::rules_list::disabled_rules_entity::DisabledRulesEntity;
 use crate::storage::entities::rules_list::rules_count_entity::RulesCountEntity;
 use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
+use crate::storage::entities::rules_list::rules_list_metadata_entity::RulesListMetadataEntity;
 use crate::storage::repositories::{BulkDeleteRepository, Repository};
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::utils::{build_in_clause, process_where_clause};
 use crate::utils::integrity::{sign_content, verify_content};
+use blake3::Hasher;
 use rusqlite::{
     named_params, params_from_iter, Connection, Error, OptionalExtension, Row, Transaction,
 };
@@ -226,38 +228,6 @@ impl RulesListRepository {
         Ok(Some(results))
     }
 
-    pub(crate) fn get_blob_handle_and_disabled_rules<'a>(
-        &'a self,
-        connection: &'a Connection,
-        filter_id: FilterId,
-    ) -> Result<(Vec<u8>, BlobHandleImpl<'a>)> {
-        let mut statement = connection.prepare(
-            r"
-            SELECT
-                rowid,
-                CAST(disabled_rules_text AS BLOB)
-            FROM
-                [rules_list]
-            WHERE
-                filter_id = ?
-        ",
-        )?;
-
-        let (row_id, disabled_rules) = statement.query_row([filter_id], |row| {
-            Ok((row.get::<usize, i64>(0)?, row.get::<usize, Vec<u8>>(1)?))
-        })?;
-
-        let blob = connection.blob_open(
-            DatabaseName::Main,
-            Self::TABLE_NAME,
-            "rules_text",
-            row_id,
-            true,
-        )?;
-
-        Ok((disabled_rules, BlobHandleImpl::new(blob)))
-    }
-
     pub(crate) fn get_disabled_rules_by_ids(
         &self,
         connection: &Connection,
@@ -327,9 +297,104 @@ impl RulesListRepository {
 
         Ok(out)
     }
-}
 
-impl RulesListRepository {
+    /// Gets lightweight metadata for a single filter, without loading rules_text and rules_disabled_text.
+    /// Returns row_id, filter_id, has_directives, integrity_signature.
+    pub(crate) fn get_metadata(
+        &self,
+        connection: &Connection,
+        filter_id: FilterId,
+    ) -> Result<RulesListMetadataEntity> {
+        let mut statement = connection.prepare(
+            r"
+            SELECT
+                rowid,
+                filter_id,
+                has_directives,
+                integrity_signature
+            FROM
+                [rules_list]
+            WHERE
+                filter_id = ?
+        ",
+        )?;
+
+        statement.query_row([filter_id], RulesListMetadataEntity::from_row)
+    }
+
+    /// Gets disabled_rules_text as bytes and blob handle of rules_text
+    pub(crate) fn get_blob_handle_and_disabled_rules<'a>(
+        &'a self,
+        connection: &'a Connection,
+        filter_id: FilterId,
+    ) -> Result<(Vec<u8>, BlobHandleImpl<'a>)> {
+        let mut statement = connection.prepare(
+            r"
+            SELECT
+                rowid,
+                CAST(disabled_rules_text AS BLOB)
+            FROM
+                [rules_list]
+            WHERE
+                filter_id = ?
+        ",
+        )?;
+
+        let (row_id, disabled_rules) = statement.query_row([filter_id], |row| {
+            Ok((row.get::<usize, i64>(0)?, row.get::<usize, Vec<u8>>(1)?))
+        })?;
+
+        let blob = connection.blob_open(
+            DatabaseName::Main,
+            Self::TABLE_NAME,
+            "rules_text",
+            row_id,
+            true,
+        )?;
+
+        Ok((disabled_rules, BlobHandleImpl::new(blob)))
+    }
+
+    /// Verifies integrity of rules_text for a single filter by streaming the blob
+    /// through blake3 incremental hasher, without loading the full text into memory.
+    /// Returns `true` if the signature matches.
+    pub(crate) fn verify_blob_integrity_streaming(
+        &self,
+        connection: &Connection,
+        derived_key: &[u8; 32],
+        metadata: &RulesListMetadataEntity,
+    ) -> Result<bool> {
+        let signature = match metadata.integrity_signature {
+            Some(ref sig) => sig,
+            None => return Ok(false),
+        };
+
+        let blob = connection.blob_open(
+            DatabaseName::Main,
+            Self::TABLE_NAME,
+            "rules_text",
+            metadata.row_id,
+            true,
+        )?;
+
+        let mut hasher = Hasher::new_keyed(derived_key);
+        hasher.update(&metadata.filter_id.to_le_bytes());
+
+        let mut buffer = vec![0u8; BLOB_CHUNK_SIZE];
+        let mut offset = 0;
+        loop {
+            let bytes_read = blob.read_at(&mut buffer, offset)?;
+            if bytes_read == 0 {
+                break;
+            }
+            hasher.update(&buffer[..bytes_read]);
+            offset += bytes_read;
+        }
+
+        let computed = hasher.finalize();
+        Ok(computed.to_hex().as_str() == signature.as_str())
+    }
+
     /// Iterates over all rules_list rows, computes integrity signature for each
     /// using the derived key, and collects `(filter_id, signature)` pairs
     /// without loading all rule bodies into memory at once.

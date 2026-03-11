@@ -1,11 +1,14 @@
+use crate::storage::blob::{BlobHandleImpl, BLOB_CHUNK_SIZE};
 use crate::storage::entities::filter::filter_include_entity::FilterIncludeEntity;
+use crate::storage::entities::filter::filter_include_metadata_entity::FilterIncludeMetadataEntity;
 use crate::storage::repositories::Repository;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::utils::{build_in_clause, process_where_clause};
 use crate::storage::Hydrate;
 use crate::utils::integrity::{sign_content, verify_content};
 use crate::FilterId;
-use rusqlite::{named_params, params_from_iter, Connection, Error, Transaction};
+use blake3::Hasher;
+use rusqlite::{named_params, params_from_iter, Connection, DatabaseName, Error, Transaction};
 use std::collections::HashMap;
 
 pub(crate) type MapFilterIdOnFilterIncludes = HashMap<FilterId, Vec<FilterIncludeEntity>>;
@@ -233,6 +236,89 @@ impl FilterIncludesRepository {
         }
 
         Ok(())
+    }
+}
+
+impl FilterIncludesRepository {
+    /// Gets lightweight metadata for includes of a single filter, without loading body.
+    /// Returns Vec of (row_id, filter_id, absolute_url, integrity_signature).
+    pub(crate) fn get_include_metadata_for_filter(
+        &self,
+        conn: &Connection,
+        filter_id: FilterId,
+    ) -> rusqlite::Result<Vec<FilterIncludeMetadataEntity>> {
+        let mut statement = conn.prepare(
+            r"
+            SELECT
+                row_id,
+                filter_id,
+                absolute_url,
+                integrity_signature
+            FROM
+                [filter_includes]
+            WHERE
+                filter_id = ?
+        ",
+        )?;
+
+        let mut rows = statement.query([filter_id])?;
+        let mut out = Vec::new();
+        while let Some(row) = rows.next()? {
+            out.push(FilterIncludeMetadataEntity::from_row(row)?);
+        }
+
+        Ok(out)
+    }
+
+    /// Verifies integrity of include body by streaming the blob through blake3
+    /// incremental hasher, without loading the full body into memory.
+    /// Returns `true` if the signature matches.
+    pub(crate) fn verify_include_blob_integrity_streaming(
+        &self,
+        conn: &Connection,
+        derived_key: &[u8; 32],
+        metadata: &FilterIncludeMetadataEntity,
+    ) -> rusqlite::Result<bool> {
+        let signature = match metadata.integrity_signature {
+            Some(ref sig) => sig,
+            None => return Ok(false),
+        };
+
+        let blob = conn.blob_open(
+            DatabaseName::Main,
+            Self::TABLE_NAME,
+            "body",
+            metadata.row_id,
+            true,
+        )?;
+
+        let mut hasher = Hasher::new_keyed(derived_key);
+        hasher.update(&metadata.filter_id.to_le_bytes());
+
+        let mut buffer = vec![0u8; BLOB_CHUNK_SIZE];
+        let mut offset = 0;
+        loop {
+            let bytes_read = blob.read_at(&mut buffer, offset)?;
+            if bytes_read == 0 {
+                break;
+            }
+            hasher.update(&buffer[..bytes_read]);
+            offset += bytes_read;
+        }
+
+        let computed = hasher.finalize();
+        Ok(computed.to_hex().as_str() == signature.as_str())
+    }
+
+    /// Opens a blob handle on include body by row_id for streaming into output.
+    pub(crate) fn get_include_blob_handle<'a>(
+        &self,
+        conn: &'a Connection,
+        row_id: i64,
+    ) -> rusqlite::Result<BlobHandleImpl<'a>> {
+        let blob = conn.blob_open(DatabaseName::Main, Self::TABLE_NAME, "body", row_id, true)?;
+
+        Ok(BlobHandleImpl::new(blob))
     }
 }
 

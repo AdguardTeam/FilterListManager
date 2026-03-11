@@ -7,8 +7,8 @@ use chrono::Utc;
 use rusqlite::Connection;
 use rusqlite::Transaction;
 
+use crate::filters::parser::collectors::default_filter_collector::DefaultFilterCollector;
 use crate::filters::parser::diff_updates::process_diff_path::process_diff_path;
-use crate::filters::parser::filter_collector::FilterCollector;
 use crate::filters::parser::filter_compiler::{CompiledFilterEntities, FilterCompiler};
 use crate::filters::parser::filter_contents_provider::string_provider::StringProvider;
 use crate::filters::parser::metadata::parsers::expires::process_expires;
@@ -86,7 +86,7 @@ impl FilterManager {
                 rule_entity,
             )?;
 
-        let filter_collector = FilterCollector::new(configuration);
+        let filter_collector = DefaultFilterCollector::new(configuration);
         let full_filter_list: FullFilterList = self.make_full_filter_list(
             download_url,
             inserted_entity,
@@ -136,7 +136,7 @@ impl FilterManager {
                 rule_entity,
             )?;
 
-        let filter_collector = FilterCollector::new(configuration);
+        let filter_collector = DefaultFilterCollector::new(configuration);
 
         self.make_full_filter_list(
             download_url,
@@ -505,7 +505,7 @@ impl FilterManager {
         download_url: String,
         inserted_entity: FilterEntity,
         compiled_filter_entities: CompiledFilterEntities,
-        mut filter_collector: FilterCollector,
+        filter_collector: DefaultFilterCollector,
     ) -> FLMResult<FullFilterList> {
         filter_collector
             .collect(&compiled_filter_entities, &download_url)

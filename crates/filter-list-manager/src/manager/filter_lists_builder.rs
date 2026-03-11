@@ -1,4 +1,4 @@
-use crate::filters::parser::filter_collector::FilterCollector;
+use crate::filters::parser::collectors::default_filter_collector::DefaultFilterCollector;
 use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::full_filter_list::FullFilterList;
 use crate::storage::entities::filter::filter_entity::FilterEntity;
@@ -84,7 +84,7 @@ impl<'a> FullFilterListBuilder<'a> {
                     }
 
                     if rules_entity.has_directives() {
-                        let (text, lines_count) = FilterCollector::new(conf)
+                        let (text, lines_count) = DefaultFilterCollector::new(conf)
                             .collect_from_parts(
                                 &rules_entity,
                                 stored_filter_metadata.download_url.as_str(),

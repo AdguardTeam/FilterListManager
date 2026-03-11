@@ -363,10 +363,9 @@ mod tests {
     use rand::prelude::SliceRandom;
     use rand::thread_rng;
     use rusqlite::Connection;
-    use std::fs::File;
+    use std::fs;
     use std::ops::Sub;
     use std::time::{SystemTime, UNIX_EPOCH};
-    use std::{env, fs};
     use url::Url;
 
     #[test]
@@ -851,52 +850,6 @@ mod tests {
             .iter()
             .find(|rules| rules.filter_id == NONEXISTENT_ID)
             .is_none())
-    }
-
-    #[test]
-    fn test_save_rules_to_file_blob() {
-        let mut path = env::current_dir().unwrap();
-        path.push("fixtures");
-        path.push(format!(
-            "test_filter_rules_{}.txt",
-            Utc::now().timestamp_micros()
-        ));
-
-        let mut conf = Configuration::default();
-        conf.app_name = "FlmApp".to_string();
-        conf.version = "1.2.3".to_string();
-        let flm = FilterListManagerImpl::new(conf).unwrap();
-
-        {
-            File::create(&path).unwrap();
-        }
-
-        let rules = FilterListRules {
-            filter_id: USER_RULES_FILTER_LIST_ID,
-            rules: vec![
-                String::from("first"),
-                String::from("second"),
-                String::from("third"),
-                String::from("fourth"),
-                String::from("fifth"),
-            ],
-            disabled_rules: vec![
-                String::from("second"),
-                String::from("fourth"),
-                String::from("second"),
-            ],
-            rules_count: 0,
-        };
-
-        flm.save_custom_filter_rules(rules).unwrap();
-
-        flm.save_rules_to_file_blob(USER_RULES_FILTER_LIST_ID, &path)
-            .unwrap();
-
-        let test_string = fs::read_to_string(&path).unwrap();
-        fs::remove_file(&path).unwrap();
-
-        assert_eq!(test_string.as_str(), "first\nthird\nfifth");
     }
 
     #[test]

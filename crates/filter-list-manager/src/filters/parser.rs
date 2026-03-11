@@ -1,8 +1,8 @@
 mod boolean_expression_parser;
 mod checksum_validator;
+pub(crate) mod collectors;
 mod conditional_directives_processor;
 pub(crate) mod diff_updates;
-pub(crate) mod filter_collector;
 pub(crate) mod filter_compiler;
 pub(crate) mod filter_contents_provider;
 mod filter_cursor;
