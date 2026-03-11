@@ -4,10 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+## [2.5.0] - 2026-03-11
+
+### Added
+- `FilterListType::MISC` for managing a collection of miscellaneous filters
+
+### Fixed
+- Reformatted, cleaned up, and fixed `README.md`
 
 ### Changed
-- README.md
+- Constants `adguard_flm::storage::constants::{STANDARD_FILTERS_DATABASE_FILENAME, DNS_FILTERS_DATABASE_FILENAME}` were replaced with `adguard_flm::storage::database_name::build_database_name_for_filter_list_type(FilterListType)`
+- Index localizations are now optional: when `Configuration::metadata_locales_url` is empty (default), localizations are skipped (previously this could fail)
+- Filter updates now use multithreading, speeding up the operation by up to 8x
+
+[2.5.0]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.4.0...ffi-2.5.0
 
 ## [2.4.0] - 2026-02-18
 
