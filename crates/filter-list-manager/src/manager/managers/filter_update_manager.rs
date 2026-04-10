@@ -1,16 +1,10 @@
-use rusqlite::types::Value;
-use rusqlite::Connection;
-
 use crate::filters::indexes::indexes_processor::IndexesProcessor;
 use crate::manager::models::PullMetadataResult;
 use crate::manager::update_filters_action::update_filters_action;
-use crate::storage::repositories::filter_repository::FilterRepository;
-use crate::storage::sql_generators::operator::SQLOperator;
+use crate::storage::entities::filter::filter_entity::FilterEntity;
 use crate::storage::DbConnectionManager;
 use crate::Configuration;
-use crate::FLMError;
 use crate::FLMResult;
-use crate::FilterId;
 use crate::UpdateResult;
 
 pub(crate) struct FilterUpdateManager;
@@ -23,33 +17,19 @@ impl FilterUpdateManager {
     /// Forced updates filters by ids
     pub(crate) fn force_update_filters_by_ids(
         &self,
+        records: Vec<FilterEntity>,
         connection_manager: &DbConnectionManager,
         configuration: &Configuration,
-        ids: Vec<FilterId>,
         loose_timeout: i32,
-    ) -> FLMResult<Option<UpdateResult>> {
-        let values = ids.into_iter().map(|id| id.into()).collect::<Vec<Value>>();
-
-        let result = connection_manager.execute_db(|conn: Connection| {
-            FilterRepository::new()
-                .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
-                .map_err(FLMError::from_database)
-        })?;
-
-        let Some(records) = result else {
-            return Ok(None);
-        };
-
-        let update_result = update_filters_action(
+    ) -> FLMResult<UpdateResult> {
+        update_filters_action(
             records,
             connection_manager,
             true,
             true,
             loose_timeout,
             configuration,
-        )?;
-
-        Ok(Some(update_result))
+        )
     }
 
     /// Pulls metadata
@@ -69,70 +49,21 @@ impl FilterUpdateManager {
     /// Updates filters
     pub(crate) fn update_filters(
         &self,
+        records: Vec<FilterEntity>,
         connection_manager: &DbConnectionManager,
         configuration: &Configuration,
         ignore_filters_expiration: bool,
         loose_timeout: i32,
         ignore_filters_status: bool,
-    ) -> FLMResult<Option<UpdateResult>> {
-        let result = connection_manager.execute_db(|conn: Connection| {
-            FilterRepository::new()
-                .select(&conn, None)
-                .map_err(FLMError::from_database)
-        })?;
-
-        let Some(records) = result else {
-            return Ok(None);
-        };
-
-        let update_result = update_filters_action(
+    ) -> FLMResult<UpdateResult> {
+        update_filters_action(
             records,
             connection_manager,
             ignore_filters_expiration,
             ignore_filters_status,
             loose_timeout,
             configuration,
-        )?;
-
-        Ok(Some(update_result))
-    }
-
-    /// Updates filters with custom setup
-    pub(crate) fn update_filters_by_ids(
-        &self,
-        connection_manager: &DbConnectionManager,
-        configuration: &Configuration,
-        ids: Vec<FilterId>,
-        force_update: bool,
-        loose_timeout: i32,
-        ignore_filters_status: bool,
-    ) -> FLMResult<Option<UpdateResult>> {
-        if ids.is_empty() {
-            return Ok(Some(UpdateResult::default()));
-        }
-
-        let values = ids.into_iter().map(|id| id.into()).collect::<Vec<Value>>();
-
-        let result = connection_manager.execute_db(|conn: Connection| {
-            FilterRepository::new()
-                .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
-                .map_err(FLMError::from_database)
-        })?;
-
-        let Some(records) = result else {
-            return Ok(Some(UpdateResult::default()));
-        };
-
-        let update_result = update_filters_action(
-            records,
-            connection_manager,
-            force_update,
-            ignore_filters_status,
-            loose_timeout,
-            configuration,
-        )?;
-
-        Ok(Some(update_result))
+        )
     }
 }
 

@@ -184,11 +184,11 @@ Function RustBuild {
     $env:RUSTFLAGS = "-Ctarget-feature=+crt-static";
 
     Write-Output "Start executing method RustBuild";
-    & cargo build --release --lib --package adguard-flm-ffi --target i686-pc-windows-msvc --features rusqlite-bundled,win-res
+    & cargo build --release --lib --package adguard-flm-ffi --target i686-pc-windows-msvc --features rusqlite-bundled,win-res --locked
     RenameOutFile "i686-pc-windows-msvc"
-    & cargo build --release --lib --package adguard-flm-ffi --target x86_64-pc-windows-msvc --features rusqlite-bundled,win-res
+    & cargo build --release --lib --package adguard-flm-ffi --target x86_64-pc-windows-msvc --features rusqlite-bundled,win-res --locked
     RenameOutFile "x86_64-pc-windows-msvc"
-    & cargo build --release --lib --package adguard-flm-ffi --target aarch64-pc-windows-msvc --features rusqlite-bundled,win-res
+    & cargo build --release --lib --package adguard-flm-ffi --target aarch64-pc-windows-msvc --features rusqlite-bundled,win-res --locked
     RenameOutFile "aarch64-pc-windows-msvc"
 
     # Generate Protobuf bindings

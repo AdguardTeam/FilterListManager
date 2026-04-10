@@ -22,12 +22,17 @@ use crate::manager::models::filter_list_rules::FilterListRules;
 use crate::manager::models::filter_list_rules_raw::FilterListRulesRaw;
 use crate::manager::models::filter_tag::FilterTag;
 use crate::manager::models::rules_count_by_filter::RulesCountByFilter;
+use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
+use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::DbConnectionManager;
+use crate::utils::integrity;
 use crate::{
     manager::FilterListManager, ActiveRulesInfo, ActiveRulesInfoRaw, FLMError, FLMResult,
     StoredFilterMetadata,
 };
+use rusqlite::types::Value;
+use rusqlite::Connection;
 use std::path::Path;
 
 /// Default implementation for [`FilterListManager`]
@@ -72,6 +77,8 @@ impl FilterListManager for FilterListManagerImpl {
         title: Option<String>,
         description: Option<String>,
     ) -> FLMResult<FullFilterList> {
+        self.verify_filter_count_if_needed()?;
+
         FilterManager::new().install_custom_filter_list_from_url(
             &self.connection_manager,
             &self.configuration,
@@ -94,15 +101,38 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn enable_filter_lists(&self, ids: Vec<FilterId>, is_enabled: bool) -> FLMResult<usize> {
-        FilterManager::new().enable_filter_lists(&self.connection_manager, ids, is_enabled)
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+        let configuration = &self.configuration;
+        self.connection_manager
+            .execute_db(move |mut conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                FilterManager::new().enable_filter_lists(&mut conn, configuration, &ids, is_enabled)
+            })
     }
 
     fn install_filter_lists(&self, ids: Vec<FilterId>, is_installed: bool) -> FLMResult<usize> {
-        FilterManager::new().install_filter_lists(&self.connection_manager, ids, is_installed)
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+        let configuration = &self.configuration;
+        self.connection_manager
+            .execute_db(move |mut conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                FilterManager::new().install_filter_lists(
+                    &mut conn,
+                    configuration,
+                    &ids,
+                    is_installed,
+                )
+            })
     }
 
     fn delete_custom_filter_lists(&self, ids: Vec<FilterId>) -> FLMResult<usize> {
-        FilterManager::new().delete_custom_filter_lists(&self.connection_manager, ids)
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+        let configuration = &self.configuration;
+        self.connection_manager
+            .execute_db(move |mut conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                FilterManager::new().delete_custom_filter_lists(&mut conn, configuration, &ids)
+            })
     }
 
     fn get_all_tags(&self) -> FLMResult<Vec<FilterTag>> {
@@ -114,6 +144,8 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_full_filter_list_by_id(&self, filter_id: FilterId) -> FLMResult<Option<FullFilterList>> {
+        self.verify_filter_count_if_needed()?;
+
         FilterManager::new().get_full_filter_list_by_id(
             &self.connection_manager,
             &self.configuration,
@@ -122,6 +154,8 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_stored_filters_metadata(&self) -> FLMResult<Vec<StoredFilterMetadata>> {
+        self.verify_filter_count_if_needed()?;
+
         FilterManager::new().get_stored_filters_metadata(
             &self.connection_manager,
             &self.configuration,
@@ -133,6 +167,8 @@ impl FilterListManager for FilterListManagerImpl {
         &self,
         filter_id: FilterId,
     ) -> FLMResult<Option<StoredFilterMetadata>> {
+        self.verify_filter_count_if_needed()?;
+
         FilterManager::new().get_stored_filter_metadata_by_id(
             &self.connection_manager,
             &self.configuration,
@@ -141,11 +177,13 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn save_custom_filter_rules(&self, rules: FilterListRules) -> FLMResult<()> {
-        RulesListManager::new().save_custom_filter_rules(
-            &self.connection_manager,
-            &self.configuration,
-            rules,
-        )
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+        let configuration = &self.configuration;
+        self.connection_manager
+            .execute_db(move |mut conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                RulesListManager::new().save_custom_filter_rules(&mut conn, configuration, rules)
+            })
     }
 
     fn save_disabled_rules(
@@ -153,11 +191,13 @@ impl FilterListManager for FilterListManagerImpl {
         filter_id: FilterId,
         disabled_rules: Vec<String>,
     ) -> FLMResult<()> {
-        RulesListManager::new().save_disabled_rules(
-            &self.connection_manager,
-            filter_id,
-            disabled_rules,
-        )
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+
+        self.connection_manager
+            .execute_db(move |mut conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                RulesListManager::new().save_disabled_rules(&mut conn, filter_id, disabled_rules)
+            })
     }
 
     fn update_filters(
@@ -166,13 +206,31 @@ impl FilterListManager for FilterListManagerImpl {
         loose_timeout: i32,
         ignore_filters_status: bool,
     ) -> FLMResult<Option<UpdateResult>> {
-        FilterUpdateManager::new().update_filters(
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+
+        let result = self
+            .connection_manager
+            .execute_db(move |conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                FilterRepository::new()
+                    .select(&conn, None)
+                    .map_err(FLMError::from_database)
+            })?;
+
+        let Some(records) = result else {
+            return Ok(None);
+        };
+
+        let update_result = FilterUpdateManager::new().update_filters(
+            records,
             &self.connection_manager,
             &self.configuration,
             ignore_filters_expiration,
             loose_timeout,
             ignore_filters_status,
-        )
+        )?;
+
+        Ok(Some(update_result))
     }
 
     fn update_filters_by_ids(
@@ -182,14 +240,36 @@ impl FilterListManager for FilterListManagerImpl {
         loose_timeout: i32,
         ignore_filters_status: bool,
     ) -> FLMResult<Option<UpdateResult>> {
-        FilterUpdateManager::new().update_filters_by_ids(
+        if ids.is_empty() {
+            return Ok(Some(UpdateResult::default()));
+        }
+
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+        let values = ids.into_iter().map(|id| id.into()).collect::<Vec<Value>>();
+
+        let result = self
+            .connection_manager
+            .execute_db(move |conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                FilterRepository::new()
+                    .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
+                    .map_err(FLMError::from_database)
+            })?;
+
+        let Some(records) = result else {
+            return Ok(Some(UpdateResult::default()));
+        };
+
+        let update_result = FilterUpdateManager::new().update_filters(
+            records,
             &self.connection_manager,
             &self.configuration,
-            ids,
             ignore_filters_expiration,
             loose_timeout,
             ignore_filters_status,
-        )
+        )?;
+
+        Ok(Some(update_result))
     }
 
     fn force_update_filters_by_ids(
@@ -197,12 +277,30 @@ impl FilterListManager for FilterListManagerImpl {
         ids: Vec<FilterId>,
         loose_timeout: i32,
     ) -> FLMResult<Option<UpdateResult>> {
-        FilterUpdateManager::new().force_update_filters_by_ids(
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+        let values = ids.into_iter().map(|id| id.into()).collect::<Vec<Value>>();
+
+        let result = self
+            .connection_manager
+            .execute_db(move |conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                FilterRepository::new()
+                    .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
+                    .map_err(FLMError::from_database)
+            })?;
+
+        let Some(records) = result else {
+            return Ok(None);
+        };
+
+        let update_result = FilterUpdateManager::new().force_update_filters_by_ids(
+            records,
             &self.connection_manager,
             &self.configuration,
-            ids,
             loose_timeout,
-        )
+        )?;
+
+        Ok(Some(update_result))
     }
 
     fn change_locale(&mut self, suggested_locale: Locale) -> FLMResult<bool> {
@@ -214,6 +312,8 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn pull_metadata(&self) -> FLMResult<PullMetadataResult> {
+        self.verify_filter_count_if_needed()?;
+
         FilterUpdateManager::new().pull_metadata(&self.connection_manager, &self.configuration)
     }
 
@@ -223,12 +323,21 @@ impl FilterListManager for FilterListManagerImpl {
         title: String,
         is_trusted: bool,
     ) -> FLMResult<bool> {
-        FilterManager::new().update_custom_filter_metadata(
-            &self.connection_manager,
-            filter_id,
-            title,
-            is_trusted,
-        )
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+        let configuration = &self.configuration;
+
+        self.connection_manager
+            .execute_db(move |mut conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+
+                FilterManager::new().update_custom_filter_metadata(
+                    &mut conn,
+                    configuration,
+                    filter_id,
+                    title,
+                    is_trusted,
+                )
+            })
     }
 
     fn get_database_path(&self) -> FLMResult<String> {
@@ -255,6 +364,8 @@ impl FilterListManager for FilterListManagerImpl {
         custom_title: Option<String>,
         custom_description: Option<String>,
     ) -> FLMResult<FullFilterList> {
+        self.verify_filter_count_if_needed()?;
+
         FilterManager::new().install_custom_filter_from_string(
             &self.connection_manager,
             &self.configuration,
@@ -269,10 +380,14 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_active_rules(&self) -> FLMResult<Vec<ActiveRulesInfo>> {
+        self.verify_filter_count_if_needed()?;
+
         RulesListManager::new().get_active_rules(&self.connection_manager, &self.configuration)
     }
 
     fn get_active_rules_raw(&self, filter_by: Vec<FilterId>) -> FLMResult<Vec<ActiveRulesInfoRaw>> {
+        self.verify_filter_count_if_needed()?;
+
         RulesListManager::new().get_active_rules_raw(
             &self.connection_manager,
             &self.configuration,
@@ -284,6 +399,8 @@ impl FilterListManager for FilterListManagerImpl {
         &self,
         ids: Vec<FilterId>,
     ) -> FLMResult<Vec<FilterListRulesRaw>> {
+        self.verify_filter_count_if_needed()?;
+
         RulesListManager::new().get_filter_rules_as_strings(
             &self.connection_manager,
             &self.configuration,
@@ -296,6 +413,8 @@ impl FilterListManager for FilterListManagerImpl {
         filter_id: FilterId,
         file_path: P,
     ) -> FLMResult<()> {
+        self.verify_filter_count_if_needed()?;
+
         StreamingRulesManager::new().save_rules_to_file_blob(
             &self.connection_manager,
             &self.configuration,
@@ -305,7 +424,16 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_disabled_rules(&self, ids: Vec<FilterId>) -> FLMResult<Vec<DisabledRulesRaw>> {
-        RulesListManager::new().get_disabled_rules(&self.connection_manager, ids)
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+
+        let result = self
+            .connection_manager
+            .execute_db(move |conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                RulesListManager::new().get_disabled_rules(&conn, &ids)
+            })?;
+
+        Ok(result.into_iter().map(Into::into).collect())
     }
 
     fn set_proxy_mode(&mut self, mode: RequestProxyMode) {
@@ -313,14 +441,23 @@ impl FilterListManager for FilterListManagerImpl {
     }
 
     fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>> {
-        RulesListManager::new().get_rules_count(&self.connection_manager, ids)
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+
+        let result = self
+            .connection_manager
+            .execute_db(move |conn: Connection| {
+                Self::verify_filter_count_in_conn(&derived_key, &conn)?;
+                RulesListManager::new().get_rules_count(&conn, &ids)
+            })?;
+
+        Ok(result.into_iter().map(Into::into).collect())
     }
 
-    fn sign_all_rules(&self) -> FLMResult<()> {
-        IntegrityControlManager::new().sign_all_rules(&self.connection_manager, &self.configuration)
+    fn sign_all_data(&self) -> FLMResult<()> {
+        IntegrityControlManager::new().sign_all_data(&self.connection_manager, &self.configuration)
     }
 
-    fn sign_all_rules_with_new_key(&mut self, integrity_key: String) -> FLMResult<()> {
+    fn sign_all_data_with_new_key(&mut self, integrity_key: String) -> FLMResult<()> {
         if integrity_key.trim().is_empty() {
             return Err(FLMError::InvalidConfiguration(
                 "integrity_key is set, but empty or contains whitespaces only",
@@ -328,12 +465,66 @@ impl FilterListManager for FilterListManagerImpl {
         }
 
         self.configuration.integrity_key = Some(integrity_key);
-        IntegrityControlManager::new().sign_all_rules(&self.connection_manager, &self.configuration)
+        IntegrityControlManager::new().sign_all_data(&self.connection_manager, &self.configuration)
     }
 
     fn verify_integrity(&self) -> FLMResult<()> {
         IntegrityControlManager::new()
             .verify_integrity(&self.connection_manager, &self.configuration)
+    }
+}
+
+impl FilterListManagerImpl {
+    /// Performs a lightweight filter count integrity check within an existing
+    /// connection.
+    ///
+    /// Reads `filter_count_signature` from the `metadata` table, counts all
+    /// filters in `[filter]`, and verifies the signature with blake3.
+    /// This is cheap (1 metadata read + 1 COUNT + 1 hash).
+    ///
+    /// No-op when `derived_key` is `None` (integrity protection disabled).
+    fn verify_filter_count_in_conn(
+        derived_key: &Option<[u8; 32]>,
+        conn: &Connection,
+    ) -> FLMResult<()> {
+        let derived_key = match derived_key {
+            Some(key) => key,
+            None => return Ok(()),
+        };
+
+        let metadata = DBMetadataRepository::read(conn)
+            .map_err(FLMError::from_database)?
+            .unwrap_or_default();
+
+        let sig = metadata
+            .filter_count_signature
+            .ok_or(FLMError::FilterIntegrityCheckFailed(0))?;
+
+        let count = FilterRepository::new()
+            .count_all(conn)
+            .map_err(FLMError::from_database)?;
+
+        if !integrity::verify_filter_count(derived_key, count, &sig) {
+            return Err(FLMError::FilterIntegrityCheckFailed(0));
+        }
+
+        Ok(())
+    }
+
+    /// Performs a lightweight filter count integrity check, opening its own
+    /// connection.  Used by read methods that delegate to managers which
+    /// manage their own connections (e.g. `get_active_rules`).
+    ///
+    /// No-op when integrity protection is disabled (`integrity_key` is `None`).
+    fn verify_filter_count_if_needed(&self) -> FLMResult<()> {
+        let derived_key = integrity::derive_key_if_needed(&self.configuration);
+        if derived_key.is_none() {
+            return Ok(());
+        }
+
+        self.connection_manager.execute_db(move |conn: Connection| {
+            Self::verify_filter_count_in_conn(&derived_key, &conn)
+        })
     }
 }
 
@@ -348,6 +539,7 @@ impl FilterListManagerImpl {
 mod tests {
     use crate::manager::managers::filter_manager::FilterManager;
     use crate::storage::entities::rules_list::rules_list_entity::RulesListEntity;
+    use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
     use crate::storage::repositories::filter_repository::FilterRepository;
     use crate::storage::repositories::rules_list_repository::RulesListRepository;
     use crate::storage::repositories::Repository;
@@ -356,8 +548,8 @@ mod tests {
     use crate::storage::DbConnectionManager;
     use crate::test_utils::spawn_test_db_with_metadata;
     use crate::{
-        string, Configuration, FilterId, FilterListManager, FilterListManagerImpl, FilterListRules,
-        USER_RULES_FILTER_LIST_ID,
+        generate_random_key, string, Configuration, FLMError, FilterId, FilterListManager,
+        FilterListManagerImpl, FilterListRules, USER_RULES_FILTER_LIST_ID,
     };
     use chrono::{Duration, Utc};
     use rand::prelude::SliceRandom;
@@ -1221,6 +1413,10 @@ mod tests {
 
         let mut flm = FilterListManagerImpl::new(conf).unwrap();
 
+        // Sign all pre-existing data immediately after creation, as required when
+        // integrity_key is set — any subsequent write will verify before re-signing.
+        flm.sign_all_data().unwrap();
+
         // 3. Install custom filter with includes (main.txt references included_part*.txt)
         let includes_filter_path = tests_path("fixtures/includes/main.txt");
         let includes_filter_body = std::fs::read_to_string(&includes_filter_path).unwrap();
@@ -1253,18 +1449,18 @@ mod tests {
             )
             .unwrap();
 
-        // 5. Sign all rules with initial key
-        flm.sign_all_rules().unwrap();
+        // 5. Sign all data with initial key
+        flm.sign_all_data().unwrap();
 
         // 6. Verify integrity - should pass
         flm.verify_integrity().unwrap();
 
-        // 7. Generate new key and re-sign all rules
+        // 7. Generate new key and re-sign all data
         let new_key = generate_random_key().unwrap();
         assert_eq!(new_key.len(), 64);
         assert_ne!(initial_key, new_key);
 
-        flm.sign_all_rules_with_new_key(new_key.clone()).unwrap();
+        flm.sign_all_data_with_new_key(new_key.clone()).unwrap();
 
         // 8. Verify integrity again - should still pass with new key
         flm.verify_integrity().unwrap();
@@ -1293,7 +1489,7 @@ mod tests {
         }
 
         // 11. Test that empty key is rejected
-        let empty_key_result = flm.sign_all_rules_with_new_key("   ".to_string());
+        let empty_key_result = flm.sign_all_data_with_new_key("   ".to_string());
         assert!(empty_key_result.is_err());
         match empty_key_result {
             Err(FLMError::InvalidConfiguration(_)) => {
@@ -1301,5 +1497,68 @@ mod tests {
             }
             _ => panic!("Expected InvalidConfiguration error for empty key"),
         }
+    }
+
+    #[test]
+    fn test_verify_integrity_fails_on_missing_filter_count_signature() {
+        // Simulate an attacker who erases filter_count_signature in the
+        // metadata table directly, bypassing the library API.
+        // verify_integrity() must detect the tampering and return
+        // FilterIntegrityCheckFailed(0) (sentinel for count mismatch).
+
+        let key = generate_random_key().unwrap();
+
+        let mut conf = Configuration::default();
+        conf.app_name = "FlmApp".to_string();
+        conf.version = "1.2.3".to_string();
+        conf.integrity_key = Some(key);
+
+        let flm = FilterListManagerImpl::new(conf).unwrap();
+
+        // Sign all pre-existing data immediately after creation, as required when
+        // integrity_key is set — any subsequent write will verify before re-signing.
+        flm.sign_all_data().unwrap();
+
+        let path = fs::canonicalize("./tests/fixtures/1.txt").unwrap();
+        let body = fs::read_to_string(&path).unwrap();
+
+        let _filter = flm
+            .install_custom_filter_from_string(
+                Url::from_file_path(&path).unwrap().to_string(),
+                1234567890,
+                true,
+                true,
+                body,
+                Some("Test filter".to_string()),
+                None,
+            )
+            .unwrap();
+
+        flm.sign_all_data().unwrap();
+
+        // Baseline: integrity check must pass after signing
+        flm.verify_integrity().unwrap();
+
+        // Attacker erases the count signature directly in SQLite
+        flm.connection_manager
+            .execute_db(|mut conn: Connection| {
+                let mut metadata = DBMetadataRepository::read(&conn)?.unwrap_or_default();
+                assert!(
+                    metadata.filter_count_signature.is_some(),
+                    "Metadata should have count signature already"
+                );
+
+                metadata.filter_count_signature = None;
+
+                with_transaction(&mut conn, |tx| DBMetadataRepository::save(&tx, &metadata))
+            })
+            .unwrap();
+
+        // verify_integrity must now detect the missing count signature
+        let result = flm.verify_integrity();
+        assert!(
+            matches!(result, Err(FLMError::FilterIntegrityCheckFailed(0))),
+            "Expected FilterIntegrityCheckFailed(0), got: {result:?}",
+        );
     }
 }

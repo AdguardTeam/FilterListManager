@@ -14,7 +14,7 @@ You may need to regenerate protobuf files **for Rust** and `flm_native_interface
 It's better to run this operation from the workspace root.
 
 ### Build library
-`cargo build -p adguard-flm-ffi` from workspace root
+`cargo build -p adguard-flm-ffi --locked` from workspace root
 
 ### Platforms
 

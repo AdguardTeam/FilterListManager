@@ -176,7 +176,19 @@
         /// Throws exception if integrity_key is not set or if any entity has a missing or invalid signature.
         /// </summary>
         VerifyIntegrity,
-        
+
+        /// <summary>
+        /// Signs all filter rules, includes, metadata, and the filter count using the integrity key.
+        /// Throws exception if integrity_key is not set in configuration.
+        /// </summary>
+        SignAllData,
+
+        /// <summary>
+        /// Updates the integrity key and re-signs all filter rules, includes, metadata, and count
+        /// with the new key.
+        /// </summary>
+        SignAllDataWithNewKey,
+
         // There are ffi methods that not used for working with filters explicitly
         
         /// <summary>

@@ -16,6 +16,7 @@ use crate::filters::parser::metadata::KnownMetadataProperty;
 use crate::io::http::blocking_client::BlockingClient;
 use crate::manager::filter_lists_builder::FullFilterListBuilder;
 use crate::storage::entities::filter::filter_entity::FilterEntity;
+use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::diff_updates_repository::DiffUpdateRepository;
 use crate::storage::repositories::filter_includes_repository::FilterIncludesRepository;
 use crate::storage::repositories::filter_repository::FilterRepository;
@@ -151,48 +152,59 @@ impl FilterManager {
     /// Deletes custom filter lists
     pub(crate) fn delete_custom_filter_lists(
         &self,
-        connection_manager: &DbConnectionManager,
-        ids: Vec<FilterId>,
+        conn: &mut Connection,
+        configuration: &Configuration,
+        ids: &[FilterId],
     ) -> FLMResult<usize> {
-        let rows_updated: usize = connection_manager.execute_db(move |mut conn: Connection| {
-            let filter_repository = FilterRepository::new();
-            let rules_repository = RulesListRepository::new();
+        let derived_key = integrity::derive_key_if_needed(configuration);
 
-            let custom_filters = filter_repository
-                .filter_custom_filters(&conn, &ids)
-                .map_err(FLMError::from_database)?;
+        let filter_repository = FilterRepository::new();
+        let rules_repository = RulesListRepository::new();
 
-            with_transaction(&mut conn, move |tx: &Transaction| {
-                let rows_deleted = filter_repository.bulk_delete(tx, &custom_filters)?;
-                rules_repository.bulk_delete(tx, &custom_filters)?;
+        let custom_filters = filter_repository
+            .filter_custom_filters(conn, ids)
+            .map_err(FLMError::from_database)?;
 
-                Ok(rows_deleted)
-            })
-        })?;
+        with_transaction(conn, move |tx: &Transaction| {
+            let rows_deleted = filter_repository.bulk_delete(tx, &custom_filters)?;
+            rules_repository.bulk_delete(tx, &custom_filters)?;
 
-        Ok(rows_updated)
+            // Update count signature after deletion
+            if let Some(ref key) = derived_key {
+                let count = filter_repository.count_all(tx)?;
+                let count_sig = integrity::sign_filter_count(key, count);
+
+                let mut meta = DBMetadataRepository::read(tx)?.unwrap_or_default();
+
+                meta.filter_count_signature = Some(count_sig);
+                DBMetadataRepository::save(tx, &meta)?;
+            }
+
+            Ok(rows_deleted)
+        })
     }
 
-    /// Enables or disabled filter lists
+    /// Enables or disables filter lists
     pub(crate) fn enable_filter_lists(
         &self,
-        connection_manager: &DbConnectionManager,
-        ids: Vec<FilterId>,
+        conn: &mut Connection,
+        configuration: &Configuration,
+        ids: &[FilterId],
         is_enabled: bool,
     ) -> FLMResult<usize> {
-        let rows_updated: usize = connection_manager.execute_db(move |mut conn: Connection| {
-            let tx = conn.transaction().map_err(FLMError::from_database)?;
+        let derived_key = integrity::derive_key_if_needed(configuration);
 
-            let rows_updated = FilterRepository::new()
-                .toggle_filter_lists(&tx, &ids, is_enabled)
-                .map_err(FLMError::from_database)?;
+        with_transaction(conn, |tx: &Transaction| {
+            let filter_repo = FilterRepository::new();
+            let rows_updated = filter_repo.toggle_filter_lists(tx, ids, is_enabled)?;
 
-            tx.commit().map_err(FLMError::from_database)?;
+            // Re-sign affected filter metadata
+            if let Some(ref key) = derived_key {
+                filter_repo.resign_filters_in_tx(tx, ids, key)?;
+            }
 
             Ok(rows_updated)
-        })?;
-
-        Ok(rows_updated)
+        })
     }
 
     /// Gets full filter list by id
@@ -239,42 +251,37 @@ impl FilterManager {
         configuration: &Configuration,
         where_clause: Option<SQLOperator>,
     ) -> FLMResult<Vec<StoredFilterMetadata>> {
-        let stored_filters_metadata: Vec<StoredFilterMetadata> = self
-            .get_stored_filter_metadata_list_inner(
-                connection_manager,
-                configuration,
-                where_clause,
-            )?;
-
-        Ok(stored_filters_metadata)
+        self.get_stored_filter_metadata_list_inner(connection_manager, configuration, where_clause)
     }
 
     /// Toggles is_installed flag for filter lists
     pub(crate) fn install_filter_lists(
         &self,
-        connection_manager: &DbConnectionManager,
-        ids: Vec<FilterId>,
+        conn: &mut Connection,
+        configuration: &Configuration,
+        ids: &[FilterId],
         is_installed: bool,
     ) -> FLMResult<usize> {
-        let rows_updated: usize = connection_manager.execute_db(move |mut conn: Connection| {
-            let tx = conn.transaction().map_err(FLMError::from_database)?;
+        let derived_key = integrity::derive_key_if_needed(configuration);
 
-            let rows_updated = FilterRepository::new()
-                .toggle_is_installed(&tx, &ids, is_installed)
-                .map_err(FLMError::from_database)?;
+        with_transaction(conn, |tx: &Transaction| {
+            let filter_repo = FilterRepository::new();
+            let rows_updated = filter_repo.toggle_is_installed(tx, ids, is_installed)?;
 
-            tx.commit().map_err(FLMError::from_database)?;
+            // Re-sign affected filter metadata
+            if let Some(ref key) = derived_key {
+                filter_repo.resign_filters_in_tx(tx, ids, key)?;
+            }
 
             Ok(rows_updated)
-        })?;
-
-        Ok(rows_updated)
+        })
     }
 
     /// Updates custom filter metadata
     pub(crate) fn update_custom_filter_metadata(
         &self,
-        connection_manager: &DbConnectionManager,
+        conn: &mut Connection,
+        configuration: &Configuration,
         filter_id: FilterId,
         title: String,
         is_trusted: bool,
@@ -283,37 +290,43 @@ impl FilterManager {
             return Err(FLMError::FieldIsEmpty("title"));
         }
 
-        let is_updated: bool = connection_manager.execute_db(move |mut conn: Connection| {
-            let filter_repository = FilterRepository::new();
+        let derived_key = integrity::derive_key_if_needed(configuration);
 
-            let count = filter_repository
-                .count(
-                    &conn,
-                    Some(FilterRepository::custom_filter_with_id(filter_id)),
-                )
-                .map_err(FLMError::from_database)?;
+        let filter_repository = FilterRepository::new();
 
-            if count > 0 {
-                let is_title_set_by_user = !title.is_empty();
+        let count = filter_repository
+            .count(
+                conn,
+                Some(FilterRepository::custom_filter_with_id(filter_id)),
+            )
+            .map_err(FLMError::from_database)?;
 
-                let is_updated: bool =
-                    with_transaction(&mut conn, move |transaction: &Transaction| {
-                        filter_repository.update_user_metadata_for_custom_filter(
-                            transaction,
-                            filter_id,
-                            title.as_str(),
-                            is_trusted,
-                            is_title_set_by_user,
-                        )
-                    })?;
+        if count > 0 {
+            let is_title_set_by_user = !title.is_empty();
 
-                Ok(is_updated)
-            } else {
-                Err(FLMError::EntityNotFound(filter_id as i64))
-            }
-        })?;
+            let is_updated: bool = with_transaction(conn, move |transaction: &Transaction| {
+                let updated = filter_repository.update_user_metadata_for_custom_filter(
+                    transaction,
+                    filter_id,
+                    title.as_str(),
+                    is_trusted,
+                    is_title_set_by_user,
+                )?;
 
-        Ok(is_updated)
+                // Re-sign metadata for this filter after is_trusted change
+                if updated {
+                    if let Some(ref key) = derived_key {
+                        filter_repository.resign_filters_in_tx(transaction, &[filter_id], key)?;
+                    }
+                }
+
+                Ok(updated)
+            })?;
+
+            Ok(is_updated)
+        } else {
+            Err(FLMError::EntityNotFound(filter_id as i64))
+        }
     }
 }
 
@@ -338,11 +351,17 @@ impl FilterManager {
         configuration: &Configuration,
         where_clause: Option<SQLOperator>,
     ) -> FLMResult<Vec<FullFilterList>> {
+        let derived_key = integrity::derive_key_if_needed(configuration);
+
         connection_manager.execute_db(move |conn: Connection| {
             FilterRepository::new()
                 .select(&conn, where_clause)
                 .map_err(FLMError::from_database)?
                 .map(|filters| {
+                    if let Some(ref dk) = derived_key {
+                        integrity::verify_filter_entities(dk, &filters)?;
+                    }
+
                     FullFilterListBuilder::new(&configuration.locale).build_full_filter_lists(
                         conn,
                         filters,
@@ -360,12 +379,18 @@ impl FilterManager {
         configuration: &Configuration,
         where_clause: Option<SQLOperator>,
     ) -> FLMResult<Vec<StoredFilterMetadata>> {
+        let derived_key = integrity::derive_key_if_needed(configuration);
+
         let stored_filter_metadata: Vec<StoredFilterMetadata> =
             connection_manager.execute_db(move |conn: Connection| {
                 FilterRepository::new()
                     .select(&conn, where_clause)
                     .map_err(FLMError::from_database)?
                     .map(|filters| {
+                        if let Some(ref dk) = derived_key {
+                            integrity::verify_filter_entities(dk, &filters)?;
+                        }
+
                         FullFilterListBuilder::new(&configuration.locale)
                             .build_stored_filter_metadata_lists(conn, filters)
                     })
@@ -447,8 +472,9 @@ impl FilterManager {
         mut entities: CompiledFilterEntities,
     ) -> FLMResult<(FilterEntity, CompiledFilterEntities)> {
         connection_manager.execute_db(move |mut conn: Connection| {
-            let (tx, inserted_entity) = spawn_transaction(&mut conn, |tx: &Transaction| {
-                FilterRepository::new().only_insert_row(tx, entity)
+            let filter_repo = FilterRepository::new();
+            let (tx, mut inserted_entity) = spawn_transaction(&mut conn, |tx: &Transaction| {
+                filter_repo.only_insert_row(tx, entity)
             })
             .map_err(FLMError::from_database)?;
 
@@ -484,6 +510,29 @@ impl FilterManager {
                 &mut entities.rules_list_entity,
                 &mut entities.filter_includes_entities,
             );
+
+            // Sign filter metadata and update count after insert
+            if let Some(derived) = integrity::derive_key_if_needed(configuration) {
+                integrity::sign_filter_entity(&derived, &mut inserted_entity);
+                if let Some(sig) = inserted_entity.integrity_signature() {
+                    filter_repo
+                        .update_integrity_signature(&tx, filter_id, sig)
+                        .map_err(FLMError::from_database)?;
+                }
+
+                let count = filter_repo
+                    .count_all(&tx)
+                    .map_err(FLMError::from_database)?;
+
+                let count_sig = integrity::sign_filter_count(&derived, count);
+
+                let mut meta = DBMetadataRepository::read(&tx)
+                    .map_err(FLMError::from_database)?
+                    .unwrap_or_default();
+                meta.filter_count_signature = Some(count_sig);
+
+                DBMetadataRepository::save(&tx, &meta).map_err(FLMError::from_database)?;
+            }
 
             RulesListRepository::new()
                 .insert(&tx, slice::from_ref(&entities.rules_list_entity))

@@ -33,6 +33,7 @@ pub(crate) struct FilterEntity {
     pub is_trusted: bool,
     pub(in crate::storage) is_user_title: Option<bool>,
     pub(in crate::storage) is_user_description: Option<bool>,
+    pub(in crate::storage) integrity_signature: Option<String>,
 }
 
 impl FilterEntity {
@@ -71,6 +72,16 @@ impl FilterEntity {
     pub(crate) fn set_is_user_description(&mut self, is_user_description: bool) {
         self.is_user_description = Some(is_user_description);
     }
+
+    /// `integrity_signature` getter
+    pub(crate) fn integrity_signature(&self) -> Option<&str> {
+        self.integrity_signature.as_deref()
+    }
+
+    /// Sets `integrity_signature` explicitly for changing in database
+    pub(crate) fn set_integrity_signature(&mut self, integrity_signature: Option<String>) {
+        self.integrity_signature = integrity_signature;
+    }
 }
 
 impl Default for FilterEntity {
@@ -96,6 +107,7 @@ impl Default for FilterEntity {
             is_installed: false,
             is_user_title: None,
             is_user_description: None,
+            integrity_signature: None,
         }
     }
 }
@@ -122,6 +134,7 @@ impl Hydrate for FilterEntity {
             is_trusted: row.get(16)?,
             is_user_title: row.get(17)?,
             is_user_description: row.get(18)?,
+            integrity_signature: row.get(19)?,
         })
     }
 }

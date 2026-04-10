@@ -175,7 +175,7 @@ class FilterListManagerAndroidTest {
             val randomKey = FilterListManager.generateRandomKey()
             assertFalse(randomKey.isEmpty())
 
-            flm.signAllRulesWithNewKey(randomKey)
+            flm.signAllDataWithNewKey(randomKey)
             flm.verifyIntegrity()
 
             // Test getting filter by ID

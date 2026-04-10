@@ -959,15 +959,16 @@ constructor(configuration: Configuration)
     }
 
     /**
-     * Signs all filter rules and includes entities with the integrity key from configuration.
+     * Signs all filter rules, includes, metadata, and the filter count using the integrity key
+     * from configuration.
      *
      * @throws FilterListManagerException if integrity_key is not set in configuration.
      */
     @Throws(FilterListManagerException::class)
-    fun signAllRules() {
+    fun signAllData() {
         val request = emptyRequest { }
 
-        call(FFIMethod.SignAllRules, request).use { result ->
+        call(FFIMethod.SignAllData, request).use { result ->
             EmptyResponse.parseFrom(result.resultData).let { response ->
                 if (response.hasError()) {
                     throw FilterListManagerException(response.error)
@@ -977,19 +978,19 @@ constructor(configuration: Configuration)
     }
 
     /**
-     * Updates the integrity key in configuration and re-signs all filter rules and includes
-     * entities with the new key.
+     * Updates the integrity key in configuration and re-signs all filter rules, includes,
+     * metadata, and the filter count with the new key.
      *
      * @param integrityKey New integrity key to use for signing.
      * @throws FilterListManagerException if there's an error in the Rust code.
      */
     @Throws(FilterListManagerException::class)
-    fun signAllRulesWithNewKey(integrityKey: String) {
-        val request = signAllRulesWithNewKeyRequest {
+    fun signAllDataWithNewKey(integrityKey: String) {
+        val request = signAllDataWithNewKeyRequest {
             this.integrityKey = integrityKey
         }
 
-        call(FFIMethod.SignAllRulesWithNewKey, request).use { result ->
+        call(FFIMethod.SignAllDataWithNewKey, request).use { result ->
             EmptyResponse.parseFrom(result.resultData).let { response ->
                 if (response.hasError()) {
                     throw FilterListManagerException(response.error)

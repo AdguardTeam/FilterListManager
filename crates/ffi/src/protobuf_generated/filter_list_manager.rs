@@ -735,7 +735,7 @@ pub struct GetRulesCountRequest {
     pub ids: ::prost::alloc::vec::Vec<i32>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SignAllRulesWithNewKeyRequest {
+pub struct SignAllDataWithNewKeyRequest {
     #[prost(string, tag = "1")]
     pub integrity_key: ::prost::alloc::string::String,
 }

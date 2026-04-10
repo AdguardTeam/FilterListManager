@@ -516,7 +516,26 @@ namespace AdGuard.FilterListManager
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        public void SignAllData()
+        {
+            EmptyRequest request = new EmptyRequest();
+            CallRustMessage<EmptyResponse>(request);
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void SignAllRulesWithNewKey(string integrityKey)
+        {
+            SignAllRulesWithNewKeyRequest request = new SignAllRulesWithNewKeyRequest();
+            request.IntegrityKey = integrityKey;
+            CallRustMessage<EmptyResponse>(request);
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public void SignAllDataWithNewKey(string integrityKey)
         {
             SignAllRulesWithNewKeyRequest request = new SignAllRulesWithNewKeyRequest();
             request.IntegrityKey = integrityKey;

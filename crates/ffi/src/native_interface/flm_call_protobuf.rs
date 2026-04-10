@@ -18,7 +18,7 @@ use crate::protobuf_generated::filter_list_manager::{
     InstallCustomFilterFromStringResponse, InstallCustomFilterListRequest,
     InstallCustomFilterListResponse, InstallFilterListsRequest, InstallFilterListsResponse,
     PullMetadataResponse, SaveCustomFilterRulesRequest, SaveDisabledRulesRequest,
-    SaveRulesToFileBlobRequest, SetProxyModeRequest, SignAllRulesWithNewKeyRequest,
+    SaveRulesToFileBlobRequest, SetProxyModeRequest, SignAllDataWithNewKeyRequest,
     UpdateCustomFilterMetadataRequest, UpdateCustomFilterMetadataResponse,
     UpdateFiltersByIdsRequest, UpdateFiltersByIdsResponse, UpdateFiltersRequest,
     UpdateFiltersResponse,
@@ -62,9 +62,9 @@ pub enum FFIMethod {
     GetDisabledRules,
     SetProxyMode,
     GetRulesCount,
-    SignAllRules,
-    SignAllRulesWithNewKey,
     VerifyIntegrity,
+    SignAllData,
+    SignAllDataWithNewKey,
 }
 
 /// Calls FLM method described as [`FFIMethod`] for object behind [`FLMHandle`]
@@ -544,24 +544,24 @@ pub unsafe extern "C" fn flm_call_protobuf(
             }
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethod::SignAllRules => EmptyResponse {
-            error: flm_handle.flm.sign_all_rules().err().map(Into::into),
+        FFIMethod::VerifyIntegrity => EmptyResponse {
+            error: flm_handle.flm.verify_integrity().err().map(Into::into),
         }
         .encode(&mut out_bytes_buffer),
-        FFIMethod::SignAllRulesWithNewKey => {
-            let request = decode_input_request!(SignAllRulesWithNewKeyRequest);
+        FFIMethod::SignAllData => EmptyResponse {
+            error: flm_handle.flm.sign_all_data().err().map(Into::into),
+        }
+        .encode(&mut out_bytes_buffer),
+        FFIMethod::SignAllDataWithNewKey => {
+            let request = decode_input_request!(SignAllDataWithNewKeyRequest);
 
             EmptyResponse {
                 error: flm_handle
                     .flm
-                    .sign_all_rules_with_new_key(request.integrity_key)
+                    .sign_all_data_with_new_key(request.integrity_key)
                     .err()
                     .map(Into::into),
             }
-        }
-        .encode(&mut out_bytes_buffer),
-        FFIMethod::VerifyIntegrity => EmptyResponse {
-            error: flm_handle.flm.verify_integrity().err().map(Into::into),
         }
         .encode(&mut out_bytes_buffer),
     };

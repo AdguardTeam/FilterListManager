@@ -19,14 +19,14 @@ pub(super) fn run_migrations(tx: &mut Transaction) -> FLMResult<()> {
 /// Runner
 #[inline]
 fn migrations_internal(dir: &Dir, tx: &mut Transaction) -> FLMResult<()> {
-    let mut metadata = DBMetadataRepository::read(tx)
+    let current_schema_version = DBMetadataRepository::read_for_migration(tx)
         .map_err(FLMError::from_database)?
         .unwrap_or_default();
 
-    let next_schema_version = Cell::new(metadata.version);
+    let next_schema_version = Cell::new(current_schema_version);
 
     for_each_migration_file(dir, |file_version, file| {
-        if file_version > metadata.version {
+        if file_version > current_schema_version {
             if let Some(contents) = file.contents_utf8() {
                 tx.execute_batch(contents)
                     .map_err(FLMError::from_database)?;
@@ -39,13 +39,12 @@ fn migrations_internal(dir: &Dir, tx: &mut Transaction) -> FLMResult<()> {
     })?;
 
     // No new migrations
-    if metadata.version == next_schema_version.get() {
+    if current_schema_version == next_schema_version.get() {
         return Ok(());
     }
 
-    metadata.version = next_schema_version.get();
-
-    DBMetadataRepository::save(tx, &metadata).map_err(FLMError::from_database)?;
+    DBMetadataRepository::save_for_migration(tx, next_schema_version.get())
+        .map_err(FLMError::from_database)?;
 
     Ok(())
 }
@@ -90,6 +89,7 @@ mod tests {
     use crate::storage::migrations::{
         for_each_migration_file, migrations_internal, run_migrations,
     };
+    use crate::storage::repositories::db_metadata_repository::CREATE_METADATA_SHAPE;
     use include_dir::{Dir, File};
     use std::cell::RefCell;
 
@@ -130,12 +130,9 @@ mod tests {
     fn test_migration() {
         let mut conn = rusqlite::Connection::open_in_memory().unwrap();
 
-        let initial_db: &str = r###"
-            CREATE TABLE [metadata] (
-                [rowid] INTEGER PRIMARY KEY,
-                [schema_version] INTEGER NOT NULL,
-                [custom_filter_increment] INTEGER NOT NULL
-            );
+        let initial_db = format!(
+            r###"
+            {}
 
             CREATE TABLE [filter] (
                [filter_id] INTEGER PRIMARY KEY,
@@ -146,9 +143,11 @@ mod tests {
             VALUES
                 (1, "First filter"),
                 (2, "Second filter");
-        "###;
+        "###,
+            CREATE_METADATA_SHAPE
+        );
 
-        conn.execute_batch(initial_db).unwrap();
+        conn.execute_batch(&initial_db).unwrap();
 
         let migration_1: &str = r###"
             -- These fails if migrations runs twice
@@ -294,5 +293,138 @@ mod tests {
         tx.execute_batch(initial_db).unwrap();
 
         run_migrations(&mut tx).unwrap();
+    }
+
+    #[test]
+    fn test_migration_when_filter_count_signature_column_is_missing() {
+        let mut conn = rusqlite::Connection::open_in_memory().unwrap();
+
+        let initial_db = format!(
+            r#"
+            {}
+
+            INSERT INTO [metadata] (
+                [rowid],
+                [schema_version],
+                [custom_filter_increment],
+                [filter_count_signature]
+            ) VALUES (
+                1,
+                7,
+                -10000,
+                'signed-count-before-tamper'
+            );
+
+            ALTER TABLE [metadata] DROP COLUMN [filter_count_signature];
+
+            CREATE TABLE [filter] (
+                [filter_id] INTEGER PRIMARY KEY,
+                [text] TEXT
+            );
+        "#,
+            CREATE_METADATA_SHAPE
+        );
+
+        conn.execute_batch(&initial_db).unwrap();
+
+        let entries = [include_dir::DirEntry::File(File::new(
+            "008-migration.sql",
+            b"ALTER TABLE [filter] ADD COLUMN [dummy] INTEGER NOT NULL DEFAULT 0;",
+        ))];
+        let dir = Dir::new("", &entries);
+
+        let mut tx = conn.transaction().unwrap();
+        migrations_internal(&dir, &mut tx).unwrap();
+        tx.commit().unwrap();
+
+        conn.query_row(
+            r"
+                SELECT
+                    [schema_version],
+                    [custom_filter_increment]
+                FROM
+                    [metadata]
+                WHERE
+                    [rowid] = 1
+            ",
+            (),
+            |row| {
+                let schema_version: i32 = row.get(0).unwrap();
+                let custom_filter_increment: i32 = row.get(1).unwrap();
+
+                assert_eq!(schema_version, 8);
+                assert_eq!(custom_filter_increment, -10000);
+
+                Ok(())
+            },
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn test_migration_preserves_filter_count_signature_when_column_exists() {
+        let mut conn = rusqlite::Connection::open_in_memory().unwrap();
+
+        let initial_db = format!(
+            r#"
+            {}
+
+            INSERT INTO [metadata] (
+                [rowid],
+                [schema_version],
+                [custom_filter_increment],
+                [filter_count_signature]
+            ) VALUES (
+                1,
+                7,
+                -10000,
+                'signed-count-before-migration'
+            );
+
+            CREATE TABLE [filter] (
+                [filter_id] INTEGER PRIMARY KEY,
+                [text] TEXT
+            );
+        "#,
+            CREATE_METADATA_SHAPE
+        );
+
+        conn.execute_batch(&initial_db).unwrap();
+
+        let entries = [include_dir::DirEntry::File(File::new(
+            "008-migration.sql",
+            b"ALTER TABLE [filter] ADD COLUMN [dummy] INTEGER NOT NULL DEFAULT 0;",
+        ))];
+        let dir = Dir::new("", &entries);
+
+        let mut tx = conn.transaction().unwrap();
+        migrations_internal(&dir, &mut tx).unwrap();
+        tx.commit().unwrap();
+
+        conn.query_row(
+            r"
+                SELECT
+                    [schema_version],
+                    [filter_count_signature]
+                FROM
+                    [metadata]
+                WHERE
+                    [rowid] = 1
+            ",
+            (),
+            |row| {
+                let schema_version: i32 = row.get(0).unwrap();
+                let filter_count_signature: Option<String> = row.get(1).unwrap();
+
+                assert_eq!(schema_version, 8);
+                assert_eq!(
+                    filter_count_signature,
+                    Some(String::from("signed-count-before-migration"))
+                );
+
+                Ok(())
+            },
+        )
+        .unwrap();
     }
 }

@@ -14,6 +14,7 @@ use crate::storage::blob::{write_to_stream, BLOB_CHUNK_SIZE};
 use crate::storage::repositories::filter_includes_repository::FilterIncludesRepository;
 use crate::storage::repositories::filter_repository::FilterRepository;
 use crate::storage::repositories::rules_list_repository::RulesListRepository;
+use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::DbConnectionManager;
 use crate::utils::integrity;
 use crate::utils::parsing::LF_BYTES_SLICE;
@@ -48,12 +49,28 @@ impl StreamingRulesManager {
 
         let mut handler = BufWriter::with_capacity(BLOB_CHUNK_SIZE, file);
 
+        let derived_key = integrity::derive_key_if_needed(configuration);
+
         connection_manager
             .execute_db(|conn: Connection| {
                 let rules_repository = RulesListRepository::new();
                 let includes_repository = FilterIncludesRepository::new();
+                let filter_repository = FilterRepository::new();
 
-                // 1. Get lightweight metadata without loading rules_text/disabled_rules_text
+                // 1. Verify filter metadata integrity before reading any rules
+                if let Some(ref dk) = derived_key {
+                    let filters = filter_repository
+                        .select(
+                            &conn,
+                            Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+                        )
+                        .map_err(FLMError::from_database)?
+                        .unwrap_or_default();
+
+                    integrity::verify_filter_entities(dk, &filters)?;
+                }
+
+                // 2. Get lightweight metadata without loading rules_text/disabled_rules_text
                 let metadata = rules_repository
                     .get_metadata(&conn, filter_id)
                     .map_err(|why| match why {
@@ -61,8 +78,8 @@ impl StreamingRulesManager {
                         err => FLMError::from_database(err),
                     })?;
 
-                // 2. Streaming integrity verification of rules_text via blob
-                if let Some(ref dk) = integrity::derive_key_if_needed(configuration) {
+                // 3. Streaming integrity verification of rules_text via blob
+                if let Some(ref dk) = derived_key {
                     if !rules_repository
                         .verify_blob_integrity_streaming(&conn, dk, &metadata)
                         .map_err(FLMError::from_database)?
@@ -71,7 +88,7 @@ impl StreamingRulesManager {
                     }
                 }
 
-                // 3. Get blob handle of rules and disabled rules
+                // 4. Get blob handle of rules and disabled rules
                 let (disabled_rules, blob) = rules_repository
                     .get_blob_handle_and_disabled_rules(&conn, filter_id)
                     .map_err(|why| match why {
@@ -85,7 +102,7 @@ impl StreamingRulesManager {
                     .collect::<HashSet<Vec<u8>>>();
 
                 if metadata.has_directives {
-                    // 4a. Path WITH directives: load include metadata, verify, stream with directives
+                    // 5a. Path WITH directives: load include metadata, verify, stream with directives
 
                     // Load include metadata (without body)
                     let include_metas = includes_repository
@@ -93,7 +110,7 @@ impl StreamingRulesManager {
                         .map_err(FLMError::from_database)?;
 
                     // Verify integrity of each include via blob streaming
-                    if let Some(ref dk) = integrity::derive_key_if_needed(configuration) {
+                    if let Some(ref dk) = derived_key {
                         for inc_meta in &include_metas {
                             if !includes_repository
                                 .verify_include_blob_integrity_streaming(&conn, dk, inc_meta)
@@ -130,7 +147,7 @@ impl StreamingRulesManager {
                     StreamingFilterCollector::new(configuration)
                         .collect(&mut filter_stream, &download_url)?;
                 } else {
-                    // 4b. Path WITHOUT directives: simple blob streaming
+                    // 5b. Path WITHOUT directives: simple blob streaming
                     write_to_stream(&mut handler, blob, &disabled_rules_set)?;
                 }
 
@@ -202,8 +219,14 @@ mod tests {
             rules_count: 0,
         };
 
-        RulesListManager::new()
-            .save_custom_filter_rules(&flm.connection_manager, flm.get_configuration(), rules)
+        flm.connection_manager
+            .execute_db(|mut conn| {
+                RulesListManager::new().save_custom_filter_rules(
+                    &mut conn,
+                    flm.get_configuration(),
+                    rules,
+                )
+            })
             .unwrap();
 
         StreamingRulesManager::new()

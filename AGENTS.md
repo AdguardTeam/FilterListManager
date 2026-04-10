@@ -95,10 +95,10 @@ crates/
 
 | Action              | Command                                     |
 |---------------------|---------------------------------------------|
-| Build               | `cargo build`                               |
-| Run tests           | `cargo test --lib`                          |
+| Build               | `cargo build --locked`                      |
+| Run tests           | `cargo test --lib --locked`                 |
 | Check formatting    | `cargo fmt --all -- --check`                |
-| Lint                | `cargo clippy`                              |
+| Lint                | `cargo clippy --locked`                     |
 | Lint docs           | `npx markdownlint-cli .`                    |
 
 ### Clippy Configuration
@@ -123,6 +123,11 @@ crates/
 - Migration files follow the pattern `NNN-migration.sql` where NNN is a zerofill
   sequential number. The `metadata.schema_version` is bumped automatically
   when migrations are applied.
+- Any work with storage/IO must happen only after migrations are applied.
+  Treat migration execution as a hard precondition for repository access.
+- Do **NOT** add runtime fallback branches for missing columns/tables
+  (e.g. handling `no such column`/`no such table`) caused by unapplied
+  migrations — this state should be fixed by running migrations, not masked.
 - Migrations **must never modify the body** of filter rules (`rules_list.text`,
   `rules_list.disabled_text`, `filter_includes.body`) — this would silently
   invalidate integrity signatures.
@@ -140,11 +145,23 @@ crates/
 
 ### Integrity Checks
 
-- Filter rules integrity is protected by **blake3 keyed hash** signatures
-  stored in the `integrity_signature` column of `rules_list` and
-  `filter_includes` tables.
+Integrity protection covers **three layers** when `Configuration.integrity_key`
+is set:
+
+1. **Filter rules** — blake3 keyed hash signatures in the
+   `integrity_signature` column of `rules_list` and `filter_includes` tables.
+2. **Filter metadata** — blake3 keyed hash over 10 critical fields
+   (`filter_id`, `download_url`, `subscription_url`, `is_trusted`,
+   `is_enabled`, `is_installed`, `version`, `last_update_time`,
+   `last_download_time`, `expires`) stored in `filter.integrity_signature`.
+3. **Filter count** — blake3 keyed hash of the total number of filter rows,
+   stored in `metadata.filter_count_signature`. Detects unauthorized addition
+   or removal of filters.
+
+#### Key rules
+
 - Signing/verification is controlled by `Configuration.integrity_key`
-  (`Option<String>`). When `None`, integrity checks are skipped.
+  (`Option<String>`). When `None`, all integrity checks are skipped.
 - The key derivation context string (`KEY_DERIVATION_CONTEXT` in
   `utils/integrity.rs`) **must never be changed** — doing so invalidates all
   existing signatures across all databases. If the signing scheme needs to
@@ -152,13 +169,57 @@ crates/
 - Low-level crypto primitives live in `utils/integrity.rs`; entity-level and
   configuration-aware helpers live in
   `manager/managers/integrity_control_manager.rs`.
-- `sign_all_filter_rules()` facade method **requires** `integrity_key` to be
-  set, otherwise returns `InvalidConfiguration`.
-- When `integrity_key` is set, the app **must** call `sign_all_filter_rules()`
-  immediately after creating the FLM instance and before any read operations.
+- `sign_all_data()` facade method **requires** `integrity_key` to be set,
+  otherwise returns `InvalidConfiguration`.
+- When `integrity_key` is set, the app **must** call `sign_all_data()`
+  immediately after creating the FLM instance and before any other operations.
   Unsigned records will fail verification.
 - To rotate the key: create a new instance with the new key, call
-  `sign_all_filter_rules()` to re-sign all data, then proceed normally.
+  `sign_all_data_with_new_key(new_key)` to re-sign all data, then proceed
+  normally.
+
+#### Verification invariants (must be maintained at all times)
+
+Every facade method that reads or writes filter data **must** perform a
+lightweight **filter count check** at the start — one metadata read, one
+`COUNT(*)`, one blake3 hash.  This is implemented via
+`FilterListManagerImpl::verify_filter_count_in_conn` (called inside
+`execute_db` for methods whose managers accept `&Connection`) or
+`FilterListManagerImpl::verify_filter_count_if_needed` (opens its own
+connection, for methods whose managers still own `execute_db`).
+
+The **only** methods exempt from this check are:
+
+- The constructor (`new`).
+- `lift_up_database` / `get_database_version` / `get_database_path`.
+- `sign_all_data` / `sign_all_data_with_new_key` / `verify_integrity`.
+- `fetch_filter_list_metadata` / `fetch_filter_list_metadata_with_body`
+  (network-only, no DB filter access).
+- `get_all_tags` / `get_all_groups` (read unprotected tables).
+- `change_locale` / `set_proxy_mode` (configuration-only).
+
+Per-entity **metadata and rules signatures** are verified on the entities that
+are actually returned to the caller (not a full DB scan on every call).
+
+A full streaming verification of **all** signatures (rules + includes +
+metadata + count) is available via the public `verify_integrity()` method.
+
+#### Signing invariants (must be maintained at all times)
+
+Any facade method that **writes** filter data must ensure that all affected
+integrity signatures are updated within the same transaction:
+
+- When a filter row is created, updated, enabled, installed, or deleted: its
+  **metadata signature** and the **count signature** in `metadata` must be
+  re-signed.
+- When filter rules or includes are written: their **rules/includes
+  signatures** must be re-signed.
+- New facade methods or code paths that modify protected tables (`filter`,
+  `rules_list`, `filter_includes`) **must** follow these patterns — otherwise
+  subsequent reads will fail with `FilterIntegrityCheckFailed`.
+
+Do **NOT** run `cargo clippy` yourself — the maintainer is aware of warnings
+and will fix them separately.
 
 ### Filter ID Ranges
 
@@ -180,6 +241,13 @@ crates/
   access, `FLMResult<T>` for error handling.
 - All public types are re-exported from `lib.rs`.
 - Use `thiserror` for error types.
+- SQL in Rust code must follow the repository style used in
+  `crates/filter-list-manager/src/storage/repositories/filter_repository.rs`:
+  SQL operators (`SELECT`, `FROM`, `WHERE`, `UPDATE`, `SET`, `INSERT INTO`)
+  start on a new line, table names are wrapped in square brackets
+  (for example `[filter]`), and selected/updated column names are listed one
+  per line. For `INSERT`, keep the closing parenthesis of the column list and
+  `VALUES` on the same line in the form `) VALUES (`.
 - Modules marked `#[doc(hidden)]` or `pub(crate)` are internal — avoid
   expanding their visibility without good reason.
 - Do NOT use `unwrap()`, `expect()`, `panic!()` or any other constructs that

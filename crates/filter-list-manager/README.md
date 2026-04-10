@@ -29,10 +29,10 @@ This library can:
   - [Miscellaneous filters/scripts collection](#miscellaneous-filtersscripts-collection)
 
 ## How to build
-`cargo build -p adguard-flm` from workspace root
+`cargo build -p adguard-flm --locked` from workspace root
 
 For Windows builds you may need to build with `libsqlite-bundled` feature enabled:\
-`cargo build -p adguard-flm --features rusqlite-bundled`
+`cargo build -p adguard-flm --features rusqlite-bundled --locked`
 
 ## Filters analysis notes
 
@@ -106,9 +106,29 @@ let flm = FilterListManagerImpl::new(configuration)?;
 
 ### Data integrity protection
 
-The library supports cryptographic integrity protection for filter rules using BLAKE3 keyed hashing. When enabled, all filter rules are signed with a derived key, and their signatures are verified on read operations. This ensures that filter data has not been tampered with or corrupted.
+The library supports cryptographic integrity protection for stored filter data
+using BLAKE3 keyed hashing. When enabled, the library signs and verifies:
 
-The typical workflow is to sign the database once during initial setup or when enabling integrity protection for existing data. After that, the library automatically signs all newly installed or updated filters, maintaining integrity protection transparently without requiring manual intervention.
+- **Filter rules** — the body of each filter's rule list and its `!#include` parts.
+- **Filter metadata** — 10 critical fields per filter (`filter_id`,
+  `download_url`, `subscription_url`, `is_trusted`, `is_enabled`,
+  `is_installed`, `version`, `last_update_time`, `last_download_time`,
+  `expires`).
+- **Filter count** — a signed total number of filter rows stored in the
+  `metadata` table, protecting against unauthorized addition or removal of
+  filters.
+
+A lightweight count-signature check (one metadata read + one `COUNT(*)` + one
+BLAKE3 hash) runs automatically at the start of **every** facade method that
+reads or writes filter data. Per-entity metadata and rules signatures are
+verified on the entities actually returned to the caller. A full streaming
+verification of all signatures can be triggered explicitly via
+`verify_integrity()`.
+
+The typical workflow is to sign the database once during initial setup or when
+enabling integrity protection for existing data. After that, the library
+automatically signs all newly installed or updated filters, maintaining
+integrity protection transparently without requiring manual intervention.
 
 To enable integrity protection:
 
@@ -130,28 +150,38 @@ To sign storage for the first time:
 
 ```rust
 // This call has rules:
-// - Call this only if your data is not signed yet, or you have instantiated the FLM with a new integrity key
+// - Call this only if your data is not signed yet, or you have instantiated
+//   the FLM with a new integrity key
 // - If integrity protection is disabled, this call will return an error
-// - If integrity protection is enabled, you should call this method immediately after creating the FLM instance and before any read operations
-flm.sign_all_rules()?;
+// - If integrity protection is enabled, you should call this method
+//   immediately after creating the FLM instance and before any other
+//   operations
+flm.sign_all_data()?;
 ```
 
 To verify integrity:
 
 ```rust
-// returns FilterIntegrityCheckFailed(filter_id) if any signature is invalid
+// Performs a full streaming verification of all signatures (rules, includes,
+// metadata, count). Returns FilterIntegrityCheckFailed(filter_id) if any
+// signature is invalid, or FilterIntegrityCheckFailed(0) for a count mismatch.
 flm.verify_integrity()?;
 ```
 
 To rotate the integrity key:
 
 ```rust
-// Generate a new key and re-sign all rules atomically
+// Generate a new key and re-sign all data atomically
 let new_key = generate_random_key()?;
-flm.sign_all_rules_with_new_key(new_key)?;
+flm.sign_all_data_with_new_key(new_key)?;
 ```
+
 > [!IMPORTANT]
-> Once integrity protection is enabled, you must sign all existing filter rules immediately after creating the FLM instance and before any read operations, or you will get an integrity-check-failed error `FilterIntegrityCheckFailed(filter_id)`. All subsequent filter installations and updates will be automatically signed.
+> Once integrity protection is enabled, you **must** call `sign_all_data()`
+> immediately after creating the FLM instance and before any other operations,
+> or every subsequent call will fail with
+> `FilterIntegrityCheckFailed(filter_id)`. All subsequent filter installations
+> and updates are automatically signed.
 
 ---
 

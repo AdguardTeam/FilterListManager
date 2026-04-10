@@ -11,6 +11,9 @@ pub(crate) struct DBMetadataEntity {
     /// Last autoincrement value for custom filters
     /// Value between [`crate::MINIMUM_CUSTOM_FILTER_ID`] and [`crate::MAXIMUM_CUSTOM_FILTER_ID`]
     pub(crate) custom_filters_autoincrement_value: FilterId,
+    /// Signed count of all filter records.
+    /// `None` when integrity protection is disabled or not yet computed.
+    pub(crate) filter_count_signature: Option<String>,
 }
 
 impl Default for DBMetadataEntity {
@@ -18,6 +21,7 @@ impl Default for DBMetadataEntity {
         DBMetadataEntity {
             version: 0,
             custom_filters_autoincrement_value: MAXIMUM_CUSTOM_FILTER_ID,
+            filter_count_signature: None,
         }
     }
 }
@@ -27,6 +31,7 @@ impl Hydrate for DBMetadataEntity {
         Ok(DBMetadataEntity {
             version: row.get(0)?,
             custom_filters_autoincrement_value: row.get(1)?,
+            filter_count_signature: row.get(2)?,
         })
     }
 }

@@ -54,7 +54,7 @@ build_framework() {
 
     mkdir -p "${CARGO_TARGET_DIR}/${ARCH}/release/deps"
 
-    cargo build --release --lib --package adguard-flm-ffi --target $ARCH
+    cargo build --release --lib --package adguard-flm-ffi --target $ARCH --locked
 
     cp "${CARGO_TARGET_DIR}/${ARCH}/release/${LIBRARY_ARTIFACT_NAME}" ${FRAMEWORK_VERSIONED_PATH}/AdGuardFLM
     install_name_tool -id @rpath/${FRAMEWORK_NAME}${VERSION_SUFFIX}/AdGuardFLM ${FRAMEWORK_VERSIONED_PATH}/AdGuardFLM

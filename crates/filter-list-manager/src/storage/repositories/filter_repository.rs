@@ -8,11 +8,12 @@ use crate::storage::repositories::db_metadata_repository::DBMetadataRepository;
 use crate::storage::repositories::{BulkDeleteRepository, Repository};
 use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::utils::{build_in_clause, process_where_clause};
+use crate::utils::integrity::{sign_filter_metadata, verify_filter_entity};
 use crate::utils::memory::heap;
 use crate::{MAXIMUM_CUSTOM_FILTER_ID, MINIMUM_CUSTOM_FILTER_ID};
 use rusqlite::types::Type;
 use rusqlite::{
-    named_params, params_from_iter, Connection, Error, OptionalExtension, Row, Transaction,
+    named_params, params_from_iter, Connection, Error, OptionalExtension, Row, Rows, Transaction,
 };
 use std::collections::HashMap;
 
@@ -37,7 +38,8 @@ const BASIC_SELECT_SQL: &str = r"
         f.is_installed,
         f.is_trusted,
         f.is_user_title,
-        f.is_user_description
+        f.is_user_description,
+        f.integrity_signature
     FROM
         [filter] f
 ";
@@ -483,7 +485,8 @@ impl FilterRepository {
                     is_installed,
                     is_trusted,
                     is_user_title,
-                    is_user_description
+                    is_user_description,
+                    integrity_signature
                 ) VALUES (
                     :filter_id,
                     :group_id,
@@ -503,7 +506,8 @@ impl FilterRepository {
                     :is_installed,
                     :is_trusted,
                     :is_user_title,
-                    :is_user_description
+                    :is_user_description,
+                    :integrity_signature
                 )",
         )?;
 
@@ -579,6 +583,7 @@ impl FilterRepository {
                 ":is_trusted": entity.is_trusted,
                 ":is_user_title": is_user_title,
                 ":is_user_description": is_user_description,
+                ":integrity_signature": entity.integrity_signature,
             })?;
         }
 
@@ -613,6 +618,204 @@ impl Repository<FilterEntity> for FilterRepository {
 
 impl BulkDeleteRepository<FilterEntity, FilterId> for FilterRepository {
     const PK_FIELD: &'static str = "filter_id";
+}
+
+/// Integrity-related methods for [`FilterRepository`]
+impl FilterRepository {
+    /// Updates `integrity_signature` for a single filter row by `filter_id`.
+    pub(crate) fn update_integrity_signature(
+        &self,
+        tx: &Transaction<'_>,
+        filter_id: FilterId,
+        signature: &str,
+    ) -> rusqlite::Result<()> {
+        tx.execute(
+            r"
+            UPDATE
+                [filter]
+            SET
+                integrity_signature = ?1
+            WHERE
+                filter_id = ?2",
+            rusqlite::params![signature, filter_id],
+        )
+        .map(|_| ())
+    }
+
+    /// Iterates over all filter rows, computes integrity signatures for their
+    /// critical metadata fields using the derived key, and returns
+    /// `(filter_id, signature)` pairs without loading everything into memory.
+    pub(crate) fn sign_and_collect_metadata_signatures_streaming(
+        &self,
+        conn: &Connection,
+        derived_key: &[u8; 32],
+    ) -> rusqlite::Result<Vec<(FilterId, String)>> {
+        let mut statement = conn.prepare(
+            r"
+            SELECT
+                filter_id,
+                download_url,
+                subscription_url,
+                is_trusted,
+                is_enabled,
+                is_installed,
+                version,
+                last_update_time,
+                last_download_time,
+                expires
+            FROM
+                [filter]",
+        )?;
+
+        let mut rows = statement.query([])?;
+        Self::collect_metadata_signatures_from_rows(&mut rows, derived_key)
+    }
+
+    /// Reads metadata fields from each row of `rows` and computes integrity
+    /// signatures, returning `(filter_id, signature)` pairs.
+    ///
+    /// Expected column order: filter_id(0), download_url(1), subscription_url(2),
+    /// is_trusted(3), is_enabled(4), is_installed(5), version(6),
+    /// last_update_time(7), last_download_time(8), expires(9).
+    fn collect_metadata_signatures_from_rows(
+        rows: &mut Rows<'_>,
+        derived_key: &[u8; 32],
+    ) -> rusqlite::Result<Vec<(FilterId, String)>> {
+        let mut signatures = Vec::new();
+
+        while let Some(row) = rows.next()? {
+            let filter_id: FilterId = row.get(0)?;
+            let download_url: String = row.get(1)?;
+            let subscription_url: String = row.get(2)?;
+            let is_trusted: bool = row.get(3)?;
+            let is_enabled: bool = row.get(4)?;
+            let is_installed: bool = row.get(5)?;
+            let version: String = row.get(6)?;
+            let last_update_time: i64 = row.get(7)?;
+            let last_download_time: i64 = row.get(8)?;
+            let expires: i32 = row.get(9)?;
+
+            let sig = sign_filter_metadata(
+                derived_key,
+                filter_id,
+                &download_url,
+                &subscription_url,
+                is_trusted,
+                is_enabled,
+                is_installed,
+                &version,
+                last_update_time,
+                last_download_time,
+                expires,
+            );
+            signatures.push((filter_id, sig.to_string()));
+        }
+
+        Ok(signatures)
+    }
+
+    /// Iterates over all filter rows and verifies their metadata integrity
+    /// signatures without loading all data into memory.
+    /// Returns the `filter_id` of the first row that fails verification.
+    pub(crate) fn verify_all_metadata_streaming(
+        &self,
+        conn: &Connection,
+        derived_key: &[u8; 32],
+    ) -> rusqlite::Result<Option<FilterId>> {
+        let sql = format!("{} ORDER BY f.filter_id", BASIC_SELECT_SQL);
+        let mut statement = conn.prepare(&sql)?;
+
+        let mut rows = statement.query_map([], FilterEntity::hydrate)?;
+        for entity in rows.by_ref() {
+            let entity = entity?;
+            if !verify_filter_entity(derived_key, &entity) {
+                // filter_id should always be Some for persisted rows
+                return Ok(Some(entity.filter_id.unwrap_or(0)));
+            }
+        }
+
+        Ok(None)
+    }
+
+    /// Batch-updates `integrity_signature` from `(filter_id, signature)` pairs.
+    pub(crate) fn batch_update_metadata_signatures(
+        &self,
+        tx: &Transaction<'_>,
+        signatures: &[(FilterId, String)],
+    ) -> rusqlite::Result<()> {
+        let mut statement = tx.prepare(
+            r"
+            UPDATE
+                [filter]
+            SET
+                integrity_signature = :sig
+            WHERE
+                filter_id = :filter_id",
+        )?;
+
+        for (filter_id, sig) in signatures {
+            statement.execute(named_params! {
+                ":filter_id": filter_id,
+                ":sig": sig,
+            })?;
+        }
+
+        Ok(())
+    }
+
+    /// Counts all filters in the database (used for integrity count signing).
+    pub(crate) fn count_all(&self, conn: &Connection) -> rusqlite::Result<i64> {
+        conn.query_row(
+            r"
+            SELECT
+                COUNT(*)
+            FROM
+                [filter]",
+            [],
+            |row| row.get(0),
+        )
+    }
+
+    /// Re-reads and re-signs metadata for specific filter_ids within a
+    /// transaction. Used after operations that modify critical metadata fields
+    /// (e.g. toggle is_enabled, is_installed, is_trusted).
+    pub(crate) fn resign_filters_in_tx(
+        &self,
+        tx: &Transaction<'_>,
+        filter_ids: &[FilterId],
+        derived_key: &[u8; 32],
+    ) -> rusqlite::Result<()> {
+        if filter_ids.is_empty() {
+            return Ok(());
+        }
+
+        let mut sql = String::from(
+            r"
+            SELECT
+                filter_id,
+                download_url,
+                subscription_url,
+                is_trusted,
+                is_enabled,
+                is_installed,
+                version,
+                last_update_time,
+                last_download_time,
+                expires
+            FROM
+                [filter]
+            WHERE ",
+        );
+
+        sql += build_in_clause("filter_id", filter_ids.len()).as_str();
+
+        let mut statement = tx.prepare(&sql)?;
+        let mut rows = statement.query(params_from_iter(filter_ids))?;
+
+        let signatures = Self::collect_metadata_signatures_from_rows(&mut rows, derived_key)?;
+
+        self.batch_update_metadata_signatures(tx, &signatures)
+    }
 }
 
 #[cfg(test)]
@@ -657,6 +860,7 @@ mod tests {
                 is_installed: false,
                 is_user_title: None,
                 is_user_description: None,
+                integrity_signature: None,
             };
 
             source
@@ -730,6 +934,7 @@ mod tests {
                 is_installed: false,
                 is_user_title: None,
                 is_user_description: None,
+                integrity_signature: None,
             };
 
             source

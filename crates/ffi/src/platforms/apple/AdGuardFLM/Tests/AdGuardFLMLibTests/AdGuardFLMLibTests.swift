@@ -53,7 +53,7 @@ final class AdGuardFLMLibTests: XCTestCase {
         let integrityKey = try generateRandomKey()
         XCTAssertNotEqual(integrityKey, "")
 
-        try flm.signAllRulesWithNewKey(integrityKey: integrityKey)
+        try flm.signAllDataWithNewKey(integrityKey: integrityKey)
         try flm.verifyIntegrity()
 
         let filter = try flm.getFullFilterListById(id: 1)

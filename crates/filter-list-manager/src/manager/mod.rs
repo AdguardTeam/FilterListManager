@@ -377,28 +377,28 @@ pub trait FilterListManager {
     /// Returns lists of rules count by list of filter IDs
     fn get_rules_count(&self, ids: Vec<FilterId>) -> FLMResult<Vec<RulesCountByFilter>>;
 
-    /// Signs all rules and includes entities with the integrity key
-    /// from configuration.
+    /// Signs all filter rules, includes, metadata, and the filter count using
+    /// the integrity key from configuration.
     ///
     /// # Failure
     ///
     /// Returns [`crate::FLMError::InvalidConfiguration`] if `integrity_key`
     /// is not set in configuration.
-    fn sign_all_rules(&self) -> FLMResult<()>;
+    fn sign_all_data(&self) -> FLMResult<()>;
 
     /// Updates the integrity key in configuration and re-signs all filter
-    /// rules and includes entities with the new key.
+    /// rules, includes, metadata, and the filter count with the new key.
     ///
     /// This method atomically:
     /// 1. Updates `configuration.integrity_key` with the provided key.
-    /// 2. Re-signs all stored filter rules and includes with the new key.
+    /// 2. Re-signs all stored filter data with the new key.
     ///
     /// Use this method when rotating the integrity key.
     ///
     /// # Arguments
     ///
     /// * `integrity_key` - New integrity key to use for signing.
-    fn sign_all_rules_with_new_key(&mut self, integrity_key: String) -> FLMResult<()>;
+    fn sign_all_data_with_new_key(&mut self, integrity_key: String) -> FLMResult<()>;
 
     /// Verifies integrity signatures of all filter rules and includes
     /// entities in the database.

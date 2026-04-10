@@ -390,6 +390,9 @@ pub(super) fn update_filters_action(
                 &mut compiled_filter_entities.filter_includes_entities,
             );
 
+            // Sign filter metadata if integrity is enabled
+            integrity::sign_filter_entity_if_needed(configuration, &mut filter);
+
             rules_entities.push(compiled_filter_entities.rules_list_entity);
             includes_entities.append(&mut compiled_filter_entities.filter_includes_entities);
             filter_entities.push(filter);

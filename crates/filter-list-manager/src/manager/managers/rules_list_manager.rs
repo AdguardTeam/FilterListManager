@@ -16,19 +16,17 @@ use crate::storage::sql_generators::operator::SQLOperator;
 use crate::storage::with_transaction;
 use crate::storage::DbConnectionManager;
 use crate::utils::integrity;
-use crate::DisabledRulesRaw;
 use crate::FLMError;
 use crate::FLMResult;
 use crate::FilterId;
 use crate::FilterListRules;
 use crate::FilterListRulesRaw;
-use crate::RulesCountByFilter;
 use crate::{ActiveRulesInfo, Configuration};
 use chrono::Utc;
 use rusqlite::types::Value;
 use rusqlite::Connection;
 use rusqlite::Transaction;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 /// Manager for rules list logic
 pub(crate) struct RulesListManager;
@@ -99,19 +97,12 @@ impl RulesListManager {
     /// Gets disabled rules
     pub(crate) fn get_disabled_rules(
         &self,
-        connection_manager: &DbConnectionManager,
-        ids: Vec<FilterId>,
-    ) -> FLMResult<Vec<DisabledRulesRaw>> {
-        let result: Vec<DisabledRulesEntity> =
-            connection_manager.execute_db(|conn: Connection| {
-                RulesListRepository::new()
-                    .get_disabled_rules_by_ids(&conn, &ids)
-                    .map_err(FLMError::from_database)
-            })?;
-
-        let disabled_rules: Vec<DisabledRulesRaw> = result.into_iter().map(Into::into).collect();
-
-        Ok(disabled_rules)
+        conn: &Connection,
+        ids: &[FilterId],
+    ) -> FLMResult<Vec<DisabledRulesEntity>> {
+        RulesListRepository::new()
+            .get_disabled_rules_by_ids(conn, ids)
+            .map_err(FLMError::from_database)
     }
 
     /// Gets filter rules by ids
@@ -121,13 +112,25 @@ impl RulesListManager {
         configuration: &Configuration,
         ids: Vec<FilterId>,
     ) -> FLMResult<Vec<FilterListRulesRaw>> {
-        let (mut result, these_includes, download_urls) =
+        let (filters, mut result, these_includes, download_urls) =
             connection_manager.execute_db(|conn: Connection| {
-                let download_urls_map = FilterRepository::new()
-                    .select_download_urls(&conn, ids.iter(), ids.len())
-                    .map_err(FLMError::from_database)?;
-
                 let values: Vec<Value> = ids.into_iter().map(Into::into).collect();
+
+                let filters = FilterRepository::new()
+                    .select(
+                        &conn,
+                        Some(SQLOperator::FieldIn("filter_id", values.clone())),
+                    )
+                    .map_err(FLMError::from_database)?
+                    .unwrap_or_default();
+
+                let mut download_urls_map: HashMap<FilterId, String> =
+                    HashMap::with_capacity(filters.len());
+                for filter in &filters {
+                    if let Some(filter_id) = filter.filter_id {
+                        download_urls_map.insert(filter_id, filter.download_url.clone());
+                    }
+                }
 
                 let includes = FilterIncludesRepository::new()
                     .select_mapped(
@@ -140,11 +143,17 @@ impl RulesListManager {
                     .select(&conn, Some(SQLOperator::FieldIn("filter_id", values)))
                     .map_err(FLMError::from_database)?;
 
-                Ok((rules, includes, download_urls_map))
+                Ok((filters, rules, includes, download_urls_map))
             })?;
 
+        let derived_key = integrity::derive_key_if_needed(configuration);
+
+        if let Some(ref dk) = derived_key {
+            integrity::verify_filter_entities(dk, &filters)?;
+        }
+
         if let Some(ref mut rules) = result {
-            if let Some(ref dk) = integrity::derive_key_if_needed(configuration) {
+            if let Some(ref dk) = derived_key {
                 integrity::verify_rules_list_entities(dk, rules)?;
                 for (_, includes) in these_includes.iter() {
                     integrity::verify_filter_include_entities(dk, includes)?;
@@ -187,124 +196,114 @@ impl RulesListManager {
     /// Gets rules count
     pub(crate) fn get_rules_count(
         &self,
-        connection_manager: &DbConnectionManager,
-        ids: Vec<FilterId>,
-    ) -> FLMResult<Vec<RulesCountByFilter>> {
-        let result: Vec<RulesCountEntity> = connection_manager.execute_db(|conn: Connection| {
-            let mut rules_counts_in_rules = RulesListRepository::new()
-                .get_rules_count(&conn, &ids)
-                .map_err(FLMError::from_database)?;
+        conn: &Connection,
+        ids: &[FilterId],
+    ) -> FLMResult<Vec<RulesCountEntity>> {
+        let mut rules_counts_in_rules = RulesListRepository::new()
+            .get_rules_count(conn, ids)
+            .map_err(FLMError::from_database)?;
 
-            let rules_counts_in_includes = FilterIncludesRepository::new()
-                .get_rules_count_for_filters(&conn, &ids)
-                .map_err(FLMError::from_database)?;
+        let rules_counts_in_includes = FilterIncludesRepository::new()
+            .get_rules_count_for_filters(conn, ids)
+            .map_err(FLMError::from_database)?;
 
-            rules_counts_in_rules.iter_mut().for_each(|entity| {
-                if let Some(rules_count) = rules_counts_in_includes.get(&entity.filter_id) {
-                    entity.rules_count += rules_count.to_owned();
-                }
-            });
+        rules_counts_in_rules.iter_mut().for_each(|entity| {
+            if let Some(rules_count) = rules_counts_in_includes.get(&entity.filter_id) {
+                entity.rules_count += rules_count.to_owned();
+            }
+        });
 
-            Ok(rules_counts_in_rules)
-        })?;
-
-        let rules_count: Vec<RulesCountByFilter> = result.into_iter().map(Into::into).collect();
-
-        Ok(rules_count)
+        Ok(rules_counts_in_rules)
     }
 
     /// Saves custom filter rules
     pub(crate) fn save_custom_filter_rules(
         &self,
-        connection_manager: &DbConnectionManager,
+        conn: &mut Connection,
         configuration: &Configuration,
         rules: FilterListRules,
     ) -> FLMResult<()> {
         let rules: FilterListRules = self.update_rules_count(rules);
 
-        connection_manager.execute_db(move |mut conn: Connection| {
-            let filter_repository = FilterRepository::new();
+        let filter_repository = FilterRepository::new();
 
-            let result = filter_repository
-                .select(
-                    &conn,
-                    Some(FilterRepository::custom_filter_with_id(rules.filter_id)),
-                )
-                .map_err(FLMError::from_database)?;
+        let result = filter_repository
+            .select(
+                conn,
+                Some(FilterRepository::custom_filter_with_id(rules.filter_id)),
+            )
+            .map_err(FLMError::from_database)?;
 
-            match result {
-                Some(mut filters) if !filters.is_empty() => {
-                    let mut filter = filters.remove(0);
-                    let http_client = BlockingClient::new(configuration)?;
+        match result {
+            Some(mut filters) if !filters.is_empty() => {
+                let mut filter = filters.remove(0);
+                let http_client = BlockingClient::new(configuration)?;
 
-                    let filter_id = rules.filter_id;
-                    let rules_entity = RulesListEntity::from(rules);
-                    let mut compiler = FilterCompiler::with_custom_provider(
-                        Box::new(StringProvider::new(rules_entity.text, &http_client)),
-                        configuration,
-                    );
+                let filter_id = rules.filter_id;
+                let rules_entity = RulesListEntity::from(rules);
+                let mut compiler = FilterCompiler::with_custom_provider(
+                    Box::new(StringProvider::new(rules_entity.text, &http_client)),
+                    configuration,
+                );
 
-                    compiler
-                        .compile(&filter.download_url)
-                        .map_err(FLMError::from_parser_error)?;
+                compiler
+                    .compile(&filter.download_url)
+                    .map_err(FLMError::from_parser_error)?;
 
-                    let mut entities = compiler.into_entities(filter_id);
-                    entities.rules_list_entity.disabled_text = rules_entity.disabled_text;
+                let mut entities = compiler.into_entities(filter_id);
+                entities.rules_list_entity.disabled_text = rules_entity.disabled_text;
 
-                    integrity::sign_entities_if_needed(
-                        configuration,
-                        &mut entities.rules_list_entity,
-                        &mut entities.filter_includes_entities,
-                    );
+                integrity::sign_entities_if_needed(
+                    configuration,
+                    &mut entities.rules_list_entity,
+                    &mut entities.filter_includes_entities,
+                );
 
-                    // TODO: do we need to update metadata here?
-                    let _ = with_transaction(&mut conn, |tx: &Transaction| {
-                        filter.last_update_time = Utc::now().timestamp();
+                let _ = with_transaction(conn, |tx: &Transaction| {
+                    filter.last_update_time = Utc::now().timestamp();
+                    integrity::sign_filter_entity_if_needed(configuration, &mut filter);
 
-                        filter_repository.insert(tx, &[filter])?;
-                        FilterIncludesRepository::new()
-                            .replace_entities_for_filters(tx, &entities.filter_includes_entities)?;
+                    filter_repository.insert(tx, &[filter])?;
+                    FilterIncludesRepository::new()
+                        .replace_entities_for_filters(tx, &entities.filter_includes_entities)?;
 
-                        RulesListRepository::new().insert(tx, &[entities.rules_list_entity])
-                    });
+                    RulesListRepository::new().insert(tx, &[entities.rules_list_entity])
+                });
 
-                    Ok(())
-                }
-
-                _ => Err(FLMError::EntityNotFound(rules.filter_id as i64)),
+                Ok(())
             }
-        })
+
+            _ => Err(FLMError::EntityNotFound(rules.filter_id as i64)),
+        }
     }
 
     /// Saves disabled rules
     pub(crate) fn save_disabled_rules(
         &self,
-        connection_manager: &DbConnectionManager,
+        conn: &mut Connection,
         filter_id: FilterId,
         disabled_rules: Vec<String>,
     ) -> FLMResult<()> {
-        connection_manager.execute_db(move |mut conn: Connection| {
-            let rules_list_repository = RulesListRepository::new();
+        let rules_list_repository = RulesListRepository::new();
 
-            let rules_lists_count = rules_list_repository
-                .count(
-                    &conn,
-                    Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
-                )
-                .map_err(FLMError::from_database)?;
+        let rules_lists_count = rules_list_repository
+            .count(
+                conn,
+                Some(SQLOperator::FieldEqualValue("filter_id", filter_id.into())),
+            )
+            .map_err(FLMError::from_database)?;
 
-            if rules_lists_count == 0 {
-                return Err(FLMError::EntityNotFound(filter_id as i64));
-            }
+        if rules_lists_count == 0 {
+            return Err(FLMError::EntityNotFound(filter_id as i64));
+        }
 
-            let _ = with_transaction(&mut conn, |transaction: &Transaction| {
-                rules_list_repository
-                    .set_disabled_rules(transaction, filter_id, disabled_rules.join("\n"))
-                    .map(|_| ())
-            });
+        let _ = with_transaction(conn, |transaction: &Transaction| {
+            rules_list_repository
+                .set_disabled_rules(transaction, filter_id, disabled_rules.join("\n"))
+                .map(|_| ())
+        });
 
-            Ok(())
-        })
+        Ok(())
     }
 }
 
@@ -367,6 +366,11 @@ impl RulesListManager {
 
         // Collect new active rules from filters, rules, includes and stuff
         let derived_key = integrity::derive_key_if_needed(configuration);
+
+        if let Some(ref dk) = derived_key {
+            integrity::verify_filter_entities(dk, &list)?;
+        }
+
         let mut active_rules: Vec<ActiveRules> = Vec::with_capacity(list.len());
         for filter_entity in list {
             if let Some(filter_id) = filter_entity.filter_id {
