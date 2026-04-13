@@ -114,8 +114,8 @@ namespace AdGuard.FilterListManager.Test
                 flm.SaveDisabledRules(customFilter.Id, new[] { "world" });
                 IEnumerable<DisabledRulesRaw> disabledRules1 =
                     flm.GetDisabledRules(new[] { customFilter.Id });
-                flm.SignAllRules();
-                flm.SignAllRulesWithNewKey(randomKey.Key);
+                flm.SignAllData();
+                flm.SignAllDataWithNewKey(randomKey.Key);
                 flm.VerifyIntegrity();
                 IEnumerable<FilterTag> tags = flm.GetAllTags();
                 IEnumerable<FilterGroup> groups = flm.GetAllGroups();

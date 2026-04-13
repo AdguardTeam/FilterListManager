@@ -26,7 +26,7 @@ namespace FilterListManager {
           string.Concat(
             "ChNjb25maWd1cmF0aW9uLnByb3RvEhNmaWx0ZXJfbGlzdF9tYW5hZ2VyIi0K",
             "GEZpbHRlcnNDb21waWxhdGlvblBvbGljeRIRCgljb25zdGFudHMYASADKAki",
-            "kgUKDUNvbmZpZ3VyYXRpb24SPQoQZmlsdGVyX2xpc3RfdHlwZRgBIAEoDjIj",
+            "3gUKDUNvbmZpZ3VyYXRpb24SPQoQZmlsdGVyX2xpc3RfdHlwZRgBIAEoDjIj",
             "LmZpbHRlcl9saXN0X21hbmFnZXIuRmlsdGVyTGlzdFR5cGUSHgoRd29ya2lu",
             "Z19kaXJlY3RvcnkYAiABKAlIAIgBARIOCgZsb2NhbGUYAyABKAkSLgomZGVm",
             "YXVsdF9maWx0ZXJfbGlzdF9leHBpcmVzX3BlcmlvZF9zZWMYBCABKAUSVgoa",
@@ -39,17 +39,19 @@ namespace FilterListManager {
             "ZXF1ZXN0X2N1c3RvbV9wcm94eV9hZGRyGAsgASgJEhAKCGFwcF9uYW1lGAwg",
             "ASgJEg8KB3ZlcnNpb24YDSABKAkSLAokc2hvdWxkX2lnbm9yZV9leHBpcmVz",
             "X2Zvcl9sb2NhbF91cmxzGA4gASgIEhoKDWludGVncml0eV9rZXkYDyABKAlI",
-            "AogBAUIUChJfd29ya2luZ19kaXJlY3RvcnlCHQobX2ZpbHRlcnNfY29tcGls",
-            "YXRpb25fcG9saWN5QhAKDl9pbnRlZ3JpdHlfa2V5KjEKDkZpbHRlckxpc3RU",
-            "eXBlEgwKCFNUQU5EQVJEEAASBwoDRE5TEAESCAoETUlTQxACKk8KE1Jhd1Jl",
-            "cXVlc3RQcm94eU1vZGUSFAoQVVNFX1NZU1RFTV9QUk9YWRAAEgwKCE5PX1BS",
-            "T1hZEAESFAoQVVNFX0NVU1RPTV9QUk9YWRACQjAKGGNvbS5hZGd1YXJkLmZs",
-            "bS5wcm90b2J1ZkISQ29uZmlndXJhdGlvblByb3RvUAFiBnByb3RvMw=="));
+            "AogBARIhChlmaWx0ZXJfdXBkYXRlX2NvbmN1cnJlbmN5GBAgASgFEicKH2Zp",
+            "bHRlcl91cGRhdGVfZGlzcGF0Y2hfZGVsYXlfbXMYESABKAVCFAoSX3dvcmtp",
+            "bmdfZGlyZWN0b3J5Qh0KG19maWx0ZXJzX2NvbXBpbGF0aW9uX3BvbGljeUIQ",
+            "Cg5faW50ZWdyaXR5X2tleSoxCg5GaWx0ZXJMaXN0VHlwZRIMCghTVEFOREFS",
+            "RBAAEgcKA0ROUxABEggKBE1JU0MQAipPChNSYXdSZXF1ZXN0UHJveHlNb2Rl",
+            "EhQKEFVTRV9TWVNURU1fUFJPWFkQABIMCghOT19QUk9YWRABEhQKEFVTRV9D",
+            "VVNUT01fUFJPWFkQAkIwChhjb20uYWRndWFyZC5mbG0ucHJvdG9idWZCEkNv",
+            "bmZpZ3VyYXRpb25Qcm90b1ABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), typeof(global::FilterListManager.RawRequestProxyMode), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FiltersCompilationPolicy), global::FilterListManager.FiltersCompilationPolicy.Parser, new[]{ "Constants" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "FiltersCompilationPolicy", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version", "ShouldIgnoreExpiresForLocalUrls", "IntegrityKey" }, new[]{ "WorkingDirectory", "FiltersCompilationPolicy", "IntegrityKey" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "FiltersCompilationPolicy", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version", "ShouldIgnoreExpiresForLocalUrls", "IntegrityKey", "FilterUpdateConcurrency", "FilterUpdateDispatchDelayMs" }, new[]{ "WorkingDirectory", "FiltersCompilationPolicy", "IntegrityKey" }, null, null, null)
           }));
     }
     #endregion
@@ -323,6 +325,8 @@ namespace FilterListManager {
       version_ = other.version_;
       shouldIgnoreExpiresForLocalUrls_ = other.shouldIgnoreExpiresForLocalUrls_;
       integrityKey_ = other.integrityKey_;
+      filterUpdateConcurrency_ = other.filterUpdateConcurrency_;
+      filterUpdateDispatchDelayMs_ = other.filterUpdateDispatchDelayMs_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -598,6 +602,40 @@ namespace FilterListManager {
       integrityKey_ = null;
     }
 
+    /// <summary>Field number for the "filter_update_concurrency" field.</summary>
+    public const int FilterUpdateConcurrencyFieldNumber = 16;
+    private int filterUpdateConcurrency_;
+    /// <summary>
+    /// Maximum number of concurrent threads used when downloading and compiling
+    /// filter lists during an update.
+    /// Default value: 16. Values of 0 will be treated as 1.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int FilterUpdateConcurrency {
+      get { return filterUpdateConcurrency_; }
+      set {
+        filterUpdateConcurrency_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "filter_update_dispatch_delay_ms" field.</summary>
+    public const int FilterUpdateDispatchDelayMsFieldNumber = 17;
+    private int filterUpdateDispatchDelayMs_;
+    /// <summary>
+    /// Minimum delay in milliseconds between consecutive filter download
+    /// dispatches during a concurrent update. Helps avoid HTTP 429.
+    /// Default value: 60.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int FilterUpdateDispatchDelayMs {
+      get { return filterUpdateDispatchDelayMs_; }
+      set {
+        filterUpdateDispatchDelayMs_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -628,6 +666,8 @@ namespace FilterListManager {
       if (Version != other.Version) return false;
       if (ShouldIgnoreExpiresForLocalUrls != other.ShouldIgnoreExpiresForLocalUrls) return false;
       if (IntegrityKey != other.IntegrityKey) return false;
+      if (FilterUpdateConcurrency != other.FilterUpdateConcurrency) return false;
+      if (FilterUpdateDispatchDelayMs != other.FilterUpdateDispatchDelayMs) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -650,6 +690,8 @@ namespace FilterListManager {
       if (Version.Length != 0) hash ^= Version.GetHashCode();
       if (ShouldIgnoreExpiresForLocalUrls != false) hash ^= ShouldIgnoreExpiresForLocalUrls.GetHashCode();
       if (HasIntegrityKey) hash ^= IntegrityKey.GetHashCode();
+      if (FilterUpdateConcurrency != 0) hash ^= FilterUpdateConcurrency.GetHashCode();
+      if (FilterUpdateDispatchDelayMs != 0) hash ^= FilterUpdateDispatchDelayMs.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -728,6 +770,14 @@ namespace FilterListManager {
         output.WriteRawTag(122);
         output.WriteString(IntegrityKey);
       }
+      if (FilterUpdateConcurrency != 0) {
+        output.WriteRawTag(128, 1);
+        output.WriteInt32(FilterUpdateConcurrency);
+      }
+      if (FilterUpdateDispatchDelayMs != 0) {
+        output.WriteRawTag(136, 1);
+        output.WriteInt32(FilterUpdateDispatchDelayMs);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -798,6 +848,14 @@ namespace FilterListManager {
         output.WriteRawTag(122);
         output.WriteString(IntegrityKey);
       }
+      if (FilterUpdateConcurrency != 0) {
+        output.WriteRawTag(128, 1);
+        output.WriteInt32(FilterUpdateConcurrency);
+      }
+      if (FilterUpdateDispatchDelayMs != 0) {
+        output.WriteRawTag(136, 1);
+        output.WriteInt32(FilterUpdateDispatchDelayMs);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -852,6 +910,12 @@ namespace FilterListManager {
       }
       if (HasIntegrityKey) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(IntegrityKey);
+      }
+      if (FilterUpdateConcurrency != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeInt32Size(FilterUpdateConcurrency);
+      }
+      if (FilterUpdateDispatchDelayMs != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeInt32Size(FilterUpdateDispatchDelayMs);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -912,6 +976,12 @@ namespace FilterListManager {
       }
       if (other.HasIntegrityKey) {
         IntegrityKey = other.IntegrityKey;
+      }
+      if (other.FilterUpdateConcurrency != 0) {
+        FilterUpdateConcurrency = other.FilterUpdateConcurrency;
+      }
+      if (other.FilterUpdateDispatchDelayMs != 0) {
+        FilterUpdateDispatchDelayMs = other.FilterUpdateDispatchDelayMs;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -995,6 +1065,14 @@ namespace FilterListManager {
             IntegrityKey = input.ReadString();
             break;
           }
+          case 128: {
+            FilterUpdateConcurrency = input.ReadInt32();
+            break;
+          }
+          case 136: {
+            FilterUpdateDispatchDelayMs = input.ReadInt32();
+            break;
+          }
         }
       }
     #endif
@@ -1075,6 +1153,14 @@ namespace FilterListManager {
           }
           case 122: {
             IntegrityKey = input.ReadString();
+            break;
+          }
+          case 128: {
+            FilterUpdateConcurrency = input.ReadInt32();
+            break;
+          }
+          case 136: {
+            FilterUpdateDispatchDelayMs = input.ReadInt32();
             break;
           }
         }

@@ -160,18 +160,6 @@
         GetRulesCount,
         
         /// <summary>
-        /// Signs all filter rules and includes entities with the integrity key from configuration.
-        /// Throws exception if integrity_key is not set in configuration.
-        /// </summary>
-        SignAllRules,
-        
-        /// <summary>
-        /// Updates the integrity key in configuration and re-signs all filter rules and includes
-        /// entities with the new key.
-        /// </summary>
-        SignAllRulesWithNewKey,
-        
-        /// <summary>
         /// Verifies integrity signatures of all filter rules and includes entities in the database.
         /// Throws exception if integrity_key is not set or if any entity has a missing or invalid signature.
         /// </summary>
