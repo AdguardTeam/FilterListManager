@@ -15,6 +15,8 @@ final class AdGuardFLMLibTests: XCTestCase {
         configuration.filtersCompilationPolicy = FilterListManager_FiltersCompilationPolicy()
         configuration.filtersCompilationPolicy.constants = ["const1", "const2"]
         configuration.shouldIgnoreExpiresForLocalUrls = false;
+        configuration.filterUpdateConcurrency = 1
+        configuration.filterUpdateDispatchDelayMs = 20
 
         return configuration
     }

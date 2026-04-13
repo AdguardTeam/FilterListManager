@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Configuration field `filter_update_concurrency` to control the maximum number of concurrent filter download/compilation threads (default: 16, max: 16)
+- Configuration field `filter_update_dispatch_delay_ms` to set minimum delay in milliseconds between consecutive filter download dispatches to avoid HTTP 429 errors (default: 60)
+
 ### Changed
 - Method names: sign_all_rules -> sign_all_data, sign_all_rules_with_new_key -> sign_all_data_with_new_key
 - All methods that read rules, will verify signatures of the rules.

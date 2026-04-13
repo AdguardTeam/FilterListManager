@@ -11,6 +11,7 @@ use crate::io::get_scheme;
 use crate::io::http::blocking_client::BlockingClient;
 use crate::io::url_schemes::UrlSchemes;
 use crate::manager::filter_lists_builder::FullFilterListBuilder;
+use crate::manager::models::configuration::DEFAULT_FILTER_UPDATE_CONCURRENCY;
 use crate::manager::models::update_result::UpdateFilterError;
 use crate::manager::models::UpdateResult;
 use crate::storage::entities::diff_update_entity::DiffUpdateEntity;
@@ -36,10 +37,7 @@ use rusqlite::{Connection, Transaction};
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::{Arc, Mutex};
-use std::time::Instant;
-
-/// Maximum number of concurrent downloads
-const MAX_CONCURRENT_DOWNLOADS: usize = 16;
+use std::time::{Duration, Instant};
 
 /// Compiled filter entry with metadata
 struct CompilationListEntry<'compiler> {
@@ -216,6 +214,10 @@ pub(super) fn update_filters_action(
         rows_count,
         &mut update_result,
         loose_timeout as u64,
+        configuration
+            .filter_update_concurrency
+            .clamp(1, DEFAULT_FILTER_UPDATE_CONCURRENCY),
+        configuration.filter_update_dispatch_delay_ms.max(0) as u64,
     );
 
     // Put here processed_filters
@@ -508,12 +510,20 @@ fn compile_concurrently<'compilers>(
     infos_count: usize,
     update_result: &mut UpdateResult,
     loose_timeout: u64,
+    max_concurrent: usize,
+    dispatch_delay_ms: u64,
 ) -> Vec<CompilationListEntry<'compilers>> {
     let is_use_timeout = loose_timeout > 0;
     let start_time = Instant::now();
-    let num_workers = MAX_CONCURRENT_DOWNLOADS.min(infos_count);
+    let num_workers = max_concurrent.min(infos_count);
     let thread_errors = Mutex::new(Vec::<UpdateFilterError>::new());
-    let work = Mutex::new(compilation_infos.into_iter().enumerate());
+
+    let dispatch_delay = Duration::from_millis(dispatch_delay_ms);
+
+    // Bundle the last-dispatch timestamp with the work iterator so that
+    // throttling is checked atomically under the same lock — no thread can
+    // skip the delay window.
+    let work = Mutex::new((compilation_infos.into_iter().enumerate(), Instant::now()));
 
     // Parallel compilation: download and compile filters concurrently
     let mut compilation_list = std::thread::scope(|s| {
@@ -524,13 +534,28 @@ fn compile_concurrently<'compilers>(
 
                     while !is_use_timeout || start_time.elapsed().as_secs() <= loose_timeout {
                         match work.lock() {
-                            Ok(mut tasks_list) => {
+                            Ok(mut guard) => {
+                                let (ref mut tasks_list, ref mut last_dispatch) = *guard;
+
                                 // Get next task
                                 if let Some((index, (filter_id, filter, mut compiler))) =
                                     tasks_list.next()
                                 {
-                                    // Unlock tasks list before compilation
-                                    drop(tasks_list);
+                                    // Throttle: if less than dispatch_delay has
+                                    // passed since the previous dispatch, sleep
+                                    // only the remainder.  The check runs under
+                                    // the work lock so no two threads can start
+                                    // a request within the same window.
+                                    if dispatch_delay_ms > 0 {
+                                        let elapsed = last_dispatch.elapsed();
+                                        if elapsed < dispatch_delay {
+                                            std::thread::sleep(dispatch_delay - elapsed);
+                                        }
+                                        *last_dispatch = Instant::now();
+                                    }
+
+                                    // Unlock mutex before compilation
+                                    drop(guard);
 
                                     // Download and compile filter
                                     let compilation_result = compiler.compile(&filter.download_url);

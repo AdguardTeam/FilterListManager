@@ -67,6 +67,16 @@ pub struct Configuration {
     /// If set, rules will be signed on write and verified on read.
     #[prost(string, optional, tag = "15")]
     pub integrity_key: ::core::option::Option<::prost::alloc::string::String>,
+    /// Maximum number of concurrent threads used when downloading and compiling
+    /// filter lists during an update.
+    /// Default value: 16. Values of 0 will be treated as 1.
+    #[prost(int32, tag = "16")]
+    pub filter_update_concurrency: i32,
+    /// Minimum delay in milliseconds between consecutive filter download
+    /// dispatches during a concurrent update. Helps avoid HTTP 429.
+    /// Default value: 0 (no throttling).
+    #[prost(int32, tag = "17")]
+    pub filter_update_dispatch_delay_ms: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

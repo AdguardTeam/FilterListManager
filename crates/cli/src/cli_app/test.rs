@@ -78,9 +78,10 @@ fn update_filters() {
         "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/windows/filters_i18n.json".to_string();
     conf.app_name = "FlmApp".to_string();
     conf.version = "1.2.3".to_string();
+    conf.filter_update_dispatch_delay_ms = 60;
 
     let flm = FilterListManagerImpl::new(conf).unwrap();
-    flm.pull_metadata().unwrap();
+    // flm.pull_metadata().unwrap();
     let updated = flm.update_filters(true, 0, true).unwrap().unwrap();
 
     println!("Updated filters count: {}", updated.updated_list.len());
@@ -162,9 +163,9 @@ fn enable_all_filters() {
 }
 
 pub(crate) fn test() {
-    // update_filters();
+    update_filters();
     // enable_all_filters();
     // duplicate_filters_with_disabled_rules(true);
     // duplicate_filters_with_disabled_rules(false);
-    get_active_filters();
+    // get_active_filters();
 }

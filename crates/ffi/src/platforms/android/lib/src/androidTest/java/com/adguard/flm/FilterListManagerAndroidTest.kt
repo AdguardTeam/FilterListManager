@@ -29,6 +29,7 @@ class FilterListManagerAndroidTest {
         }.absolutePath
         metadataUrl = "https://filters.adtidy.org/android/filters.json"
         metadataLocalesUrl = "https://filters.adtidy.org/android/filters_i18n.json"
+        filterUpdateDispatchDelayMs = 25
     }
 
     private fun <T : Throwable> assertThrows(

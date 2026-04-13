@@ -87,4 +87,14 @@ message Configuration {
   // Optional key for signing and verifying integrity of filter rules.
   // If set, rules will be signed on write and verified on read.
   optional string integrity_key = 15;
+
+  // Maximum number of concurrent threads used when downloading and compiling
+  // filter lists during an update.
+  // Default value: 16. Values of 0 will be treated as 1.
+  int32 filter_update_concurrency = 16;
+
+  // Minimum delay in milliseconds between consecutive filter download
+  // dispatches during a concurrent update. Helps avoid HTTP 429.
+  // Default value: 60.
+  int32 filter_update_dispatch_delay_ms = 17;
 }

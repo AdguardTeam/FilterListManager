@@ -62,6 +62,8 @@ impl From<Configuration> for filter_list_manager::Configuration {
             app_name: value.app_name,
             version: value.version,
             integrity_key: value.integrity_key,
+            filter_update_concurrency: value.filter_update_concurrency as i32,
+            filter_update_dispatch_delay_ms: value.filter_update_dispatch_delay_ms,
         }
     }
 }
@@ -99,6 +101,8 @@ impl From<filter_list_manager::Configuration> for Configuration {
             app_name: val.app_name,
             version: val.version,
             integrity_key: val.integrity_key,
+            filter_update_concurrency: val.filter_update_concurrency as usize,
+            filter_update_dispatch_delay_ms: val.filter_update_dispatch_delay_ms,
         }
     }
 }

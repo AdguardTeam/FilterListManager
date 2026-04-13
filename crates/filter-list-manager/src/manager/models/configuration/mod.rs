@@ -22,6 +22,13 @@ const DEFAULT_REQUEST_TIMEOUT_MS: i32 = 60000;
 /// Will be used, if value is not set in filter's metadata in seconds
 const DEFAULT_EXPIRES_VALUE_FOR_FILTERS: i32 = 86400;
 
+/// Default maximum number of concurrent filter download/compilation threads.
+pub(crate) const DEFAULT_FILTER_UPDATE_CONCURRENCY: usize = 16;
+
+/// Default minimum delay in milliseconds between consecutive filter download
+/// dispatches to avoid HTTP 429 (Too Many Requests) errors.
+pub(crate) const DEFAULT_FILTER_UPDATE_DISPATCH_DELAY_MS: i32 = 60;
+
 /// Configuration object
 pub struct Configuration {
     /// Type of filter lists to manage
@@ -81,6 +88,17 @@ pub struct Configuration {
     /// Integrity key for hashing sensitive data
     /// Every read/write operation will be hashed using this key
     pub integrity_key: Option<String>,
+    /// Maximum number of concurrent threads used when downloading and compiling
+    /// filter lists during an update.
+    /// Default value: 16.
+    /// Values of 0 will be treated as 1.
+    pub filter_update_concurrency: usize,
+    /// Minimum delay in milliseconds between consecutive filter download
+    /// dispatches during a concurrent update. Helps avoid HTTP 429
+    /// (Too Many Requests) from servers when multiple threads fetch filters
+    /// simultaneously.
+    /// Default value: 60.
+    pub filter_update_dispatch_delay_ms: i32,
 }
 
 /// Normalized locales delimiter
@@ -129,6 +147,8 @@ impl Default for Configuration {
             app_name: String::new(),
             version: String::new(),
             integrity_key: None,
+            filter_update_concurrency: DEFAULT_FILTER_UPDATE_CONCURRENCY,
+            filter_update_dispatch_delay_ms: DEFAULT_FILTER_UPDATE_DISPATCH_DELAY_MS,
         }
     }
 }

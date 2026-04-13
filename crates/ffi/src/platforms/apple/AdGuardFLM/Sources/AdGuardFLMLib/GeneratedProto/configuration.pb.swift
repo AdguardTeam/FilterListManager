@@ -116,34 +116,43 @@ public struct FilterListManager_FiltersCompilationPolicy: Sendable {
   public init() {}
 }
 
-public struct FilterListManager_Configuration: Sendable {
+public struct FilterListManager_Configuration: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var filterListType: FilterListManager_FilterListType = .standard
+  public var filterListType: FilterListManager_FilterListType {
+    get {return _storage._filterListType}
+    set {_uniqueStorage()._filterListType = newValue}
+  }
 
   /// Absolute path for library working directory.
   /// This will be used for database operating.
   /// If value is "None", `cwd` will be used.
   public var workingDirectory: String {
-    get {return _workingDirectory ?? String()}
-    set {_workingDirectory = newValue}
+    get {return _storage._workingDirectory ?? String()}
+    set {_uniqueStorage()._workingDirectory = newValue}
   }
   /// Returns true if `workingDirectory` has been explicitly set.
-  public var hasWorkingDirectory: Bool {return self._workingDirectory != nil}
+  public var hasWorkingDirectory: Bool {return _storage._workingDirectory != nil}
   /// Clears the value of `workingDirectory`. Subsequent reads from it will return its default value.
-  public mutating func clearWorkingDirectory() {self._workingDirectory = nil}
+  public mutating func clearWorkingDirectory() {_uniqueStorage()._workingDirectory = nil}
 
   /// Locale that needs to be used to extract localized names and descriptions.
   /// Locale `en-GB` will be normalized to internal `en_GB` representation.
   /// Default value: en.
-  public var locale: String = String()
+  public var locale: String {
+    get {return _storage._locale}
+    set {_uniqueStorage()._locale = newValue}
+  }
 
   /// Default period for expires in seconds (unless specified in "Expires", or its value is too small).
   /// Default value: 86400 (1 day).
   /// Values < 3600 will be clamped to 3600.
-  public var defaultFilterListExpiresPeriodSec: Int32 = 0
+  public var defaultFilterListExpiresPeriodSec: Int32 {
+    get {return _storage._defaultFilterListExpiresPeriodSec}
+    set {_uniqueStorage()._defaultFilterListExpiresPeriodSec = newValue}
+  }
 
   /// Settings for filters compilation or collection from compiled parts.
   /// 
@@ -156,59 +165,100 @@ public struct FilterListManager_Configuration: Sendable {
   /// When you get filters, they will be collected from compiled parts (main filter + includes).
   /// All directives in main filter will be resolved, using this policy, and includes will be injected. 
   public var filtersCompilationPolicy: FilterListManager_FiltersCompilationPolicy {
-    get {return _filtersCompilationPolicy ?? FilterListManager_FiltersCompilationPolicy()}
-    set {_filtersCompilationPolicy = newValue}
+    get {return _storage._filtersCompilationPolicy ?? FilterListManager_FiltersCompilationPolicy()}
+    set {_uniqueStorage()._filtersCompilationPolicy = newValue}
   }
   /// Returns true if `filtersCompilationPolicy` has been explicitly set.
-  public var hasFiltersCompilationPolicy: Bool {return self._filtersCompilationPolicy != nil}
+  public var hasFiltersCompilationPolicy: Bool {return _storage._filtersCompilationPolicy != nil}
   /// Clears the value of `filtersCompilationPolicy`. Subsequent reads from it will return its default value.
-  public mutating func clearFiltersCompilationPolicy() {self._filtersCompilationPolicy = nil}
+  public mutating func clearFiltersCompilationPolicy() {_uniqueStorage()._filtersCompilationPolicy = nil}
 
   /// URL of the index (filters.json) file.
-  public var metadataURL: String = String()
+  public var metadataURL: String {
+    get {return _storage._metadataURL}
+    set {_uniqueStorage()._metadataURL = newValue}
+  }
 
   /// URL of the locales (filters_i18n.json) file.
-  public var metadataLocalesURL: String = String()
+  public var metadataLocalesURL: String {
+    get {return _storage._metadataLocalesURL}
+    set {_uniqueStorage()._metadataLocalesURL = newValue}
+  }
 
   /// Requests timeouts in milliseconds. Default value 60000 (60 seconds).
-  public var requestTimeoutMs: Int32 = 0
+  public var requestTimeoutMs: Int32 {
+    get {return _storage._requestTimeoutMs}
+    set {_uniqueStorage()._requestTimeoutMs = newValue}
+  }
 
   /// “Uplifting” a database is a set of measures that brings the database up to date:
-  public var autoLiftUpDatabase: Bool = false
+  public var autoLiftUpDatabase: Bool {
+    get {return _storage._autoLiftUpDatabase}
+    set {_uniqueStorage()._autoLiftUpDatabase = newValue}
+  }
 
   /// Proxy mode
-  public var requestProxyMode: FilterListManager_RawRequestProxyMode = .useSystemProxy
+  public var requestProxyMode: FilterListManager_RawRequestProxyMode {
+    get {return _storage._requestProxyMode}
+    set {_uniqueStorage()._requestProxyMode = newValue}
+  }
 
   /// Custom proxy addr for requests
-  public var requestCustomProxyAddr: String = String()
+  public var requestCustomProxyAddr: String {
+    get {return _storage._requestCustomProxyAddr}
+    set {_uniqueStorage()._requestCustomProxyAddr = newValue}
+  }
 
   /// Client app name
-  public var appName: String = String()
+  public var appName: String {
+    get {return _storage._appName}
+    set {_uniqueStorage()._appName = newValue}
+  }
 
   /// Client app version
-  public var version: String = String()
+  public var version: String {
+    get {return _storage._version}
+    set {_uniqueStorage()._version = newValue}
+  }
 
   /// Should ignore expires for local urls during update
-  public var shouldIgnoreExpiresForLocalUrls: Bool = false
+  public var shouldIgnoreExpiresForLocalUrls: Bool {
+    get {return _storage._shouldIgnoreExpiresForLocalUrls}
+    set {_uniqueStorage()._shouldIgnoreExpiresForLocalUrls = newValue}
+  }
 
   /// Optional key for signing and verifying integrity of filter rules.
   /// If set, rules will be signed on write and verified on read.
   public var integrityKey: String {
-    get {return _integrityKey ?? String()}
-    set {_integrityKey = newValue}
+    get {return _storage._integrityKey ?? String()}
+    set {_uniqueStorage()._integrityKey = newValue}
   }
   /// Returns true if `integrityKey` has been explicitly set.
-  public var hasIntegrityKey: Bool {return self._integrityKey != nil}
+  public var hasIntegrityKey: Bool {return _storage._integrityKey != nil}
   /// Clears the value of `integrityKey`. Subsequent reads from it will return its default value.
-  public mutating func clearIntegrityKey() {self._integrityKey = nil}
+  public mutating func clearIntegrityKey() {_uniqueStorage()._integrityKey = nil}
+
+  /// Maximum number of concurrent threads used when downloading and compiling
+  /// filter lists during an update.
+  /// Default value: 16. Values of 0 will be treated as 1.
+  public var filterUpdateConcurrency: Int32 {
+    get {return _storage._filterUpdateConcurrency}
+    set {_uniqueStorage()._filterUpdateConcurrency = newValue}
+  }
+
+  /// Minimum delay in milliseconds between consecutive filter download
+  /// dispatches during a concurrent update. Helps avoid HTTP 429.
+  /// Default value: 0 (no throttling).
+  public var filterUpdateDispatchDelayMs: Int32 {
+    get {return _storage._filterUpdateDispatchDelayMs}
+    set {_uniqueStorage()._filterUpdateDispatchDelayMs = newValue}
+  }
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
 
-  fileprivate var _workingDirectory: String? = nil
-  fileprivate var _filtersCompilationPolicy: FilterListManager_FiltersCompilationPolicy? = nil
-  fileprivate var _integrityKey: String? = nil
+  fileprivate var _storage = _StorageClass.defaultInstance
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -281,103 +331,187 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     13: .same(proto: "version"),
     14: .standard(proto: "should_ignore_expires_for_local_urls"),
     15: .standard(proto: "integrity_key"),
+    16: .standard(proto: "filter_update_concurrency"),
+    17: .standard(proto: "filter_update_dispatch_delay_ms"),
   ]
 
+  fileprivate class _StorageClass {
+    var _filterListType: FilterListManager_FilterListType = .standard
+    var _workingDirectory: String? = nil
+    var _locale: String = String()
+    var _defaultFilterListExpiresPeriodSec: Int32 = 0
+    var _filtersCompilationPolicy: FilterListManager_FiltersCompilationPolicy? = nil
+    var _metadataURL: String = String()
+    var _metadataLocalesURL: String = String()
+    var _requestTimeoutMs: Int32 = 0
+    var _autoLiftUpDatabase: Bool = false
+    var _requestProxyMode: FilterListManager_RawRequestProxyMode = .useSystemProxy
+    var _requestCustomProxyAddr: String = String()
+    var _appName: String = String()
+    var _version: String = String()
+    var _shouldIgnoreExpiresForLocalUrls: Bool = false
+    var _integrityKey: String? = nil
+    var _filterUpdateConcurrency: Int32 = 0
+    var _filterUpdateDispatchDelayMs: Int32 = 0
+
+    #if swift(>=5.10)
+      // This property is used as the initial default value for new instances of the type.
+      // The type itself is protecting the reference to its storage via CoW semantics.
+      // This will force a copy to be made of this reference when the first mutation occurs;
+      // hence, it is safe to mark this as `nonisolated(unsafe)`.
+      static nonisolated(unsafe) let defaultInstance = _StorageClass()
+    #else
+      static let defaultInstance = _StorageClass()
+    #endif
+
+    private init() {}
+
+    init(copying source: _StorageClass) {
+      _filterListType = source._filterListType
+      _workingDirectory = source._workingDirectory
+      _locale = source._locale
+      _defaultFilterListExpiresPeriodSec = source._defaultFilterListExpiresPeriodSec
+      _filtersCompilationPolicy = source._filtersCompilationPolicy
+      _metadataURL = source._metadataURL
+      _metadataLocalesURL = source._metadataLocalesURL
+      _requestTimeoutMs = source._requestTimeoutMs
+      _autoLiftUpDatabase = source._autoLiftUpDatabase
+      _requestProxyMode = source._requestProxyMode
+      _requestCustomProxyAddr = source._requestCustomProxyAddr
+      _appName = source._appName
+      _version = source._version
+      _shouldIgnoreExpiresForLocalUrls = source._shouldIgnoreExpiresForLocalUrls
+      _integrityKey = source._integrityKey
+      _filterUpdateConcurrency = source._filterUpdateConcurrency
+      _filterUpdateDispatchDelayMs = source._filterUpdateDispatchDelayMs
+    }
+  }
+
+  fileprivate mutating func _uniqueStorage() -> _StorageClass {
+    if !isKnownUniquelyReferenced(&_storage) {
+      _storage = _StorageClass(copying: _storage)
+    }
+    return _storage
+  }
+
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularEnumField(value: &self.filterListType) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self._workingDirectory) }()
-      case 3: try { try decoder.decodeSingularStringField(value: &self.locale) }()
-      case 4: try { try decoder.decodeSingularInt32Field(value: &self.defaultFilterListExpiresPeriodSec) }()
-      case 5: try { try decoder.decodeSingularMessageField(value: &self._filtersCompilationPolicy) }()
-      case 6: try { try decoder.decodeSingularStringField(value: &self.metadataURL) }()
-      case 7: try { try decoder.decodeSingularStringField(value: &self.metadataLocalesURL) }()
-      case 8: try { try decoder.decodeSingularInt32Field(value: &self.requestTimeoutMs) }()
-      case 9: try { try decoder.decodeSingularBoolField(value: &self.autoLiftUpDatabase) }()
-      case 10: try { try decoder.decodeSingularEnumField(value: &self.requestProxyMode) }()
-      case 11: try { try decoder.decodeSingularStringField(value: &self.requestCustomProxyAddr) }()
-      case 12: try { try decoder.decodeSingularStringField(value: &self.appName) }()
-      case 13: try { try decoder.decodeSingularStringField(value: &self.version) }()
-      case 14: try { try decoder.decodeSingularBoolField(value: &self.shouldIgnoreExpiresForLocalUrls) }()
-      case 15: try { try decoder.decodeSingularStringField(value: &self._integrityKey) }()
-      default: break
+    _ = _uniqueStorage()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      while let fieldNumber = try decoder.nextFieldNumber() {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every case branch when no optimizations are
+        // enabled. https://github.com/apple/swift-protobuf/issues/1034
+        switch fieldNumber {
+        case 1: try { try decoder.decodeSingularEnumField(value: &_storage._filterListType) }()
+        case 2: try { try decoder.decodeSingularStringField(value: &_storage._workingDirectory) }()
+        case 3: try { try decoder.decodeSingularStringField(value: &_storage._locale) }()
+        case 4: try { try decoder.decodeSingularInt32Field(value: &_storage._defaultFilterListExpiresPeriodSec) }()
+        case 5: try { try decoder.decodeSingularMessageField(value: &_storage._filtersCompilationPolicy) }()
+        case 6: try { try decoder.decodeSingularStringField(value: &_storage._metadataURL) }()
+        case 7: try { try decoder.decodeSingularStringField(value: &_storage._metadataLocalesURL) }()
+        case 8: try { try decoder.decodeSingularInt32Field(value: &_storage._requestTimeoutMs) }()
+        case 9: try { try decoder.decodeSingularBoolField(value: &_storage._autoLiftUpDatabase) }()
+        case 10: try { try decoder.decodeSingularEnumField(value: &_storage._requestProxyMode) }()
+        case 11: try { try decoder.decodeSingularStringField(value: &_storage._requestCustomProxyAddr) }()
+        case 12: try { try decoder.decodeSingularStringField(value: &_storage._appName) }()
+        case 13: try { try decoder.decodeSingularStringField(value: &_storage._version) }()
+        case 14: try { try decoder.decodeSingularBoolField(value: &_storage._shouldIgnoreExpiresForLocalUrls) }()
+        case 15: try { try decoder.decodeSingularStringField(value: &_storage._integrityKey) }()
+        case 16: try { try decoder.decodeSingularInt32Field(value: &_storage._filterUpdateConcurrency) }()
+        case 17: try { try decoder.decodeSingularInt32Field(value: &_storage._filterUpdateDispatchDelayMs) }()
+        default: break
+        }
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    if self.filterListType != .standard {
-      try visitor.visitSingularEnumField(value: self.filterListType, fieldNumber: 1)
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      if _storage._filterListType != .standard {
+        try visitor.visitSingularEnumField(value: _storage._filterListType, fieldNumber: 1)
+      }
+      try { if let v = _storage._workingDirectory {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+      } }()
+      if !_storage._locale.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._locale, fieldNumber: 3)
+      }
+      if _storage._defaultFilterListExpiresPeriodSec != 0 {
+        try visitor.visitSingularInt32Field(value: _storage._defaultFilterListExpiresPeriodSec, fieldNumber: 4)
+      }
+      try { if let v = _storage._filtersCompilationPolicy {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+      } }()
+      if !_storage._metadataURL.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._metadataURL, fieldNumber: 6)
+      }
+      if !_storage._metadataLocalesURL.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._metadataLocalesURL, fieldNumber: 7)
+      }
+      if _storage._requestTimeoutMs != 0 {
+        try visitor.visitSingularInt32Field(value: _storage._requestTimeoutMs, fieldNumber: 8)
+      }
+      if _storage._autoLiftUpDatabase != false {
+        try visitor.visitSingularBoolField(value: _storage._autoLiftUpDatabase, fieldNumber: 9)
+      }
+      if _storage._requestProxyMode != .useSystemProxy {
+        try visitor.visitSingularEnumField(value: _storage._requestProxyMode, fieldNumber: 10)
+      }
+      if !_storage._requestCustomProxyAddr.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._requestCustomProxyAddr, fieldNumber: 11)
+      }
+      if !_storage._appName.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._appName, fieldNumber: 12)
+      }
+      if !_storage._version.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._version, fieldNumber: 13)
+      }
+      if _storage._shouldIgnoreExpiresForLocalUrls != false {
+        try visitor.visitSingularBoolField(value: _storage._shouldIgnoreExpiresForLocalUrls, fieldNumber: 14)
+      }
+      try { if let v = _storage._integrityKey {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 15)
+      } }()
+      if _storage._filterUpdateConcurrency != 0 {
+        try visitor.visitSingularInt32Field(value: _storage._filterUpdateConcurrency, fieldNumber: 16)
+      }
+      if _storage._filterUpdateDispatchDelayMs != 0 {
+        try visitor.visitSingularInt32Field(value: _storage._filterUpdateDispatchDelayMs, fieldNumber: 17)
+      }
     }
-    try { if let v = self._workingDirectory {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
-    } }()
-    if !self.locale.isEmpty {
-      try visitor.visitSingularStringField(value: self.locale, fieldNumber: 3)
-    }
-    if self.defaultFilterListExpiresPeriodSec != 0 {
-      try visitor.visitSingularInt32Field(value: self.defaultFilterListExpiresPeriodSec, fieldNumber: 4)
-    }
-    try { if let v = self._filtersCompilationPolicy {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-    } }()
-    if !self.metadataURL.isEmpty {
-      try visitor.visitSingularStringField(value: self.metadataURL, fieldNumber: 6)
-    }
-    if !self.metadataLocalesURL.isEmpty {
-      try visitor.visitSingularStringField(value: self.metadataLocalesURL, fieldNumber: 7)
-    }
-    if self.requestTimeoutMs != 0 {
-      try visitor.visitSingularInt32Field(value: self.requestTimeoutMs, fieldNumber: 8)
-    }
-    if self.autoLiftUpDatabase != false {
-      try visitor.visitSingularBoolField(value: self.autoLiftUpDatabase, fieldNumber: 9)
-    }
-    if self.requestProxyMode != .useSystemProxy {
-      try visitor.visitSingularEnumField(value: self.requestProxyMode, fieldNumber: 10)
-    }
-    if !self.requestCustomProxyAddr.isEmpty {
-      try visitor.visitSingularStringField(value: self.requestCustomProxyAddr, fieldNumber: 11)
-    }
-    if !self.appName.isEmpty {
-      try visitor.visitSingularStringField(value: self.appName, fieldNumber: 12)
-    }
-    if !self.version.isEmpty {
-      try visitor.visitSingularStringField(value: self.version, fieldNumber: 13)
-    }
-    if self.shouldIgnoreExpiresForLocalUrls != false {
-      try visitor.visitSingularBoolField(value: self.shouldIgnoreExpiresForLocalUrls, fieldNumber: 14)
-    }
-    try { if let v = self._integrityKey {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 15)
-    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: FilterListManager_Configuration, rhs: FilterListManager_Configuration) -> Bool {
-    if lhs.filterListType != rhs.filterListType {return false}
-    if lhs._workingDirectory != rhs._workingDirectory {return false}
-    if lhs.locale != rhs.locale {return false}
-    if lhs.defaultFilterListExpiresPeriodSec != rhs.defaultFilterListExpiresPeriodSec {return false}
-    if lhs._filtersCompilationPolicy != rhs._filtersCompilationPolicy {return false}
-    if lhs.metadataURL != rhs.metadataURL {return false}
-    if lhs.metadataLocalesURL != rhs.metadataLocalesURL {return false}
-    if lhs.requestTimeoutMs != rhs.requestTimeoutMs {return false}
-    if lhs.autoLiftUpDatabase != rhs.autoLiftUpDatabase {return false}
-    if lhs.requestProxyMode != rhs.requestProxyMode {return false}
-    if lhs.requestCustomProxyAddr != rhs.requestCustomProxyAddr {return false}
-    if lhs.appName != rhs.appName {return false}
-    if lhs.version != rhs.version {return false}
-    if lhs.shouldIgnoreExpiresForLocalUrls != rhs.shouldIgnoreExpiresForLocalUrls {return false}
-    if lhs._integrityKey != rhs._integrityKey {return false}
+    if lhs._storage !== rhs._storage {
+      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
+        let _storage = _args.0
+        let rhs_storage = _args.1
+        if _storage._filterListType != rhs_storage._filterListType {return false}
+        if _storage._workingDirectory != rhs_storage._workingDirectory {return false}
+        if _storage._locale != rhs_storage._locale {return false}
+        if _storage._defaultFilterListExpiresPeriodSec != rhs_storage._defaultFilterListExpiresPeriodSec {return false}
+        if _storage._filtersCompilationPolicy != rhs_storage._filtersCompilationPolicy {return false}
+        if _storage._metadataURL != rhs_storage._metadataURL {return false}
+        if _storage._metadataLocalesURL != rhs_storage._metadataLocalesURL {return false}
+        if _storage._requestTimeoutMs != rhs_storage._requestTimeoutMs {return false}
+        if _storage._autoLiftUpDatabase != rhs_storage._autoLiftUpDatabase {return false}
+        if _storage._requestProxyMode != rhs_storage._requestProxyMode {return false}
+        if _storage._requestCustomProxyAddr != rhs_storage._requestCustomProxyAddr {return false}
+        if _storage._appName != rhs_storage._appName {return false}
+        if _storage._version != rhs_storage._version {return false}
+        if _storage._shouldIgnoreExpiresForLocalUrls != rhs_storage._shouldIgnoreExpiresForLocalUrls {return false}
+        if _storage._integrityKey != rhs_storage._integrityKey {return false}
+        if _storage._filterUpdateConcurrency != rhs_storage._filterUpdateConcurrency {return false}
+        if _storage._filterUpdateDispatchDelayMs != rhs_storage._filterUpdateDispatchDelayMs {return false}
+        return true
+      }
+      if !storagesAreEqual {return false}
+    }
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
