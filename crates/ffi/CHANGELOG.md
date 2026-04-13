@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [Unreleased]
+## [2.6.0] - 2026-04-13
 
 ### Added
 - Configuration field `filter_update_concurrency` to control the maximum number of concurrent filter download/compilation threads (default: 16, max: 16)
@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 - Method names: sign_all_rules -> sign_all_data, sign_all_rules_with_new_key -> sign_all_data_with_new_key
+
+[2.6.0]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.5.0...ffi-2.6.0
 
 ## [2.5.0] - 2026-03-11
 
