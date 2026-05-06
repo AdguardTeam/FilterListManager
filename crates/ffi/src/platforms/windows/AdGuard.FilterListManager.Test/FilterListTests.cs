@@ -91,6 +91,7 @@ namespace AdGuard.FilterListManager.Test
                 GenerateRandomKeyResponse randomKey = flm.GenerateRandomKey();
                 configuration.IntegrityKey = randomKey.Key;
                 flm.Init(configuration);
+                flm.SignAllData();
                 flm.PullMetadata();
                 flm.UpdateFilters(false, REQUEST_TIMEOUT_MS, false);
 
