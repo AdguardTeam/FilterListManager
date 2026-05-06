@@ -130,6 +130,7 @@ git reset
 # Add the updated Cargo.toml files to the git index
 git add crates/filter-list-manager/Cargo.toml
 git add crates/ffi/Cargo.toml
+git add Cargo.lock
 git add $HASH_FILE
 
 # Commit the changes
