@@ -625,9 +625,10 @@ namespace AdGuard.FilterListManager
                 $"Cannot call RUST method \"{ffiMethodName}\"";
             FfiMethod ffiMethod = GetFfiMethod(ffiMethodName);
             if (flmHandle == IntPtr.Zero &&
-                // only two methods below can be invoked correctly without set flmHandle before
-                ffiMethod != FfiMethod.SpawnDefaultConfiguration && 
-                ffiMethod != FfiMethod.Init)
+                // methods below can be invoked correctly without set flmHandle before
+                ffiMethod != FfiMethod.SpawnDefaultConfiguration &&
+                ffiMethod != FfiMethod.Init &&
+                ffiMethod != FfiMethod.GenerateRandomKey)
             {
                 string errorMessage = $"instance must be initialized with \"{nameof(Init)}\" before invocation";
                 Logger.Error(errorTemplate);

@@ -177,15 +177,26 @@
         /// </summary>
         SignAllDataWithNewKey,
 
+        /// <summary>
+        /// Generates a cryptographically secure random key for use as integrity_key.
+        /// Uses dedicated native function <c>flm_generate_random_key_protobuf</c>
+        /// instead of the standard <c>flm_call_protobuf</c> dispatch.
+        /// </summary>
+        GenerateRandomKey,
+
         // There are ffi methods that not used for working with filters explicitly
         
         /// <summary>
-        /// Initializes the filter list manager
+        /// Initializes the filter list manager.
+        /// Uses dedicated native function <c>flm_init_protobuf</c>
+        /// instead of the standard <c>flm_call_protobuf</c> dispatch.
         /// </summary>
         Init,
         
         /// <summary>
-        /// Creates a default configuration for the filter list manager
+        /// Creates a default configuration for the filter list manager.
+        /// Uses dedicated native function <c>flm_spawn_default_configuration_protobuf</c>
+        /// instead of the standard <c>flm_call_protobuf</c> dispatch.
         /// </summary>
         SpawnDefaultConfiguration,
     }
