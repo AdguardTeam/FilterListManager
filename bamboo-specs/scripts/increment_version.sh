@@ -40,6 +40,7 @@ increment_flm_version() {
   fi
   echo "New version: $NEW_VERSION"
   sed -i "s/^ *version = \".*\"/version = \"$NEW_VERSION\"/" crates/filter-list-manager/Cargo.toml
+  sed -i "/name = \"adguard-flm\"/{N;s/version = \".*\"/version = \"$NEW_VERSION\"/}" Cargo.lock
   echo "Version incremented successfully!"
 }
 
@@ -56,6 +57,7 @@ increment_flm_ffi_version() {
   fi
   echo "New version: $NEW_VERSION"
   sed -i "s/^ *version = \".*\"/version = \"$NEW_VERSION\"/" crates/ffi/Cargo.toml
+  sed -i "/name = \"adguard-flm-ffi\"/{N;s/version = \".*\"/version = \"$NEW_VERSION\"/}" Cargo.lock
   echo "Version incremented successfully!"
 }
 
