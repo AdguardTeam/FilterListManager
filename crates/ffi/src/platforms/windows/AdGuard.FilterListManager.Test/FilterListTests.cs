@@ -87,8 +87,10 @@ namespace AdGuard.FilterListManager.Test
                 {
                     Constants = { "windows_is_the_best" }
                 };
-                flm.Init(configuration);
+
                 GenerateRandomKeyResponse randomKey = flm.GenerateRandomKey();
+                configuration.IntegrityKey = randomKey.Key;
+                flm.Init(configuration);
                 flm.PullMetadata();
                 flm.UpdateFilters(false, REQUEST_TIMEOUT_MS, false);
 
