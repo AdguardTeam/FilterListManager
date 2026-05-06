@@ -53,7 +53,7 @@ dependencies = [
 
 [[package]]
 name = "adguard-flm-ffi"
-version = "2.6.7"
+version = "2.6.8"
 dependencies = [
  "adguard-flm",
  "enum_stringify",
