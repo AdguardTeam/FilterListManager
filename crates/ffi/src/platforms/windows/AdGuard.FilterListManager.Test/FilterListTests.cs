@@ -20,6 +20,7 @@ namespace AdGuard.FilterListManager.Test
     public class FilterListTests
     {
         private const int REQUEST_TIMEOUT_MS = 60 * 1000;
+        private const string DB_FILE_NAME = "agflm_standard.db";
         private readonly string m_CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private ProtobufSerializer m_Serializer;
 
@@ -31,7 +32,8 @@ namespace AdGuard.FilterListManager.Test
         {
             string coreLibsDllPath = FilterManagerDllProvider.Instance.LibsDllPath;
             Console.WriteLine($"Rust library path is {coreLibsDllPath}");
-            FileUtils.DeleteQuietly(Path.Combine(m_CurrentDirectory, "agflm_standard.db"));
+            FileUtils.DeleteQuietly(Path.Combine(m_CurrentDirectory, DB_FILE_NAME));
+            FileUtils.DeleteQuietly(Path.Combine(Environment.CurrentDirectory, DB_FILE_NAME));
             ITraceListener traceListener = new TestContextTraceListener(TestExecutionContext.CurrentContext);
             Logger.SetCustomListener(traceListener);
             Logger.Info("Hello, I'm filter list manager");
@@ -93,6 +95,7 @@ namespace AdGuard.FilterListManager.Test
                 flm.Init(configuration);
                 flm.SignAllData();
                 flm.PullMetadata();
+                flm.SignAllData();
                 flm.UpdateFilters(false, REQUEST_TIMEOUT_MS, false);
 
                 flm.EnableFilterLists(new[] { 1, 2, 255 }, true);
