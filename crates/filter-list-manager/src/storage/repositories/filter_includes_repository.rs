@@ -96,12 +96,16 @@ impl FilterIncludesRepository {
     }
 
     /// Deletes includes for list of [`FilterId`]
-    pub(crate) fn delete_for_filters(
+    pub(crate) fn delete_for_filters<I>(
         &self,
         tx: &Transaction<'_>,
-        ids: impl Iterator<Item = FilterId>,
+        ids: I,
         len: usize,
-    ) -> rusqlite::Result<()> {
+    ) -> rusqlite::Result<()>
+    where
+        I: Iterator,
+        I::Item: rusqlite::ToSql,
+    {
         let mut sql = String::from(
             r"
                 DELETE FROM

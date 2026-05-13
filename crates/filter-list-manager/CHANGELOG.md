@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.1] - 2026-05-13
+
+### Fixed
+- `pull_metadata` left stale `integrity_signature` on filter metadata rows after index merge mutated signed fields (`expires`, `last_update_time`, `download_url`, `subscription_url`), causing subsequent reads to fail with `FilterIntegrityCheckFailed`
+- `filter_count_signature` was not refreshed by `pull_metadata`, so adding/removing filters via the index could desync the count signature
+- Orphan `filter_includes` rows were left behind when a filter was removed or moved to custom during `pull_metadata`
+
+[2.6.1]: https://github.com/AdguardTeam/FilterListManager/compare/flm-2.6.0...flm-2.6.1
+
 ## [2.6.0] - 2026-04-13
 
 ### Added

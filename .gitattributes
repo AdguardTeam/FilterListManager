@@ -1,0 +1,6 @@
+# Diff-update test fixtures are byte-exact: patch hunks count bytes,
+# checksums hash raw content, and apply_patch is sensitive to line
+# endings. Disable any text/EOL conversion so the working tree always
+# matches the bytes stored in the git object.
+crates/filter-list-manager/tests/fixtures/diffupdates/**       -text
+crates/filter-list-manager/tests/fixtures/diffupdates_custom/** -text
