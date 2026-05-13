@@ -4,14 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [2.6.1] - 2026-05-13
+## [2.6.9] - 2026-05-13
+
+### Added
+- Windows FFI tests
 
 ### Fixed
 - `pull_metadata` left stale integrity signatures on filter metadata rows, causing subsequent calls (e.g. `get_stored_filters_metadata`) to fail with `FilterIntegrityCheckFailed`
 - `filter_count_signature` was not refreshed by `pull_metadata` after add/remove of filters from the index
 - Orphan `filter_includes` rows were left behind when a filter was removed or moved to custom during `pull_metadata`
 
-[2.6.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.0...ffi-2.6.1
+[2.6.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.0...ffi-2.6.9
 
 ## [2.6.0] - 2026-04-13
 
