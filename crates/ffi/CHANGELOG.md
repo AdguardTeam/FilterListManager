@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - `filter_count_signature` was not refreshed by `pull_metadata` after add/remove of filters from the index
 - Orphan `filter_includes` rows were left behind when a filter was removed or moved to custom during `pull_metadata`
 
-[2.6.1]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.0...ffi-2.6.9
+[2.6.9]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.0...ffi-2.6.9
 
 ## [2.6.0] - 2026-04-13
 
