@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.6.10] - 2026-06-30
+
+### Changed
+- SQLite journal mode is now set to WAL (Write-Ahead Logging) on every connection to reduce disk write volume. WAL is a persistent, database-level setting stored in the DB header, so subsequent connections use it automatically. This creates `<dbname>-wal` and `<dbname>-shm` sidecar files alongside the database. Setting WAL is best-effort: on filesystems that do not support it (e.g. some network/shared mounts) the pragma has no effect and the database keeps its existing journal mode; the effective mode can be checked on demand via `PRAGMA journal_mode`.
+
+[2.6.10]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.9...ffi-2.6.10
+
 ## [2.6.9] - 2026-05-13
 
 ### Added
