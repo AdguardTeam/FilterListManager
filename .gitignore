@@ -9,12 +9,22 @@
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+# macOS
+.DS_Store
+
 # IDE
 .idea
 
 #VS
 .vs
 .vscode
+
+# Gradle / KMP
+.gradle
+local.properties
+.cxx/
+jniLibs/
+publishing.gradle.kts
 
 # Tests
 **/agflm_*.db

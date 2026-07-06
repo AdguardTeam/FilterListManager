@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [2.6.11] - 2026-07-06
+
+### Added
+- Kotlin Multiplatform adapter layer: `FlmAdapter` interface, `FlmAdapterFactory`, `FlmAdapterImpl`
+- KDoc documentation for `FlmAdapterFactory` and its `create` method
+
+[2.6.11]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.10...ffi-2.6.11
+
 ## [2.6.10] - 2026-06-30
 
 ### Changed
