@@ -20,5 +20,10 @@ Versions should be deployed from the master branch.
 4. After the plan has finished, you can obtain a new version of the `Adguard.FilterListManager` NuGet package in the local Artifactory store.
 5. Note that the version in the actual FLM Rust .dll file is specified in the `crates\ffi\resources\AGWinFLM.rc` file and can be modified in `Scripts\build_adapter.ps1`; the default value comes from `crates\ffi\Cargo.toml`.
 6. The version of the adapter .dll file specified in `AdGuard.FilterListManager.csproj` in the `<Version>` section should be automatically updated based on the version from the `AdGuard.FilterListManager.schema.json` file. This is handled by the `crates\ffi\src\platforms\windows\Scripts\build_adapter.ps1` script.
+7. The FFI crate version (`adguard-flm-ffi`, i.e. the native `AdGuardFLM.dll` crate version)
+   is written to `AdGuard.FilterListManager\metadata.json` at build time by
+   `Scripts\build_adapter.ps1` (`SetMetadataVersion`), reading the version from
+   `crates\ffi\Cargo.toml`. This file is packed into the NuGet package alongside `Cargo.toml`
+   (which carries the core `adguard-flm` crate version) so consumers can read both versions.
 
 NOTE. If a signature error occurs during assembly you can use [this solution](https://www.notion.so/adguard/sn-Vr-7f55f6d2080546c1a3fd69d509e926a2) or just remove signing from [cs proj](AdGuard.FilterListManager/AdGuard.FilterListManager.csproj#39) only for test.

@@ -31,6 +31,7 @@
     <!-- Schemas -->
     <file src="AdGuard.FilterListManager.schema.json" target="schema.json" />
     <file src="../../../crates/filter-list-manager/Cargo.toml" target="Cargo.toml" />
+    <file src="metadata.json" target="metadata.json" />
     <!-- Targets -->
     <file src="AdGuard.FilterListManager.targets" target="build"/>
     <!-- .Net Reactor map files -->

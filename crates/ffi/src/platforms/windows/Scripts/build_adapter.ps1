@@ -1,6 +1,6 @@
 $ARCH_TO_FOLDER_MAP = @{
-    "i686-pc-windows-msvc" = "x86"
-    "x86_64-pc-windows-msvc" = "x64"
+    "i686-pc-windows-msvc"    = "x86"
+    "x86_64-pc-windows-msvc"  = "x64"
     "aarch64-pc-windows-msvc" = "arm64"
 }
 
@@ -19,27 +19,27 @@ $global:win_root = "crates\ffi\src\platforms\windows";
 Function CopyToTestsBuildFolder {
     Write-Output "Copying files...";
     foreach ($arch in $ARCH_TO_FOLDER_MAP.Keys) {
-       foreach ($file in $FILES) {     
-        $folder = $ARCH_TO_FOLDER_MAP[$arch]
-        $srcPath = "target\$arch\release\$file"
+        foreach ($file in $FILES) {     
+            $folder = $ARCH_TO_FOLDER_MAP[$arch]
+            $srcPath = "target\$arch\release\$file"
 
-        foreach ($config in $CONFIGS) {
-            $destPath = "$win_root\build\bin\$config\$folder\$file"
+            foreach ($config in $CONFIGS) {
+                $destPath = "$win_root\build\bin\$config\$folder\$file"
             
-            $destDir = Split-Path -Path $destPath -Parent
-            if (!(Test-Path -Path $destDir)) {
-                New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+                $destDir = Split-Path -Path $destPath -Parent
+                if (!(Test-Path -Path $destDir)) {
+                    New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+                }
+            
+                Copy-Item -Path $srcPath -Destination $destPath
+                if (!$?) {
+                    Write-Error "Failed to copy file from $srcPath to $destPath"
+                    exit 1
+                }
+            
+                Write-Output "Copied: $srcPath to: $destPath"
             }
-            
-            Copy-Item -Path $srcPath -Destination $destPath
-            if (!$?) {
-                Write-Error "Failed to copy file from $srcPath to $destPath"
-                exit 1
-            }
-            
-            Write-Output "Copied: $srcPath to: $destPath"
         }
-       }
     }
 
     Write-Output "Copying files has been completed successfully";
@@ -153,7 +153,7 @@ Function SetAdapterVersion {
 
 function SetNativeVersion {
     $newVersion = GetJsonVersion;
-	Write-Host "Version from schema.json is $newVersion";
+    Write-Host "Version from schema.json is $newVersion";
     $rcFilePath = "crates\ffi\resources\AGWinFLM.rc";
     $rcContent = Get-Content -Path $rcFilePath;
     $dllMetaFormatVersion = $newVersion -replace '\.', ','
@@ -171,10 +171,30 @@ function SetNativeVersion {
     Write-Host "Native version $rcVersion is updated";
 }
 
+Function SetMetadataVersion {
+    # Generates metadata.json with the FFI crate version (adguard-flm-ffi)
+    # alongside the nuspec, so it can be packed into the NuGet next to Cargo.toml.
+    $ffiCargoTomlPath = "crates\ffi\Cargo.toml"
+    $ffiVersion = GetVersionFromToml $ffiCargoTomlPath
+    $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+    $metadata = [ordered]@{
+        adguard_flm_ffi_version = $ffiVersion
+        build_date              = $buildDate
+    }
+
+    $metadataPath = "$win_root\AdGuard.FilterListManager\metadata.json"
+    $json = $metadata | ConvertTo-Json
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $False
+    [System.IO.File]::WriteAllText($metadataPath, $json, $utf8NoBom)
+    Write-Host "metadata.json generated at $metadataPath with FFI version $ffiVersion"
+}
+
 Function RustBuild {    
     try {
         SetNativeVersion;
         SetAdapterVersion;
+        SetMetadataVersion;
     }
     catch {
         Write-Host $_
@@ -184,11 +204,11 @@ Function RustBuild {
     $env:RUSTFLAGS = "-Ctarget-feature=+crt-static";
 
     Write-Output "Start executing method RustBuild";
-    & cargo build --release --lib --package adguard-flm-ffi --target i686-pc-windows-msvc --features rusqlite-bundled,win-res --locked
+    & cargo build --release --lib --package adguard-flm-ffi --target i686-pc-windows-msvc --features rusqlite-bundled, win-res --locked
     RenameOutFile "i686-pc-windows-msvc"
-    & cargo build --release --lib --package adguard-flm-ffi --target x86_64-pc-windows-msvc --features rusqlite-bundled,win-res --locked
+    & cargo build --release --lib --package adguard-flm-ffi --target x86_64-pc-windows-msvc --features rusqlite-bundled, win-res --locked
     RenameOutFile "x86_64-pc-windows-msvc"
-    & cargo build --release --lib --package adguard-flm-ffi --target aarch64-pc-windows-msvc --features rusqlite-bundled,win-res --locked
+    & cargo build --release --lib --package adguard-flm-ffi --target aarch64-pc-windows-msvc --features rusqlite-bundled, win-res --locked
     RenameOutFile "aarch64-pc-windows-msvc"
 
     # Generate Protobuf bindings
