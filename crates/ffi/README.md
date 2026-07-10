@@ -20,7 +20,7 @@ It's better to run this operation from the workspace root.
 
 [Apple Readme](./src/platforms/apple/README.md)\
 [Windows Readme](./src/platforms/windows/README_WIN.md)\
-[Android Readme](./src/platforms/android/README.md)
+[Kotlin Multiplatform Readme](./src/platforms/kotlin-multiplatform/README.md)
 
 ## FFI-specific symbols
 
