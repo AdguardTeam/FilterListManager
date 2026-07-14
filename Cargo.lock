@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "adguard-flm"
-version = "2.6.2"
+version = "2.6.13"
 dependencies = [
  "adguard-flm",
  "base64",
