@@ -1,6 +1,5 @@
 [package]
 name = "ffi-native-assets-generator"
-version = "0.1.0"
 edition = "2021"
 homepage.workspace = true
 license-file.workspace = true

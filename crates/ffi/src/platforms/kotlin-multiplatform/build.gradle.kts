@@ -21,25 +21,28 @@ apply(plugin = "gradlekit")
 val gradleKit = the<GradleKit>()
 gradleKit.loadLocalProperties()
 
-fun getVersionFromCargoToml(patchVersion: Int): String {
-    val cargoTomlFile = File(rootDir, "../../../Cargo.toml")
-
-    if (!cargoTomlFile.exists()) {
-        throw GradleException("Cargo.toml file not found at ${cargoTomlFile.absolutePath}")
-    }
-
-    val content = cargoTomlFile.readText()
-    val versionRegex = Regex("""version\s*=\s*"([^"]+)"""")
-    val matchResult = versionRegex.find(content)
-        ?: throw GradleException("Version not found in Cargo.toml")
-
-    val baseVersion = matchResult.groupValues[1]
-    val resolvedVersion = "$baseVersion.$patchVersion"
-    logger.lifecycle("Version for KMP module: $resolvedVersion")
-    return resolvedVersion
+// Resolves the version: the FLM_VERSION env var, else `git describe` over v*
+// tags (leading `v` stripped). Same rule as the Rust crates' build scripts.
+fun resolveVersion(): String {
+    val fromEnv = System.getenv("FLM_VERSION")?.takeIf { it.isNotBlank() }
+    val version = (fromEnv ?: gitDescribe()).removePrefix("v")
+    logger.lifecycle("Version for KMP module: $version")
+    return version
 }
 
-version = getVersionFromCargoToml(patchVersion = 6)
+fun gitDescribe(): String {
+    val process = ProcessBuilder("git", "describe", "--tags", "--match=v*", "--abbrev=0")
+        .directory(rootDir)
+        .redirectErrorStream(true)
+        .start()
+    val output = process.inputStream.bufferedReader().use { it.readText() }.trim()
+    if (process.waitFor() != 0 || output.isEmpty()) {
+        throw GradleException("Cannot resolve version: set FLM_VERSION or create a v* git tag")
+    }
+    return output
+}
+
+version = resolveVersion()
 group = "com.adguard.flm"
 
 allprojects {

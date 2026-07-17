@@ -1,0 +1,43 @@
+<Project>
+  <!--
+    Resolves the package <Version> at build time, replacing the value that used
+    to be hardcoded in the .csproj files.
+
+    Rule (same as the Rust crates' build.rs): the FLM_VERSION environment
+    variable, else `git describe` over v* tags. A leading `v` is stripped.
+
+    This lives in a Directory.Build.targets so it applies regardless of the
+    project format: both SDK-style and old-style (net48) projects auto-import
+    it via Microsoft.Common.props.
+  -->
+  <Target Name="ResolveFlmVersion"
+          BeforeTargets="GetAssemblyVersion;GenerateNuspec;Pack">
+
+    <!-- 1. FLM_VERSION environment variable -->
+    <PropertyGroup Condition="'$(FLM_VERSION)' != ''">
+      <FlmResolvedVersion>$(FLM_VERSION)</FlmResolvedVersion>
+    </PropertyGroup>
+
+    <!-- 2. git describe over v* tags -->
+    <Exec Condition="'$(FlmResolvedVersion)' == ''"
+          Command="git describe --tags --match=v* --abbrev=0"
+          WorkingDirectory="$(MSBuildThisFileDirectory)"
+          ConsoleToMSBuild="true"
+          IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="FlmGitVersion" />
+      <Output TaskParameter="ExitCode" PropertyName="FlmGitExitCode" />
+    </Exec>
+    <PropertyGroup Condition="'$(FlmResolvedVersion)' == '' And '$(FlmGitExitCode)' == '0'">
+      <FlmResolvedVersion>$(FlmGitVersion)</FlmResolvedVersion>
+    </PropertyGroup>
+
+    <Error Condition="'$(FlmResolvedVersion)' == ''"
+           Text="Cannot resolve version: set FLM_VERSION or create a v* git tag." />
+
+    <!-- Strip a single leading 'v' and apply -->
+    <PropertyGroup>
+      <Version>$([System.Text.RegularExpressions.Regex]::Replace($(FlmResolvedVersion), '^v', ''))</Version>
+      <PackageVersion>$(Version)</PackageVersion>
+    </PropertyGroup>
+  </Target>
+</Project>

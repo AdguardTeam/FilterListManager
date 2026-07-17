@@ -7,8 +7,7 @@ Examine `windows_adapter.yaml` file to see how we build it on Bamboo.
 
 In `crates\ffi\src\platforms\windows\AdGuard.FilterListManager`:
 
-The spec file `AdGuard.FilterListManager.nuspec` is being used for deploying on Bamboo agents
-The scema file `AdGuard.FilterListManager.schema.json` should be incremented each release we want to deploy.
+The spec file `AdGuard.FilterListManager.nuspec` is being used for deploying on Bamboo agents.
 
 ### How to Release a New Version
 
@@ -16,14 +15,10 @@ Versions should be deployed from the master branch.
 
 1. If there are any breaking changes that require a pull request, you should create it and re-generate the C# bindings. See the section [Build C# Adapter](README_WIN.md#build-c-adapter).
 2. Otherwise, the Bamboo plan "Build Filter List Manager Windows" can create an actual NuGet package for you. Refer to the `bamboo-specs\windows_adapter.yaml` file.
-3. With each build on the master branch, the adapter schema in `AdGuard.FilterListManager.schema.json` should be incremented.
-4. After the plan has finished, you can obtain a new version of the `Adguard.FilterListManager` NuGet package in the local Artifactory store.
-5. Note that the version in the actual FLM Rust .dll file is specified in the `crates\ffi\resources\AGWinFLM.rc` file and can be modified in `Scripts\build_adapter.ps1`; the default value comes from `crates\ffi\Cargo.toml`.
-6. The version of the adapter .dll file specified in `AdGuard.FilterListManager.csproj` in the `<Version>` section should be automatically updated based on the version from the `AdGuard.FilterListManager.schema.json` file. This is handled by the `crates\ffi\src\platforms\windows\Scripts\build_adapter.ps1` script.
-7. The FFI crate version (`adguard-flm-ffi`, i.e. the native `AdGuardFLM.dll` crate version)
-   is written to `AdGuard.FilterListManager\metadata.json` at build time by
-   `Scripts\build_adapter.ps1` (`SetMetadataVersion`), reading the version from
-   `crates\ffi\Cargo.toml`. This file is packed into the NuGet package alongside `Cargo.toml`
-   (which carries the core `adguard-flm` crate version) so consumers can read both versions.
+3. After the plan has finished, you can obtain a new version of the `Adguard.FilterListManager` NuGet package in the local Artifactory store.
+4. All versions are resolved from the same source: the `FLM_VERSION` environment variable, or, if unset, `git describe --tags --match='v*' --abbrev=0` (a leading `v` is stripped). Set `FLM_VERSION` in the build environment to override; otherwise tag the release commit `vX.Y.Z`.
+   - The native FLM Rust `.dll` version (`AGWinFLM.rc`) is generated from `AGWinFLM.rc.in` by the ffi crate's `build.rs` into `OUT_DIR` (no file is patched in place).
+   - The C# adapter package `<Version>` is resolved at build time by `AdGuard.FilterListManager\Directory.Build.targets` (the `.csproj` files carry no `<Version>`; nothing is patched in place).
+5. The FFI crate version (`adguard-flm-ffi`) is written to `AdGuard.FilterListManager\metadata.json` at build time by `Scripts\build_adapter.ps1` (`SetMetadataVersion` / `ResolveVersion`). This file is packed into the NuGet package so consumers can read the build version.
 
 NOTE. If a signature error occurs during assembly you can use [this solution](https://www.notion.so/adguard/sn-Vr-7f55f6d2080546c1a3fd69d509e926a2) or just remove signing from [cs proj](AdGuard.FilterListManager/AdGuard.FilterListManager.csproj#39) only for test.

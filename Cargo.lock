@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "adguard-flm"
-version = "2.6.13"
+version = "0.0.0"
 dependencies = [
  "adguard-flm",
  "base64",
@@ -44,7 +44,7 @@ dependencies = [
 
 [[package]]
 name = "adguard-flm-cli"
-version = "0.1.1"
+version = "0.0.0"
 dependencies = [
  "adguard-flm",
  "clap",
@@ -53,7 +53,7 @@ dependencies = [
 
 [[package]]
 name = "adguard-flm-ffi"
-version = "2.6.13"
+version = "0.0.0"
 dependencies = [
  "adguard-flm",
  "enum_stringify",
@@ -571,7 +571,7 @@ checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 
 [[package]]
 name = "ffi-native-assets-generator"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "cbindgen",
  "prost-build",

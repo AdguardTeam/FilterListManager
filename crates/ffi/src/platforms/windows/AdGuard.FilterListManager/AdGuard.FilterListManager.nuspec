@@ -29,8 +29,6 @@
     <file src="../build/bin/release/x64/AdGuardFLM.pdb" target="build/x64"/>
     <file src="../build/bin/release/arm64/AdGuardFLM.dll" target="build/arm64"/>
     <file src="../build/bin/release/arm64/AdGuardFLM.pdb" target="build/arm64"/>
-    <!-- Schemas -->
-    <file src="AdGuard.FilterListManager.schema.json" target="schema.json" />
     <file src="../../../../../filter-list-manager/Cargo.toml" target="Cargo.toml" />
     <file src="metadata.json" target="metadata.json" />
     <!-- Targets -->

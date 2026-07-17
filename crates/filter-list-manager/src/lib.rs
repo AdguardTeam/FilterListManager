@@ -275,6 +275,10 @@ pub use crate::manager::FilterListManager;
 pub use crate::storage::constants::*;
 pub use crate::utils::integrity::generate_random_key;
 
+/// Crate version, resolved at build time (see `build.rs`):
+/// `FLM_VERSION` env var, else `git describe`, else `CARGO_PKG_VERSION`.
+pub const VERSION: &str = env!("FLM_PKG_VERSION");
+
 #[doc(hidden)]
 pub mod filters;
 #[doc(hidden)]

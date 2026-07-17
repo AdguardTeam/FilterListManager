@@ -25,7 +25,7 @@ impl BlockingClient {
                 configuration.app_name,
                 configuration.version,
                 env!("CARGO_PKG_NAME"),
-                env!("CARGO_PKG_VERSION")
+                crate::VERSION
             ));
 
         match configuration.request_proxy_mode {

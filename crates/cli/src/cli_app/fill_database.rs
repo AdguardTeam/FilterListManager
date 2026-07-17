@@ -17,7 +17,7 @@ pub fn entry(
     configuration.metadata_url = index_url.to_owned();
     configuration.metadata_locales_url = index_i18n_url.to_owned();
     configuration.app_name = env!("CARGO_PKG_NAME").to_string();
-    configuration.version = env!("CARGO_PKG_VERSION").to_string();
+    configuration.version = adguard_flm::VERSION.to_string();
 
     configuration.working_directory = Some(
         db_path
