@@ -12,7 +12,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-fixme:
-    uses: AdGuardSoftwareLimited/actions/.github/workflows/check-fixme.yml@master
-    with:
-      team: corelibs
+  cargo-check:
+    name: Cargo check
+    runs-on: [team-corelibs]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Format, lint and test
+        uses: AdGuardSoftwareLimited/actions/actions/cargo@master
+        with:
+          run: |
+            cargo fmt --all -- --check
+            cargo clippy --locked
+            cargo test --workspace --lib --all-features --locked

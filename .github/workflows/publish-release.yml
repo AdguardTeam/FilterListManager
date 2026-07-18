@@ -1,9 +1,5 @@
 name: Publish release
 
-description: >-
-  Tags the release commit from the merged release PR and creates a
-  GitHub Release with the changelog section.
-
 on:
   pull_request:
     types: [closed]
@@ -24,12 +20,82 @@ jobs:
     permissions:
       contents: write
 
-  release:
+  prepare-cargo:
+    name: Package crates
     needs: tag
-    uses: AdGuardSoftwareLimited/actions/.github/workflows/create-gh-release.yml@master
+    runs-on: [team-corelibs]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.tag.outputs.tag }}
+
+      - name: Package crates
+        uses: AdGuardSoftwareLimited/actions/actions/docker-build@master
+        with:
+          output: 'type=local,dest=./cargo-output'
+          build-args: |
+            VERSION=${{ needs.tag.outputs.version }}
+          content: |
+            FROM registry.int.agrd.dev/library/rust:2 AS build
+            ARG VERSION
+            COPY . /src
+            WORKDIR /src
+            RUN cargo ws version exact "${VERSION}" --force --no-git-commit --no-git-tag --yes \
+             && cargo package -p adguard-flm --allow-dirty \
+             && cargo package -p adguard-flm-ffi --allow-dirty \
+             && mkdir /out && cp target/package/*.crate /out/
+            FROM scratch
+            COPY --from=build /out/ /
+
+      - name: Assemble cargo payload
+        env:
+          VERSION: ${{ needs.tag.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p cargo-payload
+
+          cp cargo-output/adguard-flm-"${VERSION}".crate cargo-payload/
+          cp cargo-output/adguard-flm-ffi-"${VERSION}".crate cargo-payload/
+
+          jq -n --arg v "$VERSION" '[
+            {
+              name: "adguard-flm",
+              version: $v,
+              file: ("adguard-flm-" + $v + ".crate")
+            },
+            {
+              name: "adguard-flm-ffi",
+              version: $v,
+              file: ("adguard-flm-ffi-" + $v + ".crate")
+            }
+          ]' > cargo-payload/publish-order.json
+
+      - name: Upload cargo payload
+        uses: actions/upload-artifact@v7
+        with:
+          name: cargo-payload
+          path: cargo-payload
+          if-no-files-found: error
+
+  cargo-deploy:
+    name: Publish crates
+    needs: prepare-cargo
+    uses: AdGuardSoftwareLimited/actions/.github/workflows/deploy-to-cargo.yml@master
     with:
-      tag_name: ${{ needs.tag.outputs.tag }}
-      body: ${{ needs.tag.outputs.changelog }}
       team: corelibs
+
+  mirror-and-release:
+    needs: [tag, cargo-deploy]
+    uses: AdGuardSoftwareLimited/actions/.github/workflows/mirror-and-release.yml@master
+    with:
+      team: corelibs
+      target_repo: AdguardTeam/FilterListManager
+      tag: ${{ needs.tag.outputs.tag }}
+      changelog: ${{ needs.tag.outputs.release-notes }}
+      prerelease: ${{ needs.tag.outputs.prerelease == 'true' }}
+    secrets: inherit
     permissions:
-      contents: write
+      actions: write
+      contents: read
+      id-token: write
