@@ -1,4 +1,4 @@
-# AdGuard filter list manager
+# AdGuard Filter List Manager
 
 This repository contains a library for managing AdGuard filter lists and its
 tools and wrappers.
@@ -31,7 +31,7 @@ Install [rust][rust].
 
 ### Requirements
 
-Rust 1.85+
+Rust 1.95+
 
 ### Linters
 

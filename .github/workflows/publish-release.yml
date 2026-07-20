@@ -99,3 +99,32 @@ jobs:
       actions: write
       contents: read
       id-token: write
+
+  # Open a tracking issue in each downstream app repo (with the private-stripped
+  # changelog) and announce to Slack as one Block Kit message. All of the issue
+  # and Slack logic lives in the shared announce-release.yml, so this mirrors how
+  # the sibling CoreLibs project announces -- only product, channel and targets
+  # differ. Runs after the release is mirrored + created, reusing its URL.
+  announce:
+    name: Announce release
+    needs: [tag, mirror-and-release]
+    permissions:
+      contents: read
+      id-token: write
+    uses: AdGuardSoftwareLimited/native-libs-common/.github/workflows/announce-release.yml@master
+    with:
+      product: FilterListManager
+      version: ${{ needs.tag.outputs.version }}
+      release_url: ${{ needs.mirror-and-release.outputs.release-url }}
+      changelog: ${{ needs.tag.outputs.release-notes }}
+      channel: '#rust-filter-library'
+      targets: |
+        [
+          {"repo": "AdguardTeam/AdguardForAndroid", "assignee": "artemiv4nov", "platform": "Android"},
+          {"repo": "AdguardTeam/AdguardForWindows", "assignee": "adbuker", "platform": "Windows"},
+          {"repo": "AdguardTeam/AdguardForMac", "assignee": "vityevato", "platform": "Mac"},
+          {"repo": "AdguardTeam/AdguardForiOS", "assignee": "artemiv4nov", "platform": "iOS"},
+          {"repo": "AdguardTeam/CoreLibs", "assignee": "sfionov", "platform": "CLI"}
+        ]
+      team: corelibs
+    secrets: inherit
