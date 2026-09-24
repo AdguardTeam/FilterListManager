@@ -398,6 +398,48 @@ impl FilterRepository {
         Ok(usize > 0)
     }
 
+    /// Updates only `last_download_time` for the given
+    /// `(filter_id, last_download_time)` pairs.
+    ///
+    /// Used to refresh the expiration gate for filters whose contents were
+    /// checked during an update and found unchanged.
+    ///
+    /// NOTE: the metadata `integrity_signature` covers `last_download_time`,
+    /// so, if integrity is enabled, the caller must re-sign the affected rows
+    /// in the same transaction (see [`Self::resign_filters_in_tx`]).
+    ///
+    /// Returns the number of updated rows.
+    pub(crate) fn update_last_download_times(
+        &self,
+        transaction: &Transaction,
+        entries: &[(FilterId, i64)],
+    ) -> rusqlite::Result<usize> {
+        if entries.is_empty() {
+            return Ok(0);
+        }
+
+        let mut statement = transaction.prepare(
+            r"
+            UPDATE
+                [filter]
+            SET
+                last_download_time=:last_download_time
+            WHERE
+                filter_id=:filter_id
+        ",
+        )?;
+
+        let mut rows_updated = 0;
+        for (filter_id, last_download_time) in entries {
+            rows_updated += statement.execute(named_params! {
+                ":filter_id": filter_id,
+                ":last_download_time": last_download_time,
+            })?;
+        }
+
+        Ok(rows_updated)
+    }
+
     /// Selects inner flags for filters
     fn select_filter_inner_flag(
         &self,
@@ -827,7 +869,7 @@ mod tests {
     use crate::storage::with_transaction;
     use crate::storage::DbConnectionManager;
     use crate::test_utils::spawn_test_db_with_metadata;
-    use crate::CUSTOM_FILTERS_GROUP_ID;
+    use crate::{CUSTOM_FILTERS_GROUP_ID, SMALLEST_POSSIBLE_FILTER_ID};
     use rand::seq::SliceRandom;
     use rand::thread_rng;
     use rusqlite::types::Value;
@@ -1081,6 +1123,96 @@ mod tests {
 
                 for selected_filter in selected_filters {
                     assert!(selected_filter.is_installed);
+                }
+
+                Ok(())
+            })
+            .unwrap();
+    }
+
+    #[test]
+    fn test_update_last_download_times() {
+        let filter_repository = FilterRepository::new();
+
+        let source = DbConnectionManager::factory_test().unwrap();
+        let (_, filter_lists) = spawn_test_db_with_metadata(&source);
+
+        // Pick three existing filters to update
+        let mut entries = filter_lists
+            .iter()
+            .take(3)
+            .map(|filter| (filter.filter_id.unwrap(), filter.last_download_time + 1000))
+            .collect::<Vec<_>>();
+        assert_eq!(entries.len(), 3);
+
+        // Seed a known signature for the filters to be updated, so we can
+        // check that the method leaves it as is (re-signing is the caller's
+        // job, via `resign_filters_in_tx`).
+        const SEEDED_SIGNATURE: &str = "seeded-signature";
+        let seeded_signatures = entries
+            .iter()
+            .map(|(filter_id, _)| (*filter_id, SEEDED_SIGNATURE.to_string()))
+            .collect::<Vec<_>>();
+
+        // Plus one entry with a filter_id that can never exist in the database
+        entries.push((SMALLEST_POSSIBLE_FILTER_ID, 1000));
+
+        let (empty_rows_updated, rows_updated) = source
+            .execute_db(|mut connection: Connection| {
+                let tx = connection.transaction().unwrap();
+                filter_repository
+                    .batch_update_metadata_signatures(&tx, &seeded_signatures)
+                    .unwrap();
+                let empty_rows = filter_repository
+                    .update_last_download_times(&tx, &[])
+                    .unwrap();
+                let rows = filter_repository
+                    .update_last_download_times(&tx, &entries)
+                    .unwrap();
+                tx.commit().unwrap();
+
+                Ok((empty_rows, rows))
+            })
+            .unwrap();
+
+        // Empty slice updates nothing
+        assert_eq!(empty_rows_updated, 0);
+        // Nonexistent filter_id is not counted
+        assert_eq!(rows_updated, 3);
+
+        source
+            .execute_db(|connection: Connection| {
+                let all_filters = filter_repository
+                    .select_filters_except_bootstrapped(&connection)
+                    .unwrap()
+                    .unwrap();
+
+                for filter in all_filters {
+                    let original = filter_lists
+                        .iter()
+                        .find(|item| item.filter_id == filter.filter_id)
+                        .unwrap();
+
+                    if let Some((_, last_download_time)) = entries
+                        .iter()
+                        .find(|(filter_id, _)| *filter_id == filter.filter_id.unwrap())
+                    {
+                        // Updated filter: only `last_download_time` must
+                        // differ from the original. `integrity_signature`
+                        // must NOT be refreshed by this method.
+                        assert_eq!(filter.last_download_time, *last_download_time);
+                        assert_eq!(filter.integrity_signature(), Some(SEEDED_SIGNATURE));
+                        assert_eq!(filter.version, original.version);
+                        assert_eq!(filter.title, original.title);
+                        assert_eq!(filter.last_update_time, original.last_update_time);
+                        assert_eq!(filter.download_url, original.download_url);
+                    } else {
+                        // Untouched filter: nothing must change
+                        assert_eq!(filter.integrity_signature(), original.integrity_signature());
+                        assert_eq!(filter.last_download_time, original.last_download_time);
+                        assert_eq!(filter.version, original.version);
+                        assert_eq!(filter.title, original.title);
+                    }
                 }
 
                 Ok(())

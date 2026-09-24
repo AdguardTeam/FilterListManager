@@ -26,7 +26,7 @@ namespace FilterListManager {
           string.Concat(
             "ChNjb25maWd1cmF0aW9uLnByb3RvEhNmaWx0ZXJfbGlzdF9tYW5hZ2VyIi0K",
             "GEZpbHRlcnNDb21waWxhdGlvblBvbGljeRIRCgljb25zdGFudHMYASADKAki",
-            "3gUKDUNvbmZpZ3VyYXRpb24SPQoQZmlsdGVyX2xpc3RfdHlwZRgBIAEoDjIj",
+            "wAYKDUNvbmZpZ3VyYXRpb24SPQoQZmlsdGVyX2xpc3RfdHlwZRgBIAEoDjIj",
             "LmZpbHRlcl9saXN0X21hbmFnZXIuRmlsdGVyTGlzdFR5cGUSHgoRd29ya2lu",
             "Z19kaXJlY3RvcnkYAiABKAlIAIgBARIOCgZsb2NhbGUYAyABKAkSLgomZGVm",
             "YXVsdF9maWx0ZXJfbGlzdF9leHBpcmVzX3BlcmlvZF9zZWMYBCABKAUSVgoa",
@@ -40,18 +40,20 @@ namespace FilterListManager {
             "ASgJEg8KB3ZlcnNpb24YDSABKAkSLAokc2hvdWxkX2lnbm9yZV9leHBpcmVz",
             "X2Zvcl9sb2NhbF91cmxzGA4gASgIEhoKDWludGVncml0eV9rZXkYDyABKAlI",
             "AogBARIhChlmaWx0ZXJfdXBkYXRlX2NvbmN1cnJlbmN5GBAgASgFEicKH2Zp",
-            "bHRlcl91cGRhdGVfZGlzcGF0Y2hfZGVsYXlfbXMYESABKAVCFAoSX3dvcmtp",
-            "bmdfZGlyZWN0b3J5Qh0KG19maWx0ZXJzX2NvbXBpbGF0aW9uX3BvbGljeUIQ",
-            "Cg5faW50ZWdyaXR5X2tleSoxCg5GaWx0ZXJMaXN0VHlwZRIMCghTVEFOREFS",
-            "RBAAEgcKA0ROUxABEggKBE1JU0MQAipPChNSYXdSZXF1ZXN0UHJveHlNb2Rl",
-            "EhQKEFVTRV9TWVNURU1fUFJPWFkQABIMCghOT19QUk9YWRABEhQKEFVTRV9D",
-            "VVNUT01fUFJPWFkQAkIwChhjb20uYWRndWFyZC5mbG0ucHJvdG9idWZCEkNv",
-            "bmZpZ3VyYXRpb25Qcm90b1ABYgZwcm90bzM="));
+            "bHRlcl91cGRhdGVfZGlzcGF0Y2hfZGVsYXlfbXMYESABKAUSNAonYWx3YXlz",
+            "X2NvbXBhcmVfZmlsdGVyc19oYXNoZXNfb25fdXBkYXRlGBIgASgISAOIAQFC",
+            "FAoSX3dvcmtpbmdfZGlyZWN0b3J5Qh0KG19maWx0ZXJzX2NvbXBpbGF0aW9u",
+            "X3BvbGljeUIQCg5faW50ZWdyaXR5X2tleUIqCihfYWx3YXlzX2NvbXBhcmVf",
+            "ZmlsdGVyc19oYXNoZXNfb25fdXBkYXRlKjEKDkZpbHRlckxpc3RUeXBlEgwK",
+            "CFNUQU5EQVJEEAASBwoDRE5TEAESCAoETUlTQxACKk8KE1Jhd1JlcXVlc3RQ",
+            "cm94eU1vZGUSFAoQVVNFX1NZU1RFTV9QUk9YWRAAEgwKCE5PX1BST1hZEAES",
+            "FAoQVVNFX0NVU1RPTV9QUk9YWRACQjAKGGNvbS5hZGd1YXJkLmZsbS5wcm90",
+            "b2J1ZkISQ29uZmlndXJhdGlvblByb3RvUAFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FilterListManager.FilterListType), typeof(global::FilterListManager.RawRequestProxyMode), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.FiltersCompilationPolicy), global::FilterListManager.FiltersCompilationPolicy.Parser, new[]{ "Constants" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "FiltersCompilationPolicy", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version", "ShouldIgnoreExpiresForLocalUrls", "IntegrityKey", "FilterUpdateConcurrency", "FilterUpdateDispatchDelayMs" }, new[]{ "WorkingDirectory", "FiltersCompilationPolicy", "IntegrityKey" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::FilterListManager.Configuration), global::FilterListManager.Configuration.Parser, new[]{ "FilterListType", "WorkingDirectory", "Locale", "DefaultFilterListExpiresPeriodSec", "FiltersCompilationPolicy", "MetadataUrl", "MetadataLocalesUrl", "RequestTimeoutMs", "AutoLiftUpDatabase", "RequestProxyMode", "RequestCustomProxyAddr", "AppName", "Version", "ShouldIgnoreExpiresForLocalUrls", "IntegrityKey", "FilterUpdateConcurrency", "FilterUpdateDispatchDelayMs", "AlwaysCompareFiltersHashesOnUpdate" }, new[]{ "WorkingDirectory", "FiltersCompilationPolicy", "IntegrityKey", "AlwaysCompareFiltersHashesOnUpdate" }, null, null, null)
           }));
     }
     #endregion
@@ -283,6 +285,7 @@ namespace FilterListManager {
   {
     private static readonly pb::MessageParser<Configuration> _parser = new pb::MessageParser<Configuration>(() => new Configuration());
     private pb::UnknownFieldSet _unknownFields;
+    private int _hasBits0;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<Configuration> Parser { get { return _parser; } }
@@ -310,6 +313,7 @@ namespace FilterListManager {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Configuration(Configuration other) : this() {
+      _hasBits0 = other._hasBits0;
       filterListType_ = other.filterListType_;
       workingDirectory_ = other.workingDirectory_;
       locale_ = other.locale_;
@@ -327,6 +331,7 @@ namespace FilterListManager {
       integrityKey_ = other.integrityKey_;
       filterUpdateConcurrency_ = other.filterUpdateConcurrency_;
       filterUpdateDispatchDelayMs_ = other.filterUpdateDispatchDelayMs_;
+      alwaysCompareFiltersHashesOnUpdate_ = other.alwaysCompareFiltersHashesOnUpdate_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -636,6 +641,43 @@ namespace FilterListManager {
       }
     }
 
+    /// <summary>Field number for the "always_compare_filters_hashes_on_update" field.</summary>
+    public const int AlwaysCompareFiltersHashesOnUpdateFieldNumber = 18;
+    private readonly static bool AlwaysCompareFiltersHashesOnUpdateDefaultValue = false;
+
+    private bool alwaysCompareFiltersHashesOnUpdate_;
+    /// <summary>
+    /// Whether filter contents hashes should be compared during an update even
+    /// when the update is forced (i.e. the expiration gate is skipped).
+    /// When true (default), a forced update still downloads all the filters, but
+    /// only filters whose contents really changed are added to the updated list.
+    /// When false, forced updates skip the hash comparison and every downloaded
+    /// filter is considered updated (legacy behavior).
+    /// Default value: true. If the field is not set, FLM treats it as true, even
+    /// though the generated getter of an unset field returns false.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool AlwaysCompareFiltersHashesOnUpdate {
+      get { if ((_hasBits0 & 1) != 0) { return alwaysCompareFiltersHashesOnUpdate_; } else { return AlwaysCompareFiltersHashesOnUpdateDefaultValue; } }
+      set {
+        _hasBits0 |= 1;
+        alwaysCompareFiltersHashesOnUpdate_ = value;
+      }
+    }
+    /// <summary>Gets whether the "always_compare_filters_hashes_on_update" field is set</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool HasAlwaysCompareFiltersHashesOnUpdate {
+      get { return (_hasBits0 & 1) != 0; }
+    }
+    /// <summary>Clears the value of the "always_compare_filters_hashes_on_update" field</summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void ClearAlwaysCompareFiltersHashesOnUpdate() {
+      _hasBits0 &= ~1;
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -668,6 +710,7 @@ namespace FilterListManager {
       if (IntegrityKey != other.IntegrityKey) return false;
       if (FilterUpdateConcurrency != other.FilterUpdateConcurrency) return false;
       if (FilterUpdateDispatchDelayMs != other.FilterUpdateDispatchDelayMs) return false;
+      if (AlwaysCompareFiltersHashesOnUpdate != other.AlwaysCompareFiltersHashesOnUpdate) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -692,6 +735,7 @@ namespace FilterListManager {
       if (HasIntegrityKey) hash ^= IntegrityKey.GetHashCode();
       if (FilterUpdateConcurrency != 0) hash ^= FilterUpdateConcurrency.GetHashCode();
       if (FilterUpdateDispatchDelayMs != 0) hash ^= FilterUpdateDispatchDelayMs.GetHashCode();
+      if (HasAlwaysCompareFiltersHashesOnUpdate) hash ^= AlwaysCompareFiltersHashesOnUpdate.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -778,6 +822,10 @@ namespace FilterListManager {
         output.WriteRawTag(136, 1);
         output.WriteInt32(FilterUpdateDispatchDelayMs);
       }
+      if (HasAlwaysCompareFiltersHashesOnUpdate) {
+        output.WriteRawTag(144, 1);
+        output.WriteBool(AlwaysCompareFiltersHashesOnUpdate);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -856,6 +904,10 @@ namespace FilterListManager {
         output.WriteRawTag(136, 1);
         output.WriteInt32(FilterUpdateDispatchDelayMs);
       }
+      if (HasAlwaysCompareFiltersHashesOnUpdate) {
+        output.WriteRawTag(144, 1);
+        output.WriteBool(AlwaysCompareFiltersHashesOnUpdate);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -916,6 +968,9 @@ namespace FilterListManager {
       }
       if (FilterUpdateDispatchDelayMs != 0) {
         size += 2 + pb::CodedOutputStream.ComputeInt32Size(FilterUpdateDispatchDelayMs);
+      }
+      if (HasAlwaysCompareFiltersHashesOnUpdate) {
+        size += 2 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -982,6 +1037,9 @@ namespace FilterListManager {
       }
       if (other.FilterUpdateDispatchDelayMs != 0) {
         FilterUpdateDispatchDelayMs = other.FilterUpdateDispatchDelayMs;
+      }
+      if (other.HasAlwaysCompareFiltersHashesOnUpdate) {
+        AlwaysCompareFiltersHashesOnUpdate = other.AlwaysCompareFiltersHashesOnUpdate;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1073,6 +1131,10 @@ namespace FilterListManager {
             FilterUpdateDispatchDelayMs = input.ReadInt32();
             break;
           }
+          case 144: {
+            AlwaysCompareFiltersHashesOnUpdate = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -1161,6 +1223,10 @@ namespace FilterListManager {
           }
           case 136: {
             FilterUpdateDispatchDelayMs = input.ReadInt32();
+            break;
+          }
+          case 144: {
+            AlwaysCompareFiltersHashesOnUpdate = input.ReadBool();
             break;
           }
         }

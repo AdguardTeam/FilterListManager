@@ -69,7 +69,15 @@ pub(super) fn update_filters_action(
     let filter_includes_repository = FilterIncludesRepository::new();
 
     let current_time = Utc::now().timestamp();
+    let derived_key = integrity::derive_key_if_needed(configuration);
     let mut filter_entities: Vec<FilterEntity> = Vec::with_capacity(records.len());
+    // `(filter_id, last_download_time)` pairs of filters that were successfully
+    // checked, but whose contents are unchanged. Only their `last_download_time`
+    // is refreshed (to keep the expiration gate closed); if integrity is enabled,
+    // their metadata signatures are re-signed afterwards in the same transaction.
+    // They are not reported as updated, so they are kept separately from
+    // `filter_entities` which feeds `build_full_filter_lists`.
+    let mut unchanged_filters: Vec<(FilterId, i64)> = Vec::with_capacity(records.len());
     let mut rules_entities: Vec<RulesListEntity> = Vec::with_capacity(records.len());
     let mut includes_entities: Vec<FilterIncludeEntity> = Vec::new();
 
@@ -286,10 +294,7 @@ pub(super) fn update_filters_action(
 
             let diff_path = compiler.get_metadata(KnownMetadataProperty::DiffPath);
 
-            filter.expires = expires;
-            filter.last_download_time = current_time;
-
-            filter.last_update_time = match compiler
+            let last_update_time = match compiler
                 .get_metadata(KnownMetadataProperty::TimeUpdated)
                 .as_str()
             {
@@ -301,26 +306,29 @@ pub(super) fn update_filters_action(
             };
 
             // Should update `parsed info` only for custom filters
-            if filter.is_custom() {
-                filter.homepage = compiler.get_metadata(KnownMetadataProperty::Homepage);
-                if !filter.is_user_title() {
-                    filter.title = compiler.get_metadata(KnownMetadataProperty::Title);
-                }
-                if !filter.is_user_description() {
-                    filter.description = compiler.get_metadata(KnownMetadataProperty::Description);
-                }
-            }
+            let homepage = compiler.get_metadata(KnownMetadataProperty::Homepage);
+            let title = compiler.get_metadata(KnownMetadataProperty::Title);
+            let description = compiler.get_metadata(KnownMetadataProperty::Description);
 
-            filter.version = compiler.get_metadata(KnownMetadataProperty::Version);
-            filter.license = compiler.get_metadata(KnownMetadataProperty::License);
-            filter.checksum = compiler.get_metadata(KnownMetadataProperty::Checksum);
+            let version = compiler.get_metadata(KnownMetadataProperty::Version);
+            let license = compiler.get_metadata(KnownMetadataProperty::License);
+            let checksum = compiler.get_metadata(KnownMetadataProperty::Checksum);
 
             let mut compiled_filter_entities = compiler.into_entities(filter_id);
             compiled_filter_entities.rules_list_entity.disabled_text =
                 disabled_rules_map.remove(&filter_id).unwrap_or_default();
 
-            if !ignore_filters_expiration {
-                // Check that filter contents are really changed
+            // Set to true when the downloaded contents match the stored ones:
+            // only its `last_download_time` is then refreshed, and the filter
+            // is skipped from the updated list and from metadata/rules/includes
+            // writes.
+            let mut should_skip_as_unchanged = false;
+
+            if !ignore_filters_expiration || configuration.always_compare_filters_hashes_on_update {
+                // Check that filter contents are really changed.
+                // A forced update (`ignore_filters_expiration == true`) skips
+                // the expiration gate, but may still compare hashes, unless
+                // `always_compare_filters_hashes_on_update` is disabled.
                 if let Some(current_filter_hash) =
                     compiled_filter_entities.rules_list_entity.get_text_hash()
                 {
@@ -345,7 +353,7 @@ pub(super) fn update_filters_action(
 
                                         if all_includes_are_same {
                                             // Filter is not changed
-                                            continue;
+                                            should_skip_as_unchanged = true;
                                         }
                                     }
                                 }
@@ -354,14 +362,14 @@ pub(super) fn update_filters_action(
                                 Some(old_includes) if old_includes.is_empty() => {
                                     // Current filter has no includes too
                                     if current_includes.is_empty() {
-                                        continue;
+                                        should_skip_as_unchanged = true;
                                     }
                                 }
 
                                 None => {
                                     // Old filter has no includes
                                     if current_includes.is_empty() {
-                                        continue;
+                                        should_skip_as_unchanged = true;
                                     }
                                 }
 
@@ -371,6 +379,36 @@ pub(super) fn update_filters_action(
                     }
                 }
             }
+
+            if should_skip_as_unchanged {
+                // The filter was successfully downloaded and checked, but its
+                // contents did not change. Only `last_download_time` (which
+                // drives the expiration gate) is refreshed; all other metadata
+                // stays as stored in the database, so e.g. `last_update_time`
+                // is not shifted for custom filters without `! TimeUpdated`.
+                unchanged_filters.push((filter_id, current_time));
+
+                continue;
+            }
+
+            filter.expires = expires;
+            filter.last_download_time = current_time;
+            filter.last_update_time = last_update_time;
+
+            // Should update `parsed info` only for custom filters
+            if filter.is_custom() {
+                filter.homepage = homepage;
+                if !filter.is_user_title() {
+                    filter.title = title;
+                }
+                if !filter.is_user_description() {
+                    filter.description = description;
+                }
+            }
+
+            filter.version = version;
+            filter.license = license;
+            filter.checksum = checksum;
 
             // All pushes should be made below this line
             if !diff_path.is_empty() {
@@ -402,6 +440,28 @@ pub(super) fn update_filters_action(
 
         with_transaction(&mut conn, |transaction: &Transaction| {
             filter_repository.insert(transaction, &filter_entities)?;
+
+            // Refresh only `last_download_time` for the filters whose contents
+            // were checked and found unchanged: a full metadata rewrite would
+            // shift e.g. `last_update_time` (`Utc::now()` fallback for custom
+            // filters without `! TimeUpdated`) even though nothing changed.
+            filter_repository.update_last_download_times(transaction, &unchanged_filters)?;
+
+            // The metadata signature covers `last_download_time`, so it must be
+            // refreshed for these rows too.
+            if let Some(ref derived_key) = derived_key {
+                let unchanged_filter_ids = unchanged_filters
+                    .iter()
+                    .map(|(filter_id, _)| *filter_id)
+                    .collect::<Vec<FilterId>>();
+
+                filter_repository.resign_filters_in_tx(
+                    transaction,
+                    &unchanged_filter_ids,
+                    derived_key,
+                )?;
+            }
+
             diff_updates_repository.insert(transaction, &diff_path_entities)?;
             rule_list_repository.insert(transaction, &rules_entities)?;
             filter_includes_repository.replace_entities_for_filters(transaction, &includes_entities)
@@ -649,6 +709,7 @@ mod tests {
     use crate::filters::parser::{
         DIRECTIVE_ELSE, DIRECTIVE_ENDIF, DIRECTIVE_IF, DIRECTIVE_INCLUDE,
     };
+    use crate::manager::managers::integrity_control_manager::IntegrityControlManager;
     use crate::storage::entities::filter::filter_entity::FilterEntity;
     use crate::storage::entities::filter::filter_include_entity::FilterIncludeEntity;
     use crate::storage::entities::rules_list::rules_list_entity::{
@@ -662,6 +723,7 @@ mod tests {
     use crate::storage::DbConnectionManager;
     use crate::test_utils::tests_fixtures::TestsFixtures;
     use crate::test_utils::tests_path;
+    use crate::utils::integrity;
     use crate::{string, Configuration, FilterId, CUSTOM_FILTERS_GROUP_ID};
     use chrono::Utc;
     use mimicry::Mock;
@@ -1201,6 +1263,278 @@ mod tests {
                 Ok(())
             })
             .unwrap()
+    }
+
+    #[test]
+    fn test_force_update_filters_action_compares_hashes() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        unsafe { source.lift_up_database().unwrap() }
+
+        let mut fixtures = TestsFixtures::new();
+
+        // The filter is already installed with the same content as its fixture file
+        let filter_id: FilterId = -77;
+        let mut filter = FilterEntity::default();
+        filter.filter_id = Some(filter_id);
+        filter.group_id = CUSTOM_FILTERS_GROUP_ID;
+        filter.is_enabled = true;
+        filter.title = string!("TestFilter");
+        // Distinctive metadata: if the forced update rewrote the whole row,
+        // these values would be replaced by the (empty) compiler metadata and
+        // `last_update_time` would become `Utc::now()` (no `! TimeUpdated`).
+        filter.last_update_time = 1_000_000;
+        filter.version = string!("1.2.3");
+        filter.checksum = string!("checksum-abc");
+        filter.license = string!("MIT");
+        filter.homepage = string!("https://example.org");
+        filter.description = string!("Test description");
+        let rules_text = string!("rule1\nrule2");
+        let download_url = fixtures.write("force_compare_hashes", &rules_text);
+        filter.download_url = download_url.to_string();
+
+        let rules_entity = RulesListEntity::with_disabled_text(filter_id, rules_text, string!(), 2);
+
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+
+        source
+            .execute_db(|mut connection: Connection| {
+                with_transaction(&mut connection, |tx| {
+                    filters_repo.insert(&tx, &[filter.clone()])?;
+                    rules_repo.insert(&tx, &[rules_entity])
+                })
+            })
+            .unwrap();
+
+        // `always_compare_filters_hashes_on_update` defaults to true: the filter
+        // is downloaded (expiration gate is skipped), but since its contents are
+        // unchanged, it must NOT be added to the updated list.
+        let mut conf = Configuration::default();
+        let before_update = Utc::now().timestamp();
+        let result =
+            update_filters_action(vec![filter.clone()], &source, true, true, 0, &conf).unwrap();
+
+        assert!(result.filters_errors.is_empty());
+        assert!(result.updated_list.is_empty());
+
+        // Even though the filter is not reported as updated, its
+        // `last_download_time` must be refreshed, while all the other metadata
+        // must stay unchanged.
+        let stored = source
+            .execute_db(|conn: Connection| {
+                Ok(filters_repo
+                    .select_filters_except_bootstrapped(&conn)
+                    .unwrap()
+                    .unwrap()
+                    .into_iter()
+                    .find(|entity| entity.filter_id == Some(filter_id))
+                    .unwrap())
+            })
+            .unwrap();
+        assert!(stored.last_download_time >= before_update);
+        assert_eq!(stored.last_update_time, 1_000_000);
+        assert_eq!(stored.version, "1.2.3");
+        assert_eq!(stored.checksum, "checksum-abc");
+        assert_eq!(stored.license, "MIT");
+        assert_eq!(stored.homepage, "https://example.org");
+        assert_eq!(stored.title, "TestFilter");
+        assert_eq!(stored.description, "Test description");
+
+        // The stored rules must remain the original ones.
+        let stored_rules = source
+            .execute_db(|conn: Connection| {
+                Ok(rules_repo
+                    .select_rules_except_bootstrapped(&conn)
+                    .unwrap()
+                    .unwrap()
+                    .into_iter()
+                    .find(|rules| rules.filter_id == filter_id)
+                    .unwrap())
+            })
+            .unwrap();
+        assert_eq!(stored_rules.text, "rule1\nrule2");
+
+        // Legacy behavior: forced update with `always_compare_filters_hashes_on_update`
+        // disabled skips the hash comparison and reports the filter as updated.
+        conf.always_compare_filters_hashes_on_update = false;
+        let result = update_filters_action(vec![filter], &source, true, true, 0, &conf).unwrap();
+
+        assert!(result.filters_errors.is_empty());
+        assert_eq!(result.updated_list.len(), 1);
+        assert_eq!(result.updated_list[0].id, filter_id);
+    }
+
+    #[test]
+    fn test_unchanged_filter_refreshes_last_download_time_and_is_not_redownloaded() {
+        let source = DbConnectionManager::factory_test().unwrap();
+        unsafe { source.lift_up_database().unwrap() }
+
+        let mut fixtures = TestsFixtures::new();
+
+        let filter_id: FilterId = -78;
+        let rules_text = string!("rule1\nrule2");
+        let fixture_name = "unchanged_filter_refreshes_last_download_time";
+        let download_url = fixtures.write(fixture_name, &rules_text);
+
+        let mut filter = FilterEntity::default();
+        filter.filter_id = Some(filter_id);
+        filter.group_id = CUSTOM_FILTERS_GROUP_ID;
+        filter.is_enabled = true;
+        filter.title = string!("TestFilter");
+        filter.download_url = download_url.to_string();
+        // Distinctive metadata: if the update rewrote the whole row, these
+        // values would be replaced by the (empty) compiler metadata and
+        // `last_update_time` would become `Utc::now()` (no `! TimeUpdated`).
+        filter.last_update_time = 1_000_000;
+        filter.version = string!("1.2.3");
+        filter.checksum = string!("checksum-abc");
+        filter.license = string!("MIT");
+        filter.homepage = string!("https://example.org");
+        filter.description = string!("Test description");
+        // Make the filter ready for a full update.
+        filter.last_download_time = 0;
+
+        let rules_entity =
+            RulesListEntity::with_disabled_text(filter_id, rules_text.clone(), string!(), 2);
+
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+
+        source
+            .execute_db(|mut connection: Connection| {
+                with_transaction(&mut connection, |tx| {
+                    filters_repo.insert(&tx, &[filter.clone()])?;
+                    rules_repo.insert(&tx, &[rules_entity])
+                })
+            })
+            .unwrap();
+
+        let conf = Configuration::default();
+
+        // Regular (not forced) update with unchanged contents.
+        let before_update = Utc::now().timestamp();
+        let result = update_filters_action(vec![filter], &source, false, false, 0, &conf).unwrap();
+
+        assert!(result.filters_errors.is_empty());
+        assert!(result.updated_list.is_empty());
+
+        // `last_download_time` must be refreshed even though the filter was not
+        // reported as updated, while all the other metadata must stay unchanged.
+        let stored = source
+            .execute_db(|conn: Connection| {
+                Ok(filters_repo
+                    .select_filters_except_bootstrapped(&conn)
+                    .unwrap()
+                    .unwrap()
+                    .into_iter()
+                    .find(|entity| entity.filter_id == Some(filter_id))
+                    .unwrap())
+            })
+            .unwrap();
+        assert!(stored.last_download_time >= before_update);
+        assert_eq!(stored.last_update_time, 1_000_000);
+        assert_eq!(stored.version, "1.2.3");
+        assert_eq!(stored.checksum, "checksum-abc");
+        assert_eq!(stored.license, "MIT");
+        assert_eq!(stored.homepage, "https://example.org");
+        assert_eq!(stored.title, "TestFilter");
+        assert_eq!(stored.description, "Test description");
+
+        // The stored rules must remain the original ones.
+        let stored_rules = source
+            .execute_db(|conn: Connection| {
+                Ok(rules_repo
+                    .select_rules_except_bootstrapped(&conn)
+                    .unwrap()
+                    .unwrap()
+                    .into_iter()
+                    .find(|rules| rules.filter_id == filter_id)
+                    .unwrap())
+            })
+            .unwrap();
+        assert_eq!(stored_rules.text, rules_text);
+
+        // Change the remote contents. Since `last_download_time` was refreshed,
+        // the next non-forced update must not download the filter at all, so the
+        // change must not be picked up.
+        fixtures.write(fixture_name, "rule1\nrule2\nrule3");
+
+        let result = update_filters_action(vec![stored], &source, false, false, 0, &conf).unwrap();
+
+        assert!(result.filters_errors.is_empty());
+        assert!(result.updated_list.is_empty());
+    }
+
+    #[test]
+    fn test_unchanged_filter_refreshes_last_download_time_with_integrity_key() {
+        const INTEGRITY_KEY: &str = "test-integrity-key";
+
+        let source = DbConnectionManager::factory_test().unwrap();
+        unsafe { source.lift_up_database().unwrap() }
+
+        let mut fixtures = TestsFixtures::new();
+
+        let filter_id: FilterId = -79;
+        let rules_text = string!("rule1\nrule2");
+        let fixture_name = "unchanged_filter_refreshes_last_download_time_integrity";
+        let download_url = fixtures.write(fixture_name, &rules_text);
+
+        let mut filter = FilterEntity::default();
+        filter.filter_id = Some(filter_id);
+        filter.group_id = CUSTOM_FILTERS_GROUP_ID;
+        filter.is_enabled = true;
+        filter.title = string!("TestFilter");
+        filter.download_url = download_url.to_string();
+        filter.last_download_time = 0;
+
+        let rules_entity = RulesListEntity::with_disabled_text(filter_id, rules_text, string!(), 2);
+
+        let filters_repo = FilterRepository::new();
+        let rules_repo = RulesListRepository::new();
+
+        source
+            .execute_db(|mut connection: Connection| {
+                with_transaction(&mut connection, |tx| {
+                    filters_repo.insert(&tx, &[filter.clone()])?;
+                    rules_repo.insert(&tx, &[rules_entity])
+                })
+            })
+            .unwrap();
+
+        let mut conf = Configuration::default();
+        conf.integrity_key = Some(INTEGRITY_KEY.to_string());
+
+        // Sign the pre-existing data, as the apps do right after creating FLM
+        // when `integrity_key` is set.
+        IntegrityControlManager::new()
+            .sign_all_data(&source, &conf)
+            .unwrap();
+
+        // Update with unchanged contents.
+        let result = update_filters_action(vec![filter], &source, false, false, 0, &conf).unwrap();
+
+        assert!(result.filters_errors.is_empty());
+        assert!(result.updated_list.is_empty());
+
+        // The whole database must still verify, and the filter row (with the
+        // refreshed `last_download_time`) must have a valid metadata signature.
+        IntegrityControlManager::new()
+            .verify_integrity(&source, &conf)
+            .unwrap();
+
+        let stored = source
+            .execute_db(|conn: Connection| {
+                Ok(filters_repo
+                    .select_filters_except_bootstrapped(&conn)
+                    .unwrap()
+                    .unwrap()
+                    .into_iter()
+                    .find(|entity| entity.filter_id == Some(filter_id))
+                    .unwrap())
+            })
+            .unwrap();
+        let derived_key = integrity::derive_key(INTEGRITY_KEY);
+        assert!(integrity::verify_filter_entity(&derived_key, &stored));
     }
 
     #[test]

@@ -70,6 +70,9 @@ namespace AdGuard.FilterListManager.SampleApp
                 flm.SaveRulesToFileBlob(customFilter.Id, blobPath);
                 flm.GetFullFilterListById(customFilter.Id);
                 flm.ForceUpdateFiltersByIds(new[] { 1, 2 }, 0);
+
+                TestForcedUpdateComparesHashes(flm);
+
                 customFilter = flm.InstallCustomFilterList(
                     "https://filters.adtidy.org/extension/safari/filters/101_optimized.txt",
                     true,
@@ -100,6 +103,60 @@ namespace AdGuard.FilterListManager.SampleApp
 
                 Logger.Info("All Ok!");
             }
+        }
+
+        /// <summary>
+        /// Test: forced update compares filter hashes, so unchanged filters are not reported as updated.
+        /// </summary>
+        private static void TestForcedUpdateComparesHashes(IFilterListManager flm)
+        {
+            string localFilterPath = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "flmtest_local_filter.txt");
+            File.WriteAllText(localFilterPath, "local rule 1\nlocal rule 2");
+            string localFilterUrl = new Uri(localFilterPath).AbsoluteUri;
+
+            FullFilterList localCustomFilter = flm.InstallCustomFilterList(
+                localFilterUrl,
+                true,
+                "local title",
+                "local description");
+
+            // Contents are unchanged: the filter must NOT be reported as updated
+            UpdateResult forceUpdateResult =
+                flm.ForceUpdateFiltersByIds(new[] { localCustomFilter.Id }, 0);
+            if (forceUpdateResult.FiltersErrors.Count > 0)
+            {
+                throw new InvalidOperationException(
+                    $"Forced update must not report filter errors: {DescribeFilterErrors(forceUpdateResult)}");
+            }
+            bool updatedWhenUnchanged = forceUpdateResult.UpdatedList
+                .Any(item => item.Id == localCustomFilter.Id);
+            Debug.Assert(!updatedWhenUnchanged, "Unchanged filter must not be in the updated list on forced update");
+            Logger.Verbose($"Forced update with unchanged contents: filter is {(updatedWhenUnchanged ? "UPDATED (unexpected)" : "not updated (expected)")}");
+
+            // Change the file contents: the filter must be reported as updated
+            File.WriteAllText(localFilterPath, "local rule 1\nlocal rule 2\nlocal rule 3");
+            forceUpdateResult = flm.ForceUpdateFiltersByIds(new[] { localCustomFilter.Id }, 0);
+            if (forceUpdateResult.FiltersErrors.Count > 0)
+            {
+                throw new InvalidOperationException(
+                    $"Forced update must not report filter errors: {DescribeFilterErrors(forceUpdateResult)}");
+            }
+            bool updatedWhenChanged = forceUpdateResult.UpdatedList
+                .Any(item => item.Id == localCustomFilter.Id);
+            Debug.Assert(updatedWhenChanged, "Changed filter must be in the updated list on forced update");
+            Logger.Verbose($"Forced update with changed contents: filter is {(updatedWhenChanged ? "updated (expected)" : "NOT UPDATED (unexpected)")}");
+        }
+
+        /// <summary>
+        /// Renders the filter errors of an update result for diagnostics.
+        /// </summary>
+        private static string DescribeFilterErrors(UpdateResult result)
+        {
+            return string.Join(
+                "; ",
+                result.FiltersErrors.Select(error => $"filter {error.FilterId}: {error.Message}"));
         }
     }
 }

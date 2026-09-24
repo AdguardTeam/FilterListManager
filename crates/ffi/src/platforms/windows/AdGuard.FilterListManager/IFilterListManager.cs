@@ -125,7 +125,9 @@ namespace AdGuard.FilterListManager
         /// - Collect updated filters.
         ///
         /// * `ignore_filters_expiration` - Does not rely on filter's expire
-        ///   information.
+        ///   information. Unchanged filters are still excluded from `UpdatedList`
+        ///   unless `Configuration.AlwaysCompareFiltersHashesOnUpdate` is set to
+        ///   `false`.
         /// * `loose_timeout` - Not a strict timeout, checked after processing each
         ///   filter. If the total time exceeds this value, filters processing will
         ///   stop, and the number of unprocessed filters will be set in result
@@ -152,6 +154,8 @@ namespace AdGuard.FilterListManager
         /// with exceptions:
         /// * This returns [`None`] if DB result set is empty.
         /// * This always ignores filters `expires` and `is_enabled` parameters.
+        /// * Filters with unchanged contents are not added to `UpdatedList` unless
+        ///   `Configuration.AlwaysCompareFiltersHashesOnUpdate` is set to `false`.
         ///
         /// * `ids` - List of [`FilterId`].
         /// * `loose_timeout` - See [`FilterListManager::update_filters`]

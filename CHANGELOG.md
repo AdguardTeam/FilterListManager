@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Configuration.always_compare_filters_hashes_on_update` (default `true`): forced updates compare filter hashes and report only really changed filters.
+
+### Fixed
+
+- Filters with unchanged contents are no longer re-downloaded on every update after they expire.
+
 ## [2.6.11] - 2026-07-06
 
 ### Added

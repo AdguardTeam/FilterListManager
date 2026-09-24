@@ -74,9 +74,19 @@ pub struct Configuration {
     pub filter_update_concurrency: i32,
     /// Minimum delay in milliseconds between consecutive filter download
     /// dispatches during a concurrent update. Helps avoid HTTP 429.
-    /// Default value: 0 (no throttling).
+    /// Default value: 60.
     #[prost(int32, tag = "17")]
     pub filter_update_dispatch_delay_ms: i32,
+    /// Whether filter contents hashes should be compared during an update even
+    /// when the update is forced (i.e. the expiration gate is skipped).
+    /// When true (default), a forced update still downloads all the filters, but
+    /// only filters whose contents really changed are added to the updated list.
+    /// When false, forced updates skip the hash comparison and every downloaded
+    /// filter is considered updated (legacy behavior).
+    /// Default value: true. If the field is not set, FLM treats it as true, even
+    /// though the generated getter of an unset field returns false.
+    #[prost(bool, optional, tag = "18")]
+    pub always_compare_filters_hashes_on_update: ::core::option::Option<bool>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

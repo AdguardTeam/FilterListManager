@@ -143,7 +143,9 @@ pub trait FilterListManager {
     ///
     /// This method conducts the following checks while updating filters:
     /// - Filter expiration (or `ignore_filters_expiration` flag)
-    /// - Content equality via checksum comparison (not Checksum metadata field) (`ignore_filters_expiration` flag disables this check)
+    /// - Content equality via checksum comparison (not Checksum metadata field).
+    ///   This check is disabled only by `Configuration.always_compare_filters_hashes_on_update = false`;
+    ///   `ignore_filters_expiration` alone does not disable it.
     /// - Filter status (is_enabled) or `ignore_filters_status` flag
     /// - Local urls without `download_url` won't be updated
     /// - For index filters, versions are checked through `Version` metadata field checking up against the latest version from the index file
@@ -152,7 +154,9 @@ pub trait FilterListManager {
     /// # Parameters
     ///
     /// * `ignore_filters_expiration` - Does not rely on filter's expire
-    ///   information, also ignores content equality via checksum comparison.
+    ///   information. Unchanged filters are still excluded from `updated_list`
+    ///   unless `Configuration.always_compare_filters_hashes_on_update` is set
+    ///   to `false`.
     /// * `loose_timeout` - Not a strict timeout, checked after processing each
     ///   filter. If the total time exceeds this value, filters processing will
     ///   stop, and the number of unprocessed filters will be set in result
@@ -193,6 +197,8 @@ pub trait FilterListManager {
     /// with exceptions:
     /// * This returns [`None`] if DB result set is empty.
     /// * This always ignores filters `expires` and `is_enabled` parameters.
+    /// * Filters with unchanged contents are not added to `updated_list` unless
+    ///   `Configuration.always_compare_filters_hashes_on_update` is set to `false`.
     ///
     /// * `ids` - List of [`FilterId`].
     /// * `loose_timeout` - See [`FilterListManager::update_filters`]

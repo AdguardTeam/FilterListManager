@@ -99,6 +99,19 @@ pub struct Configuration {
     /// simultaneously.
     /// Default value: 60.
     pub filter_update_dispatch_delay_ms: i32,
+    /// Whether filter contents hashes should be compared during an update even
+    /// when the update is forced, i.e. when `ignore_filters_expiration` is set
+    /// and the expiration gate is skipped.
+    ///
+    /// When `true` (default), a forced update still downloads all the filters,
+    /// but only filters whose contents really changed are added to the
+    /// `updated_list` of the [`crate::UpdateResult`]. This allows the caller to
+    /// restart protection only for the filters that were actually updated.
+    /// When `false`, forced updates skip the hash comparison and every
+    /// downloaded filter is considered updated (legacy behavior).
+    ///
+    /// Default value: true
+    pub always_compare_filters_hashes_on_update: bool,
 }
 
 /// Normalized locales delimiter
@@ -149,6 +162,7 @@ impl Default for Configuration {
             integrity_key: None,
             filter_update_concurrency: DEFAULT_FILTER_UPDATE_CONCURRENCY,
             filter_update_dispatch_delay_ms: DEFAULT_FILTER_UPDATE_DISPATCH_DELAY_MS,
+            always_compare_filters_hashes_on_update: true,
         }
     }
 }

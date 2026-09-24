@@ -248,11 +248,28 @@ public struct FilterListManager_Configuration: @unchecked Sendable {
 
   /// Minimum delay in milliseconds between consecutive filter download
   /// dispatches during a concurrent update. Helps avoid HTTP 429.
-  /// Default value: 0 (no throttling).
+  /// Default value: 60.
   public var filterUpdateDispatchDelayMs: Int32 {
     get {return _storage._filterUpdateDispatchDelayMs}
     set {_uniqueStorage()._filterUpdateDispatchDelayMs = newValue}
   }
+
+  /// Whether filter contents hashes should be compared during an update even
+  /// when the update is forced (i.e. the expiration gate is skipped).
+  /// When true (default), a forced update still downloads all the filters, but
+  /// only filters whose contents really changed are added to the updated list.
+  /// When false, forced updates skip the hash comparison and every downloaded
+  /// filter is considered updated (legacy behavior).
+  /// Default value: true. If the field is not set, FLM treats it as true, even
+  /// though the generated getter of an unset field returns false.
+  public var alwaysCompareFiltersHashesOnUpdate: Bool {
+    get {return _storage._alwaysCompareFiltersHashesOnUpdate ?? false}
+    set {_uniqueStorage()._alwaysCompareFiltersHashesOnUpdate = newValue}
+  }
+  /// Returns true if `alwaysCompareFiltersHashesOnUpdate` has been explicitly set.
+  public var hasAlwaysCompareFiltersHashesOnUpdate: Bool {return _storage._alwaysCompareFiltersHashesOnUpdate != nil}
+  /// Clears the value of `alwaysCompareFiltersHashesOnUpdate`. Subsequent reads from it will return its default value.
+  public mutating func clearAlwaysCompareFiltersHashesOnUpdate() {_uniqueStorage()._alwaysCompareFiltersHashesOnUpdate = nil}
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -333,6 +350,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     15: .standard(proto: "integrity_key"),
     16: .standard(proto: "filter_update_concurrency"),
     17: .standard(proto: "filter_update_dispatch_delay_ms"),
+    18: .standard(proto: "always_compare_filters_hashes_on_update"),
   ]
 
   fileprivate class _StorageClass {
@@ -353,6 +371,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
     var _integrityKey: String? = nil
     var _filterUpdateConcurrency: Int32 = 0
     var _filterUpdateDispatchDelayMs: Int32 = 0
+    var _alwaysCompareFiltersHashesOnUpdate: Bool? = nil
 
     #if swift(>=5.10)
       // This property is used as the initial default value for new instances of the type.
@@ -384,6 +403,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
       _integrityKey = source._integrityKey
       _filterUpdateConcurrency = source._filterUpdateConcurrency
       _filterUpdateDispatchDelayMs = source._filterUpdateDispatchDelayMs
+      _alwaysCompareFiltersHashesOnUpdate = source._alwaysCompareFiltersHashesOnUpdate
     }
   }
 
@@ -419,6 +439,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
         case 15: try { try decoder.decodeSingularStringField(value: &_storage._integrityKey) }()
         case 16: try { try decoder.decodeSingularInt32Field(value: &_storage._filterUpdateConcurrency) }()
         case 17: try { try decoder.decodeSingularInt32Field(value: &_storage._filterUpdateDispatchDelayMs) }()
+        case 18: try { try decoder.decodeSingularBoolField(value: &_storage._alwaysCompareFiltersHashesOnUpdate) }()
         default: break
         }
       }
@@ -482,6 +503,9 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
       if _storage._filterUpdateDispatchDelayMs != 0 {
         try visitor.visitSingularInt32Field(value: _storage._filterUpdateDispatchDelayMs, fieldNumber: 17)
       }
+      try { if let v = _storage._alwaysCompareFiltersHashesOnUpdate {
+        try visitor.visitSingularBoolField(value: v, fieldNumber: 18)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -508,6 +532,7 @@ extension FilterListManager_Configuration: SwiftProtobuf.Message, SwiftProtobuf.
         if _storage._integrityKey != rhs_storage._integrityKey {return false}
         if _storage._filterUpdateConcurrency != rhs_storage._filterUpdateConcurrency {return false}
         if _storage._filterUpdateDispatchDelayMs != rhs_storage._filterUpdateDispatchDelayMs {return false}
+        if _storage._alwaysCompareFiltersHashesOnUpdate != rhs_storage._alwaysCompareFiltersHashesOnUpdate {return false}
         return true
       }
       if !storagesAreEqual {return false}

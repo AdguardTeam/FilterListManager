@@ -97,4 +97,14 @@ message Configuration {
   // dispatches during a concurrent update. Helps avoid HTTP 429.
   // Default value: 60.
   int32 filter_update_dispatch_delay_ms = 17;
+
+  // Whether filter contents hashes should be compared during an update even
+  // when the update is forced (i.e. the expiration gate is skipped).
+  // When true (default), a forced update still downloads all the filters, but
+  // only filters whose contents really changed are added to the updated list.
+  // When false, forced updates skip the hash comparison and every downloaded
+  // filter is considered updated (legacy behavior).
+  // Default value: true. If the field is not set, FLM treats it as true, even
+  // though the generated getter of an unset field returns false.
+  optional bool always_compare_filters_hashes_on_update = 18;
 }
