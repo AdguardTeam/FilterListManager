@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-09-25
+
 ### Added
 
 - `Configuration.always_compare_filters_hashes_on_update` (default `true`): forced updates compare filter hashes and report only really changed filters.
@@ -14,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Filters with unchanged contents are no longer re-downloaded on every update after they expire.
+
+## [2.6.13] - 2026-07-08
+
+### Fixed
+
+- Windows adapter build script: invalid `--features` argument list in
+  `build_adapter.ps1`.
+
+## [2.6.12] - 2026-07-08
+
+### Added
+
+- Windows NuGet package now includes `metadata.json` with the `adguard-flm-ffi`
+  crate version.
 
 ## [2.6.11] - 2026-07-06
 
@@ -564,7 +580,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Documentation of the filter-list-manager crate was cleaned up
 
-[Unreleased]: https://github.com/AdguardTeam/FilterListManager/compare/v2.6.13...HEAD
+[Unreleased]: https://github.com/AdguardTeam/FilterListManager/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/AdguardTeam/FilterListManager/compare/v2.6.13...v2.7.0
+[2.6.13]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.12...v2.6.13
+[2.6.12]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.11...ffi-2.6.12
 [2.6.11]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.10...ffi-2.6.11
 [2.6.10]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.9...ffi-2.6.10
 [2.6.9]: https://github.com/AdguardTeam/FilterListManager/compare/ffi-2.6.0...ffi-2.6.9
