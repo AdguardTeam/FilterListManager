@@ -37,7 +37,7 @@ jobs:
           build-args: |
             VERSION=${{ needs.tag.outputs.version }}
           content: |
-            FROM registry.int.agrd.dev/library/rust:2 AS build
+            FROM registry.int.agrd.dev/library/rust:1 AS build
             ARG VERSION
             COPY . /src
             WORKDIR /src
