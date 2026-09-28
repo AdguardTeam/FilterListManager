@@ -84,6 +84,9 @@ jobs:
     uses: AdGuardSoftwareLimited/actions/.github/workflows/deploy-to-cargo.yml@master
     with:
       team: corelibs
+    permissions:
+      contents: read
+      id-token: write
 
   mirror-and-release:
     needs: [tag, cargo-deploy]
