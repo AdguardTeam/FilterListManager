@@ -100,7 +100,7 @@ jobs:
     secrets: inherit
     permissions:
       actions: write
-      contents: read
+      contents: write
       id-token: write
 
   # Open a tracking issue in each downstream app repo (with the private-stripped
