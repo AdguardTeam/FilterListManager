@@ -1,0 +1,80 @@
+name: Build Apple adapter
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+        description: 'Git ref to checkout (tag or SHA)'
+      version:
+        type: string
+        required: true
+        description: 'Release version (e.g. 2.6.14)'
+      macos-runner:
+        type: string
+        required: true
+        description: 'macOS runner image label from kv (build-images/macos)'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build xcframework
+    runs-on:
+      - ephemeral
+      - ephemeral-mac
+      - ${{ inputs.macos-runner }}
+      - ephemeral-limit-memory-7168
+      - ephemeral-limit-cpu-4
+    # Without it build.rs falls back to `git describe`, and to 0.0.0 when no
+    # v* tag is reachable; Windows and KMP pass it the same way.
+    env:
+      FLM_VERSION: ${{ inputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Install Rust targets
+        run: ./crates/ffi/src/platforms/apple/Scripts/configure.sh
+
+      - name: Build xcframework
+        run: ./crates/ffi/src/platforms/apple/Scripts/build.sh
+
+      - name: Archive xcframework
+        run: |
+          set -euo pipefail
+          cd crates/ffi/src/platforms/apple/build/framework
+          zip -4yr "AdGuardFLM-${{ inputs.version }}.zip" AdGuardFLM.xcframework
+
+      - name: Prepare AK deploy payloads
+        run: |
+          bash crates/ffi/src/platforms/apple/Scripts/prepare_ak_payload.sh \
+            "${{ inputs.version }}" \
+            "crates/ffi/src/platforms/apple/build/framework/AdGuardFLM-${{ inputs.version }}.zip" \
+            "${{ vars.ARTIFACT_KEEPER_URL }}" \
+            "$GITHUB_WORKSPACE/apple-deploy"
+
+      - name: Upload xcframework artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: apple-xcframework
+          path: apple-deploy/apple-xcframework
+          if-no-files-found: error
+
+      - name: Upload podspec artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: apple-podspec
+          path: apple-deploy/apple-podspec
+          if-no-files-found: error
+
+      - name: Upload SwiftPM artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: apple-swiftpm
+          path: apple-deploy/apple-swiftpm
+          if-no-files-found: error

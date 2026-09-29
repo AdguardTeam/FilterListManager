@@ -1,0 +1,72 @@
+name: Build KMP adapter
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+        description: 'Git ref to checkout (tag or SHA)'
+      version:
+        type: string
+        required: true
+        description: 'Release version (e.g. 2.6.14)'
+      macos-runner:
+        type: string
+        required: true
+        description: 'macOS runner image label from kv (build-images/macos)'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on:
+      - ephemeral
+      - ephemeral-mac
+      - ${{ inputs.macos-runner }}
+      - ephemeral-limit-memory-7168
+      - ephemeral-limit-cpu-4
+      - ephemeral-limit-disk-gb-20
+    env:
+      M2_LOCAL_REPO: ${{ github.workspace }}/.m2/repository
+      FLM_VERSION: ${{ inputs.version }}
+    defaults:
+      run:
+        working-directory: crates/ffi/src/platforms/kotlin-multiplatform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Install Rust targets
+        run: |
+          rustup target add \
+            aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios \
+            aarch64-linux-android armv7-linux-androideabi \
+            i686-linux-android x86_64-linux-android
+
+      - name: Registry cache
+        uses: AdGuardSoftwareLimited/actions/actions/registry-cache@master
+        with:
+          config: ${{ secrets.REGISTRY_CACHE_AUTH }}
+          key: flm-build-kmp-${{ hashFiles('crates/ffi/src/platforms/kotlin-multiplatform/gradle/libs.versions.toml') }}
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.konan
+          save-always: 'true'
+
+      - name: Build KMP Maven artifacts
+        run: |
+          ./gradlew --max-workers=4 --info \
+            :flm:publishToMavenLocal \
+            -Dmaven.repo.local="${{ github.workspace }}/.m2/repository"
+          find "${{ github.workspace }}/.m2/repository" -name 'maven-metadata-local.xml' -delete
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: kmp-maven-payload
+          path: ${{ env.M2_LOCAL_REPO }}
+          if-no-files-found: error

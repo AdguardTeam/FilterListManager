@@ -26,3 +26,58 @@ jobs:
             cargo fmt --all -- --check
             cargo clippy --locked
             cargo test --workspace --lib --all-features --locked
+
+  resolve-images:
+    runs-on: [team-corelibs]
+    outputs:
+      macos: ${{ steps.kv.outputs.MACOS }}
+      windows: ${{ steps.kv.outputs.WINDOWS }}
+    steps:
+      - uses: AdGuardSoftwareLimited/actions/actions/kv-multi@master
+        id: kv
+        with:
+          get: |
+            MACOS=build-images/macos
+            WINDOWS=build-images/windows
+
+  build-apple:
+    name: Apple xcframework check
+    needs: resolve-images
+    runs-on:
+      - ephemeral
+      - ephemeral-mac
+      - ${{ needs.resolve-images.outputs.macos }}
+      - ephemeral-limit-memory-7168
+      - ephemeral-limit-cpu-4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Rust targets
+        run: ./crates/ffi/src/platforms/apple/Scripts/configure.sh
+
+      - name: Build xcframework
+        run: ./crates/ffi/src/platforms/apple/Scripts/build.sh
+
+      - name: Archive xcframework
+        run: ./crates/ffi/src/platforms/apple/Scripts/archive_framework.sh
+
+      - name: Swift build check
+        run: swift build --package-path crates/ffi/src/platforms/apple/AdGuardFLM
+
+  # Builds, tests and packs the adapter unsigned: signing and pushing
+  # belong to the release.
+  build-windows:
+    name: Windows adapter check
+    needs: resolve-images
+    # build-windows declares id-token for its signing jobs, which a caller
+    # must grant even when they are skipped.
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/build-windows.yml
+    with:
+      ref: ${{ github.sha }}
+      version: 0.0.0
+      windows-runner: ${{ needs.resolve-images.outputs.windows }}
+      sign: false

@@ -11,6 +11,12 @@ on:
         required: false
         type: string
 
+permissions:
+  contents: read
+
+# Nothing is published until every package has been built: each deploy job
+# needs all four build jobs. Publishing to crates.io cannot be undone, so a
+# build that fails late must not leave the crates released on their own.
 jobs:
   tag:
     uses: AdGuardSoftwareLimited/actions/.github/workflows/tag-from-changelog.yml@master
@@ -19,6 +25,22 @@ jobs:
       team: corelibs
     permissions:
       contents: write
+
+  resolve-images:
+    needs: tag
+    runs-on: [team-corelibs]
+    outputs:
+      macos: ${{ steps.kv.outputs.MACOS }}
+      windows: ${{ steps.kv.outputs.WINDOWS }}
+    steps:
+      - uses: AdGuardSoftwareLimited/actions/actions/kv-multi@master
+        id: kv
+        with:
+          get: |
+            MACOS=build-images/macos
+            WINDOWS=build-images/windows
+
+  # ── Cargo crates ──────────────────────────────────────────────
 
   prepare-cargo:
     name: Package crates
@@ -86,7 +108,7 @@ jobs:
 
   cargo-deploy:
     name: Publish crates
-    needs: prepare-cargo
+    needs: [prepare-cargo, build-apple, build-kmp, build-windows]
     uses: AdGuardSoftwareLimited/actions/.github/workflows/deploy-to-cargo.yml@master
     with:
       team: corelibs
@@ -94,14 +116,129 @@ jobs:
       contents: read
       id-token: write
 
+  # ── Apple adapter ─────────────────────────────────────────────
+
+  build-apple:
+    needs: [tag, resolve-images]
+    uses: ./.github/workflows/build-apple.yml
+    with:
+      ref: ${{ needs.tag.outputs.tag }}
+      version: ${{ needs.tag.outputs.version }}
+      macos-runner: ${{ needs.resolve-images.outputs.macos }}
+    secrets: inherit
+
+  apple-deploy-xcframework:
+    name: Deploy Apple xcframework
+    needs: [prepare-cargo, build-apple, build-kmp, build-windows]
+    uses: AdGuardSoftwareLimited/actions/.github/workflows/deploy-to-ak-generic.yml@master
+    with:
+      team: corelibs
+      artifact-pattern: apple-xcframework
+      ak-repo: apple-bin
+    secrets: inherit
+
+  apple-deploy-podspec:
+    name: Deploy Apple podspec
+    needs: apple-deploy-xcframework
+    uses: AdGuardSoftwareLimited/actions/.github/workflows/deploy-to-ak-generic.yml@master
+    with:
+      team: corelibs
+      artifact-pattern: apple-podspec
+      ak-repo: pods
+    secrets: inherit
+
+  apple-deploy-swiftpm:
+    name: Deploy Apple SwiftPM
+    needs: apple-deploy-xcframework
+    uses: AdGuardSoftwareLimited/actions/.github/workflows/deploy-to-ak-swift.yml@master
+    with:
+      team: corelibs
+      artifact-pattern: apple-swiftpm
+      ak-repo: swift-pkgs
+    secrets: inherit
+
+  # ── KMP adapter ───────────────────────────────────────────────
+
+  build-kmp:
+    needs: [tag, resolve-images]
+    uses: ./.github/workflows/build-kmp.yml
+    with:
+      ref: ${{ needs.tag.outputs.tag }}
+      version: ${{ needs.tag.outputs.version }}
+      macos-runner: ${{ needs.resolve-images.outputs.macos }}
+    secrets: inherit
+
+  kmp-deploy:
+    name: Deploy KMP adapter
+    needs: [prepare-cargo, build-apple, build-kmp, build-windows]
+    uses: AdGuardSoftwareLimited/actions/.github/workflows/deploy-to-ak-maven.yml@master
+    with:
+      team: corelibs
+      artifact-pattern: kmp-maven-payload
+      ak-repo: maven-internal
+    secrets: inherit
+
+  # ── Windows adapter ───────────────────────────────────────────
+
+  build-windows:
+    needs: [tag, resolve-images]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/build-windows.yml
+    with:
+      ref: ${{ needs.tag.outputs.tag }}
+      version: ${{ needs.tag.outputs.version }}
+      windows-runner: ${{ needs.resolve-images.outputs.windows }}
+    secrets: inherit
+
+  # nuget.exe needs Windows, as in core-libs' windows-deploy.
+  windows-deploy:
+    name: Push Windows NuGet package
+    needs: [resolve-images, prepare-cargo, build-apple, build-kmp, build-windows]
+    runs-on:
+      - ephemeral
+      - ephemeral-vmwin
+      - ${{ needs.resolve-images.outputs.windows }}
+      - ephemeral-limit-memory-2048
+      - ephemeral-limit-cpu-2
+      - ephemeral-job-key-${{ github.run_id }}-${{ github.job }}-${{ strategy.job-index || 0 }}
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Download NuGet package
+        uses: actions/download-artifact@v8
+        with:
+          name: windows-nupkg
+          path: nupkg
+
+      - name: Push to Artifactory
+        env:
+          NUGET_SOURCE: ${{ vars.NUGET_REPO_URL }}/AdGuard.FilterListManager
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+          ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packages = Get-ChildItem -Path nupkg -Filter *.nupkg -Recurse
+          if (-not $packages) { throw 'No .nupkg in the windows-nupkg artifact' }
+          foreach ($package in $packages) {
+            & nuget push $package.FullName -Source $env:NUGET_SOURCE `
+              -ApiKey "$($env:ARTIFACTORY_USER):$($env:ARTIFACTORY_API_KEY)" -SkipDuplicate
+            if ($LASTEXITCODE -ne 0) { throw "nuget push failed for $($package.Name)" }
+          }
+
+  # ── Mirror and GitHub Release ─────────────────────────────────
+
   mirror-and-release:
-    needs: [tag, cargo-deploy]
+    needs: [tag, cargo-deploy, apple-deploy-podspec, apple-deploy-swiftpm, kmp-deploy, windows-deploy]
     uses: AdGuardSoftwareLimited/actions/.github/workflows/mirror-and-release.yml@master
     with:
       team: corelibs
       target_repo: AdguardTeam/FilterListManager
       tag: ${{ needs.tag.outputs.tag }}
       changelog: ${{ needs.tag.outputs.release-notes }}
+      artifact_name: apple-xcframework
       prerelease: ${{ needs.tag.outputs.prerelease == 'true' }}
     secrets: inherit
     permissions:

@@ -13,6 +13,12 @@ tags: `v${version}` (e.g. `v2.6.13`).
 
 **When and how should I tag and change crate versions?**
 
-By default, versioning of crates is automatic and our CI raises patch versions in the crates by itself.
-In this case, after PR merge into the master and after version increment, it is worth to set new tags for those crates
-that were incremented.
+Never by hand. `CHANGELOG.md` is the only place that holds the version: the
+manifests carry none, and builds take it from the `FLM_VERSION` environment
+variable (else `git describe` over `v*` tags). To release:
+
+1. Run the `Prepare release` workflow with the new tag (e.g. `v2.7.0`). It opens
+   a `release-bump/` pull request that turns the `Unreleased` section of
+   `CHANGELOG.md` into that version.
+2. Merge the pull request. `Publish release` then creates the tag and builds and
+   publishes the crates and the Apple, KMP and Windows adapters with that version.

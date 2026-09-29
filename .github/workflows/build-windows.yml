@@ -1,0 +1,233 @@
+name: Build Windows adapter
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+        description: 'Git ref to checkout (tag or SHA)'
+      version:
+        type: string
+        required: true
+        description: 'Release version (e.g. 2.6.14)'
+      windows-runner:
+        type: string
+        required: true
+        description: 'Windows runner image label from kv (build-images/windows)'
+      sign:
+        type: boolean
+        default: true
+        description: 'Strong-name and Authenticode sign the DLLs before packing'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    name: Build and test
+    runs-on:
+      - ephemeral
+      - ephemeral-vmwin
+      - ${{ inputs.windows-runner }}
+      - ephemeral-limit-memory-6144
+      - ephemeral-limit-cpu-4
+      - ephemeral-job-key-${{ github.run_id }}-${{ github.job }}-${{ strategy.job-index || 0 }}
+    env:
+      FLM_VERSION: ${{ inputs.version }}
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Build Rust DLLs
+        run: |
+          $ErrorActionPreference = 'Stop'
+          . "crates\ffi\src\platforms\windows\Scripts\build_adapter.ps1"
+          RustBuild
+
+      # msbuild and sn are not on PATH until vcvars runs, as in core-libs on
+      # the same image. Export what it changes so the next steps see it,
+      # except Platform: msbuild would take its x86 as the default platform.
+      - name: Load Visual Studio environment
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $before = @{}
+          Get-ChildItem Env: | ForEach-Object { $before[$_.Name] = $_.Value }
+          $vcvars = cmd /c "vcvarsamd64_x86 && set"
+          if ($LASTEXITCODE -ne 0) { throw 'vcvarsamd64_x86 failed' }
+          foreach ($line in $vcvars) {
+            if ($line -match '^([^=]+)=(.*)$' -and $Matches[1] -ne 'Platform' -and $before[$Matches[1]] -ne $Matches[2]) {
+              "$($Matches[1])=$($Matches[2])" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            }
+          }
+
+      # The assembly is delay-signed; skipping verification lets the tests
+      # load it on this VM. The strong-name job signs it for real.
+      - name: Build .NET adapter
+        working-directory: crates/ffi/src/platforms/windows
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $env:NUGET_PACKAGES = "${pwd}\packages"
+          & nuget restore AdGuard.FilterListManager.sln `
+            -Source "${{ vars.NUGET_REPO_URL }}"
+          if (!$?) { exit 1 }
+          # sn on PATH is the x64 one and registers the skip for 64-bit
+          # processes only; the x86 tests need the 32-bit registration too.
+          & sn -Vr *
+          if (!$?) { exit 1 }
+          & "$env:WindowsSDK_ExecutablePath_x86\sn.exe" -Vr *
+          if (!$?) { exit 1 }
+          # The solution names the platform "Any CPU"; projects call it AnyCPU.
+          & msbuild AdGuard.FilterListManager.sln `
+            /t:Build /p:Configuration=Release "/p:Platform=Any CPU"
+          if (!$?) { exit 1 }
+
+      # VSTest finds no tests in this project ("No test is available") and
+      # still exits 0, so run NUnit's own console, as Bamboo and the Windows
+      # team's test-dotnet.yml do, and fail if nothing ran. Bamboo ran them in
+      # a 32-bit process, which loads the x86 native DLL; run both bitnesses.
+      - name: Run tests
+        working-directory: crates/ffi/src/platforms/windows
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tools = "$env:RUNNER_TEMP\nunit"
+          & nuget install NUnit.ConsoleRunner -Version 3.12.0 -OutputDirectory $tools `
+            -Source "${{ vars.NUGET_REPO_URL }}"
+          if (!$?) { exit 1 }
+          $nunit = (Get-ChildItem $tools -Recurse -Filter nunit3-console.exe | Select-Object -First 1).FullName
+          $failed = @()
+          foreach ($arch in 'x86', 'x64') {
+            $bitness = if ($arch -eq 'x86') { @('--x86') } else { @() }
+            & $nunit build\bin\Release\AdGuard.FilterListManager.Test.dll @bitness `
+              "--result=build\TestResults-$arch.xml" `
+              "--result=build\junit-$arch.xml;transform=Scripts\nunit3-junit.xslt"
+            if ($LASTEXITCODE -ne 0) { $failed += "$arch (exit code $LASTEXITCODE)"; continue }
+            [xml]$result = Get-Content "build\TestResults-$arch.xml"
+            $total = [int]$result.'test-run'.total
+            if ($total -eq 0) { $failed += "$arch (no tests ran)"; continue }
+            Write-Host "${arch}: $total tests passed"
+          }
+          if ($failed) { throw "Tests failed: $($failed -join ', ')" }
+
+      - name: Test summary
+        if: ${{ !cancelled() && hashFiles('crates/ffi/src/platforms/windows/build/junit-*.xml') != '' }}
+        uses: AdGuardSoftwareLimited/actions/actions/junit-summary@master
+        with:
+          path: crates/ffi/src/platforms/windows/build/junit-*.xml
+
+      # The DLLs to sign go in their own artifact, rooted at the build
+      # output; the rest of what the nuspec packs is rooted at the platform
+      # directory. The pack job downloads each back where it came from.
+      - name: Upload DLLs to sign
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-unsigned
+          path: |
+            crates/ffi/src/platforms/windows/build/bin/Release/AdGuard.FilterListManager.dll
+            crates/ffi/src/platforms/windows/build/bin/Release/*/AdGuardFLM.dll
+          if-no-files-found: error
+
+      - name: Upload other package files
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-build
+          path: |
+            crates/ffi/src/platforms/windows/build/bin/Release/AdGuard.FilterListManager.pdb
+            crates/ffi/src/platforms/windows/build/bin/Release/AdGuard.FilterListManager.xml
+            crates/ffi/src/platforms/windows/build/bin/Release/*/AdGuardFLM.pdb
+            crates/ffi/src/platforms/windows/AdGuard.FilterListManager/metadata.json
+          if-no-files-found: error
+
+  # Strong name first: re-signing rewrites the file and would break an
+  # Authenticode signature applied before it.
+  strong-name:
+    needs: build
+    if: inputs.sign
+    permissions:
+      contents: read
+      id-token: write
+    uses: AdGuardSoftwareLimited/actions/.github/workflows/sign-strong-name.yml@master
+    with:
+      team: corelibs
+      artifact-name: windows-unsigned
+      signed-artifact-name: windows-sn
+
+  authenticode:
+    needs: strong-name
+    permissions:
+      contents: read
+      id-token: write
+    uses: AdGuardSoftwareLimited/actions/.github/workflows/sign-by-signer.yml@master
+    with:
+      team: corelibs
+      artifact-name: windows-sn
+      signed-artifact-name: windows-signed
+
+  pack:
+    name: Pack NuGet package
+    needs: [build, authenticode]
+    # The signing jobs are skipped when sign is false; a dependent job
+    # without its own condition would be skipped with them.
+    if: ${{ !cancelled() && needs.build.result == 'success' && (!inputs.sign || needs.authenticode.result == 'success') }}
+    runs-on:
+      - ephemeral
+      - ephemeral-vmwin
+      - ${{ inputs.windows-runner }}
+      - ephemeral-limit-memory-2048
+      - ephemeral-limit-cpu-2
+      - ephemeral-job-key-${{ github.run_id }}-${{ github.job }}-${{ strategy.job-index || 0 }}
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Download package files
+        uses: actions/download-artifact@v8
+        with:
+          name: windows-build
+          path: crates/ffi/src/platforms/windows
+
+      - name: Download DLLs
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ inputs.sign && 'windows-signed' || 'windows-unsigned' }}
+          path: crates/ffi/src/platforms/windows/build/bin/Release
+
+      # The nuspec carries a placeholder version and takes the Adguard.Utils
+      # dependency versions as properties, so both come from the build: the
+      # release version and the csproj package references.
+      - name: Pack NuGet package
+        working-directory: crates/ffi/src/platforms/windows/AdGuard.FilterListManager
+        env:
+          FLM_VERSION: ${{ inputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          [xml]$project = Get-Content AdGuard.FilterListManager.csproj
+          $references = $project.Project.ItemGroup.PackageReference
+          $properties = foreach ($id in 'Adguard.Utils.Base', 'Adguard.Utils') {
+            $version = ($references | Where-Object { $_.Include -eq $id }).Version
+            if (-not $version) { throw "No PackageReference to $id in AdGuard.FilterListManager.csproj" }
+            ($id -replace '\.', '') + "Version=$version"
+          }
+          & nuget pack AdGuard.FilterListManager.nuspec `
+            -Version $env:FLM_VERSION `
+            -Properties ($properties -join ';') `
+            -OutputDirectory "$env:RUNNER_TEMP\nupkg"
+          if (!$?) { exit 1 }
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-nupkg
+          path: ${{ runner.temp }}/nupkg/*.nupkg
+          if-no-files-found: error

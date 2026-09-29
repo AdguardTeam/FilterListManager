@@ -108,10 +108,12 @@ crates/
 
 ## Versioning
 
-- Crates `adguard-flm` and `adguard-flm-ffi` are versioned separately.
-- Tags: `flm-${version}` for core, `ffi-${version}` for FFI.
-- CI auto-increments patch versions on merge to master.
-- See `CONTRIBUTING.md` for details.
+- Crates `adguard-flm` and `adguard-flm-ffi` share one version, and
+  `CHANGELOG.md` is the only place that holds it. Tags are `v${version}`.
+- Do not add a version to any manifest: builds read `FLM_VERSION`, else
+  `git describe` over `v*` tags, else `0.0.0`.
+- Releases go through the `Prepare release` and `Publish release` workflows;
+  see `CONTRIBUTING.md` for details.
 
 ## Critical Rules for Agents
 
