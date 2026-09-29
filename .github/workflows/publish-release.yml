@@ -37,13 +37,19 @@ jobs:
           build-args: |
             VERSION=${{ needs.tag.outputs.version }}
           content: |
-            FROM registry.int.agrd.dev/library/rust:1 AS build
+            FROM registry.int.agrd.dev/library/rust:2 AS build
             ARG VERSION
             COPY . /src
             WORKDIR /src
-            RUN cargo ws version exact "${VERSION}" --force --no-git-commit --no-git-tag --yes \
-             && cargo package -p adguard-flm --allow-dirty \
-             && cargo package -p adguard-flm-ffi --allow-dirty \
+            # The manifests carry no version, so set-version writes one in. The
+            # path dependency needs a version too before it can be packaged; the
+            # grep fails the build if the sed did not match the manifest.
+            # Packaging both crates in one call lets the ffi crate resolve
+            # adguard-flm locally, before it exists on crates.io.
+            RUN cargo set-version --workspace "${VERSION}" \
+             && sed -i -E "s|^(adguard-flm = \{ path = \"\.\./filter-list-manager\")|\1, version = \"=${VERSION}\"|" crates/ffi/Cargo.toml \
+             && grep -q "^adguard-flm = .*version = \"=${VERSION}\"" crates/ffi/Cargo.toml \
+             && cargo package -p adguard-flm -p adguard-flm-ffi --allow-dirty \
              && mkdir /out && cp target/package/*.crate /out/
             FROM scratch
             COPY --from=build /out/ /
