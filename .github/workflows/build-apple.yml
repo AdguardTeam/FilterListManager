@@ -44,32 +44,71 @@ jobs:
       - name: Build xcframework
         run: ./crates/ffi/src/platforms/apple/Scripts/build.sh
 
-      - name: Archive xcframework
+      # Stage the payloads under the paths the deploys publish verbatim:
+      # apple-bin gets adguard-flm/<version>/AdGuardFLM-<version>.zip, and
+      # swift-pkgs gets adguard/flm/<version>.zip. The registry package takes
+      # the binary from Artifact Keeper by URL and checksum; the Package.swift
+      # in the repository points at a local build instead.
+      - name: Prepare AK deploy payloads
+        env:
+          VERSION: ${{ inputs.version }}
+          AK_BASE: ${{ vars.ARTIFACT_KEEPER_URL }}
         run: |
           set -euo pipefail
-          cd crates/ffi/src/platforms/apple/build/framework
-          zip -4yr "AdGuardFLM-${{ inputs.version }}.zip" AdGuardFLM.xcframework
+          if [[ -z "$AK_BASE" ]]; then
+            echo "Error: vars.ARTIFACT_KEEPER_URL is empty" >&2
+            exit 1
+          fi
+          apple_dir="$PWD/crates/ffi/src/platforms/apple"
+          xcf_dir="$PWD/apple-deploy/apple-xcframework/adguard-flm/$VERSION"
+          spm_dir="$PWD/apple-deploy/apple-swiftpm/adguard/flm"
+          pkg_dir="$RUNNER_TEMP/swiftpm/AdGuardFLM"
+          mkdir -p "$xcf_dir" "$spm_dir" "$pkg_dir"
 
-      - name: Prepare AK deploy payloads
-        run: |
-          bash crates/ffi/src/platforms/apple/Scripts/prepare_ak_payload.sh \
-            "${{ inputs.version }}" \
-            "crates/ffi/src/platforms/apple/build/framework/AdGuardFLM-${{ inputs.version }}.zip" \
-            "${{ vars.ARTIFACT_KEEPER_URL }}" \
-            "$GITHUB_WORKSPACE/apple-deploy"
+          xcf_zip="$xcf_dir/AdGuardFLM-$VERSION.zip"
+          (cd "$apple_dir/build/framework" && zip -4yqr "$xcf_zip" AdGuardFLM.xcframework)
+          checksum="$(shasum -a 256 "$xcf_zip" | awk '{print $1}')"
+          url="$AK_BASE/api/v1/repositories/apple-bin-virtual/download/adguard-flm/$VERSION/AdGuardFLM-$VERSION.zip"
+
+          cp -r "$apple_dir/AdGuardFLM/Sources" "$pkg_dir/"
+          cat > "$pkg_dir/Package.swift" <<EOF
+          // swift-tools-version: 5.4
+          import PackageDescription
+
+          let package = Package(
+              name: "AdGuardFLM",
+              platforms: [
+                  .iOS("11.2"), .macOS("10.15")
+              ],
+              products: [
+                  .library(name: "AdGuardFLMLib", targets: ["AdGuardFLMLib"])
+              ],
+              dependencies: [
+                  .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.28.2")
+              ],
+              targets: [
+                  .target(
+                      name: "AdGuardFLMLib",
+                      dependencies: [
+                          .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+                          .target(name: "AdGuardFLM")
+                      ]
+                  ),
+                  .binaryTarget(
+                      name: "AdGuardFLM",
+                      url: "$url",
+                      checksum: "$checksum"
+                  ),
+              ]
+          )
+          EOF
+          (cd "$RUNNER_TEMP/swiftpm" && zip -4qr "$spm_dir/$VERSION.zip" AdGuardFLM)
 
       - name: Upload xcframework artifact
         uses: actions/upload-artifact@v7
         with:
           name: apple-xcframework
           path: apple-deploy/apple-xcframework
-          if-no-files-found: error
-
-      - name: Upload podspec artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: apple-podspec
-          path: apple-deploy/apple-podspec
           if-no-files-found: error
 
       - name: Upload SwiftPM artifact

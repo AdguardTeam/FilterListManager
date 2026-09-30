@@ -103,10 +103,14 @@ jobs:
           $nunit = (Get-ChildItem $tools -Recurse -Filter nunit3-console.exe | Select-Object -First 1).FullName
           $failed = @()
           foreach ($arch in 'x86', 'x64') {
-            $bitness = if ($arch -eq 'x86') { @('--x86') } else { @() }
-            & $nunit build\bin\Release\AdGuard.FilterListManager.Test.dll @bitness `
-              "--result=build\TestResults-$arch.xml" `
-              "--result=build\junit-$arch.xml;transform=Scripts\nunit3-junit.xslt"
+            # Build the list in place: assigning the output of an if turns a
+            # one-element array into a string, which splatting then passes
+            # character by character.
+            $nunitArgs = @('build\bin\Release\AdGuard.FilterListManager.Test.dll')
+            if ($arch -eq 'x86') { $nunitArgs += '--x86' }
+            $nunitArgs += "--result=build\TestResults-$arch.xml"
+            $nunitArgs += "--result=build\junit-$arch.xml;transform=Scripts\nunit3-junit.xslt"
+            & $nunit @nunitArgs
             if ($LASTEXITCODE -ne 0) { $failed += "$arch (exit code $LASTEXITCODE)"; continue }
             [xml]$result = Get-Content "build\TestResults-$arch.xml"
             $total = [int]$result.'test-run'.total

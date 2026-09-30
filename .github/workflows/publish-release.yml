@@ -137,16 +137,6 @@ jobs:
       ak-repo: apple-bin
     secrets: inherit
 
-  apple-deploy-podspec:
-    name: Deploy Apple podspec
-    needs: apple-deploy-xcframework
-    uses: AdGuardSoftwareLimited/actions/.github/workflows/deploy-to-ak-generic.yml@master
-    with:
-      team: corelibs
-      artifact-pattern: apple-podspec
-      ak-repo: pods
-    secrets: inherit
-
   apple-deploy-swiftpm:
     name: Deploy Apple SwiftPM
     needs: apple-deploy-xcframework
@@ -231,7 +221,7 @@ jobs:
   # ── Mirror and GitHub Release ─────────────────────────────────
 
   mirror-and-release:
-    needs: [tag, cargo-deploy, apple-deploy-podspec, apple-deploy-swiftpm, kmp-deploy, windows-deploy]
+    needs: [tag, cargo-deploy, apple-deploy-swiftpm, kmp-deploy, windows-deploy]
     uses: AdGuardSoftwareLimited/actions/.github/workflows/mirror-and-release.yml@master
     with:
       team: corelibs
